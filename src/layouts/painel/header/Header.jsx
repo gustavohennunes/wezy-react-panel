@@ -2,11 +2,11 @@ import { KeenIcon } from '@/components';
 import { Container } from '@/components/container';
 import { toAbsoluteUrl } from '@/utils';
 import { Link } from 'react-router-dom';
-import { useDemo6Layout } from '../';
+import { usePanelLayout } from '../';
 const Header = () => {
   const {
     setMobileSidebarOpen
-  } = useDemo6Layout();
+  } = usePanelLayout();
   const handleMobileSidebarOpen = () => {
     setMobileSidebarOpen(true);
   };

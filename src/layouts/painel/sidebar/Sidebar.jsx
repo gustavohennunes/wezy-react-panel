@@ -1,7 +1,7 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 import { useEffect, useRef, useState } from 'react';
 import { useResponsive, useViewport } from '@/hooks';
-import { useDemo6Layout } from '../';
+import { usePanelLayout } from '../';
 import { SidebarHeader, SidebarMenu, SidebarFooter } from './';
 import { getHeight } from '@/utils';
 import { usePathname } from '@/providers';
@@ -18,7 +18,7 @@ const Sidebar = () => {
   const {
     mobileSidebarOpen,
     setMobileSidebarOpen
-  } = useDemo6Layout();
+  } = usePanelLayout();
   const [scrollableHeight, setScrollableHeight] = useState(0);
   const scrollableOffset = 50;
   const handleMobileSidebarClose = () => {

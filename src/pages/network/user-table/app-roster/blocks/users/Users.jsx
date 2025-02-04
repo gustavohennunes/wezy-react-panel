@@ -178,7 +178,7 @@ const Users = () => {
           <div className="flex">
             <label className="input input-sm">
               <KeenIcon icon="magnifier" />
-              <input type="text" placeholder="Search users" value={searchInput} onChange={e => setSearchInput(e.target.value)} />
+              <input type="text" placeholder="Pesquisar" value={searchInput} onChange={e => setSearchInput(e.target.value)} />
             </label>
           </div>
 
@@ -213,7 +213,7 @@ const Users = () => {
       </div>;
   };
   return <DataGrid columns={columns} data={data} rowSelection={true} onRowSelectionChange={handleRowSelection} pagination={{
-    size: 5
+    size: 10
   }} sorting={[{
     id: 'phone',
     desc: false

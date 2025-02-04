@@ -1,3 +1,4 @@
+import { useState, useEffect } from 'react';
 import { Navigate, Route, Routes } from 'react-router';
 import { DefaultPage, Demo1DarkSidebarPage } from '@/pages/dashboards';
 import { ProfileActivityPage, ProfileBloggerPage, CampaignsCardPage, CampaignsListPage, ProjectColumn2Page, ProjectColumn3Page, ProfileCompanyPage, ProfileCreatorPage, ProfileCRMPage, ProfileDefaultPage, ProfileEmptyPage, ProfileFeedsPage, ProfileGamerPage, ProfileModalPage, ProfileNetworkPage, ProfileNFTPage, ProfilePlainPage, ProfileTeamsPage, ProfileWorksPage } from '@/pages/public-profile';
@@ -5,14 +6,25 @@ import { AccountActivityPage, AccountAllowedIPAddressesPage, AccountApiKeysPage,
 import { NetworkAppRosterPage, NetworkMarketAuthorsPage, NetworkAuthorPage, NetworkGetStartedPage, NetworkMiniCardsPage, NetworkNFTPage, NetworkSocialPage, NetworkUserCardsTeamCrewPage, NetworkSaasUsersPage, NetworkStoreClientsPage, NetworkUserTableTeamCrewPage, NetworkVisitorsPage } from '@/pages/network';
 import { AuthPage } from '@/auth';
 import { RequireAuth } from '@/auth/RequireAuth';
-import { Demo6Layout } from '@/layouts/demo6';
 import { Demo2Layout } from '@/layouts/demo2';
+import { PanelLayout } from '@/layouts/painel';
 import { ErrorsRouting } from '@/errors';
 import { AuthenticationWelcomeMessagePage, AuthenticationAccountDeactivatedPage, AuthenticationGetStartedPage } from '@/pages/authentication';
 const AppRoutingSetup = () => {
+  const [layout, setLayout] = useState(null);
+
+  useEffect(() => {
+    const layoutConfig = 'demo6';
+    setLayout(layoutConfig);
+  }, []);
+
+  if (!layout) {
+    return <div>Loading...</div>;
+  }
+
   return <Routes>
       <Route element={<RequireAuth />}>
-        <Route element={<Demo6Layout />}>
+        <Route element={layout === 'demo6' ? <PanelLayout /> : <Demo2Layout />}>
           <Route path="/" element={<DefaultPage />} />
           <Route path="/dark-sidebar" element={<Demo1DarkSidebarPage />} />
           <Route path="/public-profile/profiles/default" element={<ProfileDefaultPage />} />

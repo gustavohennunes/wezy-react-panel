@@ -1,5 +1,5 @@
 import { useLayout } from '@/providers';
-import { Demo1LightSidebarPage, Demo2Page, Demo3Page, Demo4Page, Demo5Page } from '../';
+import { Demo1LightSidebarPage, Demo2Page, Demo3Page, Demo4Page, Demo5Page, PanelPage } from '../';
 const DefaultPage = () => {
   const {
     currentLayout
@@ -24,6 +24,8 @@ const DefaultPage = () => {
     return <Demo2Page />;
   } else if (currentLayout?.name === 'demo10-layout') {
     return <Demo3Page />;
+  } else if (currentLayout?.name === 'panel-layout') {
+    return <PanelPage />;
   }
 };
 export { DefaultPage };

@@ -1,25 +1,19 @@
+/* eslint-disable no-unused-vars */
 import React, { forwardRef, useEffect, useState } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { toAbsoluteUrl } from '@/utils';
-import { Menu, MenuArrow, MenuIcon, MenuItem, MenuLabel, MenuLink, MenuSub, MenuTitle } from '@/components/menu';
-import { MENU_ROOT } from '@/config';
+import { Menu, MenuItem, MenuLabel } from '@/components/menu';
 import { KeenIcon } from '@/components';
 import { useLanguage } from '@/i18n';
 const SidebarHeader = forwardRef((props, ref) => {
   const {
     pathname
   } = useLocation();
-  const [selectedMenuItem, setSelectedMenuItem] = useState(MENU_ROOT[1]);
   const {
     isRTL
   } = useLanguage();
   const handleInputChange = () => {};
   useEffect(() => {
-    MENU_ROOT.forEach(item => {
-      if (item.rootPath && pathname.includes(item.rootPath)) {
-        setSelectedMenuItem(item);
-      }
-    });
   }, [pathname]);
   return <div ref={ref}>
       <div className="flex items-center gap-2.5 px-3.5 h-[70px]">
@@ -38,24 +32,11 @@ const SidebarHeader = forwardRef((props, ref) => {
             }
           }]
         }}>
-            <MenuLabel className="cursor-pointer text-gray-900 font-medium grow justify-between">
+            <MenuLabel className="text-gray-900 font-medium grow justify-between">
               <span className="text-base font-medium text-gray-900 grow justify-start">
-                MetronicCloud
+                Wezy
               </span>
-              <MenuArrow>
-                <KeenIcon icon="down" />
-              </MenuArrow>
             </MenuLabel>
-            <MenuSub className="menu-default w-48 py-2">
-              {MENU_ROOT.map((item, index) => <MenuItem key={index} className={item === selectedMenuItem ? 'active' : ''}>
-                  <MenuLink path={item.path}>
-                    {item.icon && <MenuIcon>
-                        <KeenIcon icon={item.icon} />
-                      </MenuIcon>}
-                    <MenuTitle>{item.title}</MenuTitle>
-                  </MenuLink>
-                </MenuItem>)}
-            </MenuSub>
           </MenuItem>
         </Menu>
       </div>

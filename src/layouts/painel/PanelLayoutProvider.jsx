@@ -1,15 +1,15 @@
 import { createContext, useContext, useEffect, useState } from 'react';
-import { MENU_SIDEBAR } from '@/config';
+import { MENU_SIDEBAR } from '@/config/panel.config';
 import { useMenus } from '@/providers';
 import { useLayout } from '@/providers';
 import { deepMerge } from '@/utils';
-import { Demo6LayoutConfig } from '.';
+import { PanelLayoutConfig } from '.';
 
 // Interface defining the properties of the layout provider context
 
-// Initial layout provider properties, using Demo6 layout configuration as the default
+// Initial layout provider properties, using Panel layout configuration as the default
 const initalLayoutProps = {
-  layout: Demo6LayoutConfig,
+  layout: PanelLayoutConfig,
   // Default layout configuration
   mobileSidebarOpen: false,
   // Mobile sidebar is closed by default
@@ -18,14 +18,14 @@ const initalLayoutProps = {
   }
 };
 
-// Create a context to manage the layout-related state and logic for Demo6 layout
-const Demo6LayoutContext = createContext(initalLayoutProps);
+// Create a context to manage the layout-related state and logic for Panel layout
+const PanelLayoutContext = createContext(initalLayoutProps);
 
 // Custom hook to access the layout context in other components
-const useDemo6Layout = () => useContext(Demo6LayoutContext);
+const usePanelLayout = () => useContext(PanelLayoutContext);
 
-// Provider component that sets up the layout state and context for Demo6 layout
-const Demo6LayoutProvider = ({
+// Provider component that sets up the layout state and context for Panel layout
+const PanelLayoutProvider = ({
   children
 }) => {
   const {
@@ -36,8 +36,8 @@ const Demo6LayoutProvider = ({
     setCurrentLayout
   } = useLayout(); // Hook to get and set layout configuration
 
-  // Merge the Demo6 layout configuration with the current layout configuration fetched via getLayout
-  const layoutConfig = deepMerge(Demo6LayoutConfig, getLayout(Demo6LayoutConfig.name));
+  // Merge the Panel layout configuration with the current layout configuration fetched via getLayout
+  const layoutConfig = deepMerge(PanelLayoutConfig, getLayout(PanelLayoutConfig.name));
 
   // Set the initial state for layout and mobile sidebar
   const [layout] = useState(layoutConfig); // Layout configuration is stored in state
@@ -52,7 +52,7 @@ const Demo6LayoutProvider = ({
   }, [layout, setCurrentLayout]); // Re-run this effect if layout or setCurrentLayout changes
 
   // Provide the layout state, sticky header state, and sidebar state to children components via context
-  return <Demo6LayoutContext.Provider value={{
+  return <PanelLayoutContext.Provider value={{
     layout,
     // The current layout configuration
     mobileSidebarOpen,
@@ -60,8 +60,8 @@ const Demo6LayoutProvider = ({
     setMobileSidebarOpen // Function to toggle the mobile sidebar state
   }}>
       {children} {/* Render child components that consume this context */}
-    </Demo6LayoutContext.Provider>;
+    </PanelLayoutContext.Provider>;
 };
 
 // eslint-disable-next-line react-refresh/only-export-components
-export { Demo6LayoutProvider, useDemo6Layout };
+export { PanelLayoutProvider, usePanelLayout };

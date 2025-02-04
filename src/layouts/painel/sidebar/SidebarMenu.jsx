@@ -1,4 +1,4 @@
-import { SidebarMenuPrimary, SidebarMenuSecondary } from './';
+import { SidebarMenuPrimary } from './';
 const SidebarMenu = ({
   height = 0
 }) => {
@@ -9,8 +9,6 @@ const SidebarMenu = ({
       })
     }}>
         <SidebarMenuPrimary />
-        <div className="border-b border-gray-300 mt-4 mb-1 mx-3.5"></div>
-        <SidebarMenuSecondary />
       </div>
     </div>;
 };

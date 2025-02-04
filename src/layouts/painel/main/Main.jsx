@@ -40,26 +40,6 @@ const Main = () => {
               <main className="grow" role="content">
                 <Toolbar>
                   <ToolbarHeading />
-
-                  <ToolbarActions>
-                    <Link to={'/account/home/get-started'} className="btn btn-sm btn-light">
-                      <KeenIcon icon="exit-down !text-base" />
-                      Export
-                    </Link>
-                    <Popover>
-                      <PopoverTrigger asChild>
-                        <button id="date" className={cn('btn btn-sm btn-light data-[state=open]:bg-light-active', !date && 'text-gray-400')}>
-                          <KeenIcon icon="calendar" className="me-0.5" />
-                          {date?.from ? date.to ? <>
-                                {format(date.from, 'LLL dd, y')} - {format(date.to, 'LLL dd, y')}
-                              </> : format(date.from, 'LLL dd, y') : <span>Pick a date range</span>}
-                        </button>
-                      </PopoverTrigger>
-                      <PopoverContent className="w-auto p-0" align="end">
-                        <Calendar initialFocus mode="range" defaultMonth={date?.from} selected={date} onSelect={setDate} numberOfMonths={2} />
-                      </PopoverContent>
-                    </Popover>
-                  </ToolbarActions>
                 </Toolbar>
                 <Outlet />
               </main>

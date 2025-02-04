@@ -1,5 +1,5 @@
-import useBodyClasses from '@/hooks/useBodyClasses';
-import { PanelLayoutProvider, Main } from './';
+import useBodyClasses from "@/hooks/useBodyClasses";
+import { PanelLayoutProvider, Main } from "./";
 const PanelLayout = () => {
   useBodyClasses(`
     [--tw-page-bg:#F6F6F9]

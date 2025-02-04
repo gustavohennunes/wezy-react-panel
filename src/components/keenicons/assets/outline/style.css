@@ -1,9 +1,9 @@
 @font-face {
-  font-family: 'keenicons-outline';
+  font-family: "keenicons-outline";
   src:
-    url('fonts/keenicons-outline.ttf?3m7u3e') format('truetype'),
-    url('fonts/keenicons-outline.woff?3m7u3e') format('woff'),
-    url('fonts/keenicons-outline.svg?3m7u3e#keenicons-outline') format('svg');
+    url("fonts/keenicons-outline.ttf?3m7u3e") format("truetype"),
+    url("fonts/keenicons-outline.woff?3m7u3e") format("woff"),
+    url("fonts/keenicons-outline.svg?3m7u3e#keenicons-outline") format("svg");
   font-weight: normal;
   font-style: normal;
   font-display: block;
@@ -11,7 +11,7 @@
 
 .ki-outline {
   /* use !important to prevent issues with browser extensions that change fonts */
-  font-family: 'keenicons-outline' !important;
+  font-family: "keenicons-outline" !important;
   speak: never;
   font-style: normal;
   font-weight: normal;

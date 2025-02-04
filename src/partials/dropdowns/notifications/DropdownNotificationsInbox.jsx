@@ -1,7 +1,14 @@
-import { useEffect, useRef, useState } from 'react';
-import { getHeight } from '@/utils';
-import { useViewport } from '@/hooks';
-import { DropdownNotificationsItem10, DropdownNotificationsItem11, DropdownNotificationsItem12, DropdownNotificationsItem13, DropdownNotificationsItem3, DropdownNotificationsItem5 } from './items';
+import { useEffect, useRef, useState } from "react";
+import { getHeight } from "@/utils";
+import { useViewport } from "@/hooks";
+import {
+  DropdownNotificationsItem10,
+  DropdownNotificationsItem11,
+  DropdownNotificationsItem12,
+  DropdownNotificationsItem13,
+  DropdownNotificationsItem3,
+  DropdownNotificationsItem5,
+} from "./items";
 const DropdownNotificationsInbox = () => {
   const footerRef = useRef(null);
   const [listHeight, setListHeight] = useState(0);
@@ -15,7 +22,8 @@ const DropdownNotificationsInbox = () => {
     }
   }, [viewportHeight]);
   const buildList = () => {
-    return <div className="flex flex-col gap-5 pt-3 pb-4 divider-y divider-gray-200">
+    return (
+      <div className="flex flex-col gap-5 pt-3 pb-4 divider-y divider-gray-200">
         <DropdownNotificationsItem10 />
 
         <div className="border-b border-b-gray-200"></div>
@@ -32,31 +40,61 @@ const DropdownNotificationsInbox = () => {
 
         <div className="border-b border-b-gray-200"></div>
 
-        <DropdownNotificationsItem3 userName="Benjamin Harris" avatar="300-30.png" badgeColor="bg-gray-400" description="requested to upgrade plan" link="" day="" date="4 days ago" info="Marketing" />
+        <DropdownNotificationsItem3
+          userName="Benjamin Harris"
+          avatar="300-30.png"
+          badgeColor="bg-gray-400"
+          description="requested to upgrade plan"
+          link=""
+          day=""
+          date="4 days ago"
+          info="Marketing"
+        />
 
         <div className="border-b border-b-gray-200"></div>
 
-        <DropdownNotificationsItem5 userName="Isaac Morgan" avatar="300-24.png" badgeColor="badge-success" description="mentioned you in" link="Data Transmission" day="topic" date="6 days ago" info="Dev Team" />
+        <DropdownNotificationsItem5
+          userName="Isaac Morgan"
+          avatar="300-24.png"
+          badgeColor="badge-success"
+          description="mentioned you in"
+          link="Data Transmission"
+          day="topic"
+          date="6 days ago"
+          info="Dev Team"
+        />
 
         <div className="border-b border-b-gray-200"></div>
-      </div>;
+      </div>
+    );
   };
   const buildFooter = () => {
-    return <>
+    return (
+      <>
         <div className="border-b border-b-gray-200"></div>
         <div className="grid grid-cols-2 p-5 gap-2.5">
-          <button className="btn btn-sm btn-light justify-center">Archive all</button>
-          <button className="btn btn-sm btn-light justify-center">Mark all as read</button>
+          <button className="btn btn-sm btn-light justify-center">
+            Archive all
+          </button>
+          <button className="btn btn-sm btn-light justify-center">
+            Mark all as read
+          </button>
         </div>
-      </>;
+      </>
+    );
   };
-  return <div className="grow">
-      <div className="scrollable-y-auto" style={{
-      maxHeight: `${listHeight}px`
-    }}>
+  return (
+    <div className="grow">
+      <div
+        className="scrollable-y-auto"
+        style={{
+          maxHeight: `${listHeight}px`,
+        }}
+      >
         {buildList()}
       </div>
       <div ref={footerRef}>{buildFooter()}</div>
-    </div>;
+    </div>
+  );
 };
 export { DropdownNotificationsInbox };

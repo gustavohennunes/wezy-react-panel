@@ -1,124 +1,187 @@
 /* eslint-disable prettier/prettier */
-import { useMemo } from 'react';
-import { toAbsoluteUrl } from '@/utils';
-import { DataGrid, DataGridColumnHeader, DataGridColumnVisibility, DataGridRowSelect, DataGridRowSelectAll, KeenIcon, useDataGrid } from '@/components';
-import { toast } from 'sonner';
-import { Input } from '@/components/ui/input';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { CurrentSessionsData } from '.';
+import { useMemo } from "react";
+import { toAbsoluteUrl } from "@/utils";
+import {
+  DataGrid,
+  DataGridColumnHeader,
+  DataGridColumnVisibility,
+  DataGridRowSelect,
+  DataGridRowSelectAll,
+  KeenIcon,
+  useDataGrid,
+} from "@/components";
+import { toast } from "sonner";
+import { Input } from "@/components/ui/input";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { CurrentSessionsData } from ".";
 const CurrentSessions = () => {
-  const ColumnInputFilter = ({
-    column
-  }) => {
-    return <Input placeholder="Filter..." value={column.getFilterValue() ?? ''} onChange={event => column.setFilterValue(event.target.value)} className="h-9 w-full max-w-40" />;
+  const ColumnInputFilter = ({ column }) => {
+    return (
+      <Input
+        placeholder="Filter..."
+        value={column.getFilterValue() ?? ""}
+        onChange={(event) => column.setFilterValue(event.target.value)}
+        className="h-9 w-full max-w-40"
+      />
+    );
   };
-  const columns = useMemo(() => [{
-    accessorKey: 'id',
-    header: () => <DataGridRowSelectAll />,
-    cell: ({
-      row
-    }) => <DataGridRowSelect row={row} />,
-    enableSorting: false,
-    enableHiding: false,
-    meta: {
-      headerClassName: 'w-0'
-    }
-  }, {
-    accessorFn: row => row.user,
-    id: 'user',
-    header: ({
-      column
-    }) => <DataGridColumnHeader title='Person' filter={<ColumnInputFilter column={column} />} column={column} />,
-    enableSorting: true,
-    cell: info => <div className="flex items-center gap-2.5">
+  const columns = useMemo(
+    () => [
+      {
+        accessorKey: "id",
+        header: () => <DataGridRowSelectAll />,
+        cell: ({ row }) => <DataGridRowSelect row={row} />,
+        enableSorting: false,
+        enableHiding: false,
+        meta: {
+          headerClassName: "w-0",
+        },
+      },
+      {
+        accessorFn: (row) => row.user,
+        id: "user",
+        header: ({ column }) => (
+          <DataGridColumnHeader
+            title="Person"
+            filter={<ColumnInputFilter column={column} />}
+            column={column}
+          />
+        ),
+        enableSorting: true,
+        cell: (info) => (
+          <div className="flex items-center gap-2.5">
             <div className="shrink-0">
-              <img src={toAbsoluteUrl(`/media/avatars/${info.row.original.user.avatar}`)} className="h-9 rounded-full" alt="" />
+              <img
+                src={toAbsoluteUrl(
+                  `/media/avatars/${info.row.original.user.avatar}`,
+                )}
+                className="h-9 rounded-full"
+                alt=""
+              />
             </div>
-            <a className="leading-none font-semibold text-gray-900 hover:text-primary" href="#">
+            <a
+              className="leading-none font-semibold text-gray-900 hover:text-primary"
+              href="#"
+            >
               {info.row.original.user.name}
             </a>
-          </div>,
-    meta: {
-      headerClassName: 'min-w-[300px]'
-    }
-  }, {
-    accessorFn: row => row.browser,
-    id: 'browser',
-    header: ({
-      column
-    }) => <DataGridColumnHeader title='Browser' column={column} />,
-    enableSorting: true,
-    cell: info => <div className="flex items-center gap-2">
-            <KeenIcon icon={info.row.original.browser.icon} className='text-gray-700 text-lg' />
-            <span className="text-gray-700">{info.row.original.browser.name}</span>
-          </div>,
-    meta: {
-      headerClassName: 'min-w-[240px]'
-    }
-  }, {
-    accessorFn: row => row.ipAddress,
-    id: 'ipAddress',
-    header: ({
-      column
-    }) => <DataGridColumnHeader title='IP Address' column={column} />,
-    enableSorting: true,
-    cell: info => info.getValue(),
-    meta: {
-      headerTitle: 'IP Address',
-      headerClassName: 'w-[240px]'
-    }
-  }, {
-    accessorFn: row => row.location,
-    id: 'location',
-    header: ({
-      column
-    }) => <DataGridColumnHeader title='Location' column={column} />,
-    enableSorting: true,
-    cell: info => <div className="flex items-center gap-1.5">
-            <img src={toAbsoluteUrl(`/media/flags/${info.row.original.location.flag}`)} className="h-4 rounded-full" alt="" />
-            <span className="leading-none text-gray-700">{info.row.original.location.name}</span>
-          </div>,
-    meta: {
-      headerClassName: 'w-[200px]'
-    }
-  }, {
-    id: 'click',
-    header: () => '',
-    enableSorting: false,
-    cell: ({
-      row
-    }) => <button className="btn btn-icon btn-light btn-clear btn-sm" onClick={() => alert(`Clicked on action button for row ${row.original.user.name}`)}>
+          </div>
+        ),
+        meta: {
+          headerClassName: "min-w-[300px]",
+        },
+      },
+      {
+        accessorFn: (row) => row.browser,
+        id: "browser",
+        header: ({ column }) => (
+          <DataGridColumnHeader title="Browser" column={column} />
+        ),
+        enableSorting: true,
+        cell: (info) => (
+          <div className="flex items-center gap-2">
+            <KeenIcon
+              icon={info.row.original.browser.icon}
+              className="text-gray-700 text-lg"
+            />
+            <span className="text-gray-700">
+              {info.row.original.browser.name}
+            </span>
+          </div>
+        ),
+        meta: {
+          headerClassName: "min-w-[240px]",
+        },
+      },
+      {
+        accessorFn: (row) => row.ipAddress,
+        id: "ipAddress",
+        header: ({ column }) => (
+          <DataGridColumnHeader title="IP Address" column={column} />
+        ),
+        enableSorting: true,
+        cell: (info) => info.getValue(),
+        meta: {
+          headerTitle: "IP Address",
+          headerClassName: "w-[240px]",
+        },
+      },
+      {
+        accessorFn: (row) => row.location,
+        id: "location",
+        header: ({ column }) => (
+          <DataGridColumnHeader title="Location" column={column} />
+        ),
+        enableSorting: true,
+        cell: (info) => (
+          <div className="flex items-center gap-1.5">
+            <img
+              src={toAbsoluteUrl(
+                `/media/flags/${info.row.original.location.flag}`,
+              )}
+              className="h-4 rounded-full"
+              alt=""
+            />
+            <span className="leading-none text-gray-700">
+              {info.row.original.location.name}
+            </span>
+          </div>
+        ),
+        meta: {
+          headerClassName: "w-[200px]",
+        },
+      },
+      {
+        id: "click",
+        header: () => "",
+        enableSorting: false,
+        cell: ({ row }) => (
+          <button
+            className="btn btn-icon btn-light btn-clear btn-sm"
+            onClick={() =>
+              alert(
+                `Clicked on action button for row ${row.original.user.name}`,
+              )
+            }
+          >
             <KeenIcon icon="dots-vertical" />
-          </button>,
-    meta: {
-      headerClassName: 'w-[60px]'
-    }
-  }], []);
+          </button>
+        ),
+        meta: {
+          headerClassName: "w-[60px]",
+        },
+      },
+    ],
+    [],
+  );
   const data = useMemo(() => CurrentSessionsData, []);
-  const handleRowSelection = state => {
+  const handleRowSelection = (state) => {
     const selectedRowIds = Object.keys(state);
     if (selectedRowIds.length > 0) {
       toast(`Total ${selectedRowIds.length} are selected.`, {
         description: `Selected row IDs: ${selectedRowIds}`,
         action: {
-          label: 'Undo',
-          onClick: () => console.log('Undo')
-        }
+          label: "Undo",
+          onClick: () => console.log("Undo"),
+        },
       });
     }
   };
   const Toolbar = () => {
-    const {
-      table
-    } = useDataGrid();
-    return <div className="card-header flex-wrap px-5 py-5 border-b-0">
+    const { table } = useDataGrid();
+    return (
+      <div className="card-header flex-wrap px-5 py-5 border-b-0">
         <h3 className="card-title">Current Sessions</h3>
 
         <div className="flex items-center flex-wrap gap-2.5">
           <label className="switch switch-sm">
-            <span className="switch-label">
-              Only Active Users
-            </span>
+            <span className="switch-label">Only Active Users</span>
             <input name="check" type="checkbox" value="1" readOnly />
           </label>
 
@@ -152,15 +215,29 @@ const CurrentSessions = () => {
           </div>
           <DataGridColumnVisibility table={table} />
         </div>
-      </div>;
+      </div>
+    );
   };
-  return <DataGrid columns={columns} data={data} rowSelection={true} onRowSelectionChange={handleRowSelection} pagination={{
-    size: 10
-  }} sorting={[{
-    id: 'user',
-    desc: false
-  }]} toolbar={<Toolbar />} layout={{
-    card: true
-  }} />;
+  return (
+    <DataGrid
+      columns={columns}
+      data={data}
+      rowSelection={true}
+      onRowSelectionChange={handleRowSelection}
+      pagination={{
+        size: 10,
+      }}
+      sorting={[
+        {
+          id: "user",
+          desc: false,
+        },
+      ]}
+      toolbar={<Toolbar />}
+      layout={{
+        card: true,
+      }}
+    />
+  );
 };
 export { CurrentSessions };

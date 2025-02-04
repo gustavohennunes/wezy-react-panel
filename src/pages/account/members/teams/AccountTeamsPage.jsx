@@ -1,17 +1,23 @@
-import { Fragment } from 'react';
-import { Container } from '@/components/container';
-import { Toolbar, ToolbarActions, ToolbarDescription, ToolbarHeading, ToolbarPageTitle } from '@/partials/toolbar';
-import { PageNavbar } from '@/pages/account';
-import { AccountTeamsContent } from '.';
-import { useLayout } from '@/providers';
+import { Fragment } from "react";
+import { Container } from "@/components/container";
+import {
+  Toolbar,
+  ToolbarActions,
+  ToolbarDescription,
+  ToolbarHeading,
+  ToolbarPageTitle,
+} from "@/partials/toolbar";
+import { PageNavbar } from "@/pages/account";
+import { AccountTeamsContent } from ".";
+import { useLayout } from "@/providers";
 const AccountTeamsPage = () => {
-  const {
-    currentLayout
-  } = useLayout();
-  return <Fragment>
+  const { currentLayout } = useLayout();
+  return (
+    <Fragment>
       <PageNavbar />
 
-      {currentLayout?.name === 'demo1-layout' && <Container>
+      {currentLayout?.name === "demo1-layout" && (
+        <Container>
           <Toolbar>
             <ToolbarHeading>
               <ToolbarPageTitle />
@@ -25,11 +31,13 @@ const AccountTeamsPage = () => {
               </a>
             </ToolbarActions>
           </Toolbar>
-        </Container>}
+        </Container>
+      )}
 
       <Container>
         <AccountTeamsContent />
       </Container>
-    </Fragment>;
+    </Fragment>
+  );
 };
 export { AccountTeamsPage };

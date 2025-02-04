@@ -1,6 +1,14 @@
-import clsx from 'clsx';
-import { Children, cloneElement, createContext, isValidElement, memo, useContext, useState } from 'react';
-import { MenuItem } from './';
+import clsx from "clsx";
+import {
+  Children,
+  cloneElement,
+  createContext,
+  isValidElement,
+  memo,
+  useContext,
+  useState,
+} from "react";
+import { MenuItem } from "./";
 const initalProps = {
   disabled: false,
   highlight: false,
@@ -12,9 +20,11 @@ const initalProps = {
   },
   // Default function for checking if an accordion is open (to be overridden)
   isOpenAccordion: (parentId, id) => {
-    console.log(`Checking if accordion at level ${parentId}, with ID ${id} is open`);
+    console.log(
+      `Checking if accordion at level ${parentId}, with ID ${id} is open`,
+    );
     return false; // By default, no accordion is open
-  }
+  },
 };
 
 // Create a Menu Context
@@ -28,15 +38,15 @@ const MenuComponent = ({
   disabled = false,
   highlight = false,
   dropdownTimeout = 150,
-  multipleExpand = false
+  multipleExpand = false,
 }) => {
   const [openAccordions, setOpenAccordions] = useState({});
 
   // Function to handle the accordion toggle
   const setOpenAccordion = (parentId, id) => {
-    setOpenAccordions(prevState => ({
+    setOpenAccordions((prevState) => ({
       ...prevState,
-      [parentId]: prevState[parentId] === id ? null : id // Toggle the current item and collapse others at the same level
+      [parentId]: prevState[parentId] === id ? null : id, // Toggle the current item and collapse others at the same level
     }));
   };
   const isOpenAccordion = (parentId, id) => {
@@ -46,8 +56,8 @@ const MenuComponent = ({
     if (isValidElement(child)) {
       if (child.type === MenuItem) {
         const modifiedProps = {
-          parentId: 'root',
-          id: `root-${index}`
+          parentId: "root",
+          id: `root-${index}`,
         };
         return cloneElement(child, modifiedProps);
       } else {
@@ -56,16 +66,22 @@ const MenuComponent = ({
     }
     return child;
   });
-  return <MenuContext.Provider value={{
-    disabled,
-    highlight,
-    dropdownTimeout,
-    multipleExpand,
-    setOpenAccordion,
-    isOpenAccordion
-  }}>
-      <div className={clsx('menu', className && className)}>{modifiedChildren}</div>
-    </MenuContext.Provider>;
+  return (
+    <MenuContext.Provider
+      value={{
+        disabled,
+        highlight,
+        dropdownTimeout,
+        multipleExpand,
+        setOpenAccordion,
+        isOpenAccordion,
+      }}
+    >
+      <div className={clsx("menu", className && className)}>
+        {modifiedChildren}
+      </div>
+    </MenuContext.Provider>
+  );
 };
 const Menu = memo(MenuComponent);
 // eslint-disable-next-line react-refresh/only-export-components

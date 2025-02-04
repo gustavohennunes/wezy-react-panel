@@ -1,7 +1,8 @@
-import { KeenIcon } from '@/components';
-import { CrudAvatarUpload } from '@/partials/crud';
+import { KeenIcon } from "@/components";
+import { CrudAvatarUpload } from "@/partials/crud";
 const PersonalInfo = () => {
-  return <div className="card min-w-full">
+  return (
+    <div className="card min-w-full">
       <div className="card-header">
         <h3 className="card-title">Personal Info</h3>
       </div>
@@ -21,9 +22,14 @@ const PersonalInfo = () => {
             </tr>
             <tr>
               <td className="py-2 text-gray-600 font-normal">Name</td>
-              <td className="py-2 text-gray-800 font-normaltext-sm">Jason Tatum</td>
+              <td className="py-2 text-gray-800 font-normaltext-sm">
+                Jason Tatum
+              </td>
               <td className="py-2 text-center">
-                <a href="#" className="btn btn-sm btn-icon btn-clear btn-primary">
+                <a
+                  href="#"
+                  className="btn btn-sm btn-icon btn-clear btn-primary"
+                >
                   <KeenIcon icon="notepad-edit" />
                 </a>
               </td>
@@ -31,19 +37,29 @@ const PersonalInfo = () => {
             <tr>
               <td className="py-3 text-gray-600 font-normal">Availability</td>
               <td className="py-3 text-gray-800 font-normal">
-                <span className="badge badge-sm badge-outline badge-success">Available now</span>
+                <span className="badge badge-sm badge-outline badge-success">
+                  Available now
+                </span>
               </td>
               <td className="py-3 text-center">
-                <a href="#" className="btn btn-sm btn-icon btn-clear btn-primary">
+                <a
+                  href="#"
+                  className="btn btn-sm btn-icon btn-clear btn-primary"
+                >
                   <KeenIcon icon="notepad-edit" />
                 </a>
               </td>
             </tr>
             <tr>
               <td className="py-3 text-gray-600 font-normal">Birthday</td>
-              <td className="py-3 text-gray-700 text-sm font-normal">28 May 1996</td>
+              <td className="py-3 text-gray-700 text-sm font-normal">
+                28 May 1996
+              </td>
               <td className="py-3 text-center">
-                <a href="#" className="btn btn-sm btn-icon btn-clear btn-primary">
+                <a
+                  href="#"
+                  className="btn btn-sm btn-icon btn-clear btn-primary"
+                >
                   <KeenIcon icon="notepad-edit" />
                 </a>
               </td>
@@ -52,7 +68,10 @@ const PersonalInfo = () => {
               <td className="py-3 text-gray-600 font-normal">Gender</td>
               <td className="py-3 text-gray-700 text-sm font-normal">Male</td>
               <td className="py-3 text-center">
-                <a href="#" className="btn btn-sm btn-icon btn-clear btn-primary">
+                <a
+                  href="#"
+                  className="btn btn-sm btn-icon btn-clear btn-primary"
+                >
                   <KeenIcon icon="notepad-edit" />
                 </a>
               </td>
@@ -71,6 +90,7 @@ const PersonalInfo = () => {
           </tbody>
         </table>
       </div>
-    </div>;
+    </div>
+  );
 };
 export { PersonalInfo };

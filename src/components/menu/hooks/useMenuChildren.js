@@ -1,6 +1,6 @@
-import { matchPath } from 'react-router';
+import { matchPath } from "react-router";
 const useMenuChildren = (pathname, items, level) => {
-  const hasActiveChild = items => {
+  const hasActiveChild = (items) => {
     for (let i = 0; i < items.length; i++) {
       const item = items[i];
       if (item.path && matchPath(pathname, item.path)) {
@@ -29,7 +29,11 @@ const useMenuChildren = (pathname, items, level) => {
         if (children) {
           return children;
         }
-      } else if (level === currentLevel && item.path && matchPath(pathname, item.path)) {
+      } else if (
+        level === currentLevel &&
+        item.path &&
+        matchPath(pathname, item.path)
+      ) {
         // If it's a leaf node and matches the path, return the current items
         return items;
       }

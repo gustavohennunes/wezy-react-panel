@@ -1,5 +1,5 @@
-import clsx from 'clsx';
-import { Link } from 'react-router-dom';
+import clsx from "clsx";
+import { Link } from "react-router-dom";
 const MenuLink = ({
   path,
   newTab,
@@ -8,28 +8,52 @@ const MenuLink = ({
   className,
   handleToggle,
   handleClick,
-  children
+  children,
 }) => {
   if (!hasItemSub && path) {
     if (externalLink) {
-      const target = newTab ? '_blank' : '_self';
-      return <a href={path} target={target} rel="noopener" onClick={handleClick} className={clsx('menu-link', className && className)}>
+      const target = newTab ? "_blank" : "_self";
+      return (
+        <a
+          href={path}
+          target={target}
+          rel="noopener"
+          onClick={handleClick}
+          className={clsx("menu-link", className && className)}
+        >
           {children}
-        </a>;
+        </a>
+      );
     } else {
-      return <Link to={path} onClick={handleClick} className={clsx('menu-link', className && className)}>
+      return (
+        <Link
+          to={path}
+          onClick={handleClick}
+          className={clsx("menu-link", className && className)}
+        >
           {children}
-        </Link>;
+        </Link>
+      );
     }
   } else {
     if (hasItemSub) {
-      return <div className={clsx('menu-link', className && className)} onClick={handleToggle}>
+      return (
+        <div
+          className={clsx("menu-link", className && className)}
+          onClick={handleToggle}
+        >
           {children}
-        </div>;
+        </div>
+      );
     } else {
-      return <div className={clsx('menu-link', className && className)} onClick={handleClick}>
+      return (
+        <div
+          className={clsx("menu-link", className && className)}
+          onClick={handleClick}
+        >
           {children}
-        </div>;
+        </div>
+      );
     }
   }
 };

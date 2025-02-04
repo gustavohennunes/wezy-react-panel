@@ -1,16 +1,25 @@
-import clsx from 'clsx';
+import clsx from "clsx";
 const MenuToggle = ({
   className,
   hasItemSub = false,
   handleToggle,
-  children
+  children,
 }) => {
   if (hasItemSub) {
-    return <div className={clsx('menu-toggle', className && className)} onClick={handleToggle}>
+    return (
+      <div
+        className={clsx("menu-toggle", className && className)}
+        onClick={handleToggle}
+      >
         {children}
-      </div>;
+      </div>
+    );
   } else {
-    return <div className={clsx('menu-toggle', className && className)}>{children}</div>;
+    return (
+      <div className={clsx("menu-toggle", className && className)}>
+        {children}
+      </div>
+    );
   }
 };
 export { MenuToggle };

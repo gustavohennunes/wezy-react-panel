@@ -1,7 +1,15 @@
-import { Contributors, Tags } from '../default';
-import { Activity, ApiCredentials, Attributes, Deals, GeneralInfo, RecentInvoices } from './blocks';
+import { Contributors, Tags } from "../default";
+import {
+  Activity,
+  ApiCredentials,
+  Attributes,
+  Deals,
+  GeneralInfo,
+  RecentInvoices,
+} from "./blocks";
 const ProfileCRMContent = () => {
-  return <div className="grid grid-cols-1 lg:grid-cols-3 gap-5 lg:gap-7.5">
+  return (
+    <div className="grid grid-cols-1 lg:grid-cols-3 gap-5 lg:gap-7.5">
       <div className="col-span-1">
         <div className="grid gap-5 lg:gap-7.5">
           <GeneralInfo />
@@ -27,6 +35,7 @@ const ProfileCRMContent = () => {
           </div>
         </div>
       </div>
-    </div>;
+    </div>
+  );
 };
 export { ProfileCRMContent };

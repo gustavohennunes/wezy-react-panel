@@ -1,7 +1,15 @@
-import { CommunityBadges } from '../default';
-import { About, Assets, Network, Tokens3dArt, TokensCollected, TokensCreated } from './blocks';
+import { CommunityBadges } from "../default";
+import {
+  About,
+  Assets,
+  Network,
+  Tokens3dArt,
+  TokensCollected,
+  TokensCreated,
+} from "./blocks";
 const ProfileNFTContent = () => {
-  return <div className="grid grid-cols-1 lg:grid-cols-3 gap-5 lg:gap-7.5">
+  return (
+    <div className="grid grid-cols-1 lg:grid-cols-3 gap-5 lg:gap-7.5">
       <div className="col-span-1">
         <div className="grid gap-5 lg:gap-7.5">
           <Assets />
@@ -24,6 +32,7 @@ const ProfileNFTContent = () => {
           </div>
         </div>
       </div>
-    </div>;
+    </div>
+  );
 };
 export { ProfileNFTContent };

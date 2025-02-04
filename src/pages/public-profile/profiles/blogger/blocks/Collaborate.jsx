@@ -1,8 +1,7 @@
-import { Link } from 'react-router-dom';
-const Collaborate = ({
-  title
-}) => {
-  return <div className="card">
+import { Link } from "react-router-dom";
+const Collaborate = ({ title }) => {
+  return (
+    <div className="card">
       <div className="card-header">
         <h3 className="card-title">{title}</h3>
       </div>
@@ -17,6 +16,7 @@ const Collaborate = ({
           View details
         </Link>
       </div>
-    </div>;
+    </div>
+  );
 };
 export { Collaborate };

@@ -1,18 +1,29 @@
-import { MiscFaq, MiscHighlightedPosts } from '@/partials/misc';
-import { BlockList, ManageData, PrivacySettings, ReportSettings } from './blocks';
+import { MiscFaq, MiscHighlightedPosts } from "@/partials/misc";
+import {
+  BlockList,
+  ManageData,
+  PrivacySettings,
+  ReportSettings,
+} from "./blocks";
 const AccountPrivacySettingsContent = () => {
-  const posts = [{
-    icon: 'toggle-on-circle',
-    title: 'Fortifying Privacy Controls: Customization and Guidelines',
-    summary: 'Enhance your privacy framework with customizable settings. Understand and apply robust controls with our comprehensive guidelines to protect member data.',
-    path: '#'
-  }, {
-    icon: 'setting',
-    title: 'Navigating Privacy Preferences: Secure Configuration Tools',
-    summary: 'Take command of your privacy settings with our secure configuration tools. Detailed resources and expert insights ensure your preferences are set for maximum protection.',
-    path: '#'
-  }];
-  return <div className="grid grid-cols-1 xl:grid-cols-3 gap-5 lg:gap-7.5">
+  const posts = [
+    {
+      icon: "toggle-on-circle",
+      title: "Fortifying Privacy Controls: Customization and Guidelines",
+      summary:
+        "Enhance your privacy framework with customizable settings. Understand and apply robust controls with our comprehensive guidelines to protect member data.",
+      path: "#",
+    },
+    {
+      icon: "setting",
+      title: "Navigating Privacy Preferences: Secure Configuration Tools",
+      summary:
+        "Take command of your privacy settings with our secure configuration tools. Detailed resources and expert insights ensure your preferences are set for maximum protection.",
+      path: "#",
+    },
+  ];
+  return (
+    <div className="grid grid-cols-1 xl:grid-cols-3 gap-5 lg:gap-7.5">
       <div className="col-span-2">
         <div className="flex flex-col gap-5 lg:gap-7.5">
           <PrivacySettings />
@@ -33,6 +44,7 @@ const AccountPrivacySettingsContent = () => {
           <MiscHighlightedPosts posts={posts} />
         </div>
       </div>
-    </div>;
+    </div>
+  );
 };
 export { AccountPrivacySettingsContent };

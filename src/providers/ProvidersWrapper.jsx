@@ -1,12 +1,17 @@
-import { QueryClient, QueryClientProvider } from 'react-query';
-import { AuthProvider } from '@/auth/providers/JWTProvider';
-import { LayoutProvider, LoadersProvider, MenusProvider, SettingsProvider, TranslationProvider } from '@/providers';
-import { HelmetProvider } from 'react-helmet-async';
+import { QueryClient, QueryClientProvider } from "react-query";
+import { AuthProvider } from "@/auth/providers/JWTProvider";
+import {
+  LayoutProvider,
+  LoadersProvider,
+  MenusProvider,
+  SettingsProvider,
+  TranslationProvider,
+} from "@/providers";
+import { HelmetProvider } from "react-helmet-async";
 const queryClient = new QueryClient();
-const ProvidersWrapper = ({
-  children
-}) => {
-  return <QueryClientProvider client={queryClient}>
+const ProvidersWrapper = ({ children }) => {
+  return (
+    <QueryClientProvider client={queryClient}>
       <AuthProvider>
         <SettingsProvider>
           <TranslationProvider>
@@ -20,6 +25,7 @@ const ProvidersWrapper = ({
           </TranslationProvider>
         </SettingsProvider>
       </AuthProvider>
-    </QueryClientProvider>;
+    </QueryClientProvider>
+  );
 };
 export { ProvidersWrapper };

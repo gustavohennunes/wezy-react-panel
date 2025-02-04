@@ -1,15 +1,21 @@
-import { Fragment, useRef, useState } from 'react';
-import { Menu, MenuIcon, MenuItem, MenuLabel, MenuSub, MenuTitle, MenuToggle } from '@/components/menu';
-import { KeenIcon } from '@/components/keenicons';
-import { useLanguage } from '@/i18n';
-import { ModalShareProfile } from '../modals/share-profile';
-import { ModalGiveAward } from '../modals/give-award';
-import { ModalReportUser } from '../modals/report-user';
+import { Fragment, useRef, useState } from "react";
+import {
+  Menu,
+  MenuIcon,
+  MenuItem,
+  MenuLabel,
+  MenuSub,
+  MenuTitle,
+  MenuToggle,
+} from "@/components/menu";
+import { KeenIcon } from "@/components/keenicons";
+import { useLanguage } from "@/i18n";
+import { ModalShareProfile } from "../modals/share-profile";
+import { ModalGiveAward } from "../modals/give-award";
+import { ModalReportUser } from "../modals/report-user";
 const NavbarDropdown = () => {
   const itemRef = useRef(null);
-  const {
-    isRTL
-  } = useLanguage();
+  const { isRTL } = useLanguage();
   const [ShareProfileModalOpen, setShareProfileModalOpen] = useState(false);
   const handleSettingsModalOpen = () => {
     setShareProfileModalOpen(true);
@@ -34,21 +40,32 @@ const NavbarDropdown = () => {
   const handleReportUserModalClose = () => {
     setReportUserModalOpen(false);
   };
-  return <Fragment>
+  return (
+    <Fragment>
       <Menu className="items-stretch">
-        <MenuItem ref={itemRef} toggle="dropdown" trigger="click" dropdownProps={{
-        placement: isRTL() ? 'bottom-start' : 'bottom-end',
-        modifiers: [{
-          name: 'offset',
-          options: {
-            offset: isRTL() ? [0, -10] : [0, 10] // [skid, distance]
-          }
-        }]
-      }}>
+        <MenuItem
+          ref={itemRef}
+          toggle="dropdown"
+          trigger="click"
+          dropdownProps={{
+            placement: isRTL() ? "bottom-start" : "bottom-end",
+            modifiers: [
+              {
+                name: "offset",
+                options: {
+                  offset: isRTL() ? [0, -10] : [0, 10], // [skid, distance]
+                },
+              },
+            ],
+          }}
+        >
           <MenuToggle className="btn btn-sm btn-icon btn-light">
             <KeenIcon icon="dots-vertical" />
           </MenuToggle>
-          <MenuSub className="menu-default" rootClassName="w-full max-w-[220px]">
+          <MenuSub
+            className="menu-default"
+            rootClassName="w-full max-w-[220px]"
+          >
             <MenuItem onClick={handleSettingsModalOpen}>
               <MenuLabel>
                 <MenuIcon>
@@ -88,9 +105,19 @@ const NavbarDropdown = () => {
         </MenuItem>
       </Menu>
 
-      <ModalShareProfile open={ShareProfileModalOpen} onOpenChange={handleShareProfileModalClose} />
-      <ModalGiveAward open={giveAwardModalOpen} onOpenChange={handleGiveAwardModalClose} />
-      <ModalReportUser open={reportUserModalOpen} onOpenChange={handleReportUserModalClose} />
-    </Fragment>;
+      <ModalShareProfile
+        open={ShareProfileModalOpen}
+        onOpenChange={handleShareProfileModalClose}
+      />
+      <ModalGiveAward
+        open={giveAwardModalOpen}
+        onOpenChange={handleGiveAwardModalClose}
+      />
+      <ModalReportUser
+        open={reportUserModalOpen}
+        onOpenChange={handleReportUserModalClose}
+      />
+    </Fragment>
+  );
 };
 export { NavbarDropdown };

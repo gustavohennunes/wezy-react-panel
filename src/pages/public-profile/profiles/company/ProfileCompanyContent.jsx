@@ -1,36 +1,55 @@
-import { Connections, Contributions, Projects, Tags } from '../default';
-import { Statistics, Highlights, OpenJobs, Network, CompanyProfile, Locations } from './blocks';
+import { Connections, Contributions, Projects, Tags } from "../default";
+import {
+  Statistics,
+  Highlights,
+  OpenJobs,
+  Network,
+  CompanyProfile,
+  Locations,
+} from "./blocks";
 const ProfileCompanyContent = () => {
-  const items = [{
-    number: '624',
-    label: 'Employees'
-  }, {
-    number: '60.7M',
-    label: 'Users'
-  }, {
-    number: '369M',
-    label: 'Revenue'
-  }, {
-    number: '27',
-    label: 'Company Rank'
-  }];
-  const data = [{
-    icon: 'dribbble',
-    link: 'https://duolingo.com'
-  }, {
-    icon: 'sms',
-    link: 'info@duolingo.com'
-  }, {
-    icon: 'facebook',
-    link: 'duolingo'
-  }, {
-    icon: 'twitter',
-    link: 'duolingo-news'
-  }, {
-    icon: 'youtube',
-    link: 'duolingo-tuts'
-  }];
-  return <div className="grid grid-cols-1 lg:grid-cols-3 gap-5 lg:gap-7.5">
+  const items = [
+    {
+      number: "624",
+      label: "Employees",
+    },
+    {
+      number: "60.7M",
+      label: "Users",
+    },
+    {
+      number: "369M",
+      label: "Revenue",
+    },
+    {
+      number: "27",
+      label: "Company Rank",
+    },
+  ];
+  const data = [
+    {
+      icon: "dribbble",
+      link: "https://duolingo.com",
+    },
+    {
+      icon: "sms",
+      link: "info@duolingo.com",
+    },
+    {
+      icon: "facebook",
+      link: "duolingo",
+    },
+    {
+      icon: "twitter",
+      link: "duolingo-news",
+    },
+    {
+      icon: "youtube",
+      link: "duolingo-tuts",
+    },
+  ];
+  return (
+    <div className="grid grid-cols-1 lg:grid-cols-3 gap-5 lg:gap-7.5">
       <div className="col-span-1 lg:col-span-3">
         <Statistics items={items} />
       </div>
@@ -60,6 +79,7 @@ const ProfileCompanyContent = () => {
           </div>
         </div>
       </div>
-    </div>;
+    </div>
+  );
 };
 export { ProfileCompanyContent };

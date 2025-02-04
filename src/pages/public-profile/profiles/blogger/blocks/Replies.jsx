@@ -1,34 +1,41 @@
-import { Link } from 'react-router-dom';
-import { KeenIcon } from '@/components';
+import { Link } from "react-router-dom";
+import { KeenIcon } from "@/components";
 const Replies = () => {
-  const items = [{
-    borderColor: 'border-brand',
-    date: '10 Jan',
-    comments: 24,
-    text: 'Experienced UI/UX designer seeking new opportunities.'
-  }, {
-    borderColor: 'border-primary',
-    date: '23 Jan',
-    comments: 3,
-    text: 'Include the name of the author of the blog post. This helps to build trust and credibility with readers.'
-  }, {
-    borderColor: 'border-warning',
-    date: '4 Feb',
-    comments: 89,
-    text: 'Avoid using all caps or excessive punctuation.'
-  }, {
-    borderColor: 'border-success',
-    date: '17 Mar',
-    comments: 32,
-    text: 'You can use this example as a starting point to design your own blog post cards. Be sure to experiment with different layouts, fonts, and colors both visually appealing and informative.'
-  }, {
-    borderColor: 'border-danger',
-    date: '9 Apr',
-    comments: 57,
-    text: 'Use high-quality images and graphics to capture the visual appeal of your cards.'
-  }];
+  const items = [
+    {
+      borderColor: "border-brand",
+      date: "10 Jan",
+      comments: 24,
+      text: "Experienced UI/UX designer seeking new opportunities.",
+    },
+    {
+      borderColor: "border-primary",
+      date: "23 Jan",
+      comments: 3,
+      text: "Include the name of the author of the blog post. This helps to build trust and credibility with readers.",
+    },
+    {
+      borderColor: "border-warning",
+      date: "4 Feb",
+      comments: 89,
+      text: "Avoid using all caps or excessive punctuation.",
+    },
+    {
+      borderColor: "border-success",
+      date: "17 Mar",
+      comments: 32,
+      text: "You can use this example as a starting point to design your own blog post cards. Be sure to experiment with different layouts, fonts, and colors both visually appealing and informative.",
+    },
+    {
+      borderColor: "border-danger",
+      date: "9 Apr",
+      comments: 57,
+      text: "Use high-quality images and graphics to capture the visual appeal of your cards.",
+    },
+  ];
   const renderItem = (item, index) => {
-    return <div key={index} className={`border-l-2 ${item.borderColor}`}>
+    return (
+      <div key={index} className={`border-l-2 ${item.borderColor}`}>
         <div className="flex gap-3 items-center ps-3 mb-0.5">
           <span className="text-2xs text-gray-600">{item.date}, 24</span>
 
@@ -41,9 +48,11 @@ const Replies = () => {
         </div>
 
         <p className="text-sm text-gray-800 leading-5.5 ps-3">{item.text}</p>
-      </div>;
+      </div>
+    );
   };
-  return <div className="card">
+  return (
+    <div className="card">
       <div className="card-header">
         <h3 className="card-title">Jenny’s Replies</h3>
 
@@ -54,10 +63,11 @@ const Replies = () => {
       <div className="card-body pb-7">
         <div className="flex flex-col gap-5">
           {items.map((item, index) => {
-          return renderItem(item, index);
-        })}
+            return renderItem(item, index);
+          })}
         </div>
       </div>
-    </div>;
+    </div>
+  );
 };
 export { Replies };

@@ -1,8 +1,10 @@
-import { Container } from '@/components/container';
-import { Demo2Content } from '.';
+import { Container } from "@/components/container";
+import { Demo2Content } from ".";
 const Demo2Page = () => {
-  return <Container>
+  return (
+    <Container>
       <Demo2Content />
-    </Container>;
+    </Container>
+  );
 };
 export { Demo2Page };

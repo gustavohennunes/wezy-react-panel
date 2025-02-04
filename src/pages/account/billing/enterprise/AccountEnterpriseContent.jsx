@@ -1,8 +1,15 @@
-import { MiscHelp } from '@/partials/misc';
-import { BillingInvoicing, CompanyProfile, LatestPayment, NextPayment, Upgrade } from './blocks';
-import { PaymentMethods } from '../basic';
+import { MiscHelp } from "@/partials/misc";
+import {
+  BillingInvoicing,
+  CompanyProfile,
+  LatestPayment,
+  NextPayment,
+  Upgrade,
+} from "./blocks";
+import { PaymentMethods } from "../basic";
 const AccountEnterpriseContent = () => {
-  return <div className="grid grid-cols-1 lg:grid-cols-2 gap-5 lg:gap-7.5">
+  return (
+    <div className="grid grid-cols-1 lg:grid-cols-2 gap-5 lg:gap-7.5">
       <div className="col-span-2">
         <Upgrade />
       </div>
@@ -30,6 +37,7 @@ const AccountEnterpriseContent = () => {
       <div className="col-span-2">
         <MiscHelp />
       </div>
-    </div>;
+    </div>
+  );
 };
 export { AccountEnterpriseContent };

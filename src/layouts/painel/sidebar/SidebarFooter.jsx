@@ -1,42 +1,57 @@
-import React, { forwardRef, useRef } from 'react';
-import { toAbsoluteUrl } from '@/utils';
-import { useAuthContext } from '@/auth';
-import { KeenIcon, Menu, MenuItem, MenuToggle } from '@/components';
-import { DropdownUserPanel } from '@/partials/dropdowns/user';
-import { useLanguage } from '@/i18n';
+import React, { forwardRef, useRef } from "react";
+import { toAbsoluteUrl } from "@/utils";
+import { useAuthContext } from "@/auth";
+import { KeenIcon, Menu, MenuItem, MenuToggle } from "@/components";
+import { DropdownUserPanel } from "@/partials/dropdowns/user";
+import { useLanguage } from "@/i18n";
 const SidebarFooter = forwardRef((props, ref) => {
-  const {
-    logout
-  } = useAuthContext();
+  const { logout } = useAuthContext();
   const itemUserRef = useRef(null);
-  const {
-    isRTL
-  } = useLanguage();
-  return <div ref={ref} className="flex flex-center justify-between shrink-0 ps-4 pe-3.5 mb-3.5">
+  const { isRTL } = useLanguage();
+  return (
+    <div
+      ref={ref}
+      className="flex flex-center justify-between shrink-0 ps-4 pe-3.5 mb-3.5"
+    >
       <Menu data-menu="true">
-        <MenuItem ref={itemUserRef} toggle="dropdown" trigger="click" dropdownProps={{
-        placement: isRTL() ? 'right-start' : 'right-end',
-        modifiers: [{
-          name: 'offset',
-          options: {
-            offset: isRTL() ? [10, 15] : [-10, 15] // [skid, distance]
-          }
-        }]
-      }}>
+        <MenuItem
+          ref={itemUserRef}
+          toggle="dropdown"
+          trigger="click"
+          dropdownProps={{
+            placement: isRTL() ? "right-start" : "right-end",
+            modifiers: [
+              {
+                name: "offset",
+                options: {
+                  offset: isRTL() ? [10, 15] : [-10, 15], // [skid, distance]
+                },
+              },
+            ],
+          }}
+        >
           <MenuToggle className="btn btn-icon rounded-full">
-            <img className="size-8 rounded-full justify-center border border-gray-500 shrink-0" src={toAbsoluteUrl('/media/avatars/gray/6.png')} alt="" />
+            <img
+              className="size-8 rounded-full justify-center border border-gray-500 shrink-0"
+              src={toAbsoluteUrl("/media/avatars/gray/6.png")}
+              alt=""
+            />
           </MenuToggle>
           {DropdownUserPanel({
-          menuItemRef: itemUserRef
-        })}
+            menuItemRef: itemUserRef,
+          })}
         </MenuItem>
       </Menu>
 
       <div className="flex items-center gap-1.5">
-        <div onClick={logout} className="btn btn-icon btn-icon-lg size-8 hover:bg-light hover:text-primary text-gray-600">
+        <div
+          onClick={logout}
+          className="btn btn-icon btn-icon-lg size-8 hover:bg-light hover:text-primary text-gray-600"
+        >
           <KeenIcon icon="exit-right" />
         </div>
       </div>
-    </div>;
+    </div>
+  );
 });
 export { SidebarFooter };

@@ -1,58 +1,86 @@
-import { Network } from '../company';
-import { Users } from '../creator';
-import { CommunityBadges } from '../default';
-import { About, Activity, FavoriteGames, NowPlaying, Statistics, Tournaments } from './blocks';
+import { Network } from "../company";
+import { Users } from "../creator";
+import { CommunityBadges } from "../default";
+import {
+  About,
+  Activity,
+  FavoriteGames,
+  NowPlaying,
+  Statistics,
+  Tournaments,
+} from "./blocks";
 const ProfileGamerContent = () => {
-  const details = [{
-    image: 'online-game.svg',
-    number: '164',
-    label: 'Tournaments'
-  }, {
-    image: 'gamer-coin.svg',
-    number: '73.2%',
-    label: 'Game Win-rate'
-  }, {
-    image: 'gamer-diamond.svg',
-    number: '257',
-    label: 'Duels Played'
-  }, {
-    image: 'gamer-trophy.svg',
-    number: '19',
-    label: 'Trophies'
-  }];
-  const items = [{
-    image: '300-27.png'
-  }, {
-    image: '300-1.png'
-  }, {
-    image: '300-2.png'
-  }, {
-    image: '300-3.png'
-  }, {
-    image: '300-5.png'
-  }, {
-    image: '300-23.png'
-  }, {
-    image: '300-6.png'
-  }, {
-    image: '300-11.png'
-  }, {
-    image: '300-12.png'
-  }];
-  const data = [{
-    icon: 'dribbble',
-    link: 'jennynft'
-  }, {
-    icon: 'facebook',
-    link: 'nftmania'
-  }, {
-    icon: 'twitter',
-    link: 'jennynft'
-  }, {
-    icon: 'youtube',
-    link: 'jennyklabber'
-  }];
-  return <div className="grid grid-cols-1 lg:grid-cols-3 gap-y-5 lg:gap-7.5">
+  const details = [
+    {
+      image: "online-game.svg",
+      number: "164",
+      label: "Tournaments",
+    },
+    {
+      image: "gamer-coin.svg",
+      number: "73.2%",
+      label: "Game Win-rate",
+    },
+    {
+      image: "gamer-diamond.svg",
+      number: "257",
+      label: "Duels Played",
+    },
+    {
+      image: "gamer-trophy.svg",
+      number: "19",
+      label: "Trophies",
+    },
+  ];
+  const items = [
+    {
+      image: "300-27.png",
+    },
+    {
+      image: "300-1.png",
+    },
+    {
+      image: "300-2.png",
+    },
+    {
+      image: "300-3.png",
+    },
+    {
+      image: "300-5.png",
+    },
+    {
+      image: "300-23.png",
+    },
+    {
+      image: "300-6.png",
+    },
+    {
+      image: "300-11.png",
+    },
+    {
+      image: "300-12.png",
+    },
+  ];
+  const data = [
+    {
+      icon: "dribbble",
+      link: "jennynft",
+    },
+    {
+      icon: "facebook",
+      link: "nftmania",
+    },
+    {
+      icon: "twitter",
+      link: "jennynft",
+    },
+    {
+      icon: "youtube",
+      link: "jennyklabber",
+    },
+  ];
+  return (
+    <div className="grid grid-cols-1 lg:grid-cols-3 gap-y-5 lg:gap-7.5">
       <div className="col-span-2 lg:col-span-3">
         <Statistics details={details} />
       </div>
@@ -79,6 +107,7 @@ const ProfileGamerContent = () => {
           <Activity />
         </div>
       </div>
-    </div>;
+    </div>
+  );
 };
 export { ProfileGamerContent };

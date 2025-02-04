@@ -1,31 +1,39 @@
-import { Fragment, useState } from 'react';
-import { Helmet } from 'react-helmet-async';
-import { Outlet, useLocation } from 'react-router';
-import { useMenuCurrentItem } from '@/components/menu';
-import { Footer, Header, Sidebar, Toolbar, ToolbarActions, ToolbarHeading } from '../';
-import { useMenus } from '@/providers';
-import { useResponsive } from '@/hooks';
-import { Link } from 'react-router-dom';
-import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
-import { Calendar } from '@/components/ui/calendar';
-import { addDays, format } from 'date-fns';
-import { cn } from '@/lib/utils';
-import { KeenIcon } from '@/components/keenicons';
+import { Fragment, useState } from "react";
+import { Helmet } from "react-helmet-async";
+import { Outlet, useLocation } from "react-router";
+import { useMenuCurrentItem } from "@/components/menu";
+import {
+  Footer,
+  Header,
+  Sidebar,
+  Toolbar,
+  ToolbarActions,
+  ToolbarHeading,
+} from "../";
+import { useMenus } from "@/providers";
+import { useResponsive } from "@/hooks";
+import { Link } from "react-router-dom";
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@/components/ui/popover";
+import { Calendar } from "@/components/ui/calendar";
+import { addDays, format } from "date-fns";
+import { cn } from "@/lib/utils";
+import { KeenIcon } from "@/components/keenicons";
 const Main = () => {
-  const mobileMode = useResponsive('down', 'lg');
-  const {
-    pathname
-  } = useLocation();
-  const {
-    getMenuConfig
-  } = useMenus();
-  const menuConfig = getMenuConfig('primary');
+  const mobileMode = useResponsive("down", "lg");
+  const { pathname } = useLocation();
+  const { getMenuConfig } = useMenus();
+  const menuConfig = getMenuConfig("primary");
   const menuItem = useMenuCurrentItem(pathname, menuConfig);
   const [date, setDate] = useState({
     from: new Date(2025, 0, 20),
-    to: addDays(new Date(2025, 0, 20), 20)
+    to: addDays(new Date(2025, 0, 20), 20),
   });
-  return <Fragment>
+  return (
+    <Fragment>
       <Helmet>
         <title>{menuItem?.title}</title>
       </Helmet>
@@ -42,21 +50,46 @@ const Main = () => {
                   <ToolbarHeading />
 
                   <ToolbarActions>
-                    <Link to={'/account/home/get-started'} className="btn btn-sm btn-light">
+                    <Link
+                      to={"/account/home/get-started"}
+                      className="btn btn-sm btn-light"
+                    >
                       <KeenIcon icon="exit-down !text-base" />
                       Export
                     </Link>
                     <Popover>
                       <PopoverTrigger asChild>
-                        <button id="date" className={cn('btn btn-sm btn-light data-[state=open]:bg-light-active', !date && 'text-gray-400')}>
+                        <button
+                          id="date"
+                          className={cn(
+                            "btn btn-sm btn-light data-[state=open]:bg-light-active",
+                            !date && "text-gray-400",
+                          )}
+                        >
                           <KeenIcon icon="calendar" className="me-0.5" />
-                          {date?.from ? date.to ? <>
-                                {format(date.from, 'LLL dd, y')} - {format(date.to, 'LLL dd, y')}
-                              </> : format(date.from, 'LLL dd, y') : <span>Pick a date range</span>}
+                          {date?.from ? (
+                            date.to ? (
+                              <>
+                                {format(date.from, "LLL dd, y")} -{" "}
+                                {format(date.to, "LLL dd, y")}
+                              </>
+                            ) : (
+                              format(date.from, "LLL dd, y")
+                            )
+                          ) : (
+                            <span>Pick a date range</span>
+                          )}
                         </button>
                       </PopoverTrigger>
                       <PopoverContent className="w-auto p-0" align="end">
-                        <Calendar initialFocus mode="range" defaultMonth={date?.from} selected={date} onSelect={setDate} numberOfMonths={2} />
+                        <Calendar
+                          initialFocus
+                          mode="range"
+                          defaultMonth={date?.from}
+                          selected={date}
+                          onSelect={setDate}
+                          numberOfMonths={2}
+                        />
                       </PopoverContent>
                     </Popover>
                   </ToolbarActions>
@@ -69,6 +102,7 @@ const Main = () => {
           </div>
         </div>
       </div>
-    </Fragment>;
+    </Fragment>
+  );
 };
 export { Main };

@@ -1,12 +1,13 @@
-import { useState } from 'react';
-import { Link } from 'react-router-dom';
-import { KeenIcon } from '@/components';
+import { useState } from "react";
+import { Link } from "react-router-dom";
+import { KeenIcon } from "@/components";
 const ApiCredentials = () => {
-  const [keyInput, setKeyInput] = useState('hwewe4654fdd5sdfh');
+  const [keyInput, setKeyInput] = useState("hwewe4654fdd5sdfh");
   const handleCopy = () => {
     navigator.clipboard.writeText(keyInput);
   };
-  return <div className="card">
+  return (
+    <div className="card">
       <div className="card-header">
         <h3 className="card-title">API Credentials</h3>
       </div>
@@ -21,7 +22,11 @@ const ApiCredentials = () => {
 
         <div className="flex flex-col flex-wrap gap-4">
           <div className="input input-sm">
-            <input type="text" value={keyInput} onChange={e => setKeyInput(e.target.value)} />
+            <input
+              type="text"
+              value={keyInput}
+              onChange={(e) => setKeyInput(e.target.value)}
+            />
             <button className="btn btn-icon btn-sm" onClick={handleCopy}>
               <KeenIcon icon="copy" />
             </button>
@@ -40,6 +45,7 @@ const ApiCredentials = () => {
           Check API’s
         </Link>
       </div>
-    </div>;
+    </div>
+  );
 };
 export { ApiCredentials };

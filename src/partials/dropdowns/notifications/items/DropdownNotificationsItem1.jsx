@@ -1,7 +1,7 @@
-import { toAbsoluteUrl } from '@/utils';
-import { Link } from 'react-router-dom';
-import { KeenIcon } from '@/components';
-import { useState } from 'react';
+import { toAbsoluteUrl } from "@/utils";
+import { Link } from "react-router-dom";
+import { KeenIcon } from "@/components";
+import { useState } from "react";
 const DropdownNotificationsItem1 = ({
   userName,
   avatar,
@@ -10,19 +10,27 @@ const DropdownNotificationsItem1 = ({
   label,
   time,
   specialist,
-  text
+  text,
 }) => {
-  const [emailInput, setEmailInput] = useState('');
-  return <div className="flex grow gap-2.5 px-5">
+  const [emailInput, setEmailInput] = useState("");
+  return (
+    <div className="flex grow gap-2.5 px-5">
       <div className="relative shrink-0 mt-0.5">
-        <img src={toAbsoluteUrl(`/media/avatars/${avatar}`)} className="rounded-full size-8" alt={`${userName} avatar`} />
+        <img
+          src={toAbsoluteUrl(`/media/avatars/${avatar}`)}
+          className="rounded-full size-8"
+          alt={`${userName} avatar`}
+        />
         <span className="size-1.5 badge badge-circle badge-success absolute top-7 end-0.5 ring-1 ring-light transform -translate-y-1/2"></span>
       </div>
 
       <div className="flex flex-col gap-3.5">
         <div className="flex flex-col gap-1">
           <div className="text-2sm font-medium">
-            <Link to="#" className="hover:text-primary-active text-gray-900 font-semibold">
+            <Link
+              to="#"
+              className="hover:text-primary-active text-gray-900 font-semibold"
+            >
               {userName}
             </Link>
             <span className="text-gray-700"> {description} </span>
@@ -40,20 +48,29 @@ const DropdownNotificationsItem1 = ({
 
         <div className="card shadow-none flex flex-col gap-2.5 p-3.5 rounded-lg bg-light-active">
           <div className="text-2sm font-semibold text-gray-600 mb-px">
-            <Link to="#" className="hover:text-primary-active text-gray-900 font-semibold">
+            <Link
+              to="#"
+              className="hover:text-primary-active text-gray-900 font-semibold"
+            >
               @Cody
             </Link>
             <span className="text-gray-700 font-medium"> {text} </span>
           </div>
 
           <label className="input input-sm">
-            <input type="text" onChange={e => setEmailInput(e.target.value)} placeholder="Reply" value={emailInput} />
+            <input
+              type="text"
+              onChange={(e) => setEmailInput(e.target.value)}
+              placeholder="Reply"
+              value={emailInput}
+            />
             <button className="btn btn-icon">
               <KeenIcon icon="picture" />
             </button>
           </label>
         </div>
       </div>
-    </div>;
+    </div>
+  );
 };
 export { DropdownNotificationsItem1 };

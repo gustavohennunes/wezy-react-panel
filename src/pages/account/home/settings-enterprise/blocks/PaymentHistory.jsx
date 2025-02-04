@@ -1,43 +1,57 @@
-import { KeenIcon, Menu, MenuItem, MenuToggle } from '@/components';
-import { useLanguage } from '@/i18n';
-import { DropdownCrud2, DropdownCrudItem1 } from '@/partials/dropdowns/general';
+import { KeenIcon, Menu, MenuItem, MenuToggle } from "@/components";
+import { useLanguage } from "@/i18n";
+import { DropdownCrud2, DropdownCrudItem1 } from "@/partials/dropdowns/general";
 const PaymentHistory = () => {
-  const {
-    isRTL
-  } = useLanguage();
-  const tables = [{
-    date: '24 Aug, 2024',
-    type: 'Subscription Fee',
-    amount: '$24.00'
-  }, {
-    date: '15 Sep, 2024',
-    type: 'Product Purchase',
-    amount: '$50.99'
-  }, {
-    date: '05 Dec, 2024',
-    type: 'Transaction Fee',
-    amount: '$2.50'
-  }, {
-    date: '30 May, 2025',
-    type: 'Annual Maintenance',
-    amount: '$40.20'
-  }];
+  const { isRTL } = useLanguage();
+  const tables = [
+    {
+      date: "24 Aug, 2024",
+      type: "Subscription Fee",
+      amount: "$24.00",
+    },
+    {
+      date: "15 Sep, 2024",
+      type: "Product Purchase",
+      amount: "$50.99",
+    },
+    {
+      date: "05 Dec, 2024",
+      type: "Transaction Fee",
+      amount: "$2.50",
+    },
+    {
+      date: "30 May, 2025",
+      type: "Annual Maintenance",
+      amount: "$40.20",
+    },
+  ];
   const renderItem = (table, index) => {
-    return <tr key={index}>
+    return (
+      <tr key={index}>
         <td className="text-sm font-normal text-gray-800">{table.date}</td>
-        <td className="text-sm font-normal text-gray-800 lg:text-end">{table.type}</td>
-        <td className="text-sm font-normal text-gray-800 lg:text-end">{table.amount}</td>
+        <td className="text-sm font-normal text-gray-800 lg:text-end">
+          {table.type}
+        </td>
+        <td className="text-sm font-normal text-gray-800 lg:text-end">
+          {table.amount}
+        </td>
         <td>
           <Menu className="items-stretch">
-            <MenuItem toggle="dropdown" trigger="click" dropdownProps={{
-            placement: isRTL() ? 'bottom-start' : 'bottom-end',
-            modifiers: [{
-              name: 'offset',
-              options: {
-                offset: [0, 10] // [skid, distance]
-              }
-            }]
-          }}>
+            <MenuItem
+              toggle="dropdown"
+              trigger="click"
+              dropdownProps={{
+                placement: isRTL() ? "bottom-start" : "bottom-end",
+                modifiers: [
+                  {
+                    name: "offset",
+                    options: {
+                      offset: [0, 10], // [skid, distance]
+                    },
+                  },
+                ],
+              }}
+            >
               <MenuToggle className="btn btn-sm btn-icon btn-light btn-clear">
                 <KeenIcon icon="dots-vertical" />
               </MenuToggle>
@@ -45,22 +59,30 @@ const PaymentHistory = () => {
             </MenuItem>
           </Menu>
         </td>
-      </tr>;
+      </tr>
+    );
   };
-  return <div className="card">
+  return (
+    <div className="card">
       <div className="card-header gap-2">
         <h3 className="card-title">Payment History</h3>
 
         <Menu className="items-stretch">
-          <MenuItem toggle="dropdown" trigger="click" dropdownProps={{
-          placement: isRTL() ? 'bottom-start' : 'bottom-end',
-          modifiers: [{
-            name: 'offset',
-            options: {
-              offset: [0, 10] // [skid, distance]
-            }
-          }]
-        }}>
+          <MenuItem
+            toggle="dropdown"
+            trigger="click"
+            dropdownProps={{
+              placement: isRTL() ? "bottom-start" : "bottom-end",
+              modifiers: [
+                {
+                  name: "offset",
+                  options: {
+                    offset: [0, 10], // [skid, distance]
+                  },
+                },
+              ],
+            }}
+          >
             <MenuToggle className="btn btn-sm btn-icon btn-light btn-clear">
               <KeenIcon icon="dots-vertical" />
             </MenuToggle>
@@ -81,8 +103,8 @@ const PaymentHistory = () => {
 
           <tbody>
             {tables.map((table, index) => {
-            return renderItem(table, index);
-          })}
+              return renderItem(table, index);
+            })}
           </tbody>
         </table>
       </div>
@@ -91,6 +113,7 @@ const PaymentHistory = () => {
           View all Payments
         </a>
       </div>
-    </div>;
+    </div>
+  );
 };
 export { PaymentHistory };

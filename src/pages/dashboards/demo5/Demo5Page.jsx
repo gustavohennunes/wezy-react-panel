@@ -1,8 +1,10 @@
-import { Container } from '@/components/container';
-import { Demo5Content } from '.';
+import { Container } from "@/components/container";
+import { Demo5Content } from ".";
 const Demo5Page = () => {
-  return <Container>
+  return (
+    <Container>
       <Demo5Content />
-    </Container>;
+    </Container>
+  );
 };
 export { Demo5Page };

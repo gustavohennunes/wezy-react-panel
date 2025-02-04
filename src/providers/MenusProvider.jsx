@@ -1,17 +1,14 @@
-/* eslint-disable no-unused-vars */
-import { createContext, useContext, useState } from 'react';
+import { createContext, useContext, useState } from "react";
 const initialProps = {
   configs: new Map(),
   setMenuConfig: () => {},
   getMenuConfig: () => null,
   setCurrentMenuItem: () => {},
-  getCurrentMenuItem: () => null
+  getCurrentMenuItem: () => null,
 };
 const MenuContext = createContext(initialProps);
 const useMenus = () => useContext(MenuContext);
-const MenusProvider = ({
-  children
-}) => {
+const MenusProvider = ({ children }) => {
   const [currentMenuItem, setCurrentMenuItem] = useState(null);
   const configs = initialProps.configs;
   const setMenuConfig = (name, config) => {
@@ -20,18 +17,22 @@ const MenusProvider = ({
   const getCurrentMenuItem = () => {
     return currentMenuItem;
   };
-  const getMenuConfig = name => {
+  const getMenuConfig = (name) => {
     return configs.get(name) ?? null;
   };
-  return <MenuContext.Provider value={{
-    configs,
-    setMenuConfig,
-    getMenuConfig,
-    setCurrentMenuItem,
-    getCurrentMenuItem
-  }}>
+  return (
+    <MenuContext.Provider
+      value={{
+        configs,
+        setMenuConfig,
+        getMenuConfig,
+        setCurrentMenuItem,
+        getCurrentMenuItem,
+      }}
+    >
       {children}
-    </MenuContext.Provider>;
+    </MenuContext.Provider>
+  );
 };
 
 // eslint-disable-next-line react-refresh/only-export-components

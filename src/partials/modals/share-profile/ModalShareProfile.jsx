@@ -1,12 +1,21 @@
-import React from 'react';
-import { ModalShareProfileViaLink, ModalShareProfileViaEmail, ModalShareProfileUsers, ModalShareProfileSettings } from './';
-import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from '@/components/ui/dialog';
-const ModalShareProfile = ({
-  open,
-  onOpenChange
-}) => {
+import React from "react";
+import {
+  ModalShareProfileViaLink,
+  ModalShareProfileViaEmail,
+  ModalShareProfileUsers,
+  ModalShareProfileSettings,
+} from "./";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
+const ModalShareProfile = ({ open, onOpenChange }) => {
   const scrollableHeight = 300;
-  return <Dialog open={open} onOpenChange={onOpenChange}>
+  return (
+    <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="max-w-[500px]">
         <DialogHeader>
           <DialogTitle>Share Profile</DialogTitle>
@@ -21,9 +30,12 @@ const ModalShareProfile = ({
 
           <div className="border-b border-b-gray-200"></div>
 
-          <div className="scrollable-y-auto" style={{
-          maxHeight: `${scrollableHeight}px`
-        }}>
+          <div
+            className="scrollable-y-auto"
+            style={{
+              maxHeight: `${scrollableHeight}px`,
+            }}
+          >
             <ModalShareProfileUsers />
           </div>
 
@@ -32,6 +44,7 @@ const ModalShareProfile = ({
           <ModalShareProfileSettings />
         </div>
       </DialogContent>
-    </Dialog>;
+    </Dialog>
+  );
 };
 export { ModalShareProfile };

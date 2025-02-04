@@ -1,57 +1,67 @@
-import { KeenIcon, Menu, MenuItem, MenuToggle } from '@/components';
-import { toAbsoluteUrl } from '@/utils/Assets';
-import { useLanguage } from '@/i18n';
-import { DropdownCrud1, DropdownCrudItem1 } from '@/partials/dropdowns/general';
-const Members = ({
-  url
-}) => {
-  const {
-    isRTL
-  } = useLanguage();
-  const tables = [{
-    avatar: '300-3.png',
-    name: 'Tyler Hero',
-    connections: 26,
-    label: 'Project Member',
-    joined: 'Today',
-    disabled: true
-  }, {
-    avatar: '300-1.png',
-    name: 'Esther Howard',
-    connections: 639,
-    label: 'Accountant',
-    joined: '5 days ago',
-    disabled: false
-  }, {
-    avatar: '300-11.png',
-    name: 'Jacob Jones',
-    connections: 125,
-    label: 'Data Analyst',
-    joined: '3 days ago',
-    disabled: false
-  }, {
-    avatar: '300-2.png',
-    name: 'Cody Fisher',
-    connections: 81,
-    label: 'Accountant',
-    joined: '2 weeks ago',
-    disabled: true
-  }, {
-    avatar: '300-5.png',
-    name: 'Leslie Alexander',
-    connections: 1203,
-    label: 'Director',
-    joined: '3 weeks ago',
-    disabled: false
-  }];
+import { KeenIcon, Menu, MenuItem, MenuToggle } from "@/components";
+import { toAbsoluteUrl } from "@/utils/Assets";
+import { useLanguage } from "@/i18n";
+import { DropdownCrud1, DropdownCrudItem1 } from "@/partials/dropdowns/general";
+const Members = ({ url }) => {
+  const { isRTL } = useLanguage();
+  const tables = [
+    {
+      avatar: "300-3.png",
+      name: "Tyler Hero",
+      connections: 26,
+      label: "Project Member",
+      joined: "Today",
+      disabled: true,
+    },
+    {
+      avatar: "300-1.png",
+      name: "Esther Howard",
+      connections: 639,
+      label: "Accountant",
+      joined: "5 days ago",
+      disabled: false,
+    },
+    {
+      avatar: "300-11.png",
+      name: "Jacob Jones",
+      connections: 125,
+      label: "Data Analyst",
+      joined: "3 days ago",
+      disabled: false,
+    },
+    {
+      avatar: "300-2.png",
+      name: "Cody Fisher",
+      connections: 81,
+      label: "Accountant",
+      joined: "2 weeks ago",
+      disabled: true,
+    },
+    {
+      avatar: "300-5.png",
+      name: "Leslie Alexander",
+      connections: 1203,
+      label: "Director",
+      joined: "3 weeks ago",
+      disabled: false,
+    },
+  ];
   const renderItem = (table, index) => {
-    return <tr key={index}>
+    return (
+      <tr key={index}>
         <td>
           <div className="flex items-center grow gap-2.5">
-            <img src={toAbsoluteUrl(`/media/avatars/${table.avatar}`)} className="rounded-full size-9 shrink-0" alt="" />
+            <img
+              src={toAbsoluteUrl(`/media/avatars/${table.avatar}`)}
+              className="rounded-full size-9 shrink-0"
+              alt=""
+            />
 
             <div className="flex flex-col">
-              <a href="#" className="text-sm font-semibold text-gray-900 hover:text-primary-active mb-px">
+              <a
+                href="#"
+                className="text-sm font-semibold text-gray-900 hover:text-primary-active mb-px"
+              >
                 {table.name}
               </a>
               <span className="text-xs font-normal text-gray-600">
@@ -66,8 +76,10 @@ const Members = ({
         </td>
 
         <td className="text-end">
-          <span className={`badge badge-sm badge-outline ${table.disabled ? 'badge-danger' : 'badge-success'}`}>
-            {table.disabled ? 'Disabled' : 'Enabled'}
+          <span
+            className={`badge badge-sm badge-outline ${table.disabled ? "badge-danger" : "badge-success"}`}
+          >
+            {table.disabled ? "Disabled" : "Enabled"}
           </span>
         </td>
 
@@ -75,15 +87,21 @@ const Members = ({
 
         <td className="text-end">
           <Menu className="inline-flex">
-            <MenuItem toggle="dropdown" trigger="click" dropdownProps={{
-            placement: isRTL() ? 'bottom-start' : 'bottom-end',
-            modifiers: [{
-              name: 'offset',
-              options: {
-                offset: isRTL() ? [0, -10] : [0, 10] // [skid, distance]
-              }
-            }]
-          }}>
+            <MenuItem
+              toggle="dropdown"
+              trigger="click"
+              dropdownProps={{
+                placement: isRTL() ? "bottom-start" : "bottom-end",
+                modifiers: [
+                  {
+                    name: "offset",
+                    options: {
+                      offset: isRTL() ? [0, -10] : [0, 10], // [skid, distance]
+                    },
+                  },
+                ],
+              }}
+            >
               <MenuToggle className="btn btn-sm btn-icon btn-light btn-clear">
                 <KeenIcon icon="dots-vertical" />
               </MenuToggle>
@@ -91,9 +109,11 @@ const Members = ({
             </MenuItem>
           </Menu>
         </td>
-      </tr>;
+      </tr>
+    );
   };
-  return <div className="card min-w-full">
+  return (
+    <div className="card min-w-full">
       <div className="card-header">
         <h3 className="card-title">Members</h3>
 
@@ -106,15 +126,21 @@ const Members = ({
           </div>
 
           <Menu className="items-stretch">
-            <MenuItem toggle="dropdown" trigger="click" dropdownProps={{
-            placement: isRTL() ? 'bottom-start' : 'bottom-end',
-            modifiers: [{
-              name: 'offset',
-              options: {
-                offset: isRTL() ? [0, -10] : [0, 10] // [skid, distance]
-              }
-            }]
-          }}>
+            <MenuItem
+              toggle="dropdown"
+              trigger="click"
+              dropdownProps={{
+                placement: isRTL() ? "bottom-start" : "bottom-end",
+                modifiers: [
+                  {
+                    name: "offset",
+                    options: {
+                      offset: isRTL() ? [0, -10] : [0, 10], // [skid, distance]
+                    },
+                  },
+                ],
+              }}
+            >
               <MenuToggle className="btn btn-sm btn-icon btn-light btn-clear">
                 <KeenIcon icon="dots-vertical" />
               </MenuToggle>
@@ -137,8 +163,8 @@ const Members = ({
               </tr>
 
               {tables.map((table, index) => {
-              return renderItem(table, index);
-            })}
+                return renderItem(table, index);
+              })}
             </tbody>
           </table>
         </div>
@@ -149,6 +175,7 @@ const Members = ({
           View 64 more
         </a>
       </div>
-    </div>;
+    </div>
+  );
 };
 export { Members };

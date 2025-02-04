@@ -1,27 +1,35 @@
-import { KeenIcon, Menu, MenuItem, MenuToggle } from '@/components';
-import { toAbsoluteUrl } from '@/utils';
-import { DropdownCard2 } from '@/partials/dropdowns/general';
+import { KeenIcon, Menu, MenuItem, MenuToggle } from "@/components";
+import { toAbsoluteUrl } from "@/utils";
+import { DropdownCard2 } from "@/partials/dropdowns/general";
 const TrustedDevices = () => {
-  const items = [{
-    logo: 'chrome.svg',
-    browser: 'Chrome',
-    location: 'Seville, Spain',
-    flag: 'spain.svg',
-    device: 'MacOS 12.19.6',
-    datetime: 'Active: Today at 9:03 AM'
-  }, {
-    logo: 'chrome.svg',
-    browser: 'Chrome',
-    location: 'Lyon, France',
-    flag: 'france.svg',
-    device: 'Android 14.35',
-    datetime: 'Active: Mar 18 at 9:03 AM'
-  }];
+  const items = [
+    {
+      logo: "chrome.svg",
+      browser: "Chrome",
+      location: "Seville, Spain",
+      flag: "spain.svg",
+      device: "MacOS 12.19.6",
+      datetime: "Active: Today at 9:03 AM",
+    },
+    {
+      logo: "chrome.svg",
+      browser: "Chrome",
+      location: "Lyon, France",
+      flag: "france.svg",
+      device: "Android 14.35",
+      datetime: "Active: Mar 18 at 9:03 AM",
+    },
+  ];
   const renderItem = (item, index) => {
-    return <tr key={index}>
+    return (
+      <tr key={index}>
         <td className="min-w-48 w-48">
           <div className="flex items-center gitem gap-2.5">
-            <img src={toAbsoluteUrl(`/media/brand-logos/${item.logo}`)} className="h-6" alt="image" />
+            <img
+              src={toAbsoluteUrl(`/media/brand-logos/${item.logo}`)}
+              className="h-6"
+              alt="image"
+            />
 
             <div className="flex flex-col">
               <div className="text-sm font-medium text-gray-900 hover:text-primary-active mb-px">
@@ -29,7 +37,11 @@ const TrustedDevices = () => {
               </div>
               <div className="flex gap-1.5">
                 <span className="text-xs text-gray-700">{item.location}</span>
-                <img src={toAbsoluteUrl(`/media/flags/${item.flag}`)} className="h-3.5 rounded-full" alt="image" />
+                <img
+                  src={toAbsoluteUrl(`/media/flags/${item.flag}`)}
+                  className="h-3.5 rounded-full"
+                  alt="image"
+                />
               </div>
             </div>
           </div>
@@ -46,22 +58,30 @@ const TrustedDevices = () => {
             <KeenIcon icon="exit-right" />
           </a>
         </td>
-      </tr>;
+      </tr>
+    );
   };
-  return <div className="card min-w-full">
+  return (
+    <div className="card min-w-full">
       <div className="card-header">
         <h3 className="card-title">Trusted Devices</h3>
 
         <Menu className="items-stretch">
-          <MenuItem toggle="dropdown" trigger="click" dropdownProps={{
-          placement: 'bottom-end',
-          modifiers: [{
-            name: 'offset',
-            options: {
-              offset: [0, 10] // [skid, distance]
-            }
-          }]
-        }}>
+          <MenuItem
+            toggle="dropdown"
+            trigger="click"
+            dropdownProps={{
+              placement: "bottom-end",
+              modifiers: [
+                {
+                  name: "offset",
+                  options: {
+                    offset: [0, 10], // [skid, distance]
+                  },
+                },
+              ],
+            }}
+          >
             <MenuToggle className="btn btn-sm btn-icon btn-light btn-clear">
               <KeenIcon icon="dots-vertical" />
             </MenuToggle>
@@ -75,8 +95,8 @@ const TrustedDevices = () => {
           <table className="table align-middle text-gray-600 font-medium text-2sm">
             <tbody>
               {items.map((item, index) => {
-              return renderItem(item, index);
-            })}
+                return renderItem(item, index);
+              })}
             </tbody>
           </table>
         </div>
@@ -87,6 +107,7 @@ const TrustedDevices = () => {
           Manage Trusted Devices
         </a>
       </div>
-    </div>;
+    </div>
+  );
 };
 export { TrustedDevices };

@@ -1,11 +1,16 @@
-import { Dialog, DialogBody, DialogContent, DialogDescription, DialogHeader, DialogTitle } from '@/components/ui/dialog';
-import { Link } from 'react-router-dom';
-import { toAbsoluteUrl } from '@/utils';
-const ModalWelcomMessage = ({
-  open,
-  onOpenChange
-}) => {
-  return <Dialog open={open} onOpenChange={onOpenChange}>
+import {
+  Dialog,
+  DialogBody,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
+import { Link } from "react-router-dom";
+import { toAbsoluteUrl } from "@/utils";
+const ModalWelcomMessage = ({ open, onOpenChange }) => {
+  return (
+    <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="max-w-[500px]">
         <DialogHeader className="border-0">
           <DialogTitle></DialogTitle>
@@ -13,8 +18,14 @@ const ModalWelcomMessage = ({
         </DialogHeader>
         <DialogBody className="flex flex-col items-center pt-10 pb-10">
           <div className="mb-10">
-            <img src={toAbsoluteUrl('/media/illustrations/21.svg')} className="dark:hidden max-h-[140px]" />
-            <img src={toAbsoluteUrl('/media/illustrations/21-dark.svg')} className="light:hidden max-h-[140px]" />
+            <img
+              src={toAbsoluteUrl("/media/illustrations/21.svg")}
+              className="dark:hidden max-h-[140px]"
+            />
+            <img
+              src={toAbsoluteUrl("/media/illustrations/21-dark.svg")}
+              className="light:hidden max-h-[140px]"
+            />
           </div>
 
           <h3 className="text-lg font-medium text-gray-900 text-center mb-3">
@@ -32,11 +43,15 @@ const ModalWelcomMessage = ({
             </Link>
           </div>
 
-          <Link to="/" className="text-2sm font-medium text-gray-700 hover:text-primary py-3">
+          <Link
+            to="/"
+            className="text-2sm font-medium text-gray-700 hover:text-primary py-3"
+          >
             Skip the tour
           </Link>
         </DialogBody>
       </DialogContent>
-    </Dialog>;
+    </Dialog>
+  );
 };
 export { ModalWelcomMessage };

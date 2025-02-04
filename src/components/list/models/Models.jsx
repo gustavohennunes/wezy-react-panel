@@ -144,7 +144,7 @@ const Models = () => {
         },
       },
     ],
-    []
+    [],
   );
   const data = useMemo(() => models, [models]); // Use models state
 

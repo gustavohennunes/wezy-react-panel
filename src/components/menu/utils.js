@@ -1,9 +1,9 @@
-import { Children, isValidElement } from 'react';
-import { MenuLink } from './MenuLink';
-import { matchPath } from 'react-router';
-export const getMenuLinkPath = children => {
-  let path = '';
-  Children.forEach(children, child => {
+import { Children, isValidElement } from "react";
+import { MenuLink } from "./MenuLink";
+import { matchPath } from "react-router";
+export const getMenuLinkPath = (children) => {
+  let path = "";
+  Children.forEach(children, (child) => {
     if (isValidElement(child) && child.type === MenuLink && child.props.path) {
       path = child.props.path; // Assign the path when found
     }
@@ -15,7 +15,7 @@ export const hasMenuActiveChild = (path, children) => {
   for (const child of childrenArray) {
     if (isValidElement(child)) {
       if (child.type === MenuLink && child.props.path) {
-        if (path === '/') {
+        if (path === "/") {
           if (child.props.path === path) {
             return true;
           }

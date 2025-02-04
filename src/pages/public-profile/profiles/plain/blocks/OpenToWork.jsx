@@ -1,17 +1,15 @@
-import { Link } from 'react-router-dom';
-import clsx from 'clsx';
-const OpenToWork = ({
-  className,
-  title
-}) => {
-  return <div className={clsx(`card ${className && className}`)}>
+import { Link } from "react-router-dom";
+import clsx from "clsx";
+const OpenToWork = ({ className, title }) => {
+  return (
+    <div className={clsx(`card ${className && className}`)}>
       <div className="card-header">
         <h3 className="card-title">{title}</h3>
       </div>
       <div className="card-body">
         <p className="text-sm text-gray-800 leading-5.5">
-          Seasoned UI/UX designer with a flair for user-centric interfaces. Let&apos;s create
-          something amazing together!
+          Seasoned UI/UX designer with a flair for user-centric interfaces.
+          Let&apos;s create something amazing together!
         </p>
       </div>
 
@@ -20,6 +18,7 @@ const OpenToWork = ({
           View details
         </Link>
       </div>
-    </div>;
+    </div>
+  );
 };
 export { OpenToWork };

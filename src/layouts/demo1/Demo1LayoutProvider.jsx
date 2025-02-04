@@ -1,13 +1,12 @@
-/* eslint-disable no-unused-vars */
-import { createContext, useContext, useEffect, useState } from 'react';
-import { useLocation } from 'react-router';
-import { useMenuChildren } from '@/components/menu';
-import { MENU_SIDEBAR } from '@/config/menu.config';
-import { useScrollPosition } from '@/hooks/useScrollPosition';
-import { useMenus } from '@/providers';
-import { useLayout } from '@/providers';
-import { deepMerge } from '@/utils';
-import { demo1LayoutConfig } from './';
+import { createContext, useContext, useEffect, useState } from "react";
+import { useLocation } from "react-router";
+import { useMenuChildren } from "@/components/menu";
+import { MENU_SIDEBAR } from "@/config/menu.config";
+import { useScrollPosition } from "@/hooks/useScrollPosition";
+import { useMenus } from "@/providers";
+import { useLayout } from "@/providers";
+import { deepMerge } from "@/utils";
+import { demo1LayoutConfig } from "./";
 
 // Interface defining the structure for layout provider properties
 
@@ -25,24 +24,24 @@ const initalLayoutProps = {
   // Mobile mega menu is closed by default
   sidebarMouseLeave: false,
   // Sidebar mouse leave is false initially
-  setSidebarMouseLeave: state => {
+  setSidebarMouseLeave: (state) => {
     console.log(`${state}`);
   },
-  setMobileMegaMenuOpen: open => {
+  setMobileMegaMenuOpen: (open) => {
     console.log(`${open}`);
   },
-  setMobileSidebarOpen: open => {
+  setMobileSidebarOpen: (open) => {
     console.log(`${open}`);
   },
-  setMegaMenuEnabled: enabled => {
+  setMegaMenuEnabled: (enabled) => {
     console.log(`${enabled}`);
   },
-  setSidebarCollapse: collapse => {
+  setSidebarCollapse: (collapse) => {
     console.log(`${collapse}`);
   },
-  setSidebarTheme: mode => {
+  setSidebarTheme: (mode) => {
     console.log(`${mode}`);
-  }
+  },
 };
 
 // Creating context for the layout provider with initial properties
@@ -52,25 +51,15 @@ const Demo1LayoutContext = createContext(initalLayoutProps);
 const useDemo1Layout = () => useContext(Demo1LayoutContext);
 
 // Layout provider component that wraps the application
-const Demo1LayoutProvider = ({
-  children
-}) => {
-  const {
-    pathname
-  } = useLocation(); // Gets the current path
-  const {
-    setMenuConfig
-  } = useMenus(); // Accesses menu configuration methods
+const Demo1LayoutProvider = ({ children }) => {
+  const { pathname } = useLocation(); // Gets the current path
+  const { setMenuConfig } = useMenus(); // Accesses menu configuration methods
   const secondaryMenu = useMenuChildren(pathname, MENU_SIDEBAR, 0); // Retrieves the secondary menu
 
   // Sets the primary and secondary menu configurations
-  setMenuConfig('primary', MENU_SIDEBAR);
-  setMenuConfig('secondary', secondaryMenu);
-  const {
-    getLayout,
-    updateLayout,
-    setCurrentLayout
-  } = useLayout(); // Layout management methods
+  setMenuConfig("primary", MENU_SIDEBAR);
+  setMenuConfig("secondary", secondaryMenu);
+  const { getLayout, updateLayout, setCurrentLayout } = useLayout(); // Layout management methods
 
   // Merges the default layout with the current one
   const getLayoutConfig = () => {
@@ -95,45 +84,47 @@ const Demo1LayoutProvider = ({
   const headerSticky = scrollPosition > 0; // Makes the header sticky based on scroll
 
   // Function to collapse or expand the sidebar
-  const setSidebarCollapse = collapse => {
+  const setSidebarCollapse = (collapse) => {
     const updatedLayout = {
       options: {
         sidebar: {
-          collapse
-        }
-      }
+          collapse,
+        },
+      },
     };
     updateLayout(demo1LayoutConfig.name, updatedLayout); // Updates the layout with the collapsed state
     setLayout(getLayoutConfig()); // Refreshes the layout configuration
   };
 
   // Function to set the sidebar theme (e.g., light or dark)
-  const setSidebarTheme = mode => {
+  const setSidebarTheme = (mode) => {
     const updatedLayout = {
       options: {
         sidebar: {
-          theme: mode
-        }
-      }
+          theme: mode,
+        },
+      },
     };
     setLayout(deepMerge(layout, updatedLayout)); // Merges and sets the updated layout
   };
   return (
     // Provides the layout configuration and controls via context to the application
-    <Demo1LayoutContext.Provider value={{
-      layout,
-      headerSticky,
-      mobileSidebarOpen,
-      mobileMegaMenuOpen,
-      megaMenuEnabled,
-      sidebarMouseLeave,
-      setMobileSidebarOpen,
-      setMegaMenuEnabled,
-      setSidebarMouseLeave,
-      setMobileMegaMenuOpen,
-      setSidebarCollapse,
-      setSidebarTheme
-    }}>
+    <Demo1LayoutContext.Provider
+      value={{
+        layout,
+        headerSticky,
+        mobileSidebarOpen,
+        mobileMegaMenuOpen,
+        megaMenuEnabled,
+        sidebarMouseLeave,
+        setMobileSidebarOpen,
+        setMegaMenuEnabled,
+        setSidebarMouseLeave,
+        setMobileMegaMenuOpen,
+        setSidebarCollapse,
+        setSidebarTheme,
+      }}
+    >
       {children}
     </Demo1LayoutContext.Provider>
   );

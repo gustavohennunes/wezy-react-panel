@@ -1,21 +1,29 @@
-import { Fragment } from 'react';
-import { Container } from '@/components/container';
-import { Toolbar, ToolbarActions, ToolbarDescription, ToolbarHeading, ToolbarPageTitle } from '@/partials/toolbar';
-import { PageNavbar } from '@/pages/account';
-import { AccountNotificationsContent } from '.';
-import { useLayout } from '@/providers';
+import { Fragment } from "react";
+import { Container } from "@/components/container";
+import {
+  Toolbar,
+  ToolbarActions,
+  ToolbarDescription,
+  ToolbarHeading,
+  ToolbarPageTitle,
+} from "@/partials/toolbar";
+import { PageNavbar } from "@/pages/account";
+import { AccountNotificationsContent } from ".";
+import { useLayout } from "@/providers";
 const AccountNotificationsPage = () => {
-  const {
-    currentLayout
-  } = useLayout();
-  return <Fragment>
+  const { currentLayout } = useLayout();
+  return (
+    <Fragment>
       <PageNavbar />
 
-      {currentLayout?.name === 'demo1-layout' && <Container>
+      {currentLayout?.name === "demo1-layout" && (
+        <Container>
           <Toolbar>
             <ToolbarHeading>
               <ToolbarPageTitle />
-              <ToolbarDescription>Central Hub for Personal Customization</ToolbarDescription>
+              <ToolbarDescription>
+                Central Hub for Personal Customization
+              </ToolbarDescription>
             </ToolbarHeading>
             <ToolbarActions>
               <a href="#" className="btn btn-sm btn-light">
@@ -23,11 +31,13 @@ const AccountNotificationsPage = () => {
               </a>
             </ToolbarActions>
           </Toolbar>
-        </Container>}
+        </Container>
+      )}
 
       <Container>
         <AccountNotificationsContent />
       </Container>
-    </Fragment>;
+    </Fragment>
+  );
 };
 export { AccountNotificationsPage };

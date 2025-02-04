@@ -1,5 +1,5 @@
 const PanelLayoutConfig = {
-  name: 'panel-layout',
-  options: {}
+  name: "panel-layout",
+  options: {},
 };
 export { PanelLayoutConfig };

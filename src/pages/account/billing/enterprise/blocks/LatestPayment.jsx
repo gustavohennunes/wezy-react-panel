@@ -1,31 +1,47 @@
-import { KeenIcon } from '@/components';
-import { toAbsoluteUrl } from '@/utils';
+import { KeenIcon } from "@/components";
+import { toAbsoluteUrl } from "@/utils";
 const LatestPayment = () => {
-  const tables = [{
-    status: 'Typ of Plan',
-    info: 'Cloud One Enterprise'
-  }, {
-    status: 'Payment Date',
-    info: '6 Aug, 2024'
-  }, {
-    status: 'Card used to pay:',
-    logo: true,
-    info: 'Ending 3604'
-  }, {
-    status: 'Total Payment:',
-    info: '$24.00'
-  }];
+  const tables = [
+    {
+      status: "Typ of Plan",
+      info: "Cloud One Enterprise",
+    },
+    {
+      status: "Payment Date",
+      info: "6 Aug, 2024",
+    },
+    {
+      status: "Card used to pay:",
+      logo: true,
+      info: "Ending 3604",
+    },
+    {
+      status: "Total Payment:",
+      info: "$24.00",
+    },
+  ];
   const renderItem = (table, index) => {
-    return <tr key={index}>
-        <td className="text-sm text-gray-600 min-w-36 pb-5 pe-6">{table.status}</td>
+    return (
+      <tr key={index}>
+        <td className="text-sm text-gray-600 min-w-36 pb-5 pe-6">
+          {table.status}
+        </td>
         <td className="flex items-center gap-2.5 text-sm text-gray-800">
-          {table.logo && <img src={toAbsoluteUrl('/media/brand-logos/visa.svg')} className="w-10 shrink-0" alt="" />}
+          {table.logo && (
+            <img
+              src={toAbsoluteUrl("/media/brand-logos/visa.svg")}
+              className="w-10 shrink-0"
+              alt=""
+            />
+          )}
 
           {table.info}
         </td>
-      </tr>;
+      </tr>
+    );
   };
-  return <div className="card grow">
+  return (
+    <div className="card grow">
       <div className="card-header">
         <h3 className="card-title">Latest Payment</h3>
 
@@ -39,11 +55,12 @@ const LatestPayment = () => {
         <table className="table-auto">
           <tbody>
             {tables.map((table, index) => {
-            return renderItem(table, index);
-          })}
+              return renderItem(table, index);
+            })}
           </tbody>
         </table>
       </div>
-    </div>;
+    </div>
+  );
 };
 export { LatestPayment };

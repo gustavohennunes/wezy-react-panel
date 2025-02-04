@@ -1,7 +1,14 @@
-import { Link } from 'react-router-dom';
-import { ActivitiesBloggingConference, ActivitiesLogin, ActivitiesNewProduct, ActivitiesProductSpecific, ActivitiesProductWebinar } from '@/partials/activities/items';
+import { Link } from "react-router-dom";
+import {
+  ActivitiesBloggingConference,
+  ActivitiesLogin,
+  ActivitiesNewProduct,
+  ActivitiesProductSpecific,
+  ActivitiesProductWebinar,
+} from "@/partials/activities/items";
 const Activity = () => {
-  return <div className="card">
+  return (
+    <div className="card">
       <div className="card-header">
         <h3 className="card-title">Recent Activity</h3>
 
@@ -12,7 +19,13 @@ const Activity = () => {
               <span className="switch-on:hidden">Off</span>
               <span className="hidden switch-on:inline">On</span>
             </span>
-            <input type="checkbox" value="1" name="check" defaultChecked readOnly />
+            <input
+              type="checkbox"
+              value="1"
+              name="check"
+              defaultChecked
+              readOnly
+            />
           </label>
         </div>
       </div>
@@ -24,7 +37,11 @@ const Activity = () => {
 
         <ActivitiesLogin />
 
-        <ActivitiesBloggingConference heading="Email campaign sent to Jenny for a special promotion." datetime="1 week ago, 11:45 AM" title="First Campaign Created" />
+        <ActivitiesBloggingConference
+          heading="Email campaign sent to Jenny for a special promotion."
+          datetime="1 week ago, 11:45 AM"
+          title="First Campaign Created"
+        />
 
         <ActivitiesProductSpecific />
       </div>
@@ -34,6 +51,7 @@ const Activity = () => {
           All-time Activities
         </Link>
       </div>
-    </div>;
+    </div>
+  );
 };
 export { Activity };

@@ -1,50 +1,64 @@
-import { KeenIcon, Menu, MenuItem, MenuToggle } from '@/components';
-import { DropdownCardItem2 } from '@/partials/dropdowns/general';
+import { KeenIcon, Menu, MenuItem, MenuToggle } from "@/components";
+import { DropdownCardItem2 } from "@/partials/dropdowns/general";
 const BillingInvoicing = () => {
-  const tables = [{
-    number: 'Invoice-2024-xd912c',
-    date: '6 Aug, 2024',
-    ammount: '24.00',
-    label: 'Upcoming',
-    color: 'badge-warning'
-  }, {
-    number: 'Invoice-2024-rq857m',
-    date: '17 Jun, 2024',
-    ammount: '29.99',
-    label: 'Paid',
-    color: 'badge-success'
-  }, {
-    number: 'Invoice-2024-hg234x',
-    date: '21 Apr, 2024',
-    ammount: '6.59',
-    label: 'Declined',
-    color: 'badge-danger'
-  }, {
-    number: 'Invoice-2024-lp098y',
-    date: '14 mar, 2024',
-    ammount: '24.00',
-    label: 'Paid',
-    color: 'badge-success'
-  }];
+  const tables = [
+    {
+      number: "Invoice-2024-xd912c",
+      date: "6 Aug, 2024",
+      ammount: "24.00",
+      label: "Upcoming",
+      color: "badge-warning",
+    },
+    {
+      number: "Invoice-2024-rq857m",
+      date: "17 Jun, 2024",
+      ammount: "29.99",
+      label: "Paid",
+      color: "badge-success",
+    },
+    {
+      number: "Invoice-2024-hg234x",
+      date: "21 Apr, 2024",
+      ammount: "6.59",
+      label: "Declined",
+      color: "badge-danger",
+    },
+    {
+      number: "Invoice-2024-lp098y",
+      date: "14 mar, 2024",
+      ammount: "24.00",
+      label: "Paid",
+      color: "badge-success",
+    },
+  ];
   const renderItem = (table, index) => {
-    return <tr key={index}>
+    return (
+      <tr key={index}>
         <td className="text-sm text-gray-800">{table.number}</td>
         <td className="lg:text-end">
-          <div className={`badge badge-sm ${table.color} badge-outline`}>{table.label}</div>
+          <div className={`badge badge-sm ${table.color} badge-outline`}>
+            {table.label}
+          </div>
         </td>
         <td className="text-sm text-gray-800 lg:text-end">{table.date}</td>
         <td className="text-sm text-gray-800 lg:text-end">${table.ammount}</td>
         <td>
           <Menu className="items-stretch">
-            <MenuItem toggle="dropdown" trigger="click" dropdownProps={{
-            placement: 'bottom-end',
-            modifiers: [{
-              name: 'offset',
-              options: {
-                offset: [0, 10] // [skid, distance]
-              }
-            }]
-          }}>
+            <MenuItem
+              toggle="dropdown"
+              trigger="click"
+              dropdownProps={{
+                placement: "bottom-end",
+                modifiers: [
+                  {
+                    name: "offset",
+                    options: {
+                      offset: [0, 10], // [skid, distance]
+                    },
+                  },
+                ],
+              }}
+            >
               <MenuToggle className="btn btn-sm btn-icon btn-light btn-clear mb-2.5-">
                 <KeenIcon icon="dots-vertical" />
               </MenuToggle>
@@ -52,9 +66,11 @@ const BillingInvoicing = () => {
             </MenuItem>
           </Menu>
         </td>
-      </tr>;
+      </tr>
+    );
   };
-  return <div className="card">
+  return (
+    <div className="card">
       <div className="card-header">
         <h3 className="card-title">Billing and Invoicing</h3>
 
@@ -77,8 +93,8 @@ const BillingInvoicing = () => {
           </thead>
           <tbody>
             {tables.map((table, index) => {
-            return renderItem(table, index);
-          })}
+              return renderItem(table, index);
+            })}
           </tbody>
         </table>
       </div>
@@ -87,6 +103,7 @@ const BillingInvoicing = () => {
           View all Payments
         </a>
       </div>
-    </div>;
+    </div>
+  );
 };
 export { BillingInvoicing };

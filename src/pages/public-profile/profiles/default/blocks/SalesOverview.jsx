@@ -1,6 +1,7 @@
-import { KeenIcon } from '@/components';
+import { KeenIcon } from "@/components";
 const SalesOverview = () => {
-  return <div className="card">
+  return (
+    <div className="card">
       <div className="card-header">
         <h3 className="card-title">Sales Overview</h3>
 
@@ -24,6 +25,7 @@ const SalesOverview = () => {
       <div className="px-3 py-1">
         <div id="sales_overview_chart"></div>
       </div>
-    </div>;
+    </div>
+  );
 };
 export { SalesOverview };

@@ -1,18 +1,17 @@
-import { Link } from 'react-router-dom';
-import { KeenIcon } from '@/components';
-import { toAbsoluteUrl } from '@/utils/Assets';
-const CardIntegration = ({
-  logo,
-  path,
-  name,
-  description,
-  actions
-}) => {
-  return <div className="card">
+import { Link } from "react-router-dom";
+import { KeenIcon } from "@/components";
+import { toAbsoluteUrl } from "@/utils/Assets";
+const CardIntegration = ({ logo, path, name, description, actions }) => {
+  return (
+    <div className="card">
       <div className="card-body p-5 lg:p-7.5">
         <div className="flex items-center justify-between mb-3 lg:mb-5">
           <div className="flex items-center justify-center">
-            <img src={toAbsoluteUrl(`/media/brand-logos/${logo}`)} className="h-11 shrink-0" alt="" />
+            <img
+              src={toAbsoluteUrl(`/media/brand-logos/${logo}`)}
+              className="h-11 shrink-0"
+              alt=""
+            />
           </div>
           <div className="btn btn-sm btn-icon btn-clear btn-light">
             <KeenIcon icon="exit-right-corner" />
@@ -20,7 +19,10 @@ const CardIntegration = ({
         </div>
 
         <div className="flex flex-col gap-1 lg:gap-2.5">
-          <Link to={`${path}`} className="text-base font-medium text-gray-900 hover:text-primary-active">
+          <Link
+            to={`${path}`}
+            className="text-base font-medium text-gray-900 hover:text-primary-active"
+          >
             {name}
           </Link>
           <span className="text-2sm text-gray-700">{description}</span>
@@ -34,6 +36,7 @@ const CardIntegration = ({
         </a>
         <div className="flex items-center gap-2.5">{actions}</div>
       </div>
-    </div>;
+    </div>
+  );
 };
 export { CardIntegration };

@@ -1,7 +1,6 @@
-/* eslint-disable no-unused-vars */
-import axios from 'axios';
-import { createContext, useState } from 'react';
-import * as authHelper from '../_helpers';
+import axios from "axios";
+import { createContext, useState } from "react";
+import * as authHelper from "../_helpers";
 const API_URL = import.meta.env.VITE_APP_API_URL;
 export const LOGIN_URL = `${API_URL}/login`;
 export const REGISTER_URL = `${API_URL}/register`;
@@ -9,18 +8,14 @@ export const FORGOT_PASSWORD_URL = `${API_URL}/forgot-password`;
 export const RESET_PASSWORD_URL = `${API_URL}/reset-password`;
 export const GET_USER_URL = `${API_URL}/user`;
 const AuthContext = createContext(null);
-const AuthProvider = ({
-  children
-}) => {
+const AuthProvider = ({ children }) => {
   const [loading, setLoading] = useState(true);
   const [auth, setAuth] = useState(authHelper.getAuth());
   const [currentUser, setCurrentUser] = useState();
   const verify = async () => {
     if (auth) {
       try {
-        const {
-          data: user
-        } = await getUser();
+        const { data: user } = await getUser();
         setCurrentUser(user);
       } catch {
         saveAuth(undefined);
@@ -28,7 +23,7 @@ const AuthProvider = ({
       }
     }
   };
-  const saveAuth = auth => {
+  const saveAuth = (auth) => {
     setAuth(auth);
     if (auth) {
       authHelper.setAuth(auth);
@@ -38,16 +33,12 @@ const AuthProvider = ({
   };
   const login = async (email, password) => {
     try {
-      const {
-        data: auth
-      } = await axios.post(LOGIN_URL, {
+      const { data: auth } = await axios.post(LOGIN_URL, {
         email,
-        password
+        password,
       });
       saveAuth(auth);
-      const {
-        data: user
-      } = await getUser();
+      const { data: user } = await getUser();
       setCurrentUser(user);
     } catch (error) {
       saveAuth(undefined);
@@ -56,34 +47,35 @@ const AuthProvider = ({
   };
   const register = async (email, password, password_confirmation) => {
     try {
-      const {
-        data: auth
-      } = await axios.post(REGISTER_URL, {
+      const { data: auth } = await axios.post(REGISTER_URL, {
         email,
         password,
-        password_confirmation
+        password_confirmation,
       });
       saveAuth(auth);
-      const {
-        data: user
-      } = await getUser();
+      const { data: user } = await getUser();
       setCurrentUser(user);
     } catch (error) {
       saveAuth(undefined);
       throw new Error(`Error ${error}`);
     }
   };
-  const requestPasswordResetLink = async email => {
+  const requestPasswordResetLink = async (email) => {
     await axios.post(FORGOT_PASSWORD_URL, {
-      email
+      email,
     });
   };
-  const changePassword = async (email, token, password, password_confirmation) => {
+  const changePassword = async (
+    email,
+    token,
+    password,
+    password_confirmation,
+  ) => {
     await axios.post(RESET_PASSWORD_URL, {
       email,
       token,
       password,
-      password_confirmation
+      password_confirmation,
     });
   };
   const getUser = async () => {
@@ -93,22 +85,26 @@ const AuthProvider = ({
     saveAuth(undefined);
     setCurrentUser(undefined);
   };
-  return <AuthContext.Provider value={{
-    loading,
-    setLoading,
-    auth,
-    saveAuth,
-    currentUser,
-    setCurrentUser,
-    login,
-    register,
-    requestPasswordResetLink,
-    changePassword,
-    getUser,
-    logout,
-    verify
-  }}>
+  return (
+    <AuthContext.Provider
+      value={{
+        loading,
+        setLoading,
+        auth,
+        saveAuth,
+        currentUser,
+        setCurrentUser,
+        login,
+        register,
+        requestPasswordResetLink,
+        changePassword,
+        getUser,
+        logout,
+        verify,
+      }}
+    >
       {children}
-    </AuthContext.Provider>;
+    </AuthContext.Provider>
+  );
 };
 export { AuthContext, AuthProvider };

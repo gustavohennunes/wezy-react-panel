@@ -1,55 +1,95 @@
-import { DefaultTooltip, KeenIcon } from '@/components';
-import { MenuItem, MenuLink, MenuSub, MenuTitle, MenuArrow, MenuIcon, MenuBadge, MenuSeparator } from '@/components/menu';
-import { useResponsive } from '@/hooks';
-import { useLanguage } from '@/i18n';
-import clsx from 'clsx';
-const MegaMenuSubDropdown = items => {
-  const desktopMode = useResponsive('up', 'lg');
-  const {
-    isRTL
-  } = useLanguage();
-  const buildItems = items => {
+import { DefaultTooltip, KeenIcon } from "@/components";
+import {
+  MenuItem,
+  MenuLink,
+  MenuSub,
+  MenuTitle,
+  MenuArrow,
+  MenuIcon,
+  MenuBadge,
+  MenuSeparator,
+} from "@/components/menu";
+import { useResponsive } from "@/hooks";
+import { useLanguage } from "@/i18n";
+import clsx from "clsx";
+const MegaMenuSubDropdown = (items) => {
+  const desktopMode = useResponsive("up", "lg");
+  const { isRTL } = useLanguage();
+  const buildItems = (items) => {
     return items.map((item, index) => {
       if (item.separator) {
         return <MenuSeparator key={index} />;
       } else if (item.children) {
-        return <MenuItem key={index} toggle={desktopMode ? 'dropdown' : 'accordion'} trigger={desktopMode ? 'hover' : 'click'} dropdownProps={{
-          placement: isRTL() ? 'left-start' : 'right-start'
-        }}>
+        return (
+          <MenuItem
+            key={index}
+            toggle={desktopMode ? "dropdown" : "accordion"}
+            trigger={desktopMode ? "hover" : "click"}
+            dropdownProps={{
+              placement: isRTL() ? "left-start" : "right-start",
+            }}
+          >
             <MenuLink className="grow-0">
-              {item.icon && <MenuIcon>
+              {item.icon && (
+                <MenuIcon>
                   <KeenIcon icon={item.icon} />
-                </MenuIcon>}
-              <MenuTitle className={clsx('')}>{item.title}</MenuTitle>
+                </MenuIcon>
+              )}
+              <MenuTitle className={clsx("")}>{item.title}</MenuTitle>
               <MenuArrow>
-                <KeenIcon icon="right" className="text-3xs rtl:transform rtl:rotate-180" />
+                <KeenIcon
+                  icon="right"
+                  className="text-3xs rtl:transform rtl:rotate-180"
+                />
               </MenuArrow>
             </MenuLink>
-            <MenuSub className="menu-default" rootClassName="max-w-[175px] lg:max-w-[220px]">
+            <MenuSub
+              className="menu-default"
+              rootClassName="max-w-[175px] lg:max-w-[220px]"
+            >
               {buildItems(item.children)}
             </MenuSub>
-          </MenuItem>;
+          </MenuItem>
+        );
       } else {
-        return <MenuItem key={index}>
+        return (
+          <MenuItem key={index}>
             <MenuLink path={item.path}>
-              {item.icon && <MenuIcon>
+              {item.icon && (
+                <MenuIcon>
                   <KeenIcon icon={item.icon} />
-                </MenuIcon>}
+                </MenuIcon>
+              )}
               <MenuTitle>{item.title}</MenuTitle>
 
-              {item.disabled && <MenuBadge>
+              {item.disabled && (
+                <MenuBadge>
                   <span className="badge badge-xs">Soon</span>
-                </MenuBadge>}
+                </MenuBadge>
+              )}
 
-              {item.badge && <MenuBadge>
-                  <span className="badge badge-primary badge-outline badge-xs">{item.badge}</span>
-                </MenuBadge>}
+              {item.badge && (
+                <MenuBadge>
+                  <span className="badge badge-primary badge-outline badge-xs">
+                    {item.badge}
+                  </span>
+                </MenuBadge>
+              )}
 
-              {item.tooltip && <DefaultTooltip title={item.tooltip.title} placement={item.tooltip.placement}>
-                  <KeenIcon icon="information-2" className="text-gray-500 text-md" />
-                </DefaultTooltip>}
+              {item.tooltip && (
+                <DefaultTooltip
+                  title={item.tooltip.title}
+                  placement={item.tooltip.placement}
+                >
+                  <KeenIcon
+                    icon="information-2"
+                    className="text-gray-500 text-md"
+                  />
+                </DefaultTooltip>
+              )}
             </MenuLink>
-          </MenuItem>;
+          </MenuItem>
+        );
       }
     });
   };

@@ -1,6 +1,15 @@
-import { KeenIcon, MenuIcon, MenuItem, MenuLink, MenuSeparator, MenuSub, MenuTitle } from '@/components';
+import {
+  KeenIcon,
+  MenuIcon,
+  MenuItem,
+  MenuLink,
+  MenuSeparator,
+  MenuSub,
+  MenuTitle,
+} from "@/components";
 const DropdownCrudItem1 = () => {
-  return <MenuSub className="menu-default" rootClassName="w-full max-w-[175px]">
+  return (
+    <MenuSub className="menu-default" rootClassName="w-full max-w-[175px]">
       <MenuItem path="#">
         <MenuLink>
           <MenuIcon>
@@ -43,6 +52,7 @@ const DropdownCrudItem1 = () => {
           <MenuTitle>Remove</MenuTitle>
         </MenuLink>
       </MenuItem>
-    </MenuSub>;
+    </MenuSub>
+  );
 };
 export { DropdownCrudItem1 };

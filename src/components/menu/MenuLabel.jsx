@@ -1,19 +1,29 @@
-import clsx from 'clsx';
+import clsx from "clsx";
 const MenuLabel = ({
   className,
   hasItemSub,
   handleToggle,
   handleClick,
-  children
+  children,
 }) => {
   if (hasItemSub) {
-    return <div className={clsx('menu-label', className && className)} onClick={handleToggle}>
+    return (
+      <div
+        className={clsx("menu-label", className && className)}
+        onClick={handleToggle}
+      >
         {children}
-      </div>;
+      </div>
+    );
   } else {
-    return <div className={clsx('menu-label', className && className)} onClick={handleClick}>
+    return (
+      <div
+        className={clsx("menu-label", className && className)}
+        onClick={handleClick}
+      >
         {children}
-      </div>;
+      </div>
+    );
   }
 };
 export { MenuLabel };

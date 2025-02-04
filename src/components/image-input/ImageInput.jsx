@@ -1,16 +1,16 @@
 /* eslint-disable no-unused-vars */
-import { useCallback, useRef, useState } from 'react';
-import { getAcceptTypeString, getListFiles, openFileDialog } from './utils';
-import React from 'react';
+import { useCallback, useRef, useState } from "react";
+import { getAcceptTypeString, getListFiles, openFileDialog } from "./utils";
+import React from "react";
 export const DEFAULT_NULL_INDEX = -1;
-export const DEFAULT_DATA_URL_KEY = 'dataURL';
+export const DEFAULT_DATA_URL_KEY = "dataURL";
 const ImageInput = ({
   value,
   acceptType,
   inputProps,
   multiple,
   children,
-  onChange
+  onChange,
 }) => {
   const inValue = value || [];
   const inputRef = useRef(null);
@@ -25,11 +25,11 @@ const ImageInput = ({
   const onImageUpload = useCallback(() => {
     handleClickInput();
   }, [handleClickInput]);
-  const onInputChange = async e => {
+  const onInputChange = async (e) => {
     await handleChange(e.target.files);
-    if (inputRef.current) inputRef.current.value = '';
+    if (inputRef.current) inputRef.current.value = "";
   };
-  const handleChange = async files => {
+  const handleChange = async (files) => {
     if (!files) return;
     const fileList = await getListFiles(files, DEFAULT_DATA_URL_KEY);
     if (!fileList.length) return;
@@ -51,10 +51,10 @@ const ImageInput = ({
     }
     onChange?.(updatedFileList, updatedIndexes);
   };
-  const onImageRemove = index => {
+  const onImageRemove = (index) => {
     const updatedList = [...inValue];
     if (Array.isArray(index)) {
-      index.forEach(i => {
+      index.forEach((i) => {
         updatedList.splice(i, 1);
       });
     } else {
@@ -62,27 +62,27 @@ const ImageInput = ({
     }
     onChange?.(updatedList);
   };
-  const onImageUpdate = index => {
+  const onImageUpdate = (index) => {
     setKeyUpdate(index);
     handleClickInput();
   };
-  const handleDrag = e => {
+  const handleDrag = (e) => {
     e.preventDefault();
     e.stopPropagation();
   };
-  const handleDragIn = e => {
+  const handleDragIn = (e) => {
     e.preventDefault();
     e.stopPropagation();
     if (e.dataTransfer.items && e.dataTransfer.items.length > 0) {
       setIsDragging(true);
     }
   };
-  const handleDragOut = e => {
+  const handleDragOut = (e) => {
     e.preventDefault();
     e.stopPropagation();
     setIsDragging(false);
   };
-  const handleDrop = e => {
+  const handleDrop = (e) => {
     e.preventDefault();
     e.stopPropagation();
     setIsDragging(false);
@@ -90,32 +90,42 @@ const ImageInput = ({
       handleChange(e.dataTransfer.files);
     }
   };
-  const handleDragStart = e => {
+  const handleDragStart = (e) => {
     e.preventDefault();
     e.stopPropagation();
     e.dataTransfer.clearData();
   };
-  return <>
-      <input ref={inputRef} type="file" accept={getAcceptTypeString(acceptType)} multiple={multiple} onChange={e => {
-      onInputChange(e);
-    }} style={{
-      display: 'none'
-    }} {...inputProps} />
+  return (
+    <>
+      <input
+        ref={inputRef}
+        type="file"
+        accept={getAcceptTypeString(acceptType)}
+        multiple={multiple}
+        onChange={(e) => {
+          onInputChange(e);
+        }}
+        style={{
+          display: "none",
+        }}
+        {...inputProps}
+      />
       {children?.({
-      fileList: inValue,
-      onImageUpload,
-      onImageRemove,
-      onImageUpdate,
-      onImageRemoveAll,
-      dragProps: {
-        onDrop: handleDrop,
-        onDragEnter: handleDragIn,
-        onDragLeave: handleDragOut,
-        onDragOver: handleDrag,
-        onDragStart: handleDragStart
-      },
-      isDragging
-    })}
-    </>;
+        fileList: inValue,
+        onImageUpload,
+        onImageRemove,
+        onImageUpdate,
+        onImageRemoveAll,
+        dragProps: {
+          onDrop: handleDrop,
+          onDragEnter: handleDragIn,
+          onDragLeave: handleDragOut,
+          onDragOver: handleDrag,
+          onDragStart: handleDragStart,
+        },
+        isDragging,
+      })}
+    </>
+  );
 };
 export { ImageInput };

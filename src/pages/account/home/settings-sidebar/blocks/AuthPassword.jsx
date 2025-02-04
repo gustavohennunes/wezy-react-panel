@@ -1,5 +1,6 @@
 const AuthPassword = () => {
-  return <div className="card">
+  return (
+    <div className="card">
       <div className="card-header" id="auth_password">
         <h3 className="card-title">Password</h3>
       </div>
@@ -8,7 +9,7 @@ const AuthPassword = () => {
         <div className="w-full">
           <div className="flex items-baseline flex-wrap lg:flex-nowrap gap-2.5">
             <label className="form-label max-w-56">Current Password</label>
-            <input className="input" type="text" placeholder="Enter phone" />   
+            <input className="input" type="text" placeholder="Enter phone" />
           </div>
         </div>
 
@@ -22,7 +23,11 @@ const AuthPassword = () => {
         <div className="w-full">
           <div className="flex items-baseline flex-wrap lg:flex-nowrap gap-2.5">
             <label className="form-label max-w-56">Confirm New Password</label>
-            <input className="input" type="text" placeholder="Confirm new password" />
+            <input
+              className="input"
+              type="text"
+              placeholder="Confirm new password"
+            />
           </div>
         </div>
 
@@ -30,6 +35,7 @@ const AuthPassword = () => {
           <button className="btn btn-primary">Reset Password</button>
         </div>
       </div>
-    </div>;
+    </div>
+  );
 };
 export { AuthPassword };

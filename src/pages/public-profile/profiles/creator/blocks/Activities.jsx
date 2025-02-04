@@ -1,9 +1,17 @@
-import { Fragment } from 'react';
-import { Link } from 'react-router-dom';
-import { toAbsoluteUrl } from '@/utils';
-import { ActivitiesAnniversary, ActivitiesBloggingConference, ActivitiesFollowersMilestone, ActivitiesInterview, ActivitiesNewArticle, ActivitiesUpcomingContent } from '@/partials/activities/items';
+import { Fragment } from "react";
+import { Link } from "react-router-dom";
+import { toAbsoluteUrl } from "@/utils";
+import {
+  ActivitiesAnniversary,
+  ActivitiesBloggingConference,
+  ActivitiesFollowersMilestone,
+  ActivitiesInterview,
+  ActivitiesNewArticle,
+  ActivitiesUpcomingContent,
+} from "@/partials/activities/items";
 const Activities = () => {
-  return <div className="card">
+  return (
+    <div className="card">
       <div className="card-header">
         <h3 className="card-title">Activities</h3>
 
@@ -14,7 +22,13 @@ const Activities = () => {
               <span className="switch-on:hidden">Off</span>
               <span className="hidden switch-on:inline">On</span>
             </span>
-            <input type="checkbox" value="1" name="check" defaultChecked readOnly />
+            <input
+              type="checkbox"
+              value="1"
+              name="check"
+              defaultChecked
+              readOnly
+            />
           </label>
         </div>
       </div>
@@ -26,10 +40,22 @@ const Activities = () => {
 
         <ActivitiesUpcomingContent />
 
-        <ActivitiesBloggingConference image={<Fragment>
-              <img src={toAbsoluteUrl(`/media/illustrations/3.svg`)} className="dark:hidden max-h-[160px]" alt="" />
-              <img src={toAbsoluteUrl(`/media/illustrations/3-dark.svg`)} className="light:hidden max-h-[160px]" alt="" />
-            </Fragment>} />
+        <ActivitiesBloggingConference
+          image={
+            <Fragment>
+              <img
+                src={toAbsoluteUrl(`/media/illustrations/3.svg`)}
+                className="dark:hidden max-h-[160px]"
+                alt=""
+              />
+              <img
+                src={toAbsoluteUrl(`/media/illustrations/3-dark.svg`)}
+                className="light:hidden max-h-[160px]"
+                alt=""
+              />
+            </Fragment>
+          }
+        />
 
         <ActivitiesFollowersMilestone />
 
@@ -41,6 +67,7 @@ const Activities = () => {
           All-time Activities
         </Link>
       </div>
-    </div>;
+    </div>
+  );
 };
 export { Activities };

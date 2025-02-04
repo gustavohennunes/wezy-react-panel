@@ -1,13 +1,18 @@
-import { Link } from 'react-router-dom';
-import { toAbsoluteUrl } from '@/utils/Assets';
-const Users = ({
-  title,
-  items
-}) => {
+import { Link } from "react-router-dom";
+import { toAbsoluteUrl } from "@/utils/Assets";
+const Users = ({ title, items }) => {
   const renderItem = (item, index) => {
-    return <img src={toAbsoluteUrl(`/media/avatars/${item.image}`)} className="rounded-full h-[36px]" alt="" key={index} />;
+    return (
+      <img
+        src={toAbsoluteUrl(`/media/avatars/${item.image}`)}
+        className="rounded-full h-[36px]"
+        alt=""
+        key={index}
+      />
+    );
   };
-  return <div className="card">
+  return (
+    <div className="card">
       <div className="card-header">
         <h3 className="card-title">{title}</h3>
       </div>
@@ -15,8 +20,8 @@ const Users = ({
       <div className="card-body">
         <div className="flex flex-wrap gap-2.5 xl:me-16">
           {items.map((item, index) => {
-          return renderItem(item, index);
-        })}
+            return renderItem(item, index);
+          })}
         </div>
       </div>
 
@@ -25,6 +30,7 @@ const Users = ({
           Join Our Team
         </Link>
       </div>
-    </div>;
+    </div>
+  );
 };
 export { Users };

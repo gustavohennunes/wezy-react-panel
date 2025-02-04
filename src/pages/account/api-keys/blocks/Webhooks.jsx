@@ -1,15 +1,22 @@
-import { useState } from 'react';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { useState } from "react";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 const Webhooks = () => {
-  const [webhooknameInput, setWebhookNameInput] = useState('CostaRicaHook');
-  return <div className="card pb-2.5">
+  const [webhooknameInput, setWebhookNameInput] = useState("CostaRicaHook");
+  return (
+    <div className="card pb-2.5">
       <div className="card-header" id="webhooks">
         <h3 className="card-title">Webhooks</h3>
       </div>
       <div className="card-body grid gap-5">
         <p className="text-2sm text-gray-800">
-          Set up Webhooks to trigger actions on external services in real-time. Stay informed on
-          updates and changes to <br />
+          Set up Webhooks to trigger actions on external services in real-time.
+          Stay informed on updates and changes to <br />
           ensure seamless integration.
         </p>
 
@@ -23,7 +30,12 @@ const Webhooks = () => {
         <div className="flex items-center flex-wrap lg:flex-nowrap gap-2.5">
           <label className="form-label max-w-56">Webhook Name</label>
           <div className="grow">
-            <input className="input" type="text" value={webhooknameInput} onChange={e => setWebhookNameInput(e.target.value)} /> 
+            <input
+              className="input"
+              type="text"
+              value={webhooknameInput}
+              onChange={(e) => setWebhookNameInput(e.target.value)}
+            />
           </div>
         </div>
 
@@ -37,10 +49,10 @@ const Webhooks = () => {
               <SelectContent>
                 <SelectItem value="1">All Events</SelectItem>
                 <SelectItem value="2">Push Webhooks</SelectItem>
-                <SelectItem value="3">Pipe Webhook</SelectItem> 
-                <SelectItem value="4">Plugin Webhooks</SelectItem> 
+                <SelectItem value="3">Pipe Webhook</SelectItem>
+                <SelectItem value="4">Plugin Webhooks</SelectItem>
               </SelectContent>
-            </Select>   
+            </Select>
           </div>
         </div>
 
@@ -58,6 +70,7 @@ const Webhooks = () => {
           <button className="btn btn-primary">Save Changes</button>
         </div>
       </div>
-    </div>;
+    </div>
+  );
 };
 export { Webhooks };

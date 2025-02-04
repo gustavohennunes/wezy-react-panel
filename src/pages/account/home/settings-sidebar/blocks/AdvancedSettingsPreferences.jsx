@@ -1,6 +1,13 @@
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 const AdvancedSettingsPreferences = () => {
-  return <div className="card">
+  return (
+    <div className="card">
       <div className="card-header" id="advanced_settings_preferences">
         <h3 className="card-title">Preferences</h3>
       </div>
@@ -15,9 +22,9 @@ const AdvancedSettingsPreferences = () => {
               <SelectContent>
                 <SelectItem value="1">American English</SelectItem>
                 <SelectItem value="2">Option 2</SelectItem>
-                <SelectItem value="3">Option 3</SelectItem> 
+                <SelectItem value="3">Option 3</SelectItem>
               </SelectContent>
-            </Select> 
+            </Select>
           </div>
         </div>
 
@@ -29,11 +36,13 @@ const AdvancedSettingsPreferences = () => {
                 <SelectValue placeholder="Select" />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="4">GMT -5:00 - Eastern Time(US & Canada)</SelectItem>
+                <SelectItem value="4">
+                  GMT -5:00 - Eastern Time(US & Canada)
+                </SelectItem>
                 <SelectItem value="5">Option 2</SelectItem>
-                <SelectItem value="6">Option 3</SelectItem> 
+                <SelectItem value="6">Option 3</SelectItem>
               </SelectContent>
-            </Select> 
+            </Select>
           </div>
         </div>
 
@@ -47,9 +56,9 @@ const AdvancedSettingsPreferences = () => {
               <SelectContent>
                 <SelectItem value="7">United States Dollar (USD)</SelectItem>
                 <SelectItem value="8">Option 2</SelectItem>
-                <SelectItem value="9">Option 3</SelectItem> 
+                <SelectItem value="9">Option 3</SelectItem>
               </SelectContent>
-            </Select>  
+            </Select>
           </div>
         </div>
 
@@ -57,11 +66,23 @@ const AdvancedSettingsPreferences = () => {
           <label className="form-label max-w-56">Open tasks as...</label>
           <div className="flex items-center gap-5">
             <label className="radio-group">
-              <input className="radio" name="open-tasks" type="radio" value="1" readOnly />
+              <input
+                className="radio"
+                name="open-tasks"
+                type="radio"
+                value="1"
+                readOnly
+              />
               <span className="radio-label">Modal</span>
             </label>
             <label className="radio-group">
-              <input className="radio" name="open-tasks" type="radio" value="2" readOnly />
+              <input
+                className="radio"
+                name="open-tasks"
+                type="radio"
+                value="2"
+                readOnly
+              />
               <span className="radio-label">Fullscreen</span>
             </label>
           </div>
@@ -72,7 +93,13 @@ const AdvancedSettingsPreferences = () => {
           <div className="flex flex-col items-start gap-5">
             <div className="flex flex-col gap-2.5">
               <label className="checkbox-group">
-                <input className="checkbox" name="attributes" type="checkbox" value="1" readOnly />
+                <input
+                  className="checkbox"
+                  name="attributes"
+                  type="checkbox"
+                  value="1"
+                  readOnly
+                />
                 <span className="checkbox-label">Show list names</span>
               </label>
               <div className="form-hint">See the name next to each icon</div>
@@ -80,10 +107,19 @@ const AdvancedSettingsPreferences = () => {
 
             <div className="flex flex-col gap-2.5">
               <label className="checkbox-group">
-                <input className="checkbox" name="attributes" type="checkbox" defaultChecked value="2" readOnly />
+                <input
+                  className="checkbox"
+                  name="attributes"
+                  type="checkbox"
+                  defaultChecked
+                  value="2"
+                  readOnly
+                />
                 <span className="checkbox-label">Show linked task names</span>
               </label>
-              <div className="form-hint">Show task names next to ids for linked project tasks.</div>
+              <div className="form-hint">
+                Show task names next to ids for linked project tasks.
+              </div>
             </div>
           </div>
         </div>
@@ -100,6 +136,7 @@ const AdvancedSettingsPreferences = () => {
           <button className="btn btn-primary">Save Changes</button>
         </div>
       </div>
-    </div>;
+    </div>
+  );
 };
 export { AdvancedSettingsPreferences };

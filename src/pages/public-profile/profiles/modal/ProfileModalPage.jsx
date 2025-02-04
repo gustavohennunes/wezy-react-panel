@@ -1,24 +1,38 @@
-import { Fragment } from 'react';
-import { Container } from '@/components/container';
-import { toAbsoluteUrl } from '@/utils/Assets';
-import { KeenIcon } from '@/components';
-import { UserProfileHero } from '@/partials/heros';
-import { Navbar, NavbarActions, NavbarDropdown } from '@/partials/navbar';
-import { PageMenu } from '@/pages/public-profile';
-import { ProfileModalContent } from '.';
+import { Fragment } from "react";
+import { Container } from "@/components/container";
+import { toAbsoluteUrl } from "@/utils/Assets";
+import { KeenIcon } from "@/components";
+import { UserProfileHero } from "@/partials/heros";
+import { Navbar, NavbarActions, NavbarDropdown } from "@/partials/navbar";
+import { PageMenu } from "@/pages/public-profile";
+import { ProfileModalContent } from ".";
 const ProfileModalPage = () => {
-  const image = <img src={toAbsoluteUrl('/media/avatars/300-1.png')} className="rounded-full border-3 border-success size-[100px] shrink-0" />;
-  return <Fragment>
-      <UserProfileHero name="Jenny Klabber" image={image} info={[{
-      label: 'KeenThemes',
-      icon: 'abstract-41'
-    }, {
-      label: '',
-      icon: ''
-    }, {
-      email: 'jenny@kteam.com',
-      icon: 'sms'
-    }]} />
+  const image = (
+    <img
+      src={toAbsoluteUrl("/media/avatars/300-1.png")}
+      className="rounded-full border-3 border-success size-[100px] shrink-0"
+    />
+  );
+  return (
+    <Fragment>
+      <UserProfileHero
+        name="Jenny Klabber"
+        image={image}
+        info={[
+          {
+            label: "KeenThemes",
+            icon: "abstract-41",
+          },
+          {
+            label: "",
+            icon: "",
+          },
+          {
+            email: "jenny@kteam.com",
+            icon: "sms",
+          },
+        ]}
+      />
 
       <Container>
         <Navbar>
@@ -37,6 +51,7 @@ const ProfileModalPage = () => {
       </Container>
 
       <ProfileModalContent />
-    </Fragment>;
+    </Fragment>
+  );
 };
 export { ProfileModalPage };

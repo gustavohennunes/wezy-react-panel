@@ -1,10 +1,17 @@
-import { KeenIcon, MenuArrow, MenuIcon, MenuItem, MenuLink, MenuSub, MenuTitle } from '@/components';
-import { useLanguage } from '@/i18n';
+import {
+  KeenIcon,
+  MenuArrow,
+  MenuIcon,
+  MenuItem,
+  MenuLink,
+  MenuSub,
+  MenuTitle,
+} from "@/components";
+import { useLanguage } from "@/i18n";
 const DropdownCrud1 = () => {
-  const {
-    isRTL
-  } = useLanguage();
-  return <MenuSub className="menu-default" rootClassName="w-full max-w-[175px]">
+  const { isRTL } = useLanguage();
+  return (
+    <MenuSub className="menu-default" rootClassName="w-full max-w-[175px]">
       <MenuItem path="/account/home/settings-plain">
         <MenuLink>
           <MenuIcon>
@@ -21,22 +28,31 @@ const DropdownCrud1 = () => {
           <MenuTitle>Import</MenuTitle>
         </MenuLink>
       </MenuItem>
-      <MenuItem toggle="dropdown" trigger="hover" dropdownProps={{
-      placement: isRTL() ? 'left-start' : 'right-start',
-      modifiers: [{
-        name: 'offset',
-        options: {
-          offset: isRTL() ? [15, 0] : [-15, 0] // [skid, distance]
-        }
-      }]
-    }}>
+      <MenuItem
+        toggle="dropdown"
+        trigger="hover"
+        dropdownProps={{
+          placement: isRTL() ? "left-start" : "right-start",
+          modifiers: [
+            {
+              name: "offset",
+              options: {
+                offset: isRTL() ? [15, 0] : [-15, 0], // [skid, distance]
+              },
+            },
+          ],
+        }}
+      >
         <MenuLink>
           <MenuIcon>
             <KeenIcon icon="file-up" />
           </MenuIcon>
           <MenuTitle>Export</MenuTitle>
           <MenuArrow>
-            <KeenIcon icon="right" className="text-3xs rtl:transform rtl:rotate-180" />
+            <KeenIcon
+              icon="right"
+              className="text-3xs rtl:transform rtl:rotate-180"
+            />
           </MenuArrow>
         </MenuLink>
         <MenuSub className="menu-default" rootClassName="w-full max-w-[125px]">
@@ -65,6 +81,7 @@ const DropdownCrud1 = () => {
           <MenuTitle>Settings</MenuTitle>
         </MenuLink>
       </MenuItem>
-    </MenuSub>;
+    </MenuSub>
+  );
 };
 export { DropdownCrud1 };

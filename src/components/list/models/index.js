@@ -1,2 +1,2 @@
-export * from './Models';
-export * from './ModelsData';
+export * from "./Models";
+export * from "./ModelsData";

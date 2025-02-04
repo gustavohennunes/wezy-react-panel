@@ -1,33 +1,54 @@
-import { Fragment } from 'react';
-import { toAbsoluteUrl } from '@/utils';
-import { CommunityBadges, Tags } from '../default';
-import { Activities, FeaturesHighlight, Statistics, Summary, UpcomingEvents, Users, Works } from './blocks';
+import { Fragment } from "react";
+import { toAbsoluteUrl } from "@/utils";
+import { CommunityBadges, Tags } from "../default";
+import {
+  Activities,
+  FeaturesHighlight,
+  Statistics,
+  Summary,
+  UpcomingEvents,
+  Users,
+  Works,
+} from "./blocks";
 const ProfileCreatorContent = () => {
-  const data = [{
-    title: 'Releases',
-    value: '397'
-  }, {
-    title: 'Earnigns',
-    value: '89k'
-  }];
-  const items = [{
-    image: '300-1.png'
-  }, {
-    image: '300-2.png'
-  }, {
-    image: '300-3.png'
-  }, {
-    image: '300-5.png'
-  }, {
-    image: '300-6.png'
-  }, {
-    image: '300-11.png'
-  }, {
-    image: '300-7.png'
-  }, {
-    image: '300-12.png'
-  }];
-  return <div className="grid grid-cols-1 xl:grid-cols-3 gap-5 lg:gap-7.5">
+  const data = [
+    {
+      title: "Releases",
+      value: "397",
+    },
+    {
+      title: "Earnigns",
+      value: "89k",
+    },
+  ];
+  const items = [
+    {
+      image: "300-1.png",
+    },
+    {
+      image: "300-2.png",
+    },
+    {
+      image: "300-3.png",
+    },
+    {
+      image: "300-5.png",
+    },
+    {
+      image: "300-6.png",
+    },
+    {
+      image: "300-11.png",
+    },
+    {
+      image: "300-7.png",
+    },
+    {
+      image: "300-12.png",
+    },
+  ];
+  return (
+    <div className="grid grid-cols-1 xl:grid-cols-3 gap-5 lg:gap-7.5">
       <div className="col-span-1">
         <div className="grid gap-5 lg:gap-7.5">
           <Statistics data={data} />
@@ -44,13 +65,32 @@ const ProfileCreatorContent = () => {
 
       <div className="col-span-2">
         <div className="flex flex-col gap-5 lg:gap-7.5">
-          <FeaturesHighlight image={<Fragment>
-                <img src={toAbsoluteUrl('/media/illustrations/18.svg')} className="dark:hidden max-h-[200px]" alt="" />
-                <img src={toAbsoluteUrl('/media/illustrations/18-dark.svg')} className="light:hidden max-h-[200px]" alt="" />
-              </Fragment>} title="Restyle Your Space:<br>Soft Goods Makeover Ideas" description="Transform your living space beautifully with our Restyle Your Space: Soft Goods Makeover Ideas tutorial" more={{
-          title: 'Get Started',
-          url: '/network/get-started'
-        }} features={[['Time-Saving', 'Easy Revamp'], ['Budget-Friendly', 'Fresh Look']]} />
+          <FeaturesHighlight
+            image={
+              <Fragment>
+                <img
+                  src={toAbsoluteUrl("/media/illustrations/18.svg")}
+                  className="dark:hidden max-h-[200px]"
+                  alt=""
+                />
+                <img
+                  src={toAbsoluteUrl("/media/illustrations/18-dark.svg")}
+                  className="light:hidden max-h-[200px]"
+                  alt=""
+                />
+              </Fragment>
+            }
+            title="Restyle Your Space:<br>Soft Goods Makeover Ideas"
+            description="Transform your living space beautifully with our Restyle Your Space: Soft Goods Makeover Ideas tutorial"
+            more={{
+              title: "Get Started",
+              url: "/network/get-started",
+            }}
+            features={[
+              ["Time-Saving", "Easy Revamp"],
+              ["Budget-Friendly", "Fresh Look"],
+            ]}
+          />
 
           <Works />
 
@@ -59,6 +99,7 @@ const ProfileCreatorContent = () => {
           <Activities />
         </div>
       </div>
-    </div>;
+    </div>
+  );
 };
 export { ProfileCreatorContent };

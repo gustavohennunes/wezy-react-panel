@@ -1,18 +1,26 @@
-import { Fragment } from 'react';
-import { Container } from '@/components/container';
-import { Toolbar, ToolbarActions, ToolbarDescription, ToolbarHeading, ToolbarPageTitle } from '@/partials/toolbar';
-import { NetworkUserCardsTeamCrewContent } from '.';
-import { useLayout } from '@/providers';
+import { Fragment } from "react";
+import { Container } from "@/components/container";
+import {
+  Toolbar,
+  ToolbarActions,
+  ToolbarDescription,
+  ToolbarHeading,
+  ToolbarPageTitle,
+} from "@/partials/toolbar";
+import { NetworkUserCardsTeamCrewContent } from ".";
+import { useLayout } from "@/providers";
 const NetworkUserCardsTeamCrewPage = () => {
-  const {
-    currentLayout
-  } = useLayout();
-  return <Fragment>
-      {currentLayout?.name === 'demo1-layout' && <Container>
+  const { currentLayout } = useLayout();
+  return (
+    <Fragment>
+      {currentLayout?.name === "demo1-layout" && (
+        <Container>
           <Toolbar>
             <ToolbarHeading>
               <ToolbarPageTitle />
-              <ToolbarDescription>Central Hub for Personal Customization</ToolbarDescription>
+              <ToolbarDescription>
+                Central Hub for Personal Customization
+              </ToolbarDescription>
             </ToolbarHeading>
             <ToolbarActions>
               <a href="#" className="btn btn-sm btn-light">
@@ -23,11 +31,13 @@ const NetworkUserCardsTeamCrewPage = () => {
               </a>
             </ToolbarActions>
           </Toolbar>
-        </Container>}
+        </Container>
+      )}
 
       <Container>
         <NetworkUserCardsTeamCrewContent />
       </Container>
-    </Fragment>;
+    </Fragment>
+  );
 };
 export { NetworkUserCardsTeamCrewPage };

@@ -1,6 +1,15 @@
-import { KeenIcon, MenuIcon, MenuItem, MenuLink, MenuSeparator, MenuSub, MenuTitle } from '@/components';
+import {
+  KeenIcon,
+  MenuIcon,
+  MenuItem,
+  MenuLink,
+  MenuSeparator,
+  MenuSub,
+  MenuTitle,
+} from "@/components";
 const DropdownCardItem2 = () => {
-  return <MenuSub className="menu-default" rootClassName="w-full max-w-[175px]">
+  return (
+    <MenuSub className="menu-default" rootClassName="w-full max-w-[175px]">
       <MenuItem path="#">
         <MenuLink>
           <MenuIcon>
@@ -34,6 +43,7 @@ const DropdownCardItem2 = () => {
           <MenuTitle>Share</MenuTitle>
         </MenuLink>
       </MenuItem>
-    </MenuSub>;
+    </MenuSub>
+  );
 };
 export { DropdownCardItem2 };

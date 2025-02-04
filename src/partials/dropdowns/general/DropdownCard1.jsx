@@ -1,10 +1,18 @@
-import { KeenIcon, MenuArrow, MenuIcon, MenuItem, MenuLink, MenuSeparator, MenuSub, MenuTitle } from '@/components';
-import { useLanguage } from '@/i18n';
+import {
+  KeenIcon,
+  MenuArrow,
+  MenuIcon,
+  MenuItem,
+  MenuLink,
+  MenuSeparator,
+  MenuSub,
+  MenuTitle,
+} from "@/components";
+import { useLanguage } from "@/i18n";
 const DropdownCard1 = () => {
-  const {
-    isRTL
-  } = useLanguage();
-  return <MenuSub className="menu-default" rootClassName="w-full max-w-[200px]">
+  const { isRTL } = useLanguage();
+  return (
+    <MenuSub className="menu-default" rootClassName="w-full max-w-[200px]">
       <MenuItem>
         <MenuLink path="/account/activity">
           <MenuIcon>
@@ -21,22 +29,31 @@ const DropdownCard1 = () => {
           <MenuTitle>Share</MenuTitle>
         </MenuLink>
       </MenuItem>
-      <MenuItem toggle="dropdown" trigger="hover" dropdownProps={{
-      placement: isRTL() ? 'left-start' : 'right-start',
-      modifiers: [{
-        name: 'offset',
-        options: {
-          offset: isRTL() ? [15, 0] : [-15, 0] // [skid, distance]
-        }
-      }]
-    }}>
+      <MenuItem
+        toggle="dropdown"
+        trigger="hover"
+        dropdownProps={{
+          placement: isRTL() ? "left-start" : "right-start",
+          modifiers: [
+            {
+              name: "offset",
+              options: {
+                offset: isRTL() ? [15, 0] : [-15, 0], // [skid, distance]
+              },
+            },
+          ],
+        }}
+      >
         <MenuLink>
           <MenuIcon>
             <KeenIcon icon="notification-status" />
           </MenuIcon>
           <MenuTitle>Notifications</MenuTitle>
           <MenuArrow>
-            <KeenIcon icon="right" className="text-3xs rtl:transform rtl:rotate-180" />
+            <KeenIcon
+              icon="right"
+              className="text-3xs rtl:transform rtl:rotate-180"
+            />
           </MenuArrow>
         </MenuLink>
         <MenuSub className="menu-default" rootClassName="w-full max-w-[175px]">
@@ -83,6 +100,7 @@ const DropdownCard1 = () => {
           <MenuTitle>Settings</MenuTitle>
         </MenuLink>
       </MenuItem>
-    </MenuSub>;
+    </MenuSub>
+  );
 };
 export { DropdownCard1 };

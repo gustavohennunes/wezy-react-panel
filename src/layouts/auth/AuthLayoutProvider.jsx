@@ -1,13 +1,13 @@
-import { createContext, useContext, useEffect, useState } from 'react';
-import { deepMerge } from '@/utils';
-import { useLayout } from '@/providers';
-import { authLayoutConfig } from './AuthLayoutConfig';
+import { createContext, useContext, useEffect, useState } from "react";
+import { deepMerge } from "@/utils";
+import { useLayout } from "@/providers";
+import { authLayoutConfig } from "./AuthLayoutConfig";
 
 // Defining the structure for the AuthLayoutProvider's props, which contains a layout of type ILayoutConfig
 
 // Initial layout properties for the AuthLayoutProvider, using authLayoutConfig as the default configuration
 const initalLayoutProps = {
-  layout: authLayoutConfig
+  layout: authLayoutConfig,
 };
 
 // Creating a context for the AuthLayout with the initial layout properties
@@ -17,13 +17,8 @@ const LayoutContext = createContext(initalLayoutProps);
 const useAuthLayout = () => useContext(LayoutContext);
 
 // AuthLayoutProvider component that wraps its children with the layout context
-const AuthLayoutProvider = ({
-  children
-}) => {
-  const {
-    getLayout,
-    setCurrentLayout
-  } = useLayout(); // Access layout-related functions
+const AuthLayoutProvider = ({ children }) => {
+  const { getLayout, setCurrentLayout } = useLayout(); // Access layout-related functions
 
   // Function to merge the current layout with the auth layout configuration
   const getLayoutConfig = () => {
@@ -39,11 +34,15 @@ const AuthLayoutProvider = ({
   });
 
   // Providing the layout context to all child components wrapped by AuthLayoutProvider
-  return <LayoutContext.Provider value={{
-    layout
-  }}>
+  return (
+    <LayoutContext.Provider
+      value={{
+        layout,
+      }}
+    >
       {children}
-    </LayoutContext.Provider>;
+    </LayoutContext.Provider>
+  );
 };
 
 // eslint-disable-next-line react-refresh/only-export-components

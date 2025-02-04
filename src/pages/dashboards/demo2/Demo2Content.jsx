@@ -1,8 +1,12 @@
-import { BlockList, ReportSettings } from '@/pages/account/security/privacy-settings';
-import { EntryCallout, Teams } from '@/pages/dashboards/demo1';
-import { Integrations, ManageData, MyBalance, Options } from './blocks';
+import {
+  BlockList,
+  ReportSettings,
+} from "@/pages/account/security/privacy-settings";
+import { EntryCallout, Teams } from "@/pages/dashboards/demo1";
+import { Integrations, ManageData, MyBalance, Options } from "./blocks";
 const Demo2Content = () => {
-  return <div className="grid gap-5 lg:gap-7.5">
+  return (
+    <div className="grid gap-5 lg:gap-7.5">
       <div className="grid lg:grid-cols-3 gap-y-5 lg:gap-7.5 items-stretch">
         <div className="lg:col-span-2">
           <div className="grid md:grid-cols-2 gap-5 lg:gap-7.5 h-full items-stretch">
@@ -31,7 +35,10 @@ const Demo2Content = () => {
         </div>
 
         <div className="lg:col-span-1">
-          <BlockList className="h-full" text="Users on the block list are unable to send chat requests or messages to you anymore, ever, or again" />
+          <BlockList
+            className="h-full"
+            text="Users on the block list are unable to send chat requests or messages to you anymore, ever, or again"
+          />
         </div>
       </div>
 
@@ -44,6 +51,7 @@ const Demo2Content = () => {
           <ManageData className="h-full" />
         </div>
       </div>
-    </div>;
+    </div>
+  );
 };
 export { Demo2Content };

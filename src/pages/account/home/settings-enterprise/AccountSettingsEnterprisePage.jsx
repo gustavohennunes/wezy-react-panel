@@ -1,21 +1,29 @@
-import { Fragment } from 'react';
-import { Container } from '@/components/container';
-import { Toolbar, ToolbarActions, ToolbarDescription, ToolbarHeading, ToolbarPageTitle } from '@/partials/toolbar';
-import { PageNavbar } from '@/pages/account';
-import { AccountSettingsEnterpriseContent } from '.';
-import { useLayout } from '@/providers';
+import { Fragment } from "react";
+import { Container } from "@/components/container";
+import {
+  Toolbar,
+  ToolbarActions,
+  ToolbarDescription,
+  ToolbarHeading,
+  ToolbarPageTitle,
+} from "@/partials/toolbar";
+import { PageNavbar } from "@/pages/account";
+import { AccountSettingsEnterpriseContent } from ".";
+import { useLayout } from "@/providers";
 const AccountSettingsEnterprisePage = () => {
-  const {
-    currentLayout
-  } = useLayout();
-  return <Fragment>
+  const { currentLayout } = useLayout();
+  return (
+    <Fragment>
       <PageNavbar />
 
-      {currentLayout?.name === 'demo1-layout' && <Container>
+      {currentLayout?.name === "demo1-layout" && (
+        <Container>
           <Toolbar>
             <ToolbarHeading>
               <ToolbarPageTitle />
-              <ToolbarDescription>Tailored Tools for Business Scalability</ToolbarDescription>
+              <ToolbarDescription>
+                Tailored Tools for Business Scalability
+              </ToolbarDescription>
             </ToolbarHeading>
             <ToolbarActions>
               <a href="#" className="btn btn-sm btn-light">
@@ -26,10 +34,12 @@ const AccountSettingsEnterprisePage = () => {
               </a>
             </ToolbarActions>
           </Toolbar>
-        </Container>}
+        </Container>
+      )}
       <Container>
         <AccountSettingsEnterpriseContent />
       </Container>
-    </Fragment>;
+    </Fragment>
+  );
 };
 export { AccountSettingsEnterprisePage };

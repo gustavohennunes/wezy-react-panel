@@ -1,25 +1,35 @@
-import { KeenIcon } from '@/components';
+import { KeenIcon } from "@/components";
 const Details = () => {
-  const tables = [{
-    status: 'Company Name',
-    info: 'KeenThemes'
-  }, {
-    status: 'Address',
-    info: 'Keizersgracht 136, 1015 CW Amsterdam, Netherlands'
-  }, {
-    status: 'Contact',
-    info: 'Jason Tatum'
-  }, {
-    status: 'VAT ID',
-    info: 'NL123456789B01'
-  }];
+  const tables = [
+    {
+      status: "Company Name",
+      info: "KeenThemes",
+    },
+    {
+      status: "Address",
+      info: "Keizersgracht 136, 1015 CW Amsterdam, Netherlands",
+    },
+    {
+      status: "Contact",
+      info: "Jason Tatum",
+    },
+    {
+      status: "VAT ID",
+      info: "NL123456789B01",
+    },
+  ];
   const renderItem = (table, index) => {
-    return <tr key={index}>
-        <td className="text-sm text-gray-600 min-w-36 pb-5 pe-6">{table.status}</td>
+    return (
+      <tr key={index}>
+        <td className="text-sm text-gray-600 min-w-36 pb-5 pe-6">
+          {table.status}
+        </td>
         <td className="text-sm text-gray-800 pb-5">{table.info}</td>
-      </tr>;
+      </tr>
+    );
   };
-  return <div className="card">
+  return (
+    <div className="card">
       <div className="card-header">
         <h3 className="card-title">Billing Details</h3>
 
@@ -33,11 +43,12 @@ const Details = () => {
         <table className="table-auto">
           <tbody>
             {tables.map((table, index) => {
-            return renderItem(table, index);
-          })}
+              return renderItem(table, index);
+            })}
           </tbody>
         </table>
       </div>
-    </div>;
+    </div>
+  );
 };
 export { Details };

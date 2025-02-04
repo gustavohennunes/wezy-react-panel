@@ -1,6 +1,7 @@
-import { KeenIcon } from '@/components';
+import { KeenIcon } from "@/components";
 const CrudCardFooter = () => {
-  return <div className="card-footer justify-center md:justify-between flex-col md:flex-row gap-5 text-gray-600 text-2sm font-medium">
+  return (
+    <div className="card-footer justify-center md:justify-between flex-col md:flex-row gap-5 text-gray-600 text-2sm font-medium">
       <div className="flex items-center gap-2 order-2 md:order-1">
         Show
         <select className="select select-sm w-16" name="perpage">
@@ -31,6 +32,7 @@ const CrudCardFooter = () => {
           </button>
         </div>
       </div>
-    </div>;
+    </div>
+  );
 };
 export { CrudCardFooter };

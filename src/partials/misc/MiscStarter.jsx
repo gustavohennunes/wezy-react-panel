@@ -1,11 +1,7 @@
-import { Link } from 'react-router-dom';
-const MiscStarter = ({
-  image,
-  title,
-  subTitle,
-  engage
-}) => {
-  return <div className="card">
+import { Link } from "react-router-dom";
+const MiscStarter = ({ image, title, subTitle, engage }) => {
+  return (
+    <div className="card">
       <div className="card-body flex flex-col items-center gap-2.5 py-7.5">
         <div className="flex justify-center p-7.5 py-9">{image}</div>
 
@@ -22,6 +18,7 @@ const MiscStarter = ({
           </div>
         </div>
       </div>
-    </div>;
+    </div>
+  );
 };
 export { MiscStarter };

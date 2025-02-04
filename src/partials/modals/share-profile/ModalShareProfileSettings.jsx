@@ -1,8 +1,9 @@
-import { KeenIcon } from '@/components';
-import React from 'react';
-import { Link } from 'react-router-dom';
+import { KeenIcon } from "@/components";
+import React from "react";
+import { Link } from "react-router-dom";
 const ModalShareProfileSettings = () => {
-  return <div className="flex flex-col px-5 gap-4">
+  return (
+    <div className="flex flex-col px-5 gap-4">
       <label className="text-gray-900 font-semibold text-2sm">Settings</label>
 
       <div className="flex flex-center justify-between flex-wrap gap-2">
@@ -34,6 +35,7 @@ const ModalShareProfileSettings = () => {
       </div>
 
       <button className="btn btn-primary justify-center">Done</button>
-    </div>;
+    </div>
+  );
 };
 export { ModalShareProfileSettings };

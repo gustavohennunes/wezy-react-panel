@@ -1,46 +1,54 @@
-import { Link } from 'react-router-dom';
-import { useLanguage } from '@/i18n';
-import { KeenIcon, Menu, MenuItem, MenuToggle } from '@/components';
-import { DropdownCrud1, DropdownCrudItem1 } from '@/partials/dropdowns/general';
+import { Link } from "react-router-dom";
+import { useLanguage } from "@/i18n";
+import { KeenIcon, Menu, MenuItem, MenuToggle } from "@/components";
+import { DropdownCrud1, DropdownCrudItem1 } from "@/partials/dropdowns/general";
 const Deals = () => {
-  const {
-    isRTL
-  } = useLanguage();
-  const items = [{
-    name: 'Acme Software License',
-    ammount: '5,000',
-    date: 30,
-    label: 'Ongoing',
-    color: 'badge-primary'
-  }, {
-    name: 'Strategic Partnership Deal',
-    ammount: '12,500',
-    date: 45,
-    label: 'Closed',
-    color: 'badge-success'
-  }, {
-    name: 'Client Onboarding',
-    ammount: '18,000',
-    date: 60,
-    label: 'On Hold',
-    color: 'badge-warning'
-  }, {
-    name: 'Widget Supply Agreement',
-    ammount: '3,500',
-    date: 10,
-    label: 'Canceled',
-    color: 'badge-danger'
-  }, {
-    name: 'Project X Redesign',
-    ammount: '8,200',
-    date: 15,
-    label: 'Closed',
-    color: 'badge-success'
-  }];
+  const { isRTL } = useLanguage();
+  const items = [
+    {
+      name: "Acme Software License",
+      ammount: "5,000",
+      date: 30,
+      label: "Ongoing",
+      color: "badge-primary",
+    },
+    {
+      name: "Strategic Partnership Deal",
+      ammount: "12,500",
+      date: 45,
+      label: "Closed",
+      color: "badge-success",
+    },
+    {
+      name: "Client Onboarding",
+      ammount: "18,000",
+      date: 60,
+      label: "On Hold",
+      color: "badge-warning",
+    },
+    {
+      name: "Widget Supply Agreement",
+      ammount: "3,500",
+      date: 10,
+      label: "Canceled",
+      color: "badge-danger",
+    },
+    {
+      name: "Project X Redesign",
+      ammount: "8,200",
+      date: 15,
+      label: "Closed",
+      color: "badge-success",
+    },
+  ];
   const renderItem = (item, index) => {
-    return <tr key={index}>
+    return (
+      <tr key={index}>
         <td className="text-start">
-          <a href="#" className="text-sm font-medium text-gray-900 hover:text-primary">
+          <a
+            href="#"
+            className="text-sm font-medium text-gray-900 hover:text-primary"
+          >
             {item.name}
           </a>
         </td>
@@ -48,22 +56,30 @@ const Deals = () => {
         <td className="text-sm text-gray-800">${item.ammount}</td>
 
         <td>
-          <div className={`badge badge-sm ${item.color} badge-outline`}>{item.label}</div>
+          <div className={`badge badge-sm ${item.color} badge-outline`}>
+            {item.label}
+          </div>
         </td>
 
         <td className="text-sm text-gray-800">{item.date} days</td>
 
         <td className="text-start">
           <Menu>
-            <MenuItem toggle="dropdown" trigger="click" dropdownProps={{
-            placement: isRTL() ? 'bottom-start' : 'bottom-end',
-            modifiers: [{
-              name: 'offset',
-              options: {
-                offset: isRTL() ? [0, -10] : [0, 10] // [skid, distance]
-              }
-            }]
-          }}>
+            <MenuItem
+              toggle="dropdown"
+              trigger="click"
+              dropdownProps={{
+                placement: isRTL() ? "bottom-start" : "bottom-end",
+                modifiers: [
+                  {
+                    name: "offset",
+                    options: {
+                      offset: isRTL() ? [0, -10] : [0, 10], // [skid, distance]
+                    },
+                  },
+                ],
+              }}
+            >
               <MenuToggle className="btn btn-sm btn-icon btn-light btn-clear">
                 <KeenIcon icon="dots-vertical" />
               </MenuToggle>
@@ -71,22 +87,30 @@ const Deals = () => {
             </MenuItem>
           </Menu>
         </td>
-      </tr>;
+      </tr>
+    );
   };
-  return <div className="card">
+  return (
+    <div className="card">
       <div className="card-header">
         <h3 className="card-title">Deals</h3>
 
         <Menu>
-          <MenuItem toggle="dropdown" trigger="click" dropdownProps={{
-          placement: isRTL() ? 'bottom-start' : 'bottom-end',
-          modifiers: [{
-            name: 'offset',
-            options: {
-              offset: isRTL() ? [0, -10] : [0, 10] // [skid, distance]
-            }
-          }]
-        }}>
+          <MenuItem
+            toggle="dropdown"
+            trigger="click"
+            dropdownProps={{
+              placement: isRTL() ? "bottom-start" : "bottom-end",
+              modifiers: [
+                {
+                  name: "offset",
+                  options: {
+                    offset: isRTL() ? [0, -10] : [0, 10], // [skid, distance]
+                  },
+                },
+              ],
+            }}
+          >
             <MenuToggle className="btn btn-sm btn-icon btn-light btn-clear">
               <KeenIcon icon="dots-vertical" />
             </MenuToggle>
@@ -98,7 +122,9 @@ const Deals = () => {
         <table className="table text-end">
           <thead>
             <tr>
-              <th className="text-start min-w-[150px] !text-gray-700">Deal Name</th>
+              <th className="text-start min-w-[150px] !text-gray-700">
+                Deal Name
+              </th>
               <th className="min-w-[100px] !text-gray-700">Amount</th>
               <th className="min-w-[100px]">Status</th>
               <th className="min-w-[110px] !text-gray-700">Duration</th>
@@ -107,8 +133,8 @@ const Deals = () => {
           </thead>
           <tbody>
             {items.map((item, index) => {
-            return renderItem(item, index);
-          })}
+              return renderItem(item, index);
+            })}
           </tbody>
         </table>
       </div>
@@ -117,6 +143,7 @@ const Deals = () => {
           All Deals
         </Link>
       </div>
-    </div>;
+    </div>
+  );
 };
 export { Deals };

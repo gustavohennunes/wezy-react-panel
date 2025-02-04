@@ -1,4 +1,3 @@
-// eslint-disable-next-line no-unused-vars
 export const throttle = (func, limit) => {
   let lastFunc;
   let lastRan;
@@ -8,12 +7,15 @@ export const throttle = (func, limit) => {
       lastRan = Date.now();
     } else {
       clearTimeout(lastFunc);
-      lastFunc = setTimeout(() => {
-        if (Date.now() - lastRan >= limit) {
-          func.apply(this, args);
-          lastRan = Date.now();
-        }
-      }, limit - (Date.now() - lastRan));
+      lastFunc = setTimeout(
+        () => {
+          if (Date.now() - lastRan >= limit) {
+            func.apply(this, args);
+            lastRan = Date.now();
+          }
+        },
+        limit - (Date.now() - lastRan),
+      );
     }
   };
 };

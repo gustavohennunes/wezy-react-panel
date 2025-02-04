@@ -1,4 +1,4 @@
-const getCurrentUrl = path => {
+const getCurrentUrl = (path) => {
   return path.split(/[?#]/)[0];
 };
 const matchPath = (path, pathname) => {

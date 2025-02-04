@@ -1,7 +1,8 @@
-import { useState } from 'react';
+import { useState } from "react";
 const AuthEmail = () => {
-  const [emailInput, setEmailInput] = useState('jason@studio.io');
-  return <div className="card pb-2.5">
+  const [emailInput, setEmailInput] = useState("jason@studio.io");
+  return (
+    <div className="card pb-2.5">
       <div className="card-header" id="auth_email">
         <h3 className="card-title">Email</h3>
       </div>
@@ -10,7 +11,12 @@ const AuthEmail = () => {
           <div className="flex items-baseline flex-wrap lg:flex-nowrap gap-2.5">
             <label className="form-label max-w-56">Email</label>
             <div className="flex flex-col tems-start grow gap-7.5 w-full">
-              <input className="input" type="text" value={emailInput} onChange={e => setEmailInput(e.target.value)} />   
+              <input
+                className="input"
+                type="text"
+                value={emailInput}
+                onChange={(e) => setEmailInput(e.target.value)}
+              />
               <div className="flex items-center gap-7.5">
                 <label className="switch">
                   <span className="switch-label">Active</span>
@@ -24,8 +30,8 @@ const AuthEmail = () => {
               </div>
 
               <span className="form-info text-gray-800 text-2sm font-normal">
-                Input your email, designate as primary for priority updates. Toggle to seamlessly
-                customize <br />
+                Input your email, designate as primary for priority updates.
+                Toggle to seamlessly customize <br />
                 your communication preferences
               </span>
             </div>
@@ -36,6 +42,7 @@ const AuthEmail = () => {
           <button className="btn btn-primary">Save Changes</button>
         </div>
       </div>
-    </div>;
+    </div>
+  );
 };
 export { AuthEmail };

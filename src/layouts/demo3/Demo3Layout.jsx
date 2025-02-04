@@ -1,11 +1,9 @@
-import { useEffect } from 'react';
-import useBodyClasses from '@/hooks/useBodyClasses';
-import { Demo3LayoutProvider, Main } from '.';
-import { useSettings } from '@/providers';
+import { useEffect } from "react";
+import useBodyClasses from "@/hooks/useBodyClasses";
+import { Demo3LayoutProvider, Main } from ".";
+import { useSettings } from "@/providers";
 const Demo3Layout = () => {
-  const {
-    updateSettings
-  } = useSettings();
+  const { updateSettings } = useSettings();
 
   // Using the custom hook to set multiple CSS variables and class properties
   useBodyClasses(`
@@ -23,7 +21,7 @@ const Demo3Layout = () => {
   `);
   useEffect(() => {
     updateSettings({
-      container: 'fluid'
+      container: "fluid",
     });
   }, []);
   return (

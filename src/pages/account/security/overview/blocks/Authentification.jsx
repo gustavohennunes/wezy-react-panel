@@ -1,7 +1,8 @@
-import { KeenIcon } from '@/components';
-import { toAbsoluteUrl } from '@/utils/Assets';
+import { KeenIcon } from "@/components";
+import { toAbsoluteUrl } from "@/utils/Assets";
 const Authentification = () => {
-  return <div className="card min-w-full">
+  return (
+    <div className="card min-w-full">
       <div className="card-header">
         <h3 className="card-title">Authentication</h3>
       </div>
@@ -10,7 +11,9 @@ const Authentification = () => {
           <tbody>
             <tr>
               <td className="text-gray-600 font-normal">Password</td>
-              <td className="text-gray-700 font-normal">Password last changed 2 months ago</td>
+              <td className="text-gray-700 font-normal">
+                Password last changed 2 months ago
+              </td>
               <td className="text-end">
                 <a href="#" className="btn btn-sm btn-icon btn-icon-lg link">
                   <KeenIcon icon="notepad-edit" />
@@ -30,17 +33,42 @@ const Authentification = () => {
               <td>Sign-in with</td>
               <td>
                 <div className="flex items-center gap-2.5">
-                  <a href="#" className="flex items-center justify-center size-8 bg-light rounded-full border border-gray-300">
-                    <img src={toAbsoluteUrl('/media/brand-logos/google.svg')} className="size-4" alt="" />
+                  <a
+                    href="#"
+                    className="flex items-center justify-center size-8 bg-light rounded-full border border-gray-300"
+                  >
+                    <img
+                      src={toAbsoluteUrl("/media/brand-logos/google.svg")}
+                      className="size-4"
+                      alt=""
+                    />
                   </a>
 
-                  <a href="#" className="flex items-center justify-center size-8 bg-light rounded-full border border-gray-300">
-                    <img src={toAbsoluteUrl('/media/brand-logos/facebook.svg')} className="size-4" alt="" />
+                  <a
+                    href="#"
+                    className="flex items-center justify-center size-8 bg-light rounded-full border border-gray-300"
+                  >
+                    <img
+                      src={toAbsoluteUrl("/media/brand-logos/facebook.svg")}
+                      className="size-4"
+                      alt=""
+                    />
                   </a>
 
-                  <a href="#" className="flex items-center justify-center size-8 bg-light rounded-full border border-gray-300">
-                    <img src={toAbsoluteUrl('/media/brand-logos/apple-black.svg')} className="dark:hidden size-4" alt="" />
-                    <img src={toAbsoluteUrl('/media/brand-logos/apple-white.svg')} className="light:hidden size-4" alt="" />
+                  <a
+                    href="#"
+                    className="flex items-center justify-center size-8 bg-light rounded-full border border-gray-300"
+                  >
+                    <img
+                      src={toAbsoluteUrl("/media/brand-logos/apple-black.svg")}
+                      className="dark:hidden size-4"
+                      alt=""
+                    />
+                    <img
+                      src={toAbsoluteUrl("/media/brand-logos/apple-white.svg")}
+                      className="light:hidden size-4"
+                      alt=""
+                    />
                   </a>
                 </div>
               </td>
@@ -53,6 +81,7 @@ const Authentification = () => {
           </tbody>
         </table>
       </div>
-    </div>;
+    </div>
+  );
 };
 export { Authentification };

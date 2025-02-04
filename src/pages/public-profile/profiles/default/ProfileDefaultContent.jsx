@@ -1,6 +1,18 @@
-import { About, CommunityBadges, Connections, Contributions, MediaUploads, Projects, RecentUploads, Tags, UnlockPartnerships, WorkExperience } from './blocks';
+import {
+  About,
+  CommunityBadges,
+  Connections,
+  Contributions,
+  MediaUploads,
+  Projects,
+  RecentUploads,
+  Tags,
+  UnlockPartnerships,
+  WorkExperience,
+} from "./blocks";
 const ProfileDefaultContent = () => {
-  return <div className="grid grid-cols-1 xl:grid-cols-3 gap-5 lg:gap-7.5">
+  return (
+    <div className="grid grid-cols-1 xl:grid-cols-3 gap-5 lg:gap-7.5">
       <div className="col-span-1">
         <div className="grid gap-5 lg:gap-7.5">
           <CommunityBadges title="Community Badges" />
@@ -32,6 +44,7 @@ const ProfileDefaultContent = () => {
           <Projects />
         </div>
       </div>
-    </div>;
+    </div>
+  );
 };
 export { ProfileDefaultContent };

@@ -1,117 +1,147 @@
-import { Link } from 'react-router-dom';
-import { useLanguage } from '@/i18n';
-import { KeenIcon, Menu, MenuItem, MenuToggle } from '@/components';
-import { CommonAvatars } from '@/partials/common';
-import { DropdownCrud1, DropdownCrudItem1 } from '@/partials/dropdowns/general';
+import { Link } from "react-router-dom";
+import { useLanguage } from "@/i18n";
+import { KeenIcon, Menu, MenuItem, MenuToggle } from "@/components";
+import { CommonAvatars } from "@/partials/common";
+import { DropdownCrud1, DropdownCrudItem1 } from "@/partials/dropdowns/general";
 const Projects = () => {
-  const {
-    isRTL
-  } = useLanguage();
-  const items = [{
-    name: 'Acme software development',
-    team: {
-      group: [{
-        filename: '300-4.png'
-      }, {
-        filename: '300-1.png'
-      }, {
-        filename: '300-2.png'
-      }],
-      more: {
-        number: 3,
-        variant: 'text-success-inverse ring-success-light bg-success'
-      }
+  const { isRTL } = useLanguage();
+  const items = [
+    {
+      name: "Acme software development",
+      team: {
+        group: [
+          {
+            filename: "300-4.png",
+          },
+          {
+            filename: "300-1.png",
+          },
+          {
+            filename: "300-2.png",
+          },
+        ],
+        more: {
+          number: 3,
+          variant: "text-success-inverse ring-success-light bg-success",
+        },
+      },
+      dueDate: "24 Aug, 2024",
+      progress: {
+        variant: "progress-primary",
+        value: 60,
+      },
     },
-    dueDate: '24 Aug, 2024',
-    progress: {
-      variant: 'progress-primary',
-      value: 60
-    }
-  }, {
-    name: 'Strategic Partnership Deal',
-    team: {
-      group: [{
-        filename: '300-1.png'
-      }, {
-        filename: '300-2.png'
-      }, {
-        fallback: 'M',
-        variant: 'text-danger-inverse ring-danger-light bg-danger'
-      }]
+    {
+      name: "Strategic Partnership Deal",
+      team: {
+        group: [
+          {
+            filename: "300-1.png",
+          },
+          {
+            filename: "300-2.png",
+          },
+          {
+            fallback: "M",
+            variant: "text-danger-inverse ring-danger-light bg-danger",
+          },
+        ],
+      },
+      dueDate: "10 Sep, 2024",
+      progress: {
+        variant: "",
+        value: 100,
+      },
     },
-    dueDate: '10 Sep, 2024',
-    progress: {
-      variant: '',
-      value: 100
-    }
-  }, {
-    name: 'Client Onboarding',
-    team: {
-      group: [{
-        filename: '300-20.png'
-      }, {
-        filename: '300-7.png'
-      }]
+    {
+      name: "Client Onboarding",
+      team: {
+        group: [
+          {
+            filename: "300-20.png",
+          },
+          {
+            filename: "300-7.png",
+          },
+        ],
+      },
+      dueDate: "19 Sep, 2024",
+      progress: {
+        variant: "progress-primary",
+        value: 20,
+      },
     },
-    dueDate: '19 Sep, 2024',
-    progress: {
-      variant: 'progress-primary',
-      value: 20
-    }
-  }, {
-    name: 'Widget Supply Agreement',
-    team: {
-      group: [{
-        filename: '300-6.png'
-      }, {
-        filename: '300-23.png'
-      }, {
-        filename: '300-12.png'
-      }],
-      more: {
-        number: 1,
-        variant: 'text-primary-inverse ring-primary-light bg-primary'
-      }
+    {
+      name: "Widget Supply Agreement",
+      team: {
+        group: [
+          {
+            filename: "300-6.png",
+          },
+          {
+            filename: "300-23.png",
+          },
+          {
+            filename: "300-12.png",
+          },
+        ],
+        more: {
+          number: 1,
+          variant: "text-primary-inverse ring-primary-light bg-primary",
+        },
+      },
+      dueDate: "5 May, 2024",
+      progress: {
+        variant: "progress-success",
+        value: 100,
+      },
     },
-    dueDate: '5 May, 2024',
-    progress: {
-      variant: 'progress-success',
-      value: 100
-    }
-  }, {
-    name: 'Project X Redesign',
-    team: {
-      group: [{
-        filename: '300-2.png'
-      }, {
-        filename: '300-15.png'
-      }, {
-        filename: '300-18.png'
-      }],
-      more: {
-        number: 2,
-        variant: 'text-success-inverse ring-success-light bg-success'
-      }
+    {
+      name: "Project X Redesign",
+      team: {
+        group: [
+          {
+            filename: "300-2.png",
+          },
+          {
+            filename: "300-15.png",
+          },
+          {
+            filename: "300-18.png",
+          },
+        ],
+        more: {
+          number: 2,
+          variant: "text-success-inverse ring-success-light bg-success",
+        },
+      },
+      dueDate: "1 Feb, 2025",
+      progress: {
+        variant: "progress-primary",
+        value: 80,
+      },
     },
-    dueDate: '1 Feb, 2025',
-    progress: {
-      variant: 'progress-primary',
-      value: 80
-    }
-  }];
+  ];
   const renderItem = (item, index) => {
-    return <tr key={index}>
+    return (
+      <tr key={index}>
         <td className="text-start">
-          <a href="#" className="text-sm font-medium text-gray-900 hover:text-primary">
+          <a
+            href="#"
+            className="text-sm font-medium text-gray-900 hover:text-primary"
+          >
             {item.name}
           </a>
         </td>
 
         <td>
           <div className={`progress ${item.progress.variant}`}>
-            <div className="progress-bar" style={{
-            width: `${item.progress.value}%`
-          }}></div>
+            <div
+              className="progress-bar"
+              style={{
+                width: `${item.progress.value}%`,
+              }}
+            ></div>
           </div>
         </td>
 
@@ -125,15 +155,21 @@ const Projects = () => {
 
         <td className="text-start">
           <Menu>
-            <MenuItem toggle="dropdown" trigger="click" dropdownProps={{
-            placement: isRTL() ? 'bottom-start' : 'bottom-end',
-            modifiers: [{
-              name: 'offset',
-              options: {
-                offset: isRTL() ? [0, -10] : [0, 10] // [skid, distance]
-              }
-            }]
-          }}>
+            <MenuItem
+              toggle="dropdown"
+              trigger="click"
+              dropdownProps={{
+                placement: isRTL() ? "bottom-start" : "bottom-end",
+                modifiers: [
+                  {
+                    name: "offset",
+                    options: {
+                      offset: isRTL() ? [0, -10] : [0, 10], // [skid, distance]
+                    },
+                  },
+                ],
+              }}
+            >
               <MenuToggle className="btn btn-sm btn-icon btn-light btn-clear">
                 <KeenIcon icon="dots-vertical" />
               </MenuToggle>
@@ -141,22 +177,30 @@ const Projects = () => {
             </MenuItem>
           </Menu>
         </td>
-      </tr>;
+      </tr>
+    );
   };
-  return <div className="card">
+  return (
+    <div className="card">
       <div className="card-header">
         <h3 className="card-title">Projects</h3>
 
         <Menu>
-          <MenuItem toggle="dropdown" trigger="click" dropdownProps={{
-          placement: isRTL() ? 'bottom-start' : 'bottom-end',
-          modifiers: [{
-            name: 'offset',
-            options: {
-              offset: isRTL() ? [0, -10] : [0, 10] // [skid, distance]
-            }
-          }]
-        }}>
+          <MenuItem
+            toggle="dropdown"
+            trigger="click"
+            dropdownProps={{
+              placement: isRTL() ? "bottom-start" : "bottom-end",
+              modifiers: [
+                {
+                  name: "offset",
+                  options: {
+                    offset: isRTL() ? [0, -10] : [0, 10], // [skid, distance]
+                  },
+                },
+              ],
+            }}
+          >
             <MenuToggle className="btn btn-sm btn-icon btn-light btn-clear">
               <KeenIcon icon="dots-vertical" />
             </MenuToggle>
@@ -169,7 +213,9 @@ const Projects = () => {
         <table className="table text-end">
           <thead>
             <tr>
-              <th className="text-start min-w-52 !font-normal !text-gray-700">Project Name</th>
+              <th className="text-start min-w-52 !font-normal !text-gray-700">
+                Project Name
+              </th>
               <th className="min-w-40 !font-normal !text-gray-700">Progress</th>
               <th className="min-w-32 !font-normal !text-gray-700">People</th>
               <th className="min-w-32 !font-normal !text-gray-700">Due Date</th>
@@ -179,8 +225,8 @@ const Projects = () => {
 
           <tbody>
             {items.map((item, index) => {
-            return renderItem(item, index);
-          })}
+              return renderItem(item, index);
+            })}
           </tbody>
         </table>
       </div>
@@ -190,6 +236,7 @@ const Projects = () => {
           All Projects
         </Link>
       </div>
-    </div>;
+    </div>
+  );
 };
 export { Projects };

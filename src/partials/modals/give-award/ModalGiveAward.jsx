@@ -1,11 +1,20 @@
-import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from '@/components/ui/dialog';
-import { ModalShareProfileViaLink, ModalShareProfileViaEmail, ModalShareProfileUsers, ModalShareProfileSettings } from '@/partials/modals/share-profile';
-const ModalGiveAward = ({
-  open,
-  onOpenChange
-}) => {
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
+import {
+  ModalShareProfileViaLink,
+  ModalShareProfileViaEmail,
+  ModalShareProfileUsers,
+  ModalShareProfileSettings,
+} from "@/partials/modals/share-profile";
+const ModalGiveAward = ({ open, onOpenChange }) => {
   const scrollableHeight = 300;
-  return <Dialog open={open} onOpenChange={onOpenChange}>
+  return (
+    <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="max-w-[600px]">
         <DialogHeader className="py-4 px-5">
           <DialogTitle>Give Award</DialogTitle>
@@ -18,9 +27,12 @@ const ModalGiveAward = ({
           <ModalShareProfileViaEmail />
           <div className="border-b border-b-gray-200"></div>
 
-          <div className="scrollable-y-auto" style={{
-          maxHeight: `${scrollableHeight}px`
-        }}>
+          <div
+            className="scrollable-y-auto"
+            style={{
+              maxHeight: `${scrollableHeight}px`,
+            }}
+          >
             <ModalShareProfileUsers />
           </div>
 
@@ -28,6 +40,7 @@ const ModalGiveAward = ({
           <ModalShareProfileSettings />
         </div>
       </DialogContent>
-    </Dialog>;
+    </Dialog>
+  );
 };
 export { ModalGiveAward };

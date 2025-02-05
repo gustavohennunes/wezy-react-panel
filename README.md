@@ -11,3 +11,5 @@ Currently, two official plugins are available:
 # Observações
 
 src\components\keenicons\assets - tem um demo.html para ver os icones disponiveis no projeto
+
+AuthPage - tem AuthLayout que tem a versão branded e padrão, possivelmente local de limpeza para retirar o branded se não for usar

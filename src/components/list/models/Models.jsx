@@ -1,6 +1,7 @@
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { Link } from "react-router-dom";
 import { toAbsoluteUrl } from "@/utils";
+import axios from "axios";
 import {
   DataGrid,
   KeenIcon,
@@ -31,6 +32,19 @@ const Models = () => {
     );
   };
   const [models, setModels] = useState(ModelsData); // Initialize state with ModelsData
+  const getModels = async () => { 
+    axios.get("https://67a27e8c409de5ed52559556.mockapi.io/api/v1/user")
+    .then(response => {
+      setModels(response.data)
+    })
+    .catch(error => {
+      console.log(error)
+    })
+  }
+
+  useEffect(() => {
+    getModels()
+  }, [])
 
   const handleToggle = (index) => {
     setModels((prevModels) => {
@@ -96,7 +110,7 @@ const Models = () => {
         ),
         enableSorting: true,
         cell: (info) => {
-          return info.row.original.country;
+          return info.row.original.pais;
         },
         meta: {
           className: "min-w-[225px]",

@@ -10,7 +10,6 @@ import { useLayout } from "@/providers";
 import { Alert } from "@/components";
 const loginSchema = Yup.object().shape({
   email: Yup.string()
-    .email("Wrong email format")
     .min(3, "Minimum 3 symbols")
     .max(50, "Maximum 50 symbols")
     .required("Email is required"),
@@ -21,8 +20,10 @@ const loginSchema = Yup.object().shape({
   remember: Yup.boolean(),
 });
 const initialValues = {
-  email: "demo@keenthemes.com",
-  password: "demo1234",
+  //email: "demo@keenthemes.com",
+  //password: "demo1234",
+  email: "admin",
+  password: "admin",
   remember: false,
 };
 const Login = () => {

@@ -1,5 +1,6 @@
 import { getData, setData } from "@/utils";
 const AUTH_LOCAL_STORAGE_KEY = `${import.meta.env.VITE_APP_NAME}-auth-v${import.meta.env.VITE_APP_VERSION}`;
+const LOCAL_STORAGE_AUTH = `auth-token`;
 const getAuth = () => {
   try {
     const auth = getData(AUTH_LOCAL_STORAGE_KEY);
@@ -14,6 +15,9 @@ const getAuth = () => {
 };
 const setAuth = (auth) => {
   setData(AUTH_LOCAL_STORAGE_KEY, auth);
+};
+const setLocalAuth = (auth) => {
+  setData(LOCAL_STORAGE_AUTH, auth);
 };
 const removeAuth = () => {
   if (!localStorage) {
@@ -38,4 +42,4 @@ export function setupAxios(axios) {
     async (err) => await Promise.reject(err),
   );
 }
-export { AUTH_LOCAL_STORAGE_KEY, getAuth, removeAuth, setAuth };
+export { AUTH_LOCAL_STORAGE_KEY, getAuth, removeAuth, setAuth, setLocalAuth };

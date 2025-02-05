@@ -35,6 +35,7 @@ const Models = () => {
   const getModels = async () => { 
     axios.get("https://67a27e8c409de5ed52559556.mockapi.io/api/v1/user")
     .then(response => {
+      console.log(response.data)
       setModels(response.data)
     })
     .catch(error => {

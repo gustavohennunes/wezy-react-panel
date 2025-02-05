@@ -2,7 +2,9 @@ import axios from "axios";
 import { createContext, useState } from "react";
 import * as authHelper from "../_helpers";
 const API_URL = import.meta.env.VITE_APP_API_URL;
+const CAYMAN_API_URL_lOGIN = import.meta.env.VITE_CAYMAN_API_URL_lOGIN;
 export const LOGIN_URL = `${API_URL}/login`;
+export const CAYMAN_LOGIN_URL = `${CAYMAN_API_URL_lOGIN}`;
 export const REGISTER_URL = `${API_URL}/register`;
 export const FORGOT_PASSWORD_URL = `${API_URL}/forgot-password`;
 export const RESET_PASSWORD_URL = `${API_URL}/reset-password`;
@@ -15,7 +17,7 @@ const AuthProvider = ({ children }) => {
   const verify = async () => {
     if (auth) {
       try {
-        const { data: user } = await getUser();
+        const { data: user } = await newUser();
         setCurrentUser(user);
       } catch {
         saveAuth(undefined);
@@ -27,18 +29,32 @@ const AuthProvider = ({ children }) => {
     setAuth(auth);
     if (auth) {
       authHelper.setAuth(auth);
+      if(auth.success){
+        authHelper.setLocalAuth(auth.success.response.data.session_token);
+      }
     } else {
       authHelper.removeAuth();
     }
   };
-  const login = async (email, password) => {
+  const login = async (login, senha) => {
     try {
-      const { data: auth } = await axios.post(LOGIN_URL, {
-        email,
-        password,
+      const { data: auth } = await axios.post(CAYMAN_LOGIN_URL, {
+        login: login,
+        senha: senha,
+      }, {
+        headers: {
+          'Content-Type': 'application/x-www-form-urlencoded',
+          'Customer-Host': 'douglasfeuse',
+          Authorization: 'Bearer Iq1uQxXL-CLgL2L1QitNsyU7pQqv8RA5CBoDP4Lv5fBAApymt7G3rKrPYPiaY'
+        }
       });
+      /* const tokens = { 
+        'access_token': response.sucess.request.code,
+        'token_type': 'Bearer'
+      } */
       saveAuth(auth);
-      const { data: user } = await getUser();
+      const { data: user } = await newUser();
+      console.log(auth)
       setCurrentUser(user);
     } catch (error) {
       saveAuth(undefined);
@@ -81,6 +97,18 @@ const AuthProvider = ({ children }) => {
   const getUser = async () => {
     return await axios.get(GET_USER_URL);
   };
+  const newUser = async () => {
+    //TODO
+    return { data: {
+        id:1,
+        first_name: 'Douglas',
+        last_name: 'Feuser',
+        role: 'user',
+        status: 'active',
+        email: 'douglas.feuser@gmail.com'
+      }
+    };
+  };
   const logout = () => {
     saveAuth(undefined);
     setCurrentUser(undefined);
@@ -99,6 +127,7 @@ const AuthProvider = ({ children }) => {
         requestPasswordResetLink,
         changePassword,
         getUser,
+        newUser,
         logout,
         verify,
       }}

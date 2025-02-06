@@ -13,3 +13,5 @@ Currently, two official plugins are available:
 src\components\keenicons\assets - tem um demo.html para ver os icones disponiveis no projeto
 
 AuthPage - tem AuthLayout que tem a versão branded e padrão, possivelmente local de limpeza para retirar o branded se não for usar
+
+<React.StrictMode> no arquivo main.jsx faz com que no modo de desenvolvimento local ele renderize os componentes duas vezes

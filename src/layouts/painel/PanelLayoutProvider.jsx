@@ -26,7 +26,7 @@ const usePanelLayout = () => useContext(PanelLayoutContext);
 
 // Provider component that sets up the layout state and context for Panel layout
 const PanelLayoutProvider = ({ children }) => {
-  const { setMenuConfig } = useMenus(); // Hook to manage menu configurations
+  const { getMenuConfig, fetchMenu } = useMenus(); // Hook to manage menu configurations
   const { getLayout, setCurrentLayout } = useLayout(); // Hook to get and set layout configuration
 
   // Merge the Panel layout configuration with the current layout configuration fetched via getLayout
@@ -40,7 +40,14 @@ const PanelLayoutProvider = ({ children }) => {
   const [mobileSidebarOpen, setMobileSidebarOpen] = useState(false); // Manage state for mobile sidebar
 
   // Set the menu configuration for the primary menu using the provided MENU_SIDEBAR configuration
-  setMenuConfig("primary", MENU_SIDEBAR);
+  //setMenuConfig("primary", MENU_SIDEBAR);
+  //fetchMenu();
+  /* useEffect(() => {
+    if (!getMenuConfig("primary")) {
+      console.log("📢 Nenhum menu encontrado, buscando...");
+      fetchMenu();
+    }
+  }, [getMenuConfig, fetchMenu]); */
 
   // When the layout state changes, set the current layout configuration in the layout provider
   useEffect(() => {

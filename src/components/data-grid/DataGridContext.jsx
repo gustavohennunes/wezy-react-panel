@@ -29,8 +29,8 @@ export const useDataGrid = () => {
 export const DataGridProvider = (props) => {
   const defaultValues = {
     messages: {
-      empty: "No data available",
-      loading: "Loading...",
+      empty: "Sem dados",
+      loading: "carregando...",
     },
     layout: {
       cellSpacing: "md",
@@ -38,11 +38,11 @@ export const DataGridProvider = (props) => {
       card: false,
     },
     pagination: {
-      info: "{from} - {to} of {count}",
+      info: "{from} - {to} de {count}",
       sizes: [5, 10, 25, 50, 100],
       sizesLabel: "Show",
-      sizesDescription: "per page",
-      size: 5,
+      sizesDescription: "por página",
+      size: 10,
       page: 0,
       moreLimit: 5,
       more: false,
@@ -58,7 +58,7 @@ export const DataGridProvider = (props) => {
   );
   const [pagination, setPagination] = useState({
     pageIndex: props.pagination?.page ?? 0,
-    pageSize: props.pagination?.size ?? 5,
+    pageSize: props.pagination?.size ?? 10,
   });
   const [rowSelection, setRowSelection] = useState(mergedProps.rowSelection);
   const [sorting, setSorting] = useState(mergedProps.sorting ?? []);

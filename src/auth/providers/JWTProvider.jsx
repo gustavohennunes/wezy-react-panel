@@ -1,5 +1,5 @@
 import axios from "axios";
-import { createContext, useState } from "react";
+import { createContext, useState, useContext } from "react";
 import * as authHelper from "../_helpers";
 const API_URL = import.meta.env.VITE_APP_API_URL;
 const CAYMAN_API_URL_lOGIN = import.meta.env.VITE_CAYMAN_API_URL_lOGIN;
@@ -54,7 +54,6 @@ const AuthProvider = ({ children }) => {
       } */
       saveAuth(auth);
       const { data: user } = await newUser();
-      console.log(auth)
       setCurrentUser(user);
     } catch (error) {
       saveAuth(undefined);
@@ -136,4 +135,7 @@ const AuthProvider = ({ children }) => {
     </AuthContext.Provider>
   );
 };
-export { AuthContext, AuthProvider };
+
+const useAuth = () => useContext(AuthContext);
+
+export { AuthContext, AuthProvider, useAuth };

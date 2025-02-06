@@ -31,7 +31,7 @@ const Models = () => {
       />
     );
   };
-  const [models, setModels] = useState(ModelsData); // Initialize state with ModelsData
+  const [models, setModels] = useState(ModelsData);
   const getModels = async () => { 
     axios.get("https://67a27e8c409de5ed52559556.mockapi.io/api/v1/user")
     .then(response => {
@@ -52,7 +52,7 @@ const Models = () => {
       const updatedModels = [...prevModels];
       updatedModels[index] = {
         ...updatedModels[index],
-        switch: !updatedModels[index].switch, // Toggle the switch state
+        switch: !updatedModels[index].switch,
       };
       return updatedModels;
     });
@@ -233,7 +233,7 @@ const Models = () => {
       rowSelection={true}
       onRowSelectionChange={handleRowSelection}
       pagination={{
-        size: 5,
+        size: 10,
       }}
       sorting={[
         {

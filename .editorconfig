@@ -7,7 +7,7 @@ insert_final_newline = true
 
 # Matches multiple files with brace expansion notation
 # Set default charset
-[*.{js,py}]
+[*.{js,jsx,py,php}]
 charset = utf-8
 
 # Tab indentation (no size specified)

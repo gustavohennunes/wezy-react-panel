@@ -1,5 +1,4 @@
 import { createContext, useContext, useState, useEffect } from "react";
-import * as authHelper from "../auth/_helpers";
 import { useAuth } from "../auth/providers/JWTProvider";
 import axios from "axios";
 const initialProps = {
@@ -14,7 +13,7 @@ const MenuContext = createContext(initialProps);
 const useMenus = () => useContext(MenuContext);
 
 const MenusProvider = ({ children }) => {
-  const { auth } = useAuth();
+  const { auth, logout } = useAuth();
   const [currentMenuItem, setCurrentMenuItem] = useState(null);
   const [configs, setConfigs] = useState(new Map());
 
@@ -36,28 +35,30 @@ const MenusProvider = ({ children }) => {
 
   const fetchMenu = async () => {
     try {
-      await axios.get('https://painel.amazon.cayman.com.br/api/v1/panel/menus', {
-        headers: {
-          'Content-Type': 'application/x-www-form-urlencoded',
-          'Customer-Host': 'douglasfeuse'
-        }
-      }).then(response => {
-        const data = response.data.success.response.data;
-        console.log(data)
-        setMenuConfig("primary", data);
-        return data;
-      }).catch(error => {
-        console.log(error)
-      });
-
+      await axios
+        .get("https://painel.amazon.cayman.com.br/api/v1/panel/menus", {
+          headers: {
+            "Content-Type": "application/x-www-form-urlencoded",
+            "Customer-Host": "douglasfeuse",
+          },
+        })
+        .then((response) => {
+          const data = response.data.success.response.data;
+          setMenuConfig("primary", data);
+          return data;
+        })
+        .catch((error) => {
+          //logout();
+          console.log(error);
+        });
     } catch (error) {
+      //logout();
       console.error("Erro ao buscar menu:", error);
     }
   };
 
   useEffect(() => {
     if (auth) {
-      console.log("📢 Usuário autenticado! Buscando menus...");
       fetchMenu();
     }
   }, [auth]);

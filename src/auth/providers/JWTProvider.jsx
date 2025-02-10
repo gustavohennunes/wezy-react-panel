@@ -29,7 +29,7 @@ const AuthProvider = ({ children }) => {
     setAuth(auth);
     if (auth) {
       authHelper.setAuth(auth);
-      if(auth.success){
+      if (auth.success) {
         authHelper.setLocalAuth(auth.success.response.data.session_token);
       }
     } else {
@@ -38,16 +38,21 @@ const AuthProvider = ({ children }) => {
   };
   const login = async (login, senha) => {
     try {
-      const { data: auth } = await axios.post(CAYMAN_LOGIN_URL, {
-        login: login,
-        senha: senha,
-      }, {
-        headers: {
-          'Content-Type': 'application/x-www-form-urlencoded',
-          'Customer-Host': 'douglasfeuse',
-          Authorization: 'Bearer Iq1uQxXL-CLgL2L1QitNsyU7pQqv8RA5CBoDP4Lv5fBAApymt7G3rKrPYPiaY'
-        }
-      });
+      const { data: auth } = await axios.post(
+        CAYMAN_LOGIN_URL,
+        {
+          login: login,
+          senha: senha,
+        },
+        {
+          headers: {
+            "Content-Type": "application/x-www-form-urlencoded",
+            "Customer-Host": "douglasfeuse",
+            Authorization:
+              "Bearer Iq1uQxXL-CLgL2L1QitNsyU7pQqv8RA5CBoDP4Lv5fBAApymt7G3rKrPYPiaY",
+          },
+        },
+      );
       /* const tokens = { 
         'access_token': response.sucess.request.code,
         'token_type': 'Bearer'
@@ -98,14 +103,15 @@ const AuthProvider = ({ children }) => {
   };
   const newUser = async () => {
     //TODO
-    return { data: {
-        id:1,
-        first_name: 'Douglas',
-        last_name: 'Feuser',
-        role: 'user',
-        status: 'active',
-        email: 'douglas.feuser@gmail.com'
-      }
+    return {
+      data: {
+        id: 1,
+        first_name: "Douglas",
+        last_name: "Feuser",
+        role: "user",
+        status: "active",
+        email: "douglas.feuser@gmail.com",
+      },
     };
   };
   const logout = () => {

@@ -7,35 +7,25 @@ import {
   Header,
   Sidebar,
   Toolbar,
-  ToolbarActions,
   ToolbarHeading,
 } from "../";
 import { useMenus } from "@/providers";
 import { useResponsive } from "@/hooks";
-import { Link } from "react-router-dom";
-import {
-  Popover,
-  PopoverContent,
-  PopoverTrigger,
-} from "@/components/ui/popover";
-import { Calendar } from "@/components/ui/calendar";
-import { addDays, format } from "date-fns";
-import { cn } from "@/lib/utils";
-import { KeenIcon } from "@/components/keenicons";
+import { usePageData } from "@/context/PageDataContext";
+import parse from 'html-react-parser';
+
 const Main = () => {
   const mobileMode = useResponsive("down", "lg");
   const { pathname } = useLocation();
   const { getMenuConfig } = useMenus();
   const menuConfig = getMenuConfig("primary");
   const menuItem = useMenuCurrentItem(pathname, menuConfig);
-  const [date, setDate] = useState({
-    from: new Date(2025, 0, 20),
-    to: addDays(new Date(2025, 0, 20), 20),
-  });
+  const { pageData } = usePageData();
+
   return (
     <Fragment>
       <Helmet>
-        <title>{menuItem?.title}</title>
+        <title>{pageData?.params?.title || ""}</title>
       </Helmet>
 
       <div className="flex grow">
@@ -47,7 +37,8 @@ const Main = () => {
             <div className="flex flex-col grow lg:scrollable-y-auto lg:[scrollbar-width:auto] lg:light:[--tw-scrollbar-thumb-color:var(--tw-content-scrollbar-color)] pt-5">
               <main className="grow" role="content">
                 <Toolbar>
-                  <ToolbarHeading />
+                {/* { parse(pageData?.params?.breadcrumbs || '') } */}
+                  <ToolbarHeading title={pageData?.params?.title || "Header"} />
                 </Toolbar>
                 <Outlet />
               </main>

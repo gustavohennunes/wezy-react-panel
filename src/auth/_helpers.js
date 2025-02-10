@@ -63,4 +63,11 @@ export function setupAxios(axios) {
     async (err) => await Promise.reject(err),
   );
 }
-export { AUTH_LOCAL_STORAGE_KEY, getAuth, getLocalAuth, removeAuth, setAuth, setLocalAuth };
+export {
+  AUTH_LOCAL_STORAGE_KEY,
+  getAuth,
+  getLocalAuth,
+  removeAuth,
+  setAuth,
+  setLocalAuth,
+};

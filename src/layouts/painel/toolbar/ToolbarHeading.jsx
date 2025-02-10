@@ -14,7 +14,7 @@ const ToolbarHeading = ({ title = "" }) => {
       <h1 className="font-medium text-lg text-gray-900">
         {title || currentMenuItem?.title}
       </h1>
-      <ToolbarBreadcrumbs />
+      <ToolbarBreadcrumbs title={title}/>
     </div>
   );
 };

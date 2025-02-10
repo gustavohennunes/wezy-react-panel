@@ -39,7 +39,7 @@ export const DataGridProvider = (props) => {
     },
     pagination: {
       info: "{from} - {to} de {count}",
-      sizes: [5, 10, 25, 50, 100],
+      sizes: [5, 10, 20, 50, 100],
       sizesLabel: "Show",
       sizesDescription: "por página",
       size: 10,

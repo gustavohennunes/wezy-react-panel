@@ -3,7 +3,7 @@ import { useMenuBreadcrumbs } from "@/components";
 import { Link } from "react-router-dom";
 import { useMenus } from "@/providers";
 import { useLocation } from "react-router";
-const ToolbarBreadcrumbs = () => {
+const ToolbarBreadcrumbs = ({ title = "" }) => {
   const { getMenuConfig } = useMenus();
   const { pathname } = useLocation();
   const items = useMenuBreadcrumbs(pathname, getMenuConfig("primary"));

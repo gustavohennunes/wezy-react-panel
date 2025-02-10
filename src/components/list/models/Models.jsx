@@ -32,20 +32,21 @@ const Models = () => {
     );
   };
   const [models, setModels] = useState(ModelsData);
-  const getModels = async () => { 
-    axios.get("https://67a27e8c409de5ed52559556.mockapi.io/api/v1/user")
-    .then(response => {
-      console.log(response.data)
-      setModels(response.data)
-    })
-    .catch(error => {
-      console.log(error)
-    })
-  }
+  const getModels = async () => {
+    axios
+      .get("https://67a27e8c409de5ed52559556.mockapi.io/api/v1/user")
+      .then((response) => {
+        //console.log(response.data)
+        setModels(response.data);
+      })
+      .catch((error) => {
+        console.log(error);
+      });
+  };
 
   useEffect(() => {
-    getModels()
-  }, [])
+    getModels();
+  }, []);
 
   const handleToggle = (index) => {
     setModels((prevModels) => {
@@ -233,7 +234,7 @@ const Models = () => {
       rowSelection={true}
       onRowSelectionChange={handleRowSelection}
       pagination={{
-        size: 10,
+        size: 20,
       }}
       sorting={[
         {

@@ -70,9 +70,22 @@ const Models = ({model, columnHeader, btnAdd, search}) => {
         );        
       },
       meta: {
-        className: col.class || "",
-        cellClassName: "text-gray-800 font-normal",
-      },
+        headerClassName: [
+          col.width && col.width !== "0%" ? `w-[${col.width}]` : "",
+          col.class ? col.class : "",
+          col.align === "left" ? "text-left" : col.align === "center" ? "text-center" : col.align === "right" ? "text-right" : ""
+        ].filter(Boolean).join(" "),
+      
+        cellClassName: [
+          col.width && col.width !== "0%" ? `w-[${col.width}]` : "",
+          "text-gray-800 font-normal",
+          col.align === "left" ? "text-left" : col.align === "center" ? "text-center" : col.align === "right" ? "text-right" : ""
+        ].filter(Boolean).join(" "),
+      
+        style: col.style 
+          ? Object.fromEntries(col.style.split(";").map(rule => rule.split(":").map(s => s.trim())).filter(([key, value]) => key && value))
+          : {}
+      }      
     }});
   };
 

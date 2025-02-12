@@ -3,9 +3,9 @@ import {
   DataGridRowSelect,
 } from "@/components";
 export const DataRowContext = ({fullRow, row, index, handleToggle}) => {
-  console.log(row);
-  console.log(row.content);
-  console.log(Array.isArray(row.content));
+  //console.log(row);
+  //console.log(row.content);
+  //console.log(Array.isArray(row.content));
 
   if (row.component === "checkbox_delete") {
     // CHECKBOX
@@ -21,8 +21,7 @@ export const DataRowContext = ({fullRow, row, index, handleToggle}) => {
           <input
             type="checkbox"
             checked={row.content}
-            onChange={() => handleToggle(fullRow.index)} // Use row.index for the correct user
-          />
+            onChange={() => handleToggle(fullRow.index)} />
           <span className="slider round"></span>
         </label>
       </div>

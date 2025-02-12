@@ -19,7 +19,8 @@ const AppRoutingSetup = () => {
   const [layout, setLayout] = useState(null);
 
   useEffect(() => {
-    const layoutConfig = Math.random() < 0.5 ? "demo6" : "demo2";
+    const layoutConfig = "demo6";
+    //const layoutConfig = Math.random() < 0.5 ? "demo6" : "demo2";
     setLayout(layoutConfig);
   }, []);
 

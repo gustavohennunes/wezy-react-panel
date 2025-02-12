@@ -48,11 +48,11 @@ const MenusProvider = ({ children }) => {
           return data;
         })
         .catch((error) => {
-          //logout();
+          logout();
           console.log(error);
         });
     } catch (error) {
-      //logout();
+      logout();
       console.error("Erro ao buscar menu:", error);
     }
   };

@@ -11,3 +11,4 @@ export * from "./DataGridColumnFilter";
 export * from "./DataGridColumnVisibility";
 export * from "./DataGridRowSelectAll";
 export * from "./DataGridRowSelect";
+export * from "./row-components";

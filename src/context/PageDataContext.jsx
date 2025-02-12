@@ -13,7 +13,7 @@ export const PageDataProvider = ({ children }) => {
   useEffect(() => {
     api.get(`/panel/module?module=administracao`)
       .then((response) => {
-        console.log(response)
+        //console.log(response)
         setPageData(response.data.success.response.data); // Armazena o JSON da API no contexto
       })
       .catch((err) => {

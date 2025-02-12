@@ -1,7 +1,5 @@
-import { useEffect, useMemo, useState } from "react";
-import { Link } from "react-router-dom";
-import { toAbsoluteUrl } from "@/utils";
-import axios from "axios";
+import { useMemo, useState } from "react";
+import Skeleton from 'react-loading-skeleton'
 import {
   DataGrid,
   KeenIcon,
@@ -9,6 +7,7 @@ import {
   DataGridRowSelect,
   DataGridRowSelectAll,
   useDataGrid,
+  DataRowContext
 } from "@/components";
 import {
   Select,
@@ -17,10 +16,9 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { ModelsData } from "./";
 import { toast } from "sonner";
 import { Input } from "@/components/ui/input";
-const Models = () => {
+const Models = ({model, columnHeader, btnAdd, search}) => {
   const ColumnInputFilter = ({ column }) => {
     return (
       <Input
@@ -31,22 +29,7 @@ const Models = () => {
       />
     );
   };
-  const [models, setModels] = useState(ModelsData);
-  const getModels = async () => {
-    axios
-      .get("https://67a27e8c409de5ed52559556.mockapi.io/api/v1/user")
-      .then((response) => {
-        //console.log(response.data)
-        setModels(response.data);
-      })
-      .catch((error) => {
-        console.log(error);
-      });
-  };
-
-  useEffect(() => {
-    getModels();
-  }, []);
+  const [models, setModels] = useState(model);
 
   const handleToggle = (index) => {
     setModels((prevModels) => {
@@ -58,111 +41,43 @@ const Models = () => {
       return updatedModels;
     });
   };
-  const columns = useMemo(
-    () => [
-      {
-        accessorKey: "id",
-        header: () => <DataGridRowSelectAll />,
-        cell: ({ row }) => <DataGridRowSelect row={row} />,
-        enableSorting: false,
-        enableHiding: false,
-        meta: {
-          headerClassName: "w-0",
-        },
-      },
-      {
-        accessorFn: (row) => row.user,
-        id: "models",
-        header: ({ column }) => (
-          <DataGridColumnHeader
-            title="Cliente"
-            filter={<ColumnInputFilter column={column} />}
-            column={column}
+
+  const createColumns = (columnsData) => {
+    if(!columnsData) return false;
+
+    return columnsData.map((col, index) => {
+
+      return {
+      accessorKey: `col_${index}`,
+      id: col.component === "select_all_checkbox" ? (
+        'id'
+      ) : col?.content?.toLowerCase().replace(/\s/g, "_"),
+      header: ({ column }) => 
+        col.component === "select_all_checkbox" ? (
+          <DataGridRowSelectAll />
+        ) : (
+          <DataGridColumnHeader 
+            title={col.content} 
+            column={column} 
+            filter={<ColumnInputFilter column={column} />} 
           />
         ),
-        enableSorting: true,
-        cell: ({ row }) => {
-          return row.original.name;
-        },
-        meta: {
-          className: "min-w-[200px]",
-          cellClassName: "font-normal text-gray-800",
-        },
+      
+      enableSorting: true,
+      cell: ({ row }) => {
+        return (
+          <DataRowContext fullRow={row} row={row.original.columns[index]} index={index} handleToggle={handleToggle}/>    
+        );        
       },
-      {
-        accessorFn: (row) => row.branch,
-        id: "branch",
-        header: ({ column }) => (
-          <DataGridColumnHeader title="Dominio" column={column} />
-        ),
-        enableSorting: true,
-        cell: (info) => {
-          return info.row.original.email;
-        },
-        meta: {
-          className: "min-w-[165px]",
-          cellClassName: "text-gray-800 font-normal",
-        },
+      meta: {
+        className: col.class || "",
+        cellClassName: "text-gray-800 font-normal",
       },
-      {
-        accessorFn: (row) => row.labels,
-        id: "label",
-        header: ({ column }) => (
-          <DataGridColumnHeader title="Pais" column={column} />
-        ),
-        enableSorting: true,
-        cell: (info) => {
-          return info.row.original.pais;
-        },
-        meta: {
-          className: "min-w-[225px]",
-        },
-      },
-      {
-        accessorFn: (row) => row.switch,
-        id: "switch",
-        header: ({ column }) => (
-          <DataGridColumnHeader title="2FA" column={column} />
-        ),
-        enableSorting: true,
-        cell: ({ row }) => {
-          const userSwitch = row.original.switch;
-          return (
-            <div className="flex items-center mb-2">
-              <label className="switch switch-sm">
-                <input
-                  type="checkbox"
-                  checked={userSwitch}
-                  onChange={() => handleToggle(row.index)} // Use row.index for the correct user
-                />
-                <span className="slider round"></span>
-              </label>
-            </div>
-          );
-        },
-        meta: {
-          className: "min-w-[100px]",
-        },
-      },
-      {
-        id: "edit",
-        header: () => "",
-        enableSorting: false,
-        cell: () => {
-          return (
-            <button className="btn btn-sm btn-icon btn-clear btn-light">
-              <KeenIcon icon="dots-vertical" />
-            </button>
-          );
-        },
-        meta: {
-          headerClassName: "w-[60px]",
-        },
-      },
-    ],
-    [],
-  );
-  const data = useMemo(() => models, [models]); // Use models state
+    }});
+  };
+
+  const teste = useMemo(() => columnHeader ? createColumns(columnHeader) : [], [columnHeader]);
+  //const data = useMemo(() => models, [models]); // Use models state
 
   const handleRowSelection = (state) => {
     const selectedRowIds = Object.keys(state);
@@ -178,10 +93,13 @@ const Models = () => {
   };
   const Toolbar = () => {
     const { table } = useDataGrid();
-    const [searchInput, setSearchInput] = useState("");
+    const [searchInput, setSearchInput] = useState(search?.value);
+    const addBtn = btnAdd?.label ? <button className="btn btn-primary">{btnAdd?.label}</button> : "";
     return (
       <div className="card-header flex-wrap gap-2 border-b-0 px-5">
-        <h3 className="card-title font-medium text-sm">Header</h3>
+        <h3 className="card-title font-medium text-sm">
+          {addBtn}
+        </h3>
 
         <div className="flex flex-wrap gap-2 lg:gap-5">
           <div className="flex">
@@ -189,7 +107,7 @@ const Models = () => {
               <KeenIcon icon="magnifier" />
               <input
                 type="text"
-                placeholder="Pesquisar"
+                placeholder={search?.placeholder}
                 value={searchInput}
                 onChange={(e) => setSearchInput(e.target.value)}
               />
@@ -227,10 +145,15 @@ const Models = () => {
       </div>
     );
   };
+  
+  if (!teste || teste.length === 0) {
+    return <Skeleton />;
+  }
+
   return (
     <DataGrid
-      columns={columns}
-      data={data}
+      columns={teste}
+      data={model}
       rowSelection={true}
       onRowSelectionChange={handleRowSelection}
       pagination={{

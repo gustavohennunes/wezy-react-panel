@@ -1,30 +1,19 @@
-//import { DataRowSelector } from ".";
+import { DataRowToggle, DataRowActionsMenu } from ".";
 import {
   DataGridRowSelect,
 } from "@/components";
 export const DataRowContext = ({fullRow, row, index, handleToggle}) => {
-  //console.log(row);
-  //console.log(row.content);
-  //console.log(Array.isArray(row.content));
 
   if (row.component === "checkbox_delete") {
     // CHECKBOX
     return <DataGridRowSelect row={fullRow} />
-  } else if (Array.isArray(row.content)) {
+  } else if (row.component === "menu_dropdown" && Array.isArray(row.content)) {
     // MENU AÇÕES
-    return row.content[0].title || "-";
+    return <DataRowActionsMenu row={row}/>;
   }  else if (row.component === "toggle") {
     // TOOGLE
     return (
-      <div className="flex items-center mb-2">
-        <label className="switch switch-sm">
-          <input
-            type="checkbox"
-            checked={row.content}
-            onChange={() => handleToggle(fullRow.index)} />
-          <span className="slider round"></span>
-        </label>
-      </div>
+      <DataRowToggle row={row} fullRow={fullRow} handleToggle={handleToggle} />
     )
   }
 

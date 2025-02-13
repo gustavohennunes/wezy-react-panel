@@ -47,7 +47,7 @@ const DataGridTable = () => {
                 className={cn(
                   headCellSpacing,
                   cellBorder && "border-e",
-                  "h-12 text-left rtl:text-right align-middle font-medium text-muted-foreground [&:has([role=checkbox])]:pe-0",
+                  "h-12 min-w-[30px] text-left rtl:text-right align-middle font-medium text-muted-foreground [&:has([role=checkbox])]:pe-0",
                   header.column.columnDef.meta?.headerClassName,
                 )}
               >

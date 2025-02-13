@@ -1,33 +1,40 @@
-import { useLocation } from "react-router-dom";
-//import usePageData from "@/hooks/usePageData";
+import { useEffect, useState } from "react";
 import { usePageData } from "@/context/PageDataContext";
 import { Models } from "@/components/list/models";
+import { FormContext } from "@/components/form/FormContext";
+import { ScreenLoader } from "@/components/loaders";
 
 const PanelContent = () => {
-  let content,btnAdd,search;
-  let location = useLocation();
-  const { pageData } = usePageData();
-  /* const { data, columns, actions, loading, error } = usePageData(location.search);
+  const { pageData, loading } = usePageData();
+  const [content, setContent] = useState(null);
 
-  if (loading) return <ScreenLoader />;
-  if (error) return <p>Erro ao carregar dados</p>;
-   */
+  useEffect(() => {
+    let newContent;
 
-  //content = <Models></Models>;
-  content = <Models model={pageData?.params?.list?.rows} columnHeader={pageData?.params?.list?.header} btnAdd={pageData?.params?.add_button} search={pageData?.params?.search}></Models>
-  if (pageData?.layout == "galeria") {
-    content = "<Forms>";
-  } else if (pageData?.layout == "form") {
-    content = "<Forms>";
-  } else if (pageData?.layout == "link") {
-    content = "<Forms>";
+    if (
+      pageData?.layout === "galeria" ||
+      pageData?.layout === "link"
+    ) {
+      newContent = "Em breve";
+    } else if (pageData?.layout === "form"){
+      newContent = <FormContext data={pageData?.params} />;
+    } else {
+      newContent = (
+        <Models
+          model={pageData?.params?.list?.rows}
+          columnHeader={pageData?.params?.list?.header}
+          btnAdd={pageData?.params?.add_button}
+          search={pageData?.params?.search}
+        />
+      );
+    } 
+
+    setContent(newContent);
+  }, [pageData]);
+
+  if (loading) {
+    return <ScreenLoader />;
   }
-
-  /* Botão adicionar */
-    btnAdd = '<button className="btn btn-primary"></button>';
-
-  /* Pesquisar */
-    search = '';
 
   return (
     <div className="grid gap-5 lg:gap-7.5">

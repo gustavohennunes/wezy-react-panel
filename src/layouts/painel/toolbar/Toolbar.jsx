@@ -4,7 +4,7 @@ const Toolbar = ({ children }) => {
     <div className="pb-5">
       <Container
         width="fluid"
-        className="flex items-center justify-between flex-wrap gap-3"
+        className="flex items-center flex-wrap gap-3"
       >
         {children}
       </Container>

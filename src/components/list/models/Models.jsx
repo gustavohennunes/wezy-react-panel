@@ -1,5 +1,5 @@
 import { useMemo, useState } from "react";
-import Skeleton from 'react-loading-skeleton'
+import { Skeleton } from "@/components/ui/skeleton";
 import {
   DataGrid,
   KeenIcon,
@@ -89,7 +89,7 @@ const Models = ({model, columnHeader, btnAdd, search}) => {
     }});
   };
 
-  const teste = useMemo(() => columnHeader ? createColumns(columnHeader) : [], [columnHeader]);
+  const column = useMemo(() => columnHeader ? createColumns(columnHeader) : [], [columnHeader]);
   //const data = useMemo(() => models, [models]); // Use models state
 
   const handleRowSelection = (state) => {
@@ -107,7 +107,8 @@ const Models = ({model, columnHeader, btnAdd, search}) => {
   const Toolbar = () => {
     const { table } = useDataGrid();
     const [searchInput, setSearchInput] = useState(search?.value);
-    const addBtn = btnAdd?.label ? <button className="btn btn-primary">{btnAdd?.label}</button> : "";
+    //const addBtn = btnAdd?.label ? <a className="btn btn-primary" path={btnAdd?.url}>{btnAdd?.label}</a> : "";
+    const addBtn = btnAdd?.label ? <a className="btn btn-primary" path="?pag=administracao&acao=Inserir">{btnAdd?.label}</a> : "";
     return (
       <div className="card-header flex-wrap gap-2 border-b-0 px-5">
         <h3 className="card-title font-medium text-sm">
@@ -159,13 +160,13 @@ const Models = ({model, columnHeader, btnAdd, search}) => {
     );
   };
   
-  if (!teste || teste.length === 0) {
-    return <Skeleton />;
+  if (!column || column.length === 0) {
+    return <Skeleton className="h-8"/>;
   }
 
   return (
     <DataGrid
-      columns={teste}
+      columns={column}
       data={model}
       rowSelection={true}
       onRowSelectionChange={handleRowSelection}

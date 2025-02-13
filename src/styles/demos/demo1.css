@@ -181,3 +181,7 @@
   transition: inset-inline-start var(--tw-sidebar-transition-duration)
     var(--tw-sidebar-transition-timing);
 }
+
+.switch input[type=checkbox]:checked, .switch input[type=checkbox][aria-checked="true"] {
+  background-color: green;
+}

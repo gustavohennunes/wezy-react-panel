@@ -1,4 +1,4 @@
-import { Fragment, useState } from "react";
+import { Fragment, useState, useEffect } from "react";
 import { Helmet } from "react-helmet-async";
 import { Outlet, useLocation } from "react-router";
 import { useMenuCurrentItem } from "@/components/menu";
@@ -21,11 +21,17 @@ const Main = () => {
   const menuConfig = getMenuConfig("primary");
   const menuItem = useMenuCurrentItem(pathname, menuConfig);
   const { pageData } = usePageData();
+  const [title, setTitle] = useState("");
+
+  useEffect(() => {
+    let newTitle = pageData?.params?.title || "";
+    setTitle(newTitle);
+  }, [pageData])
 
   return (
     <Fragment>
       <Helmet>
-        <title>{pageData?.params?.title || ""}</title>
+        <title>{title}</title>
       </Helmet>
 
       <div className="flex grow">
@@ -37,8 +43,10 @@ const Main = () => {
             <div className="flex flex-col grow lg:scrollable-y-auto lg:[scrollbar-width:auto] lg:light:[--tw-scrollbar-thumb-color:var(--tw-content-scrollbar-color)] pt-5">
               <main className="grow" role="content">
                 <Toolbar>
-                {/* { parse(pageData?.params?.breadcrumbs || '') } */}
-                  <ToolbarHeading title={pageData?.params?.title || "Header"} />
+                  <ToolbarHeading title={title} />
+                  <div className="breadcrumbs">
+                    { parse(pageData?.params?.breadcrumbs || '') }
+                  </div>
                 </Toolbar>
                 <Outlet />
               </main>

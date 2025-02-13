@@ -58,22 +58,12 @@ const DropdownUserPanel = ({ menuItemRef }) => {
         <MenuSeparator />
         <div className="flex flex-col">
           <MenuItem>
-            <MenuLink path="/public-profile/profiles/default">
+            <MenuLink path="?pag=administracao">
               <MenuIcon className="menu-icon">
                 <KeenIcon icon="badge" />
               </MenuIcon>
               <MenuTitle>
-                <FormattedMessage id="USER.MENU.PUBLIC_PROFILE" />
-              </MenuTitle>
-            </MenuLink>
-          </MenuItem>
-          <MenuItem>
-            <MenuLink path="/account/home/user-profile">
-              <MenuIcon>
-                <KeenIcon icon="profile-circle" />
-              </MenuIcon>
-              <MenuTitle>
-                <FormattedMessage id="USER.MENU.MY_PROFILE" />
+                Administração
               </MenuTitle>
             </MenuLink>
           </MenuItem>

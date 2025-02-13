@@ -12,7 +12,6 @@ import {
 } from "@/components";
 import { useLanguage } from "@/i18n";
 const DataRowActionsMenu = ({ row }) => {
-  console.log(row);
   const { isRTL } = useLanguage();
   return (
     <Menu className="inline-flex">

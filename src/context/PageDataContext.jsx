@@ -21,7 +21,7 @@ export const PageDataProvider = ({ children }) => {
       params.set('slug', 'administracao');
     }
 
-    const allowedParams = ['p', 'setor', 'qua', 'qui', 'sex', 'slug'];
+    const allowedParams = ['p', 'setor', 'qua', 'qui', 'sex', 'slug', 'acao'];
     for (const param of searchParams.keys()) {
       if (!allowedParams.includes(param)) {
         params.delete(param);
@@ -29,6 +29,7 @@ export const PageDataProvider = ({ children }) => {
     }
 
     const urlApi = `/panel/module?${params.toString()}`;
+    //console.log(urlApi)
 
     setLoading(true);
     api.get(urlApi)

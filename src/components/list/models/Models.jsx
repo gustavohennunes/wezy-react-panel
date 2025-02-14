@@ -107,8 +107,8 @@ const Models = ({model, columnHeader, btnAdd, search}) => {
   const Toolbar = () => {
     const { table } = useDataGrid();
     const [searchInput, setSearchInput] = useState(search?.value);
-    //const addBtn = btnAdd?.label ? <a className="btn btn-primary" path={btnAdd?.url}>{btnAdd?.label}</a> : "";
-    const addBtn = btnAdd?.label ? <a className="btn btn-primary" path="?pag=administracao&acao=Inserir">{btnAdd?.label}</a> : "";
+    //const addBtn = btnAdd?.label ? <a className="btn btn-primary" href={btnAdd?.url}>{btnAdd?.label}</a> : "";
+    const addBtn = btnAdd?.label ? <a className="btn btn-primary" href="?pag=administracao&acao=Inserir" target="_self">{btnAdd?.label}</a> : "";
     return (
       <div className="card-header flex-wrap gap-2 border-b-0 px-5">
         <h3 className="card-title font-medium text-sm">

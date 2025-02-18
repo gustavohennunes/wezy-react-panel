@@ -6,7 +6,6 @@ const FormContext = ({ data }) => {
     const [sections, setSections] = useState('')
 
     useEffect(() => {
-        console.log(data)
         if (data?.form?.fields) {
             const fields = data.form.fields
             const groupedSections = []
@@ -35,7 +34,6 @@ const FormContext = ({ data }) => {
             }
 
             setSections(groupedSections)
-            console.log(groupedSections)
         }
     }, [data])
 

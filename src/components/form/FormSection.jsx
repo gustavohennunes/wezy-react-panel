@@ -1,7 +1,7 @@
 import { useState } from 'react'
 import { FormInput } from './'
 
-const FormSection = ({ data, index, button }) => {
+const FormSection = ({ data, index, button, form }) => {
     const [nameInput, setNameInput] = useState('Douglas Feuser')
     const [emailInput, setEmailInput] = useState('douglas@cayman.com')
 
@@ -14,14 +14,15 @@ const FormSection = ({ data, index, button }) => {
     if (button) {
         endButton = (
             <div className="flex justify-start">
-                <button className="btn btn-success">Enviar</button>
+                <button className="btn btn-success">{form.submit_button}</button>
             </div>
         )
     }
+    
     return (
         <div className="card pb-2.5">
             <div className="card-header justify-start" id="general_settings">
-                <span className="badge badge-primary mr-[8px]">0{index}</span>
+                <span className="badge badge-primary mr-[8px]">0{data.number}</span>
                 <h3 className="card-title">{data.title}</h3>
             </div>
             <div className="card-body grid gap-5">

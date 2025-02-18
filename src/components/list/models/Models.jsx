@@ -39,6 +39,11 @@ const Models = ({ model, columnHeader, btnAdd, search, btnExcluir }) => {
         }
     }, [model])
 
+    const handleExcluir = (id) => {
+        //TODO excluir da API linhas selecionadas
+        console.log("Linhas a serem excluidas: "+selectedRows)
+    }
+
     const handleToggle = (index) => {
         setModels((prevModels) => {
             const updatedModels = [...prevModels]
@@ -157,8 +162,8 @@ const Models = ({ model, columnHeader, btnAdd, search, btnExcluir }) => {
         const addBtn = btnAdd?.label ? (
             <a
                 className="btn btn-primary"
-                href={btnAdd?.url}
-                //href="?pag=administracao&acao=Inserir"
+                //href={btnAdd?.url}
+                href="?pag=administracao&acao=Inserir"
                 target="_self"
             >
                 {btnAdd?.label}
@@ -208,7 +213,7 @@ const Models = ({ model, columnHeader, btnAdd, search, btnExcluir }) => {
                     <a
                         className={`btn btn-danger ${selectedRows.length === 0 ? 'opacity-50 cursor-not-allowed' : ''}`}
                         disabled={selectedRows.length === 0}
-                        onClick={() => console.log('Excluir IDs:', selectedRows)}
+                        onClick={() => handleExcluir}
                     >
                         Excluir selecionados
                     </a>

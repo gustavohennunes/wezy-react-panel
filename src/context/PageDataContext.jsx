@@ -29,6 +29,7 @@ export const PageDataProvider = ({ children }) => {
             'sex',
             'slug',
             'acao',
+            'id',
         ]
         for (const param of searchParams.keys()) {
             if (!allowedParams.includes(param)) {

@@ -13,6 +13,12 @@ import {
 import { useLanguage } from '@/i18n'
 const DataRowActionsMenu = ({ row }) => {
     const { isRTL } = useLanguage()
+
+    const removeRow = (id) => {
+        //TODO excluir da API menu ações 
+        console.log("Linha a ser excluida: "+id)
+    }
+
     return (
         <Menu className="inline-flex">
             <MenuItem
@@ -44,12 +50,26 @@ const DataRowActionsMenu = ({ row }) => {
                                 key={index}
                                 path={item.url || '#'}
                                 target={item.target || '_self'}
+                                onClick={(e, props) => {
+                                    e.preventDefault();                             
+                                    const { path } = props.path;
+                                    
+                                    if (props.path.startsWith("Javascript:")) {
+                                        const match = props.path.match(/removeRow\('(\d+)'\)/);
+                                        if (match) {
+                                            const rowId = match[1];
+                                            removeRow(rowId);
+                                        }
+                                    } else {
+                                        window.location.href = props.path;
+                                    }
+                                }}
                             >
                                 <MenuLink>
                                     <MenuIcon>
                                         <KeenIcon icon="search-list" />
                                     </MenuIcon>
-                                    <MenuTitle>{item.title}</MenuTitle>
+                                    <MenuTitle>{item.title} 2 </MenuTitle>
                                 </MenuLink>
                             </MenuItem>
                         ))
@@ -57,7 +77,7 @@ const DataRowActionsMenu = ({ row }) => {
                         <MenuItem>
                             <MenuLink>
                                 <MenuTitle className="text-gray-500">
-                                    No Actions
+                                    Sem ações
                                 </MenuTitle>
                             </MenuLink>
                         </MenuItem>

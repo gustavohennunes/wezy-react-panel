@@ -1,8 +1,8 @@
-import { DataGridInner, DataGridProvider } from ".";
+import { DataGridInner, DataGridProvider } from '.'
 export const DataGrid = (props) => {
-  return (
-    <DataGridProvider {...props}>
-      <DataGridInner />
-    </DataGridProvider>
-  );
-};
+    return (
+        <DataGridProvider {...props}>
+            <DataGridInner />
+        </DataGridProvider>
+    )
+}

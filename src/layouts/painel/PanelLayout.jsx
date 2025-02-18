@@ -1,7 +1,7 @@
-import useBodyClasses from "@/hooks/useBodyClasses";
-import { PanelLayoutProvider, Main } from "./";
+import useBodyClasses from '@/hooks/useBodyClasses'
+import { PanelLayoutProvider, Main } from './'
 const PanelLayout = () => {
-  useBodyClasses(`
+    useBodyClasses(`
     [--tw-page-bg:#F6F6F9]
     [--tw-page-bg-dark:var(--tw-coal-200)]
     [--tw-content-bg:var(--tw-light)]
@@ -12,11 +12,11 @@ const PanelLayout = () => {
     bg-[--tw-page-bg]
     dark:bg-[--tw-page-bg-dark]
     lg:overflow-hidden
-  `);
-  return (
-    <PanelLayoutProvider>
-      <Main />
-    </PanelLayoutProvider>
-  );
-};
-export { PanelLayout };
+  `)
+    return (
+        <PanelLayoutProvider>
+            <Main />
+        </PanelLayoutProvider>
+    )
+}
+export { PanelLayout }

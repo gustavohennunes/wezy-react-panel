@@ -7,7 +7,7 @@ const FormSection = ({ data, index, button }) => {
 
     let inputs = ''
     if (true) {
-        inputs = <FormInput data={data} nameInput={nameInput}/>
+        inputs = <FormInput data={data} nameInput={nameInput} />
     }
 
     let endButton = ''

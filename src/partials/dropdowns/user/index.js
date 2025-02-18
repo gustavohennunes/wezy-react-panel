@@ -1,3 +1,3 @@
-export * from "./DropdownUser";
-export * from "./DropdownUserPanel";
-export * from "./DropdownUserLanguages";
+export * from './DropdownUser'
+export * from './DropdownUserPanel'
+export * from './DropdownUserLanguages'

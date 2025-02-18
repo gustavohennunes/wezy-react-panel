@@ -1,5 +1,5 @@
-import { Roles } from "./blocks";
+import { Roles } from './blocks'
 const AccountRolesContent = () => {
-  return <Roles />;
-};
-export { AccountRolesContent };
+    return <Roles />
+}
+export { AccountRolesContent }

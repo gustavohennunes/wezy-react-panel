@@ -15,7 +15,6 @@ AuthPage - tem AuthLayout que tem a versão branded e padrão, possivelmente loc
 
 <React.StrictMode> no arquivo main.jsx faz com que no modo de desenvolvimento local ele renderize os componentes duas vezes
 
-
 # TODO
 
     Preciso saber como vem esses itens atualmente,
@@ -39,7 +38,7 @@ AuthPage - tem AuthLayout que tem a versão branded e padrão, possivelmente loc
         Pag/Formulario/produto
         Pag/Formulario/produto/Alterar/{id}
 
-        Onde 
+        Onde
             Pag é o layout geral, nele vai ter o tipo que então é onde vai ler se sera uma listagem ou formulario
                 listagem nessa parte ele vai controlar onde traz os dados dependendo da pagina que vai ser, exemplo produto
                     com base na requisição da listagem que vai precisar ser montada ele configura e monta os dados na tabela
@@ -49,5 +48,7 @@ AuthPage - tem AuthLayout que tem a versão branded e padrão, possivelmente loc
                     caso ele for se alteração, tras os dados para preencher no formulario conforme o id passado
 
         configurações de URL, passar com query params
-            
 
+    Conferir
+    https://github.com/awssat/tailwindo
+    Ferramenta para converter bootstrap para tailwind, talvez seja util no novo painel já que o modelo antigo utilizava se de bootstrap

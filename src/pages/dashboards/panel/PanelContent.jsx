@@ -7,9 +7,9 @@ import { ScreenLoader } from '@/components/loaders'
 const PanelContent = () => {
     const { pageData, loading } = usePageData()
     const [content, setContent] = useState(null)
-    
+
     useEffect(() => {
-        let newContent = '';
+        let newContent = ''
 
         if (pageData?.layout === 'galeria' || pageData?.layout === 'link') {
             newContent = 'Em breve'

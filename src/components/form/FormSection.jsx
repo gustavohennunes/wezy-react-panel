@@ -9,8 +9,8 @@ import {
 import { FormInput } from './'
 
 const FormSection = ({ data, index, button, form }) => {
-    const [formState, setFormState] = useState({});
-    const [selectedValue, setSelectedValue] = useState('');
+    const [formState, setFormState] = useState({})
+    const [selectedValue, setSelectedValue] = useState('')
 
     const handleInputChange = (name, value) => {
         setFormState((prev) => ({
@@ -39,8 +39,6 @@ const FormSection = ({ data, index, button, form }) => {
 
                     if (!fieldData) return null
 
-                    console.log(field)
-                    console.log(fieldData)
                     switch (type) {
                         case 'Frm':
                         case 'Psw':
@@ -138,12 +136,12 @@ const FormSection = ({ data, index, button, form }) => {
                                     <label className="form-label max-w-56">
                                         {title}
                                     </label>
-                                    <div className={fieldData.class}> 
+                                    <div className={fieldData.class}>
                                         {fieldData.value}
                                         {fieldData.extra_html}
                                     </div>
                                 </div>
-                            )  
+                            )
                         case 'Dta':
                         case 'Cod':
                         case 'Din':
@@ -175,25 +173,52 @@ const FormSection = ({ data, index, button, form }) => {
                             )
 
                         case 'Sel':
-                            return ( <div key={idx} className="flex items-baseline flex-wrap lg:flex-nowrap gap-2.5">
-                                <label className="form-label max-w-56">
-                                    {fieldData.title || title}
-                                </label>
-                                <Select value={selectedValue} onValueChange={setSelectedValue}>
-                                    <SelectTrigger className="w-28" size="sm">
-                                        <SelectValue>
-                                            {selectedValue ? fieldData.options.find(opt => opt.value === selectedValue)?.lable || selectedValue: "Select"}
-                                        </SelectValue>
-                                    </SelectTrigger>
-                                    <SelectContent className="w-32">
-                                        {fieldData.options.map((option, idoption) => (
-                                            <SelectItem key={option.id || idoption} value={option.value || 0}>
-                                                {option.lable}
-                                            </SelectItem>
-                                        ))}
-                                    </SelectContent>
-                                </Select>
-                            </div>);
+                            return (
+                                <div
+                                    key={idx}
+                                    className="flex items-baseline flex-wrap lg:flex-nowrap gap-2.5"
+                                >
+                                    <label className="form-label max-w-56">
+                                        {fieldData.title || title}
+                                    </label>
+                                    <Select
+                                        value={selectedValue}
+                                        onValueChange={setSelectedValue}
+                                    >
+                                        <SelectTrigger
+                                            className="w-28"
+                                            size="sm"
+                                        >
+                                            <SelectValue>
+                                                {selectedValue
+                                                    ? fieldData.options.find(
+                                                          (opt) =>
+                                                              opt.value ===
+                                                              selectedValue
+                                                      )?.lable || selectedValue
+                                                    : 'Select'}
+                                            </SelectValue>
+                                        </SelectTrigger>
+                                        <SelectContent className="w-32">
+                                            {fieldData.options.map(
+                                                (option, idoption) => (
+                                                    <SelectItem
+                                                        key={
+                                                            option.id ||
+                                                            idoption
+                                                        }
+                                                        value={
+                                                            option.value || 0
+                                                        }
+                                                    >
+                                                        {option.lable}
+                                                    </SelectItem>
+                                                )
+                                            )}
+                                        </SelectContent>
+                                    </Select>
+                                </div>
+                            )
                         case 'Tab':
                         case 'Man':
                         case 'Mul':

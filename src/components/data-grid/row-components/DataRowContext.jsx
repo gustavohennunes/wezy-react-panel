@@ -1,6 +1,7 @@
-import { DataRowToggle, DataRowActionsMenu } from '.'
+import { DataRowToggle, DataRowActionsMenu, DataRowPicture } from '.'
 import { DataGridRowSelect } from '@/components'
 export const DataRowContext = ({ fullRow, row, index, handleToggle }) => {
+
     if (row.component === 'checkbox_delete') {
         // CHECKBOX
         return <DataGridRowSelect row={fullRow} />
@@ -10,13 +11,17 @@ export const DataRowContext = ({ fullRow, row, index, handleToggle }) => {
     ) {
         // MENU AÇÕES
         return <DataRowActionsMenu row={row} />
+    } else if (row.component === 'photo_preview') {
+        return <DataRowPicture row={row}/>
     } else if (row.component === 'toggle') {
         // TOOGLE
         return (
             <DataRowToggle
                 row={row}
                 fullRow={fullRow}
-                handleToggle={handleToggle}
+                handleToggle={() =>
+                    handleToggle(fullRow.original['row-id'], index)
+                }
             />
         )
     }

@@ -30,6 +30,7 @@ export const PageDataProvider = ({ children }) => {
             'slug',
             'acao',
             'id',
+            'busca',
         ]
         for (const param of searchParams.keys()) {
             if (!allowedParams.includes(param)) {

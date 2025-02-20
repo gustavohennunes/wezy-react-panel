@@ -19,7 +19,7 @@ const FormContext = ({ data }) => {
                     }
                     currentSection = {
                         title: field.field.value.title,
-                        number: field.field.value.number, 
+                        number: field.field.value.number,
                         fields: [],
                     }
                 } else if (currentSection) {
@@ -44,7 +44,13 @@ const FormContext = ({ data }) => {
     return (
         <div className="grid grid gap-5 lg:gap-7.5 mx-auto">
             {sections.map((section, index) => (
-                <FormSection key={index} data={section} index={index + 1} button={index === sections.length - 1} form={data.form} />
+                <FormSection
+                    key={index}
+                    data={section}
+                    index={index + 1}
+                    button={index === sections.length - 1}
+                    form={data.form}
+                />
             ))}
         </div>
     )

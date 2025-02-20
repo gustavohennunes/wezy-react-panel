@@ -4,19 +4,9 @@ import {
     DataGrid,
     KeenIcon,
     DataGridColumnHeader,
-    DataGridRowSelect,
     DataGridRowSelectAll,
-    useDataGrid,
     DataRowContext,
 } from '@/components'
-import {
-    Select,
-    SelectContent,
-    SelectItem,
-    SelectTrigger,
-    SelectValue,
-} from '@/components/ui/select'
-import { toast } from 'sonner'
 import { Input } from '@/components/ui/input'
 const Models = ({ model, columnHeader, btnAdd, search, btnExcluir }) => {
     const ColumnInputFilter = ({ column }) => {
@@ -30,8 +20,9 @@ const Models = ({ model, columnHeader, btnAdd, search, btnExcluir }) => {
         )
     }
     const [models, setModels] = useState(model || [])
-    const [footer, setFooter] = useState("")
+    const [footer, setFooter] = useState('')
     const [selectedRows, setSelectedRows] = useState([])
+    const data = useMemo(() => models, [models])
 
     useEffect(() => {
         if (model && Array.isArray(model) && model.length > 0) {
@@ -41,18 +32,28 @@ const Models = ({ model, columnHeader, btnAdd, search, btnExcluir }) => {
 
     const handleExcluir = (id) => {
         //TODO excluir da API linhas selecionadas
-        console.log("Linhas a serem excluidas: "+selectedRows)
+        console.log('Linhas a serem excluidas: ' + selectedRows)
     }
 
-    const handleToggle = (index) => {
+    const handleToggle = (rowId, colIndex) => {
         setModels((prevModels) => {
-            const updatedModels = [...prevModels]
-            updatedModels[index] = {
-                ...updatedModels[index],
-                switch: !updatedModels[index].switch,
-            }
+            const updatedModels = prevModels.map((row) => {
+                if (row['row-id'] === rowId) {
+                    const updatedRow = { ...row }
+                    updatedRow.columns = updatedRow.columns.map((col, i) => {
+                        if (i === colIndex) {
+                            return { ...col, content: !col.content }
+                        }
+                        return col
+                    })
+                    return updatedRow
+                }
+                return row
+            })
             return updatedModels
         })
+        // TODO ATUALIZAR STATUS PELA API
+        console.log('Atualizar linha na API: ' + models)
     }
 
     const createColumns = (columnsData) => {
@@ -67,7 +68,9 @@ const Models = ({ model, columnHeader, btnAdd, search, btnExcluir }) => {
                         : col?.content?.toLowerCase().replace(/\s/g, '_'),
                 header: ({ column }) =>
                     col.component === 'select_all_checkbox' ? (
-                        <DataGridRowSelectAll />
+                        <DataGridRowSelectAll
+                            setSelectedRows={setSelectedRows}
+                        />
                     ) : (
                         <DataGridColumnHeader
                             title={col.content}
@@ -83,7 +86,9 @@ const Models = ({ model, columnHeader, btnAdd, search, btnExcluir }) => {
                             fullRow={row}
                             row={row.original.columns[index]}
                             index={index}
-                            handleToggle={handleToggle}
+                            handleToggle={() =>
+                                handleToggle(row.original['row-id'], index)
+                            }
                         />
                     )
                 },
@@ -93,12 +98,13 @@ const Models = ({ model, columnHeader, btnAdd, search, btnExcluir }) => {
                             ? `w-[${col.width}]`
                             : '',
                         col.class ? col.class : '',
+                        col.component === 'select_all_checkbox' ? 'w-8' : '',
                         col.align === 'left'
-                            ? 'text-left'
+                            ? 'text-left justify-items-start'
                             : col.align === 'center'
-                              ? 'text-center'
+                              ? 'text-center justify-items-center'
                               : col.align === 'right'
-                                ? 'text-right'
+                                ? 'text-right justify-items-end'
                                 : '',
                     ]
                         .filter(Boolean)
@@ -110,11 +116,11 @@ const Models = ({ model, columnHeader, btnAdd, search, btnExcluir }) => {
                             : '',
                         'text-gray-800 font-normal',
                         col.align === 'left'
-                            ? 'text-left'
+                            ? 'text-left justify-items-start'
                             : col.align === 'center'
-                              ? 'text-center'
+                              ? 'text-center justify-items-center'
                               : col.align === 'right'
-                                ? 'text-right'
+                                ? 'text-right justify-items-end'
                                 : '',
                     ]
                         .filter(Boolean)
@@ -139,31 +145,28 @@ const Models = ({ model, columnHeader, btnAdd, search, btnExcluir }) => {
         () => (columnHeader ? createColumns(columnHeader) : []),
         [columnHeader]
     )
-    const data = useMemo(() => models, [models]) // Use models state
 
     const handleRowSelection = (state) => {
-        const selectedRowIds = Object.keys(state)
+        const selectedRowIds = Object.keys(state).filter((key) => state[key])
         setSelectedRows(selectedRowIds)
-        if (selectedRowIds.length > 0) {
-            toast(`Total de ${selectedRowIds.length} linhas estão selecionadas.`, {
-                description: `Linhas selecionadas: ${selectedRowIds}`,
-                action: {
-                    label: 'Desfazer',
-                    onClick: () => setSelectedRows([]),
-                },
-            })
-        }
     }
 
     const Toolbar = () => {
-        const { table } = useDataGrid()
-        const [searchInput, setSearchInput] = useState(search?.value)
-        //const addBtn = btnAdd?.label ? <a className="btn btn-primary" href={btnAdd?.url}>{btnAdd?.label}</a> : "";
+        const [searchInput, setSearchInput] = useState(search?.value || "")
+        
+        const cleanUrl = (url) => url?.replace(/\/index\.php/g, "") || "";
+
+        const submitSearch = (e) => {
+            e.preventDefault(); // Evita o reload da página
+            const url = new URL(search?.action, window.location.origin);
+            url.searchParams.set("busca", searchInput); // Adiciona o parâmetro de busca
+            window.location.href = url.toString(); // Atualiza a URL
+        }
+
         const addBtn = btnAdd?.label ? (
             <a
                 className="btn btn-primary"
-                //href={btnAdd?.url}
-                href="?pag=administracao&acao=Inserir"
+                href={cleanUrl(btnAdd?.url)}
                 target="_self"
             >
                 {btnAdd?.label}
@@ -181,6 +184,7 @@ const Models = ({ model, columnHeader, btnAdd, search, btnExcluir }) => {
                         name="form2"
                         method="post"
                         action={search?.action}
+                        onSubmit={(e) => submitSearch(e)}
                         className="flex form-busca"
                     >
                         <label className="input input-sm">
@@ -190,7 +194,7 @@ const Models = ({ model, columnHeader, btnAdd, search, btnExcluir }) => {
                                 id="FrmBusca"
                                 className="inputBusca"
                                 placeholder={search?.placeholder}
-                                value={search?.value}
+                                value={searchInput}
                                 onChange={(e) => setSearchInput(e.target.value)}
                             />
                         </label>
@@ -251,6 +255,5 @@ const Models = ({ model, columnHeader, btnAdd, search, btnExcluir }) => {
             {footer}
         </div>
     )
-    
 }
 export { Models }

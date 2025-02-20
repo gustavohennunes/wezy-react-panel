@@ -1,6 +1,7 @@
 module.exports = {
     content: ['index.html', './src/**/*.{js,jsx}'],
     safelist: [
+        "w-[110px]",
         'demo1',
         'hidden',
         'ki-filled',
@@ -11,6 +12,7 @@ module.exports = {
         { pattern: /^leaflet-.*$/ },
     ],
     darkMode: 'class',
+    mode: 'jit',
     theme: {
         extend: {
             base: {

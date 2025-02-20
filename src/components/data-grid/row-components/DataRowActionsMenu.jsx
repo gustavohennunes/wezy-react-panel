@@ -15,8 +15,8 @@ const DataRowActionsMenu = ({ row }) => {
     const { isRTL } = useLanguage()
 
     const removeRow = (id) => {
-        //TODO excluir da API menu ações 
-        console.log("Linha a ser excluida: "+id)
+        //TODO excluir da API menu ações
+        console.log('Linha a ser excluida: ' + id)
     }
 
     return (
@@ -51,17 +51,20 @@ const DataRowActionsMenu = ({ row }) => {
                                 path={item.url || '#'}
                                 target={item.target || '_self'}
                                 onClick={(e, props) => {
-                                    e.preventDefault();                             
-                                    const { path } = props.path;
-                                    
-                                    if (props.path.startsWith("Javascript:")) {
-                                        const match = props.path.match(/removeRow\('(\d+)'\)/);
+                                    e.preventDefault()
+                                    const { path } = props.path
+
+                                    if (props.path.startsWith('Javascript:')) {
+                                        const match =
+                                            props.path.match(
+                                                /removeRow\('(\d+)'\)/
+                                            )
                                         if (match) {
-                                            const rowId = match[1];
-                                            removeRow(rowId);
+                                            const rowId = match[1]
+                                            removeRow(rowId)
                                         }
                                     } else {
-                                        window.location.href = props.path;
+                                        window.location.href = props.path
                                     }
                                 }}
                             >

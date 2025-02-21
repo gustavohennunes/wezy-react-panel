@@ -18,11 +18,13 @@ const PanelContent = () => {
         } else {
             newContent = (
                 <Models
-                    model={pageData?.params?.list?.rows}
+                    model={pageData?.params?.list?.rows || []}
                     columnHeader={pageData?.params?.list?.header}
                     btnAdd={pageData?.params?.add_button}
+                    tabs={pageData?.params?.buttons?.list}
                     search={pageData?.params?.search}
                     btnExcluir={pageData?.params?.footer}
+                    pagination={pageData?.params?.pagination}
                 />
             )
         }

@@ -16,8 +16,11 @@ import {
     useState,
     useCallback,
 } from 'react'
+import { useSearchParams } from 'react-router-dom'
 import { DataGridInner } from './DataGridInner'
 import { deepMerge, debounce } from '@/lib/helpers'
+import { usePageData } from '@/context/PageDataContext'
+import { updateTablePagination } from '@/utils/urlHelper'
 const DataGridContext = createContext(undefined)
 export const useDataGrid = () => {
     const context = useContext(DataGridContext)
@@ -27,6 +30,7 @@ export const useDataGrid = () => {
     return context
 }
 export const DataGridProvider = (props) => {
+    const { callApi } = usePageData();
     const defaultValues = {
         messages: {
             empty: 'Sem dados',
@@ -53,6 +57,7 @@ export const DataGridProvider = (props) => {
     const mergedProps = deepMerge(defaultValues, props)
     const [data, setData] = useState(mergedProps.data || [])
     const [loading, setLoading] = useState(false)
+    const { pageData } = usePageData()
     const [totalRows, setTotalRows] = useState(
         mergedProps.data ? mergedProps.data.length : 0
     )
@@ -65,7 +70,7 @@ export const DataGridProvider = (props) => {
     const [columnFilters, setColumnFilters] = useState([])
     const [columnVisibility, setColumnVisibility] = useState({})
     const fetchServerSideData = useCallback(async () => {
-        if (loading || !mergedProps.onFetchData) return
+        if (loading) return
         setLoading(true)
         try {
             const requestParams = {
@@ -74,6 +79,7 @@ export const DataGridProvider = (props) => {
                 sorting,
                 columnFilters,
             }
+
             const { data, totalCount } =
                 await mergedProps.onFetchData(requestParams)
             setData(data || [])

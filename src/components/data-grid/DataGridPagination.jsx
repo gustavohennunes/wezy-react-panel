@@ -11,7 +11,7 @@ import {
 import { Button } from '@/components/ui/button'
 import { cn } from '@/lib/utils'
 const DataGridPagination = () => {
-    const { table, totalRows, props } = useDataGrid()
+    const { table, totalRows, props, loading } = useDataGrid()
     const btnBaseClasses = 'size-7 p-0 text-[13px]'
     const btnArrowClasses = btnBaseClasses + ' rtl:transform rtl:rotate-180'
     const pageIndex = table.getState().pagination.pageIndex
@@ -51,6 +51,7 @@ const DataGridPagination = () => {
                         'bg-accent text-accent-foreground': pageIndex === i,
                     })}
                     onClick={() => table.setPageIndex(i)}
+                    disabled={loading}
                 >
                     {i + 1}
                 </Button>
@@ -67,6 +68,7 @@ const DataGridPagination = () => {
                     className={btnBaseClasses}
                     variant="ghost"
                     onClick={() => table.setPageIndex(currentGroupStart - 1)}
+                    disabled={loading}
                 >
                     ...
                 </Button>
@@ -83,6 +85,7 @@ const DataGridPagination = () => {
                     className={btnBaseClasses}
                     variant="ghost"
                     onClick={() => table.setPageIndex(currentGroupEnd)}
+                    disabled={loading}
                 >
                     ...
                 </Button>
@@ -128,9 +131,9 @@ const DataGridPagination = () => {
                         variant="ghost"
                         className={btnArrowClasses}
                         onClick={() => table.previousPage()}
-                        disabled={!table.getCanPreviousPage()}
+                        disabled={!table.getCanPreviousPage() || loading}
                     >
-                        <span className="sr-only">Go to previous page</span>
+                        <span className="sr-only">Ultima página</span>
                         <ChevronLeftIcon className="size-4" />
                     </Button>
 
@@ -144,9 +147,9 @@ const DataGridPagination = () => {
                         variant="ghost"
                         className={btnArrowClasses}
                         onClick={() => table.nextPage()}
-                        disabled={!table.getCanNextPage()}
+                        disabled={!table.getCanNextPage() || loading}
                     >
-                        <span className="sr-only">Go to next page</span>
+                        <span className="sr-only">Próxima página</span>
                         <ChevronRightIcon className="size-4" />
                     </Button>
                 </div>

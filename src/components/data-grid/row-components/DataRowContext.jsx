@@ -2,6 +2,8 @@ import { DataRowToggle, DataRowActionsMenu, DataRowPicture } from '.'
 import { DataGridRowSelect } from '@/components'
 export const DataRowContext = ({ fullRow, row, index, handleToggle }) => {
 
+    if(!row) return;
+
     if (row.component === 'checkbox_delete') {
         // CHECKBOX
         return <DataGridRowSelect row={fullRow} />

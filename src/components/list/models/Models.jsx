@@ -7,8 +7,11 @@ import {
     DataGridRowSelectAll,
     DataRowContext,
 } from '@/components'
+import { toast } from 'sonner'
 import { Input } from '@/components/ui/input'
-const Models = ({ model, columnHeader, btnAdd, search, btnExcluir }) => {
+import { updateTablePagination, buildApiUrl } from '@/utils/urlHelper'
+import { api } from '@/services/api'
+const Models = ({ model, columnHeader, btnAdd, search, btnExcluir, pagination, tabs }) => {
     const ColumnInputFilter = ({ column }) => {
         return (
             <Input
@@ -21,6 +24,9 @@ const Models = ({ model, columnHeader, btnAdd, search, btnExcluir }) => {
     }
     const [models, setModels] = useState(model || [])
     const [footer, setFooter] = useState('')
+    const [gridPagination, setGridPagination] = useState({
+        size: 20 
+    })
     const [selectedRows, setSelectedRows] = useState([])
     const data = useMemo(() => models, [models])
 
@@ -30,30 +36,51 @@ const Models = ({ model, columnHeader, btnAdd, search, btnExcluir }) => {
         }
     }, [model])
 
+    useEffect(() => {
+        if (pagination) {
+            setGridPagination({
+                size: pagination?.information?.end || 0,
+                rowCount: pagination?.information?.total || 0,
+                pageCount: pagination?.buttons?.content?.length-1 || 0,
+            })
+        }
+    }, [pagination])
+
     const handleExcluir = (id) => {
         //TODO excluir da API linhas selecionadas
         console.log('Linhas a serem excluidas: ' + selectedRows)
     }
 
     const handleToggle = (rowId, colIndex) => {
-        setModels((prevModels) => {
-            const updatedModels = prevModels.map((row) => {
-                if (row['row-id'] === rowId) {
-                    const updatedRow = { ...row }
-                    updatedRow.columns = updatedRow.columns.map((col, i) => {
-                        if (i === colIndex) {
-                            return { ...col, content: !col.content }
-                        }
-                        return col
-                    })
-                    return updatedRow
-                }
-                return row
+        let response = '';
+        try {
+            setModels((prevModels) => {
+                const updatedModels = prevModels.map((row) => {
+                    if (row['row-id'] === rowId) {
+                        const updatedRow = { ...row }
+                        updatedRow.columns = updatedRow.columns.map((col, i) => {
+                            if (i === colIndex) {
+                                response = api.post(buildApiUrl(col.action.toString()));
+                                return { ...col, content: !col.content }
+                            }
+                            return col
+                        })
+                        return updatedRow
+                    }
+                    return row
+                })
+                return updatedModels
             })
-            return updatedModels
-        })
-        // TODO ATUALIZAR STATUS PELA API
-        console.log('Atualizar linha na API: ' + models)
+        } catch (err) {
+            toast(`Error atualizar`, {
+                description: `❌ Erro ao atualizar item.`
+            })
+            setError(err)
+        } finally {
+            toast(`Sucesso`, {
+                description: response?.success?.response.data.message
+            })
+        }
     }
 
     const createColumns = (columnsData) => {
@@ -174,6 +201,19 @@ const Models = ({ model, columnHeader, btnAdd, search, btnExcluir }) => {
         ) : (
             ''
         )
+
+        let tabsBefore = '';
+        let tabsAfter = '';
+        if(tabs){
+            tabs.after.map((col, i) => {
+                    
+            })
+    
+            tabs.before.map((col, i) => {
+    
+            })
+        }
+
         return (
             <div className="card-header flex-wrap gap-2 border-b-0 px-5">
                 <h3 className="card-title font-medium text-sm">{addBtn}</h3>
@@ -226,10 +266,39 @@ const Models = ({ model, columnHeader, btnAdd, search, btnExcluir }) => {
         }
     }, [btnExcluir, selectedRows])
 
-    if (!data || data.length === 0) {
-        return <Skeleton className="h-8" />
-    }
+    const fetchGridData = async (params) => {
+        try {
+            if(params.pageIndex == 0) {
+                return { 
+                    data: data,
+                    totalCount: pagination?.information?.total || 0,
+                }
+            }
+            
+            let newUrl = await updateTablePagination(params);
 
+            const response = await api.get(newUrl)
+
+            return {
+                data: response.data?.success?.response?.data?.params?.list?.rows,
+                totalCount: response?.data?.success?.response?.data?.params?.pagination?.information?.total,
+            }
+        } catch (error) {
+            console.log(error)
+            toast(`Error de dados`, {
+                description: `❌ Erro ao carregar dados da página.`,
+                action: {
+                    label: 'Ok',
+                    onClick: () => console.log('Ok'),
+                },
+            })
+            return {
+                data: [],
+                totalCount: 0,
+            }
+        }
+    }
+    
     return (
         <div>
             <DataGrid
@@ -237,9 +306,8 @@ const Models = ({ model, columnHeader, btnAdd, search, btnExcluir }) => {
                 data={data}
                 rowSelection={true}
                 onRowSelectionChange={handleRowSelection}
-                pagination={{
-                    size: 20,
-                }}
+                pagination={gridPagination}
+                onFetchData={fetchGridData}
                 sorting={[
                     {
                         id: 'id',

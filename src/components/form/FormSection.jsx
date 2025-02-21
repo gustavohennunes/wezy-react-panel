@@ -25,7 +25,7 @@ const FormSection = ({ data, index, button, form }) => {
                 <span className="badge badge-primary mr-[8px]">0{index}</span>
                 <h3 className="card-title">{data.title}</h3>
             </div>
-            <div className="card-body grid gap-5">
+            <div className="card-body grid gap-5" >
                 {data.fields.map((field, idx) => {
                     const {
                         type,
@@ -45,8 +45,8 @@ const FormSection = ({ data, index, button, form }) => {
                         case 'Val':
                             return (
                                 <div
-                                    key={idx}
-                                    className="flex items-baseline flex-wrap lg:flex-nowrap gap-2.5"
+                                    key={field.name}
+                                    className="flex items-center flex-wrap lg:flex-nowrap gap-2.5"
                                 >
                                     <label className="form-label max-w-56">
                                         {title}
@@ -75,8 +75,8 @@ const FormSection = ({ data, index, button, form }) => {
                         case 'Hdn':
                             return (
                                 <div
-                                    key={idx}
-                                    className="flex items-baseline flex-wrap lg:flex-nowrap gap-2.5"
+                                    key={field.name}
+                                    className="flex items-center flex-wrap lg:flex-nowrap gap-2.5"
                                 >
                                     <label className="form-label max-w-56">
                                         {title}
@@ -100,8 +100,8 @@ const FormSection = ({ data, index, button, form }) => {
                         case 'Txt':
                             return (
                                 <div
-                                    key={idx}
-                                    className="flex items-baseline flex-wrap lg:flex-nowrap gap-2.5"
+                                    key={field.name}
+                                    className="flex items-center flex-wrap lg:flex-nowrap gap-2.5"
                                 >
                                     <label className="form-label max-w-56">
                                         {title}
@@ -130,8 +130,8 @@ const FormSection = ({ data, index, button, form }) => {
                         case 'Lis':
                             return (
                                 <div
-                                    key={idx}
-                                    className="flex items-baseline flex-wrap lg:flex-nowrap gap-2.5"
+                                    key={field.name}
+                                    className="flex items-center flex-wrap lg:flex-nowrap gap-2.5"
                                 >
                                     <label className="form-label max-w-56">
                                         {title}
@@ -142,41 +142,80 @@ const FormSection = ({ data, index, button, form }) => {
                                     </div>
                                 </div>
                             )
-                        case 'Dta':
-                        case 'Cod':
-                        case 'Din':
-                        case 'Cor':
                         case 'Rdo':
-                        case 'Qnt':
+                            return (
+                                <div key={field.name} className="flex items-center flex-wrap lg:flex-nowrap gap-2.5">
+                                    <div className="form-label max-w-56">
+                                        {title}
+                                    </div>
+                                    <div className="flex flex-col gap-3.5">
+                                        {fieldData.map((item, index) => (
+                                            <label
+                                                key={index}
+                                                className="form-label flex items-center gap-2.5"
+                                            >
+                                                <input
+                                                    className="radio radio-sm"
+                                                    name={item.name}
+                                                    id={item.id}
+                                                    checked={formState[item.name] === item.value}
+                                                    onChange={(e) =>
+                                                        handleInputChange(
+                                                            fieldName,
+                                                            e.target.value
+                                                        )
+                                                    }
+                                                    type="radio"
+                                                    value={item.value}
+                                                />
+                                                <div className="flex flex-col gap-0.5">
+                                                    <div className="text-sm font-semibold text-gray-900">
+                                                        {item.title}
+                                                    </div>
+                                                    <div className="text-2sm font-medium text-gray-600">
+                                                        {item.description}
+                                                    </div>
+                                                </div>
+                                            </label>
+                                        ))}
+                                    </div>
+                                </div>
+                            )
                         case 'Ckb':
+                            console.log(fieldData)
                             return (
                                 <div
-                                    key={idx}
-                                    className="flex items-baseline flex-wrap lg:flex-nowrap gap-2.5"
+                                    key={field.name}
+                                    className="flex items-center flex-wrap lg:flex-nowrap gap-2.5"
                                 >
                                     <label className="form-label max-w-56">
                                         {fieldData.title || title}
                                     </label>
-                                    <input
-                                        type="checkbox"
-                                        className="checkbox"
-                                        name={fieldName}
-                                        checked={formState[fieldName] || false}
-                                        onChange={(e) =>
-                                            handleInputChange(
-                                                fieldName,
-                                                e.target.checked
-                                            )
-                                        }
-                                    />
+                                    {fieldData.map((item, index) => (
+                                        <div className="flex" key={index}>
+                                            <input
+                                                type="checkbox"
+                                                className="checkbox"
+                                                name={fieldName}
+                                                checked={formState[fieldName] || false}
+                                                onChange={(e) =>
+                                                    handleInputChange(
+                                                        fieldName,
+                                                        e.target.checked
+                                                    )
+                                                }
+                                            />
+                                            <label className="form-label pl-2">{item.title}</label>
+                                        </div>
+                                    ))}
                                 </div>
                             )
 
                         case 'Sel':
                             return (
                                 <div
-                                    key={idx}
-                                    className="flex items-baseline flex-wrap lg:flex-nowrap gap-2.5"
+                                    key={field.name}
+                                    className="flex items-center flex-wrap lg:flex-nowrap gap-2.5"
                                 >
                                     <label className="form-label max-w-56">
                                         {fieldData.title || title}
@@ -219,12 +258,23 @@ const FormSection = ({ data, index, button, form }) => {
                                     </Select>
                                 </div>
                             )
+                        case 'Dta':
+                            //Todo componente Data picker
+                            return null
+                        case 'Arq':
+                        case 'Fto':
+                            //Todo componente Foto
+                            return null
+                        case 'Cor':
+                            //Todo componente color picker
+                            return null
                         case 'Tab':
                         case 'Man':
                         case 'Mul':
                         case 'Aut':
-                        case 'Fto':
-                        case 'Arq':
+                        case 'Cod':
+                        case 'Din':
+                        case 'Qnt':
                         default:
                             return null
                     }

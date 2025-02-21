@@ -1,6 +1,7 @@
-import { createContext, useContext, useEffect, useState } from 'react'
+import { createContext, useContext, useEffect, useState, useCallback } from 'react'
 import { useSearchParams } from 'react-router-dom'
 import { api } from '@/services/api'
+import { buildApiUrl } from '@/utils/urlHelper'
 
 const PageDataContext = createContext()
 
@@ -9,54 +10,31 @@ export const PageDataProvider = ({ children }) => {
     const [loading, setLoading] = useState(true)
     const [error, setError] = useState(null)
     const [searchParams] = useSearchParams()
+    const [lastUrl, setLastUrl] = useState(null)
+
+    const callApi = useCallback(async (urlApi) => {
+        if (urlApi === lastUrl) return
+        setLoading(true)
+        setLastUrl(urlApi)
+        try {
+            const response = await api.get(urlApi)
+            setPageData(response.data.success.response.data)
+        } catch (err) {
+            console.log(err)
+            console.error('❌ Erro ao carregar dados da página:', err)
+            setError(err)
+        } finally {
+            setLoading(false)
+        }
+    }, [])
 
     useEffect(() => {
-        const pag = searchParams.get('pag')
-        const params = new URLSearchParams(searchParams)
-
-        if (pag) {
-            params.set('slug', pag)
-            params.delete('pag')
-        } else {
-            params.set('slug', 'administracao')
-        }
-
-        const allowedParams = [
-            'p',
-            'setor',
-            'qua',
-            'qui',
-            'sex',
-            'slug',
-            'acao',
-            'id',
-            'busca',
-        ]
-        for (const param of searchParams.keys()) {
-            if (!allowedParams.includes(param)) {
-                params.delete(param)
-            }
-        }
-
-        const urlApi = `/panel/module?${params.toString()}`
-        //console.log(urlApi)
-
-        setLoading(true)
-        api.get(urlApi)
-            .then((response) => {
-                setPageData(response.data.success.response.data)
-            })
-            .catch((err) => {
-                console.error('Erro ao carregar dados da página:', err)
-                setError(err)
-            })
-            .finally(() => {
-                setLoading(false)
-            })
+        const urlApi = buildApiUrl(searchParams)
+        callApi(urlApi)
     }, [searchParams])
 
     return (
-        <PageDataContext.Provider value={{ pageData, loading, error }}>
+        <PageDataContext.Provider value={{ pageData, loading, error, callApi }}>
             {children}
         </PageDataContext.Provider>
     )

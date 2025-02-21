@@ -1,0 +1,49 @@
+export const buildApiUrl = (searchParams, defaultSlug = 'administracao') => {
+    const params = new URLSearchParams(searchParams)
+
+    const pag = params.get('pag')
+    if (pag) {
+        params.set('slug', pag)
+        params.delete('pag')
+    } else {
+        params.set('slug', defaultSlug)
+    }
+
+    const allowedParams = [
+        'p', 'setor', 'qua', 'qui', 'sex', 'slug', 'acao', 'id', 'toggle-status',
+        'busca', 'filters', 'limit', 'page', 'order-field', 'order-direction'
+    ]
+
+    // Remove parâmetros não permitidos
+    for (const param of [...params.keys()]) {
+        if (!allowedParams.includes(param)) {
+            params.delete(param)
+        }
+    }
+
+    return `/panel/module?${params.toString()}`
+}
+export const updateTablePagination = async (params) => {
+    const url = new URL(window.location.href);
+    url.searchParams.set('page', String(params.pageIndex + 1)) // Page is 1-indexed on server
+    url.searchParams.set('limit', String(params.pageSize))
+    if (params.sorting?.[0]?.id) {
+        url.searchParams.set('order-field', params.sorting[0].id)
+        url.searchParams.set(
+            'order-direction',
+            params.sorting[0].desc ? 'DESC' : 'ASC'
+        )
+    }
+    
+    // Column filters
+    if (params.columnFilters) {
+        params.columnFilters.forEach(({ id, value }) => {
+            if (value !== undefined && value !== null) {
+                url.searchParams.set(`filter[${id}]`, String(value)) // Properly serialize filter values
+            }
+        })
+    }
+
+    const apiUrl = buildApiUrl(url.searchParams.toString())
+    return apiUrl
+}

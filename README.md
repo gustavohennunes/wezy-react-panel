@@ -52,3 +52,5 @@ AuthPage - tem AuthLayout que tem a versão branded e padrão, possivelmente loc
     Conferir
     https://github.com/awssat/tailwindo
     Ferramenta para converter bootstrap para tailwind, talvez seja util no novo painel já que o modelo antigo utilizava se de bootstrap
+
+    ponto de observação conferir os valors que vem do painel atualmente e sua conversão atual, alguns valores provavelmente não irão vir definidos e podem não apresentar css do tailwind corretamente, caso ocorra isso tem que incluir na safelist no tailind.config.js ou varificar outro modo e incluir como style diretamente.

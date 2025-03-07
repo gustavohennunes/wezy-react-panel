@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react'
 import { usePageData } from '@/context/PageDataContext'
 import { Models } from '@/components/list/models'
 import { FormContext } from '@/components/form/FormContext'
+import { PicturesContext } from '@/components/pictures/PicturesContext'
 import { ScreenLoader } from '@/components/loaders'
 
 const PanelContent = () => {
@@ -12,7 +13,9 @@ const PanelContent = () => {
         let newContent = ''
 
         if (pageData?.layout === 'photos') {
-            newContent = 'Em breve'
+            newContent = (
+                <PicturesContext data={pageData?.params} />
+            )
         } else if (pageData?.layout === 'funnel') {
             newContent = <FormContext data={pageData?.params} />
         } else if (pageData?.layout === 'form') {

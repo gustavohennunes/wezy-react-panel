@@ -19,28 +19,29 @@ const FormFile = ({ multiple, accept, maxSize, onFilesChange }) => {
     }
   };
 
+  const getFileInputClassName = () => {
+    let className = "file-input";
+
+    if (error) {
+      className += " border-danger";
+    } else if (selectedFiles.length > 0) {
+      className += " border-success";
+    }
+
+    return className;
+  };
+
   return (
     <div>
       <input
-        className="file-input"
+        className={getFileInputClassName()}
         type="file"
         multiple={multiple}
         accept={accept}
         onChange={handleFileChange}
       />
-      {error && <p className="text-red-500 mt-2">{error}</p>}
-      {selectedFiles.length > 0 && (
-        <div className="mt-4">
-          <p>Arquivos selecionados:</p>
-          <ul>
-            {selectedFiles.map((file) => (
-              <li key={file.name}>{file.name}</li>
-            ))}
-          </ul>
-        </div>
-      )}
     </div>
   );
 };
 
-export default FormFile;
+export { FormFile };

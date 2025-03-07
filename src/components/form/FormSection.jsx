@@ -43,104 +43,21 @@ const FormSection = ({ data, index, button, form }) => {
                         case 'Frm':
                         case 'Psw':
                         case 'Val':
-                            return (
-                                <div
-                                    key={field.name}
-                                    className="flex items-center flex-wrap lg:flex-nowrap gap-2.5"
-                                >
-                                    <label className="form-label max-w-56">
-                                        {title}
-                                    </label>
-                                    <input
-                                        type={fieldData.type}
-                                        className={
-                                            'input ' +
-                                            fieldClass +
-                                            ' ' +
-                                            fieldData.class
-                                        }
-                                        name={fieldName}
-                                        placeholder={title}
-                                        value={formState[fieldName] || ''}
-                                        required={required}
-                                        onChange={(e) =>
-                                            handleInputChange(
-                                                fieldName,
-                                                e.target.value
-                                            )
-                                        }
-                                    />
-                                </div>
-                            )
                         case 'Hdn':
-                            return (
-                                <div
-                                    key={field.name}
-                                    className="flex items-center flex-wrap lg:flex-nowrap gap-2.5"
-                                >
-                                    <label className="form-label max-w-56">
-                                        {title}
-                                    </label>
-                                    <input
-                                        type={'hidden'}
-                                        className={'input ' + fieldClass}
-                                        name={fieldName}
-                                        placeholder={title}
-                                        value={formState[fieldName] || ''}
-                                        required={required}
-                                        onChange={(e) =>
-                                            handleInputChange(
-                                                fieldName,
-                                                e.target.value
-                                            )
-                                        }
-                                    />
-                                </div>
-                            )
                         case 'Txt':
-                            return (
-                                <div
-                                    key={field.name}
-                                    className="flex items-center flex-wrap lg:flex-nowrap gap-2.5"
-                                >
-                                    <label className="form-label max-w-56">
-                                        {title}
-                                    </label>
-                                    <textarea
-                                        type={fieldData.type}
-                                        className={
-                                            'input min-h-[120px] ' +
-                                            fieldClass +
-                                            ' ' +
-                                            fieldData.class
-                                        }
-                                        name={fieldName}
-                                        placeholder={title}
-                                        value={formState[fieldName] || ''}
-                                        required={required}
-                                        onChange={(e) =>
-                                            handleInputChange(
-                                                fieldName,
-                                                e.target.value
-                                            )
-                                        }
-                                    />
-                                </div>
-                            )
                         case 'Lis':
                             return (
-                                <div
-                                    key={field.name}
-                                    className="flex items-center flex-wrap lg:flex-nowrap gap-2.5"
-                                >
-                                    <label className="form-label max-w-56">
-                                        {title}
-                                    </label>
-                                    <div className={fieldData.class}>
-                                        {fieldData.value}
-                                        {fieldData.extra_html}
-                                    </div>
-                                </div>
+                                <FormInput
+                                    key={fieldName}
+                                    type={type}
+                                    title={title}
+                                    fieldName={fieldName}
+                                    fieldClass={fieldClass}
+                                    fieldData={fieldData}
+                                    formState={formState}
+                                    required={required}
+                                    handleInputChange={handleInputChange}
+                                />
                             )
                         case 'Rdo':
                             return (

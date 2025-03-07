@@ -1,4 +1,5 @@
 export * from './FormContext'
 export * from './FormSection'
 export * from './FormInput'
+export * from './FormSelect'
 export * from './FormFile'

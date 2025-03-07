@@ -1,16 +1,8 @@
 import { useState } from 'react'
-import {
-    Select,
-    SelectContent,
-    SelectItem,
-    SelectTrigger,
-    SelectValue,
-} from '@/components/ui/select'
-import { FormInput } from './'
+import { FormInput, FormSelect } from './'
 
 const FormSection = ({ data, index, button, form }) => {
     const [formState, setFormState] = useState({})
-    const [selectedValue, setSelectedValue] = useState('')
 
     const handleInputChange = (name, value) => {
         setFormState((prev) => ({
@@ -18,6 +10,13 @@ const FormSection = ({ data, index, button, form }) => {
             [name]: value,
         }))
     }
+
+    const handleSelectChange = (name, value) => {
+        setFormState((prev) => ({
+          ...prev,
+          [name]: value,
+        }));
+      };
 
     return (
         <div className="card pb-2.5">
@@ -30,6 +29,7 @@ const FormSection = ({ data, index, button, form }) => {
                     const {
                         type,
                         title,
+                        subtitle,
                         field: fieldData,
                         required,
                         name,
@@ -46,11 +46,15 @@ const FormSection = ({ data, index, button, form }) => {
                         case 'Hdn':
                         case 'Txt':
                         case 'Lis':
+                        case 'Arq':
+                        case 'Fto':
+                        case 'Din':
                             return (
                                 <FormInput
                                     key={fieldName}
                                     type={type}
                                     title={title}
+                                    subtitle={subtitle}
                                     fieldName={fieldName}
                                     fieldClass={fieldClass}
                                     fieldData={fieldData}
@@ -99,7 +103,6 @@ const FormSection = ({ data, index, button, form }) => {
                                 </div>
                             )
                         case 'Ckb':
-                            console.log(fieldData)
                             return (
                                 <div
                                     key={field.name}
@@ -127,60 +130,19 @@ const FormSection = ({ data, index, button, form }) => {
                                     ))}
                                 </div>
                             )
-
+                        case 'Qnt':
                         case 'Sel':
                             return (
-                                <div
-                                    key={field.name}
-                                    className="flex items-center flex-wrap lg:flex-nowrap gap-2.5"
-                                >
-                                    <label className="form-label max-w-56">
-                                        {fieldData.title || title}
-                                    </label>
-                                    <Select
-                                        value={selectedValue}
-                                        onValueChange={setSelectedValue}
-                                    >
-                                        <SelectTrigger
-                                            className="w-28"
-                                            size="sm"
-                                        >
-                                            <SelectValue>
-                                                {selectedValue
-                                                    ? fieldData.options.find(
-                                                          (opt) =>
-                                                              opt.value ===
-                                                              selectedValue
-                                                      )?.lable || selectedValue
-                                                    : 'Select'}
-                                            </SelectValue>
-                                        </SelectTrigger>
-                                        <SelectContent className="w-32">
-                                            {fieldData.options.map(
-                                                (option, idoption) => (
-                                                    <SelectItem
-                                                        key={
-                                                            option.id ||
-                                                            idoption
-                                                        }
-                                                        value={
-                                                            option.value || 0
-                                                        }
-                                                    >
-                                                        {option.lable}
-                                                    </SelectItem>
-                                                )
-                                            )}
-                                        </SelectContent>
-                                    </Select>
-                                </div>
-                            )
+                                <FormSelect
+                                    key={fieldName}
+                                    field={field}
+                                    fieldData={fieldData}
+                                    formState={formState}
+                                    handleSelectChange={handleSelectChange}
+                                />
+                            );
                         case 'Dta':
                             //Todo componente Data picker
-                            return null
-                        case 'Arq':
-                        case 'Fto':
-                            //Todo componente Foto
                             return null
                         case 'Cor':
                             //Todo componente color picker
@@ -189,9 +151,7 @@ const FormSection = ({ data, index, button, form }) => {
                         case 'Man':
                         case 'Mul':
                         case 'Aut':
-                        case 'Cod':
-                        case 'Din':
-                        case 'Qnt':
+                        case 'Cod':                                              
                         default:
                             return null
                     }

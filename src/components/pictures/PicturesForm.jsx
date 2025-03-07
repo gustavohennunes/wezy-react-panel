@@ -5,6 +5,7 @@ import { FormInput } from '../form/FormInput';
 
 const PicturesForm = ({ data }) => {
     const [sections, setSections] = useState('')
+    const [formState, setFormState] = useState({})
     const [selectedFiles, setSelectedFiles] = useState([]);
 
     useEffect(() => {
@@ -28,32 +29,46 @@ const PicturesForm = ({ data }) => {
     }
 
     return (
-        <div className="grid">
+        <div className="card grid">
             <form action="">
-                <FormFile
-                    multiple={true}
-                    accept="image/*" // Exemplo: aceitar apenas imagens
-                    maxSize={5 * 1024 * 1024} // Exemplo: tamanho máximo de 5MB
-                    onFilesChange={handleFilesChange}
-                />
+                <div className="card-body grid gap-5" >
+                    <FormFile
+                        multiple={true}
+                        accept="image/*"
+                        maxSize={5 * 1024 * 1024}
+                        onFilesChange={handleFilesChange}
+                    />
+                </div>
+                <div className="card-body grid gap-5" >
                 <FormInput
                     key={"Link"}
                     type={"Frm"}
                     title={"Link"}
                     fieldName={"Link"}
-                    fieldData={fieldData}
+                    fieldData={{
+                        "type": "text",
+                        "name": "FrmLink",
+                        "id": "FrmLink",
+                    }}
                     formState={formState}
                     handleInputChange={handleInputChange}
                 />
+                </div>
+                <div className="card-body grid gap-5" >
                 <FormInput
                     key={"Legenda"}
                     type={"Frm"}
                     title={"Legenda"}
                     fieldName={"Legenda"}
-                    fieldData={fieldData}
+                    fieldData={{
+                        "type": "text",
+                        "name": "FrmLegenda",
+                        "id": "FrmLegenda",
+                    }}
                     formState={formState}
                     handleInputChange={handleInputChange}
                 />
+                </div>
             </form>
         </div>
     )

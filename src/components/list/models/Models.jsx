@@ -1,11 +1,11 @@
 import qs from 'qs'
-import { useMemo, useState, useEffect  } from 'react'
+import { useMemo, useState, useEffect } from 'react'
 import {
     DataGrid,
     KeenIcon,
     DataGridColumnHeader,
     DataGridRowSelectAll,
-    DataRowContext
+    DataRowContext,
 } from '@/components'
 import { toast } from 'sonner'
 import { Input } from '@/components/ui/input'
@@ -23,8 +23,8 @@ const Models = ({
     pagination,
     tabs,
 }) => {
-    const { callApi } = usePageData();
-    
+    const { callApi } = usePageData()
+
     const ColumnInputFilter = ({ column }) => {
         return (
             <Input
@@ -69,7 +69,7 @@ const Models = ({
             }
             let response = ''
             const urlExcluir = `?slug=${slug}&acao=remove-items`
-        
+
             response = await api.post(
                 buildApiUrl(urlExcluir),
                 qs.stringify(data),
@@ -79,9 +79,11 @@ const Models = ({
                     },
                 }
             )
-            
-            const urlRefresh = buildApiUrl(new URLSearchParams(e.view.location.search));
-            callApi(urlRefresh);
+
+            const urlRefresh = buildApiUrl(
+                new URLSearchParams(e.view.location.search)
+            )
+            callApi(urlRefresh)
 
             toast(`Sucesso`, {
                 description: response?.success?.response?.data?.message,

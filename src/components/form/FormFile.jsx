@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 
-const FormFile = ({ multiple, accept, maxSize, onFilesChange }) => {
+const FormFile = ({ multiple, accept, maxSize, onFilesChange, fieldName, fieldClass = '', fieldData = {}, required = false }) => {
   const [selectedFiles, setSelectedFiles] = useState([]);
   const [error, setError] = useState(null);
 
@@ -32,12 +32,14 @@ const FormFile = ({ multiple, accept, maxSize, onFilesChange }) => {
   };
 
   return (
-    <div>
+    <div className='w-full'>
       <input
-        className={getFileInputClassName()}
+        name={fieldName}
+        className={getFileInputClassName() + `${fieldClass} ${fieldData.class}`}
         type="file"
         multiple={multiple}
         accept={accept}
+        required={required}
         onChange={handleFileChange}
       />
     </div>

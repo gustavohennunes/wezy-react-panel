@@ -1,76 +1,152 @@
-import React from 'react';
+import React from 'react'
+import { FormFile } from './'
 
 const FormInput = ({
-  type,
-  title,
-  fieldName,
-  fieldClass = '',
-  fieldData,
-  formState,
-  required = false,
-  handleInputChange,
+    type,
+    title,
+    subtitle = '',
+    fieldName,
+    fieldClass = '',
+    fieldData,
+    formState,
+    required = false,
+    handleInputChange,
 }) => {
-  let inputElement;
+    let inputElement
 
-  switch (type) {
-    case 'Frm':
-    case 'Psw':
-    case 'Val':
-      inputElement = (
-        <input
-          type={fieldData.type}
-          className={`input ${fieldClass} ${fieldData.class}`}
-          name={fieldName}
-          placeholder={title}
-          value={formState[fieldName] || ''}
-          required={required}
-          onChange={(e) => handleInputChange(fieldName, e.target.value)}
-        />
-      );
-      break;
-    case 'Hdn':
-      inputElement = (
-        <input
-          type="hidden"
-          className={`input ${fieldClass}`}
-          name={fieldName}
-          placeholder={title}
-          value={formState[fieldName] || ''}
-          required={required}
-          onChange={(e) => handleInputChange(fieldName, e.target.value)}
-        />
-      );
-      break;
-    case 'Txt':
-      inputElement = (
-        <textarea
-          className={`input min-h-[120px] ${fieldClass} ${fieldData.class}`}
-          name={fieldName}
-          placeholder={title}
-          value={formState[fieldName] || ''}
-          required={required}
-          onChange={(e) => handleInputChange(fieldName, e.target.value)}
-        />
-      );
-      break;
-    case 'Lis':
-      inputElement = (
-        <div className={fieldData.class}>
-          {fieldData.value}
-          {fieldData.extra_html}
+    const handleFilesChange = (files) => {
+        setSelectedFiles(files)
+        console.log('Arquivos selecionados:', files)
+    }
+
+    const toValue = (value) => {
+        if (typeof value !== 'number') {
+            return ''
+        }
+
+        return value.toLocaleString('pt-BR', {
+            style: 'currency',
+            currency: 'BRL',
+        })
+    }
+
+    switch (type) {
+        case 'Frm':
+        case 'Val':
+            inputElement = (
+                <input
+                    type={fieldData.type}
+                    className={`input ${fieldClass} ${fieldData.class}`}
+                    name={fieldName}
+                    placeholder={title}
+                    value={formState[fieldName] || ''}
+                    required={required}
+                    onChange={(e) =>
+                        handleInputChange(fieldName, e.target.value)
+                    }
+                />
+            )
+            break
+        case 'Psw':
+            inputElement = (
+                <div
+                    className={`input ${fieldClass} ${fieldData.class}`}
+                    data-toggle-password="true"
+                >
+                    <input
+                        placeholder={title}
+                        name={fieldName}
+                        type="password"
+                        required={required}
+                        onChange={(e) =>
+                            handleInputChange(fieldName, e.target.value)
+                        }
+                    />
+                    <div
+                        className="btn btn-icon"
+                        data-toggle-password-trigger="true"
+                    >
+                        <i className="ki-outline ki-eye toggle-password-active:hidden"></i>
+                        <i className="ki-outline ki-eye-slash hidden toggle-password-active:block"></i>
+                    </div>
+                </div>
+            )
+            break
+        case 'Hdn':
+            inputElement = (
+                <input
+                    type="hidden"
+                    className={`input ${fieldClass}`}
+                    name={fieldName}
+                    placeholder={title}
+                    value={formState[fieldName] || ''}
+                    required={required}
+                    onChange={(e) =>
+                        handleInputChange(fieldName, e.target.value)
+                    }
+                />
+            )
+            break
+        case 'Txt':
+            inputElement = (
+                <textarea
+                    className={`input min-h-[120px] ${fieldClass} ${fieldData.class}`}
+                    name={fieldName}
+                    placeholder={title}
+                    value={formState[fieldName] || ''}
+                    required={required}
+                    onChange={(e) =>
+                        handleInputChange(fieldName, e.target.value)
+                    }
+                />
+            )
+            break
+        case 'Lis':
+            inputElement = (
+                <div className={fieldData.class}>
+                    {fieldData.value}
+                    {fieldData.extra_html}
+                </div>
+            )
+            break
+        case 'Fto':
+            inputElement = (
+                <FormFile
+                    fieldName={fieldName}
+                    multiple={true}
+                    accept="image/*"
+                    maxSize={5 * 1024 * 1024}
+                    onFilesChange={handleFilesChange}
+                />
+            )
+            break
+        case 'Arq':
+            inputElement = (
+                <FormFile
+                    fieldName={fieldName}
+                    multiple={true}
+                    accept="*"
+                    maxSize={5 * 1024 * 1024}
+                    onFilesChange={handleFilesChange}
+                />
+            )
+            break
+        case 'Din':
+            inputElement = toValue(fieldData.value)
+            break
+        default:
+            inputElement = null
+    }
+
+    return (
+        <div className="flex items-center flex-wrap lg:flex-nowrap gap-2.5">
+            <div className="form-label max-w-56 flex-col">
+                <label>{title}</label>
+                {subtitle && <span className="text-[10px]"> {subtitle} </span>}
+            </div>
+            {inputElement}
         </div>
-      );
-      break;
-    default:
-      inputElement = null;
-  }
+    )
+}
 
-  return (
-    <div className="flex items-center flex-wrap lg:flex-nowrap gap-2.5">
-      <label className="form-label max-w-56">{title}</label>
-      {inputElement}
-    </div>
-  );
-};
-
-export { FormInput };
+export { FormInput }

@@ -26,6 +26,9 @@ export const DataRowContext = ({ fullRow, row, index, handleToggle }) => {
                 }
             />
         )
+    } else if (row.component === 'html') { 
+        // RETORNA COMO TEXTO 
+        return row.content || '-'
     }
 
     return row.content || '-'

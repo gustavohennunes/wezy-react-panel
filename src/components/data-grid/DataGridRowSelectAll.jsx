@@ -5,6 +5,7 @@ const DataGridRowSelectAll = ({ setSelectedRows }) => {
     const { table } = useDataGrid()
     const [selectableRowIds, setSelectableRowIds] = useState([])
     const [selectedRowIds, setSelectedRowIds] = useState([])
+    const [selectedDataTableIds, setSelectedDataTableIds] = useState([])
 
     useEffect(() => {
         const selectableRows = table
@@ -18,11 +19,12 @@ const DataGridRowSelectAll = ({ setSelectedRows }) => {
     }, [selectedRowIds, setSelectedRows])
 
     const checkAllRows = (value) => {
+        console.log('TESTE')
         const updatedSelected = value ? selectableRowIds : []
         setSelectedRowIds(updatedSelected)
-        selectableRowIds.forEach((id) =>
+        selectableRowIds.forEach((id) => {
             table.getRow(id)?.toggleSelected(!!value)
-        )
+        })
     }
 
     return (

@@ -1,17 +1,19 @@
+export const cleanUrl = (url) => { return url?.replace(/\/?index\.php/g, "") || "" };
 export const buildApiUrl = (searchParams, defaultSlug = 'administracao') => {
     const params = new URLSearchParams(searchParams)
 
     const pag = params.get('pag')
+    const slug = params.get('slug')
     if (pag) {
         params.set('slug', pag)
         params.delete('pag')
     } else {
-        params.set('slug', defaultSlug)
+        params.set('slug', slug ?? defaultSlug)
     }
 
     const allowedParams = [
         'p', 'setor', 'qua', 'qui', 'sex', 'slug', 'acao', 'id', 'toggle-status',
-        'busca', 'filters', 'limit', 'page', 'order-field', 'order-direction'
+        'busca', 'filters', 'limit', 'pagina', 'order-field', 'order-direction'
     ]
 
     // Remove parâmetros não permitidos
@@ -25,7 +27,7 @@ export const buildApiUrl = (searchParams, defaultSlug = 'administracao') => {
 }
 export const updateTablePagination = async (params) => {
     const url = new URL(window.location.href);
-    url.searchParams.set('page', String(params.pageIndex + 1)) // Page is 1-indexed on server
+    url.searchParams.set('pagina', String(params.pageIndex + 1)) // Page is 1-indexed on server
     url.searchParams.set('limit', String(params.pageSize))
     if (params.sorting?.[0]?.id) {
         url.searchParams.set('order-field', params.sorting[0].id)

@@ -1,6 +1,7 @@
 import { createContext, useContext, useState, useEffect } from 'react'
 import { useAuth } from '../auth/providers/JWTProvider'
 import axios from 'axios'
+const CUSTOMER_HOST = import.meta.env.VITE_CUSTOMER_HOST
 const initialProps = {
     configs: new Map(),
     fetchMenu: () => {},
@@ -39,7 +40,7 @@ const MenusProvider = ({ children }) => {
                 .get('https://painel.amazon.cayman.com.br/api/v1/panel/menus', {
                     headers: {
                         'Content-Type': 'application/x-www-form-urlencoded',
-                        'Customer-Host': 'douglasfeuse',
+                        'Customer-Host': CUSTOMER_HOST
                     },
                 })
                 .then((response) => {

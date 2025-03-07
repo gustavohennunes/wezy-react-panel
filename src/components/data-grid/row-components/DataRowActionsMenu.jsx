@@ -10,13 +10,29 @@ import {
     MenuSub,
     MenuTitle,
 } from '@/components'
+import { buildApiUrl } from '@/utils/urlHelper'
+import { api } from '@/services/api'
 import { useLanguage } from '@/i18n'
+import { toast } from 'sonner'
 const DataRowActionsMenu = ({ row }) => {
     const { isRTL } = useLanguage()
 
-    const removeRow = (id) => {
+    const removeRow = (url) => {
         //TODO excluir da API menu ações
-        console.log('Linha a ser excluida: ' + id)
+        let response = '';
+        console.log('Linha a ser excluida: ' + url)
+        try {
+            //response = api.post(buildApiUrl(url));
+        } catch (err) {
+            toast(`Error atualizar`, {
+                description: `❌ Erro ao excluir item.`
+            })
+            setError(err)
+        } finally {
+            toast(`Sucesso`, {
+                description: response?.success?.response.data.message
+            })
+        }
     }
 
     return (
@@ -52,19 +68,13 @@ const DataRowActionsMenu = ({ row }) => {
                                 target={item.target || '_self'}
                                 onClick={(e, props) => {
                                     e.preventDefault()
-                                    const { path } = props.path
+                                    const params = new URLSearchParams(props.path)
 
-                                    if (props.path.startsWith('Javascript:')) {
-                                        const match =
-                                            props.path.match(
-                                                /removeRow\('(\d+)'\)/
-                                            )
-                                        if (match) {
-                                            const rowId = match[1]
-                                            removeRow(rowId)
-                                        }
+                                    if (params.has("excluir")) {
+                                        const idExcluir = params.get("excluir");
+                                        removeRow(idExcluir)
                                     } else {
-                                        window.location.href = props.path
+                                        //window.location.href = props.path
                                     }
                                 }}
                             >

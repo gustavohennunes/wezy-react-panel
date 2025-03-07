@@ -11,8 +11,10 @@ const PanelContent = () => {
     useEffect(() => {
         let newContent = ''
 
-        if (pageData?.layout === 'galeria' || pageData?.layout === 'link') {
+        if (pageData?.layout === 'photos') {
             newContent = 'Em breve'
+        } else if (pageData?.layout === 'funnel') {
+            newContent = <FormContext data={pageData?.params} />
         } else if (pageData?.layout === 'form') {
             newContent = <FormContext data={pageData?.params} />
         } else {
@@ -28,6 +30,17 @@ const PanelContent = () => {
                 />
             )
         }
+
+        // javascript e css
+        if(pageData?.javascript){
+
+        }
+        if(pageData?.css){
+
+        }
+        //pageData?.javascript
+
+        //pageData?.css
 
         setContent(newContent)
     }, [pageData])

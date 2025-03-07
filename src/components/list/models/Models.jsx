@@ -1,17 +1,30 @@
-import { useMemo, useState, useEffect } from 'react'
-import { Skeleton } from '@/components/ui/skeleton'
+import qs from 'qs'
+import { useMemo, useState, useEffect  } from 'react'
 import {
     DataGrid,
     KeenIcon,
     DataGridColumnHeader,
     DataGridRowSelectAll,
-    DataRowContext,
+    DataRowContext
 } from '@/components'
 import { toast } from 'sonner'
 import { Input } from '@/components/ui/input'
-import { updateTablePagination, buildApiUrl } from '@/utils/urlHelper'
+import { updateTablePagination, buildApiUrl, cleanUrl } from '@/utils/urlHelper'
 import { api } from '@/services/api'
-const Models = ({ model, columnHeader, btnAdd, search, btnExcluir, pagination, tabs }) => {
+import { Tabs } from '@/components/custom/tabs/tabs'
+import { usePageData } from '@/context/PageDataContext'
+
+const Models = ({
+    model,
+    columnHeader,
+    btnAdd,
+    search,
+    btnExcluir,
+    pagination,
+    tabs,
+}) => {
+    const { callApi } = usePageData();
+    
     const ColumnInputFilter = ({ column }) => {
         return (
             <Input
@@ -25,10 +38,11 @@ const Models = ({ model, columnHeader, btnAdd, search, btnExcluir, pagination, t
     const [models, setModels] = useState(model || [])
     const [footer, setFooter] = useState('')
     const [gridPagination, setGridPagination] = useState({
-        size: 20 
+        size: 20,
     })
     const [selectedRows, setSelectedRows] = useState([])
     const data = useMemo(() => models, [models])
+    const [activeTab, setActiveTab] = useState('')
 
     useEffect(() => {
         if (model && Array.isArray(model) && model.length > 0) {
@@ -41,30 +55,62 @@ const Models = ({ model, columnHeader, btnAdd, search, btnExcluir, pagination, t
             setGridPagination({
                 size: pagination?.information?.end || 0,
                 rowCount: pagination?.information?.total || 0,
-                pageCount: pagination?.buttons?.content?.length-1 || 0,
+                pageCount: pagination?.buttons?.content?.length - 1 || 0,
             })
         }
     }, [pagination])
 
-    const handleExcluir = (id) => {
-        //TODO excluir da API linhas selecionadas
-        console.log('Linhas a serem excluidas: ' + selectedRows)
+    const handleExcluir = async (e) => {
+        try {
+            const params = new URLSearchParams(e.view.location.search)
+            const slug = params.get('slug') ?? params.get('pag')
+            const data = {
+                items: selectedRows,
+            }
+            let response = ''
+            const urlExcluir = `?slug=${slug}&acao=remove-items`
+        
+            response = await api.post(
+                buildApiUrl(urlExcluir),
+                qs.stringify(data),
+                {
+                    headers: {
+                        'Content-Type': 'application/x-www-form-urlencoded',
+                    },
+                }
+            )
+            
+            const urlRefresh = buildApiUrl(new URLSearchParams(e.view.location.search));
+            callApi(urlRefresh);
+
+            toast(`Sucesso`, {
+                description: response?.success?.response?.data?.message,
+            })
+        } catch (err) {
+            toast(`Error atualizar`, {
+                description: `❌ Erro ao excluir item. ${err.response?.data?.error?.message ?? err}`,
+            })
+        }
     }
 
     const handleToggle = (rowId, colIndex) => {
-        let response = '';
+        let response = ''
         try {
             setModels((prevModels) => {
                 const updatedModels = prevModels.map((row) => {
                     if (row['row-id'] === rowId) {
                         const updatedRow = { ...row }
-                        updatedRow.columns = updatedRow.columns.map((col, i) => {
-                            if (i === colIndex) {
-                                response = api.post(buildApiUrl(col.action.toString()));
-                                return { ...col, content: !col.content }
+                        updatedRow.columns = updatedRow.columns.map(
+                            (col, i) => {
+                                if (i === colIndex) {
+                                    response = api.post(
+                                        buildApiUrl(col.action.toString())
+                                    )
+                                    return { ...col, content: !col.content }
+                                }
+                                return col
                             }
-                            return col
-                        })
+                        )
                         return updatedRow
                     }
                     return row
@@ -73,12 +119,12 @@ const Models = ({ model, columnHeader, btnAdd, search, btnExcluir, pagination, t
             })
         } catch (err) {
             toast(`Error atualizar`, {
-                description: `❌ Erro ao atualizar item.`
+                description: `❌ Erro ao atualizar item.`,
             })
             setError(err)
         } finally {
             toast(`Sucesso`, {
-                description: response?.success?.response.data.message
+                description: response?.success?.response.data.message,
             })
         }
     }
@@ -174,20 +220,20 @@ const Models = ({ model, columnHeader, btnAdd, search, btnExcluir, pagination, t
     )
 
     const handleRowSelection = (state) => {
-        const selectedRowIds = Object.keys(state).filter((key) => state[key])
+        const selectedRowIds = Object.keys(state).filter((key) => {
+            return state[key]
+        })
         setSelectedRows(selectedRowIds)
     }
 
     const Toolbar = () => {
-        const [searchInput, setSearchInput] = useState(search?.value || "")
-        
-        const cleanUrl = (url) => url?.replace(/\/index\.php/g, "") || "";
+        const [searchInput, setSearchInput] = useState(search?.value || '')
 
         const submitSearch = (e) => {
-            e.preventDefault(); // Evita o reload da página
-            const url = new URL(search?.action, window.location.origin);
-            url.searchParams.set("busca", searchInput); // Adiciona o parâmetro de busca
-            window.location.href = url.toString(); // Atualiza a URL
+            e.preventDefault() // Evita o reload da página
+            const url = new URL(search?.action, window.location.origin)
+            url.searchParams.set('busca', searchInput) // Adiciona o parâmetro de busca
+            window.location.href = url.toString() // Atualiza a URL
         }
 
         const addBtn = btnAdd?.label ? (
@@ -202,50 +248,72 @@ const Models = ({ model, columnHeader, btnAdd, search, btnExcluir, pagination, t
             ''
         )
 
-        let tabsBefore = '';
-        let tabsAfter = '';
-        if(tabs){
-            tabs.after.map((col, i) => {
-                    
-            })
-    
-            tabs.before.map((col, i) => {
-    
-            })
-        }
-
         return (
-            <div className="card-header flex-wrap gap-2 border-b-0 px-5">
-                <h3 className="card-title font-medium text-sm">{addBtn}</h3>
+            <div className="bg-transparent">
+                {tabs?.before && Array.isArray(tabs?.before) ? (
+                    <div className="card-header flex-wrap gap-2 border-b-0 px-5">
+                        <Tabs
+                            activeTab={activeTab}
+                            setActiveTab={setActiveTab}
+                            tabs={tabs?.before}
+                        />
+                    </div>
+                ) : null}
+                <div className="card-header flex-wrap my-2 gap-2 border-b-0 px-5">
+                    <h3 className="card-title font-medium text-sm">{addBtn}</h3>
 
-                <div className="flex flex-wrap gap-2 lg:gap-5">
-                    <form
-                        id="form2"
-                        name="form2"
-                        method="post"
-                        action={search?.action}
-                        onSubmit={(e) => submitSearch(e)}
-                        className="flex form-busca"
-                    >
-                        <label className="input input-sm">
-                            <input
-                                type="text"
-                                name="FrmBusca"
-                                id="FrmBusca"
-                                className="inputBusca"
-                                placeholder={search?.placeholder}
-                                value={searchInput}
-                                onChange={(e) => setSearchInput(e.target.value)}
-                            />
-                        </label>
-                        <button
-                            type="submit"
-                            className="btn btn-primary btn-sm ml-1"
+                    <div className="flex flex-wrap gap-2 lg:gap-5">
+                        <form
+                            id="form2"
+                            name="form2"
+                            method="post"
+                            action={search?.action}
+                            onSubmit={(e) => submitSearch(e)}
+                            className="flex form-busca"
                         >
-                            <KeenIcon icon="magnifier" />
-                        </button>
-                    </form>
+                            <label className="input input-sm">
+                                <input
+                                    type="text"
+                                    name="FrmBusca"
+                                    id="FrmBusca"
+                                    className="inputBusca"
+                                    placeholder={search?.placeholder}
+                                    value={searchInput}
+                                    onChange={(e) =>
+                                        setSearchInput(e.target.value)
+                                    }
+                                />
+                            </label>
+                            <button
+                                type="submit"
+                                className="btn btn-primary btn-sm ml-1"
+                            >
+                                <KeenIcon icon="magnifier" />
+                            </button>
+                        </form>
+                    </div>
                 </div>
+                {tabs?.after && Array.isArray(tabs?.after) ? (
+                    <div className="card-header justify-start flex-wrap gap-2 border-b-0 px-5">
+                        {tabs?.after?.map((afterTab, i) => {
+                            return (
+                                <a
+                                    key={i}
+                                    className="btn btn-primary"
+                                    href={
+                                        !afterTab.url ||
+                                        afterTab.url === 'javascript:;'
+                                            ? ''
+                                            : cleanUrl(afterTab.url)
+                                    }
+                                    target={afterTab.target ?? '_self'}
+                                >
+                                    {afterTab.content}
+                                </a>
+                            )
+                        })}
+                    </div>
+                ) : null}
             </div>
         )
     }
@@ -254,13 +322,13 @@ const Models = ({ model, columnHeader, btnAdd, search, btnExcluir, pagination, t
         if (btnExcluir) {
             setFooter(
                 <div className="card-title font-medium text-sm mt-3">
-                    <a
+                    <button
                         className={`btn btn-danger ${selectedRows.length === 0 ? 'opacity-50 cursor-not-allowed' : ''}`}
                         disabled={selectedRows.length === 0}
-                        onClick={() => handleExcluir}
+                        onClick={handleExcluir}
                     >
                         Excluir selecionados
-                    </a>
+                    </button>
                 </div>
             )
         }
@@ -268,20 +336,22 @@ const Models = ({ model, columnHeader, btnAdd, search, btnExcluir, pagination, t
 
     const fetchGridData = async (params) => {
         try {
-            if(params.pageIndex == 0) {
-                return { 
+            if (params.pageIndex == 0) {
+                return {
                     data: data,
                     totalCount: pagination?.information?.total || 0,
                 }
             }
-            
-            let newUrl = await updateTablePagination(params);
 
+            let newUrl = await updateTablePagination(params)
             const response = await api.get(newUrl)
 
             return {
-                data: response.data?.success?.response?.data?.params?.list?.rows,
-                totalCount: response?.data?.success?.response?.data?.params?.pagination?.information?.total,
+                data: response.data?.success?.response?.data?.params?.list
+                    ?.rows,
+                totalCount:
+                    response?.data?.success?.response?.data?.params?.pagination
+                        ?.information?.total,
             }
         } catch (error) {
             console.log(error)
@@ -296,9 +366,11 @@ const Models = ({ model, columnHeader, btnAdd, search, btnExcluir, pagination, t
                 data: [],
                 totalCount: 0,
             }
+        } finally {
+            //setLoading(false);
         }
     }
-    
+
     return (
         <div>
             <DataGrid
@@ -308,6 +380,7 @@ const Models = ({ model, columnHeader, btnAdd, search, btnExcluir, pagination, t
                 onRowSelectionChange={handleRowSelection}
                 pagination={gridPagination}
                 onFetchData={fetchGridData}
+                getRowId={(row) => row['row-id']}
                 sorting={[
                     {
                         id: 'id',

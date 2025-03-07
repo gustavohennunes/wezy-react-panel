@@ -25,7 +25,8 @@ const DataGridContext = createContext(undefined)
 export const useDataGrid = () => {
     const context = useContext(DataGridContext)
     if (!context) {
-        throw new Error('useDataGrid must be used within a DataGridProvider')
+        console.warn('useDataGrid foi chamado fora de um DataGridProvider.')
+        return { table: null }
     }
     return context
 }

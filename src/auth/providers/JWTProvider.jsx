@@ -9,6 +9,8 @@ export const REGISTER_URL = `${API_URL}/register`
 export const FORGOT_PASSWORD_URL = `${API_URL}/forgot-password`
 export const RESET_PASSWORD_URL = `${API_URL}/reset-password`
 export const GET_USER_URL = `${API_URL}/user`
+const BTOKEN = import.meta.env.VITE_BTOKEN
+const CUSTOMER_HOST = import.meta.env.VITE_CUSTOMER_HOST
 const AuthContext = createContext(null)
 const AuthProvider = ({ children }) => {
     const [loading, setLoading] = useState(true)
@@ -49,16 +51,12 @@ const AuthProvider = ({ children }) => {
                 {
                     headers: {
                         'Content-Type': 'application/x-www-form-urlencoded',
-                        'Customer-Host': 'douglasfeuse',
-                        Authorization:
-                            'Bearer Iq1uQxXL-CLgL2L1QitNsyU7pQqv8RA5CBoDP4Lv5fBAApymt7G3rKrPYPiaY',
+                        'Customer-Host': CUSTOMER_HOST,
+                        Authorization: `Bearer ${BTOKEN}`
                     },
                 }
             )
-            /* const tokens = { 
-        'access_token': response.sucess.request.code,
-        'token_type': 'Bearer'
-      } */
+
             saveAuth(auth)
             const { data: user } = await newUser()
             setCurrentUser(user)

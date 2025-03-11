@@ -10,6 +10,7 @@ import {
     MenuTitle,
 } from '@/components/menu'
 import { useMenus } from '@/providers'
+import { transformOldIcon } from '@/lib/transformOldIcon'
 const SidebarMenuPrimary = () => {
     const subIndetion = ['ps-7', 'ps-2.5', 'ps-2.5']
     const buildMenu = (items) => {
@@ -20,13 +21,13 @@ const SidebarMenuPrimary = () => {
         })
     }
     const buildMenuItemRoot = (item, index, level) => {
+        var icon = transformOldIcon(item.icon)
         if (item.children) {
             return (
                 <MenuItem key={index} toggle="accordion" trigger="click">
                     <MenuLink className="gap-2.5 py-2 px-2.5 rounded-md border border-transparent">
                         <MenuIcon className="items-start text-gray-600 text-lg menu-item-here:text-gray-800 menu-item-show:text-gray-800 menu-link-hover:text-gray-800 dark:menu-item-here:text-gray-900 dark:menu-item-show:text-gray-900 dark:menu-link-hover:text-gray-900">
-                            <KeenIcon icon={'setting-3'} />
-                            {/* {item.icon && <KeenIcon icon={item.icon} />} */}
+                            <KeenIcon icon={icon.icon} style={icon.type}  />
                         </MenuIcon>
                         <MenuTitle className="font-medium text-sm text-gray-800 menu-item-here:text-gray-900 menu-item-show:text-gray-900 menu-link-hover:text-gray-900">
                             {item.title}
@@ -53,7 +54,7 @@ const SidebarMenuPrimary = () => {
                         )}
                     >
                         <MenuIcon className="items-start text-lg text-gray-600 menu-item-active:text-gray-800 menu-item-here:text-gray-800 menu-item-show:text-gray-800 menu-link-hover:text-gray-800 dark:menu-item-active:text-gray-900 dark:menu-item-here:text-gray-900 dark:menu-item-show:text-gray-900 dark:menu-link-hover:text-gray-900">
-                            <KeenIcon icon={'fasten'} />
+                            <KeenIcon icon={icon.icon} style={icon.type} />
                             {/* {item.icon && <KeenIcon icon={item.icon} />} */}
                         </MenuIcon>
                         <MenuTitle className="text-sm text-gray-800 font-medium menu-item-here:text-gray-900 menu-item-show:text-gray-900 menu-link-hover:text-gray-900">
@@ -72,6 +73,7 @@ const SidebarMenuPrimary = () => {
         })
     }
     const buildMenuItemChild = (item, index, level = 0) => {
+        var icon = transformOldIcon(item.icon)
         if (item.children) {
             return (
                 <MenuItem
@@ -82,7 +84,7 @@ const SidebarMenuPrimary = () => {
                 >
                     <MenuLink className="py-2 px-2.5 rounded-md border border-transparent">
                         <MenuIcon className="text-gray-600">
-                            <KeenIcon icon={'wrench'} />
+                            <KeenIcon icon={icon.icon} style={icon.type} />
                         </MenuIcon>
                         {item.collapse ? (
                             <MenuTitle className="text-2sm text-gray-600 menu-item-here:text-gray-800 menu-item-show:text-gray-800 menu-link-hover:text-gray-800 dark:menu-item-here:text-gray-900 dark:menu-item-show:text-gray-900 dark:menu-link-hover:text-gray-900">
@@ -123,7 +125,7 @@ const SidebarMenuPrimary = () => {
                         className="py-2 px-2.5 rounded-md border border-transparent menu-item-active:border-gray-200 menu-item-active:bg-light menu-link-hover:bg-light menu-link-hover:border-gray-200"
                     >
                         <MenuIcon className="items-start text-lg text-gray-600 pr-2 menu-item-active:text-gray-800 menu-item-here:text-gray-800 menu-item-show:text-gray-800 menu-link-hover:text-gray-800 dark:menu-item-active:text-gray-900 dark:menu-item-here:text-gray-900 dark:menu-item-show:text-gray-900 dark:menu-link-hover:text-gray-900">
-                            <KeenIcon icon={'code'} />
+                            <KeenIcon icon={icon.icon} style={icon.type} />
                         </MenuIcon>
                         <MenuTitle className="text-2sm text-gray-800 menu-item-active:text-gray-900 menu-link-hover:text-gray-900">
                             {item.title}

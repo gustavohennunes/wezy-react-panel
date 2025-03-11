@@ -14,6 +14,7 @@ import { buildApiUrl } from '@/utils/urlHelper'
 import { api } from '@/services/api'
 import { useLanguage } from '@/i18n'
 import { toast } from 'sonner'
+import { transformOldIcon } from '@/lib/transformOldIcon'
 const DataRowActionsMenu = ({ row }) => {
     const { isRTL } = useLanguage()
 
@@ -61,8 +62,9 @@ const DataRowActionsMenu = ({ row }) => {
                     rootClassName="w-full max-w-[175px]"
                 >
                     {Array.isArray(row.content) && row.content.length > 0 ? (
-                        row.content.map((item, index) => (
-                            <MenuItem
+                        row.content.map((item, index) => {
+                            var icon = transformOldIcon(item.icon)
+                            return (<MenuItem
                                 key={index}
                                 path={item.url || '#'}
                                 target={item.target || '_self'}
@@ -80,12 +82,12 @@ const DataRowActionsMenu = ({ row }) => {
                             >
                                 <MenuLink>
                                     <MenuIcon>
-                                        <KeenIcon icon="search-list" />
+                                        <KeenIcon icon={icon.icon} style={icon.type} />
                                     </MenuIcon>
-                                    <MenuTitle>{item.title} 2 </MenuTitle>
+                                    <MenuTitle>{item.title}</MenuTitle>
                                 </MenuLink>
                             </MenuItem>
-                        ))
+                        )})
                     ) : (
                         <MenuItem>
                             <MenuLink>

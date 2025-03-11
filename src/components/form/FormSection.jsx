@@ -1,8 +1,18 @@
 import { useState } from 'react'
 import { FormInput, FormSelect } from './'
+import {
+    Popover,
+    PopoverContent,
+    PopoverTrigger,
+} from '@/components/ui/popover'
+import { KeenIcon } from '@/components'
+import { Calendar } from '@/components/ui/calendar'
+import { format } from 'date-fns'
+import { cn } from '@/lib/utils'
 
 const FormSection = ({ data, index, button, form }) => {
     const [formState, setFormState] = useState({})
+    const [date, setDate] = useState(new Date(1984, 0, 20))
 
     const handleInputChange = (name, value) => {
         setFormState((prev) => ({
@@ -13,10 +23,10 @@ const FormSection = ({ data, index, button, form }) => {
 
     const handleSelectChange = (name, value) => {
         setFormState((prev) => ({
-          ...prev,
-          [name]: value,
-        }));
-      };
+            ...prev,
+            [name]: value,
+        }))
+    }
 
     return (
         <div className="card pb-2.5">
@@ -24,7 +34,7 @@ const FormSection = ({ data, index, button, form }) => {
                 <span className="badge badge-primary mr-[8px]">0{index}</span>
                 <h3 className="card-title">{data.title}</h3>
             </div>
-            <div className="card-body grid gap-5" >
+            <div className="card-body grid gap-5">
                 {data.fields.map((field, idx) => {
                     const {
                         type,
@@ -65,7 +75,10 @@ const FormSection = ({ data, index, button, form }) => {
                             )
                         case 'Rdo':
                             return (
-                                <div key={field.name} className="flex items-center flex-wrap lg:flex-nowrap gap-2.5">
+                                <div
+                                    key={field.name}
+                                    className="flex items-center flex-wrap lg:flex-nowrap gap-2.5"
+                                >
                                     <div className="form-label max-w-56">
                                         {title}
                                     </div>
@@ -79,7 +92,10 @@ const FormSection = ({ data, index, button, form }) => {
                                                     className="radio radio-sm"
                                                     name={item.name}
                                                     id={item.id}
-                                                    checked={formState[item.name] === item.value}
+                                                    checked={
+                                                        formState[item.name] ===
+                                                        item.value
+                                                    }
                                                     onChange={(e) =>
                                                         handleInputChange(
                                                             fieldName,
@@ -117,7 +133,10 @@ const FormSection = ({ data, index, button, form }) => {
                                                 type="checkbox"
                                                 className="checkbox"
                                                 name={fieldName}
-                                                checked={formState[fieldName] || false}
+                                                checked={
+                                                    formState[fieldName] ||
+                                                    false
+                                                }
                                                 onChange={(e) =>
                                                     handleInputChange(
                                                         fieldName,
@@ -125,13 +144,16 @@ const FormSection = ({ data, index, button, form }) => {
                                                     )
                                                 }
                                             />
-                                            <label className="form-label pl-2">{item.title}</label>
+                                            <label className="form-label pl-2">
+                                                {item.title}
+                                            </label>
                                         </div>
                                     ))}
                                 </div>
                             )
                         case 'Qnt':
                         case 'Sel':
+                        case 'Man':
                             return (
                                 <FormSelect
                                     key={fieldName}
@@ -140,18 +162,67 @@ const FormSection = ({ data, index, button, form }) => {
                                     formState={formState}
                                     handleSelectChange={handleSelectChange}
                                 />
-                            );
+                            )
                         case 'Dta':
                             //Todo componente Data picker
-                            return null
+                            return (
+                                <div className="w-full">
+                                    <div className="flex items-baseline flex-wrap lg:flex-nowrap gap-2.5">
+                                        <label className="form-label flex items-center gap-1 max-w-56">
+                                            {fieldData.title || title}
+                                        </label>
+                                        <Popover>
+                                            <PopoverTrigger asChild>
+                                                <button
+                                                    id="date"
+                                                    className={cn(
+                                                        'input data-[state=open]:border-primary',
+                                                        !date &&
+                                                            'text-muted-foreground'
+                                                    )}
+                                                >
+                                                    <KeenIcon
+                                                        icon="calendar"
+                                                        className="-ms-0.5"
+                                                    />
+                                                    {date ? (
+                                                        format(
+                                                            date,
+                                                            'LLL dd, y'
+                                                        )
+                                                    ) : (
+                                                        <span>Pick a date</span>
+                                                    )}
+                                                </button>
+                                            </PopoverTrigger>
+                                            <PopoverContent
+                                                className="w-auto p-0"
+                                                align="start"
+                                            >
+                                                <Calendar
+                                                    initialFocus
+                                                    mode="single" // Single date selection
+                                                    defaultMonth={date}
+                                                    selected={date}
+                                                    onSelect={setDate}
+                                                    numberOfMonths={1}
+                                                />
+                                            </PopoverContent>
+                                        </Popover>
+                                    </div>
+                                </div>
+                            )
+                            break
                         case 'Cor':
                             //Todo componente color picker
                             return null
+                            break
+                        case 'Cod':
+                            return fieldData?.value || '-'
+                            break
                         case 'Tab':
-                        case 'Man':
                         case 'Mul':
                         case 'Aut':
-                        case 'Cod':                                              
                         default:
                             return null
                     }

@@ -28,6 +28,9 @@ const FormSelect = ({ field, fieldData, formState, handleSelectChange }) => {
             setOptions(generatedOptions)
         } else if (field.type === 'Sel') {
             setOptions(fieldData.options)
+        } else if (field.type === 'Man') {
+            console.log(fieldData.options)
+            setOptions(fieldData.options)
         }
     }, [field, fieldData])
 
@@ -50,9 +53,9 @@ const FormSelect = ({ field, fieldData, formState, handleSelectChange }) => {
                         const value =
                             option.value !== undefined && option.value !== null &&  option.value !== ''
                                 ? option.value
-                                : index 
+                                : index
                         return (
-                            <SelectItem key={value} value={value}>
+                            <SelectItem key={index} value={value}>
                                 {option.label}
                             </SelectItem>
                         )

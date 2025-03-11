@@ -16,16 +16,17 @@ const DataGridRowSelectAll = ({ setSelectedRows }) => {
 
     useEffect(() => {
         setSelectedRows(selectedRowIds)
-    }, [selectedRowIds, setSelectedRows])
+    }, [selectedRowIds])
 
     const checkAllRows = (value) => {
-        console.log('TESTE')
         const updatedSelected = value ? selectableRowIds : []
         setSelectedRowIds(updatedSelected)
         selectableRowIds.forEach((id) => {
             table.getRow(id)?.toggleSelected(!!value)
         })
     }
+
+    
 
     return (
         <Checkbox

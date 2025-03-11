@@ -29,7 +29,6 @@ const FormSelect = ({ field, fieldData, formState, handleSelectChange }) => {
         } else if (field.type === 'Sel') {
             setOptions(fieldData.options)
         } else if (field.type === 'Man') {
-            console.log(fieldData.options)
             setOptions(fieldData.options)
         }
     }, [field, fieldData])

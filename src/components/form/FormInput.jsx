@@ -1,5 +1,6 @@
-import React from 'react'
+import React, { useState } from 'react'
 import { FormFile } from './'
+import { FormColorPicker } from "./FormColorPicker";
 
 const FormInput = ({
     type,
@@ -13,6 +14,7 @@ const FormInput = ({
     handleInputChange,
 }) => {
     let inputElement
+    const [color, setColor] = useState("#aabbcc");
 
     const handleFilesChange = (files) => {
         setSelectedFiles(files)
@@ -133,6 +135,9 @@ const FormInput = ({
             break
         case 'Din':
             inputElement = toValue(fieldData.value)
+            break
+        case 'Cor':
+            inputElement = (<FormColorPicker color={color} onChange={setColor} />);
             break
         default:
             inputElement = null

@@ -12,7 +12,7 @@ import { cn } from '@/lib/utils'
 
 const FormSection = ({ data, index, button, form }) => {
     const [formState, setFormState] = useState({})
-    const [date, setDate] = useState(new Date(1984, 0, 20))
+    const [date, setDate] = useState(new Date())
 
     const handleInputChange = (name, value) => {
         setFormState((prev) => ({
@@ -59,6 +59,7 @@ const FormSection = ({ data, index, button, form }) => {
                         case 'Arq':
                         case 'Fto':
                         case 'Din':
+                        case 'Cor':
                             return (
                                 <FormInput
                                     key={fieldName}
@@ -164,9 +165,8 @@ const FormSection = ({ data, index, button, form }) => {
                                 />
                             )
                         case 'Dta':
-                            //Todo componente Data picker
                             return (
-                                <div className="w-full">
+                                <div key={fieldName} className="w-full">
                                     <div className="flex items-baseline flex-wrap lg:flex-nowrap gap-2.5">
                                         <label className="form-label flex items-center gap-1 max-w-56">
                                             {fieldData.title || title}
@@ -188,10 +188,10 @@ const FormSection = ({ data, index, button, form }) => {
                                                     {date ? (
                                                         format(
                                                             date,
-                                                            'LLL dd, y'
+                                                            'dd/MM/y'
                                                         )
                                                     ) : (
-                                                        <span>Pick a date</span>
+                                                        <span>Selecione uma data</span>
                                                     )}
                                                 </button>
                                             </PopoverTrigger>
@@ -201,7 +201,7 @@ const FormSection = ({ data, index, button, form }) => {
                                             >
                                                 <Calendar
                                                     initialFocus
-                                                    mode="single" // Single date selection
+                                                    mode="single"
                                                     defaultMonth={date}
                                                     selected={date}
                                                     onSelect={setDate}
@@ -212,11 +212,6 @@ const FormSection = ({ data, index, button, form }) => {
                                     </div>
                                 </div>
                             )
-                            break
-                        case 'Cor':
-                            //Todo componente color picker
-                            return null
-                            break
                         case 'Cod':
                             return fieldData?.value || '-'
                             break

@@ -1,6 +1,7 @@
-import React, { useState } from 'react'
+import React from 'react'
+import { CurrencyInput } from 'react-currency-mask';
 import { FormFile } from './'
-import { FormColorPicker } from "./FormColorPicker";
+import { FormColorPicker } from './FormColorPicker'
 
 const FormInput = ({
     type,
@@ -14,7 +15,6 @@ const FormInput = ({
     handleInputChange,
 }) => {
     let inputElement
-    const [color, setColor] = useState("#aabbcc");
 
     const handleFilesChange = (files) => {
         setSelectedFiles(files)
@@ -34,7 +34,6 @@ const FormInput = ({
 
     switch (type) {
         case 'Frm':
-        case 'Val':
             inputElement = (
                 <input
                     type={fieldData.type}
@@ -45,6 +44,30 @@ const FormInput = ({
                     required={required}
                     onChange={(e) =>
                         handleInputChange(fieldName, e.target.value)
+                    }
+                />
+            )
+            break
+        case 'Val':
+            inputElement = (
+                <CurrencyInput
+                    onChangeValue={(event, originalValue, maskedValue) => {
+                        console.log(event, originalValue, maskedValue)
+                    }}
+                    defaultValue={formState[fieldName] || 0}
+                    value ={formState[fieldName] || 0}
+                    InputElement={
+                        <input
+                            type={fieldData.type}
+                            className={`input ${fieldClass} ${fieldData.class}`}
+                            name={fieldName}
+                            placeholder={'R$ 0,00'}
+                            value={formState[fieldName] || 0}
+                            required={required}
+                            onChange={(e) =>
+                                handleInputChange(fieldName, e.target.value)
+                            }
+                        />
                     }
                 />
             )
@@ -137,7 +160,12 @@ const FormInput = ({
             inputElement = toValue(fieldData.value)
             break
         case 'Cor':
-            inputElement = (<FormColorPicker color={color} onChange={setColor} />);
+            inputElement = (
+                <FormColorPicker
+                    color={formState[fieldName]}
+                    onChange={(color) => handleInputChange(fieldName, color)}
+                />
+            )
             break
         default:
             inputElement = null

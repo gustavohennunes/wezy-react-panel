@@ -15,6 +15,53 @@ const FormContext = ({ data }) => {
     const { callApi } = usePageData()
     const { auth, logout } = useAuth()
 
+    /* useEffect(() => {
+        if (data?.form?.fields) {
+            const fields = data.form.fields;
+            const groupedSections = [];
+            let currentSection = null;
+    
+            fields.forEach((field) => {
+                if (field.type === 'Cab') {
+                    if (currentSection) {
+                        groupedSections.push(currentSection);
+                    }
+                    currentSection = {
+                        title: field.field.value.title,
+                        number: field.field.value.number,
+                        fields: [],
+                    };
+                } else if (currentSection) {
+                    currentSection.fields.push(field);
+                }
+            });
+    
+            if (currentSection) {
+                groupedSections.push(currentSection);
+            }
+    
+            // Atualizar sections com initialValues
+            const updatedSections = groupedSections.map((section) => {
+                const updatedFields = section.fields.map((field) => {
+                    const fieldName = field.field?.name || field.name;
+                    const fieldValue = field.field?.value;
+                    if (fieldValue !== undefined && fieldValue !== null) {
+                        return {
+                            ...field,
+                            initialValue: {
+                                [fieldName]: fieldValue, 
+                            },
+                        };
+                    }
+                    return field;
+                });
+                return { ...section, fields: updatedFields };
+            });
+
+            setSections(updatedSections);
+        }
+    }, [data]); */
+
     useEffect(() => {
         if (data?.form?.fields) {
             const fields = data.form.fields
@@ -23,7 +70,6 @@ const FormContext = ({ data }) => {
 
             fields.forEach((field) => {
                 if (field.type === 'Cab') {
-                    // Se encontrou um novo "Cab", inicia uma nova seção
                     if (currentSection) {
                         groupedSections.push(currentSection)
                     }
@@ -33,7 +79,6 @@ const FormContext = ({ data }) => {
                         fields: [],
                     }
                 } else if (currentSection) {
-                    // Adiciona os campos filhos dentro da seção atual
                     currentSection.fields.push(field)
                 }
             })

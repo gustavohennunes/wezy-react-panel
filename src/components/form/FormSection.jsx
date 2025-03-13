@@ -11,23 +11,54 @@ import { format } from 'date-fns'
 import { cn } from '@/lib/utils'
 
 const FormSection = ({ data, index, button, form }) => {
-    const [formState, setFormState] = useState({})
-    const [date, setDate] = useState(new Date())
+    const initialFormState = {};
+    data.fields.forEach((field) => {
+        const fieldName = field.field?.name || field.name;
+        initialFormState[fieldName] = field.field?.value || '';
+
+        if (field.type === 'Dta') {
+            const dateValue = field.field?.value;
+            if (dateValue && dateValue !== '00/00/0000') {
+                const parsedDate = new Date(dateValue);
+                if (!isNaN(parsedDate)) {
+                    initialFormState[fieldName] = parsedDate;
+                } else {
+                    initialFormState[fieldName] = new Date();
+                }
+            } else {
+                initialFormState[fieldName] = new Date();
+            }
+        }
+        if (field.type === 'Cor') {
+            initialFormState[fieldName] = initialFormState[fieldName] || "#aabbcc";
+        }
+    });
+
+    const [formState, setFormState] = useState(initialFormState)
 
     const handleInputChange = (name, value) => {
         setFormState((prev) => ({
             ...prev,
             [name]: value,
         }))
+        console.log(formState)
     }
-
+    
     const handleSelectChange = (name, value) => {
         setFormState((prev) => ({
             ...prev,
             [name]: value,
         }))
+        console.log(formState)
     }
 
+    const handleDateChange = (name, date) => {
+        setFormState((prev) => ({
+            ...prev,
+            [name]: date,
+        }));
+    };
+    
     return (
         <div className="card pb-2.5">
             <div className="card-header justify-start" id="general_settings">
@@ -175,10 +206,10 @@ const FormSection = ({ data, index, button, form }) => {
                                         <Popover key={`${fieldName}-${idx}`}>
                                             <PopoverTrigger asChild>
                                                 <button
-                                                    id="date"
+                                                    id={`btn-date-${fieldName}`}
                                                     className={cn(
                                                         'input data-[state=open]:border-primary',
-                                                        !date &&
+                                                        !formState[fieldName] &&
                                                             'text-muted-foreground'
                                                     )}
                                                 >
@@ -186,9 +217,9 @@ const FormSection = ({ data, index, button, form }) => {
                                                         icon="calendar"
                                                         className="-ms-0.5"
                                                     />
-                                                    {date ? (
+                                                    {formState[fieldName] ? (
                                                         format(
-                                                            date,
+                                                            formState[fieldName],
                                                             'dd/MM/y'
                                                         )
                                                     ) : (
@@ -203,9 +234,9 @@ const FormSection = ({ data, index, button, form }) => {
                                                 <Calendar
                                                     initialFocus
                                                     mode="single"
-                                                    defaultMonth={date}
-                                                    selected={date}
-                                                    onSelect={setDate}
+                                                    defaultMonth={formState[fieldName]}
+                                                    selected={formState[fieldName]}
+                                                    onSelect={(date) => handleDateChange(fieldName, date)}
                                                     numberOfMonths={1}
                                                 />
                                             </PopoverContent>

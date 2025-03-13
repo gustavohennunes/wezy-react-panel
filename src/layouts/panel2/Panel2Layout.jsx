@@ -1,5 +1,6 @@
 import useBodyClasses from '@/hooks/useBodyClasses'
 import { Panel2LayoutProvider, Main } from './'
+import { PageDataProvider } from '@/context/PageDataContext'
 const Panel2Layout = () => {
     // Using the custom hook to set multiple CSS variables and class properties
     useBodyClasses(`
@@ -13,9 +14,11 @@ const Panel2Layout = () => {
   `)
     return (
         // Providing layout context and rendering the main content
-        <Panel2LayoutProvider>
-            <Main />
-        </Panel2LayoutProvider>
+        <PageDataProvider>
+            <Panel2LayoutProvider>
+                <Main />
+            </Panel2LayoutProvider>
+        </PageDataProvider>
     )
 }
 export { Panel2Layout }

@@ -14,7 +14,7 @@ const CUSTOMER_HOST = import.meta.env.VITE_CUSTOMER_HOST
 const AuthContext = createContext(null)
 const AuthProvider = ({ children }) => {
     const [loading, setLoading] = useState(true)
-    const [auth, setAuth] = useState(authHelper.getAuth())
+    const [auth, setAuth] = useState(authHelper.getAuthToken())
     const [currentUser, setCurrentUser] = useState()
     const verify = async () => {
         if (auth) {

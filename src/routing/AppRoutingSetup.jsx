@@ -22,26 +22,20 @@ const AppRoutingSetup = () => {
     }
 
     return (
-        <PageDataProvider>
-            <Routes>
-                <Route element={<RequireAuth />}>
-                    <Route
-                        element={
-                            layout === 'demo6' ? (
-                                <PanelLayout />
-                            ) : (
-                                <Panel2Layout />
-                            )
-                        }
-                    >
-                        <Route path="/" element={<DefaultPage />} />
-                    </Route>
+        <Routes>
+            <Route element={<RequireAuth />}>
+                <Route
+                    element={
+                        layout === 'demo6' ? <PanelLayout /> : <Panel2Layout />
+                    }
+                >
+                    <Route path="/" element={<DefaultPage />} />
                 </Route>
-                <Route path="error/*" element={<ErrorsRouting />} />
-                <Route path="auth/*" element={<AuthPage />} />
-                <Route path="*" element={<Navigate to="/error/404" />} />
-            </Routes>
-        </PageDataProvider>
+            </Route>
+            <Route path="error/*" element={<ErrorsRouting />} />
+            <Route path="auth/*" element={<AuthPage />} />
+            <Route path="*" element={<Navigate to="/error/404" />} />
+        </Routes>
     )
 }
 export { AppRoutingSetup }

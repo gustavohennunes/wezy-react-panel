@@ -55,11 +55,6 @@ const FormContext = ({ data }) => {
             console.log(pair[0], pair[1])
         }
 
-        /* console.log(e)
-        console.log(window.location)
-        console.log(window.location.search)
-        console.log('TESTE') */
-
         try {
             const params = new URLSearchParams(window.location.search)
             const slug = params.get('slug') ?? params.get('pag')

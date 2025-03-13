@@ -1,5 +1,6 @@
 import useBodyClasses from '@/hooks/useBodyClasses'
 import { PanelLayoutProvider, Main } from './'
+import { PageDataProvider } from '@/context/PageDataContext'
 const PanelLayout = () => {
     useBodyClasses(`
     [--tw-page-bg:#F6F6F9]
@@ -14,9 +15,11 @@ const PanelLayout = () => {
     lg:overflow-hidden
   `)
     return (
-        <PanelLayoutProvider>
-            <Main />
-        </PanelLayoutProvider>
+        <PageDataProvider>
+            <PanelLayoutProvider>
+                <Main />
+            </PanelLayoutProvider>
+        </PageDataProvider>
     )
 }
 export { PanelLayout }

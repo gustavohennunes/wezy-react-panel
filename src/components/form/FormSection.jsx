@@ -62,7 +62,7 @@ const FormSection = ({ data, index, button, form }) => {
                         case 'Cor':
                             return (
                                 <FormInput
-                                    key={fieldName}
+                                    key={`${fieldName}-${idx}`}
                                     type={type}
                                     title={title}
                                     subtitle={subtitle}
@@ -77,7 +77,7 @@ const FormSection = ({ data, index, button, form }) => {
                         case 'Rdo':
                             return (
                                 <div
-                                    key={field.name}
+                                    key={`${fieldName}-${idx}`}
                                     className="flex items-center flex-wrap lg:flex-nowrap gap-2.5"
                                 >
                                     <div className="form-label max-w-56">
@@ -86,7 +86,7 @@ const FormSection = ({ data, index, button, form }) => {
                                     <div className="flex flex-col gap-3.5">
                                         {fieldData.map((item, index) => (
                                             <label
-                                                key={index}
+                                                key={`${fieldName}-${index}-${idx}`}
                                                 className="form-label flex items-center gap-2.5"
                                             >
                                                 <input
@@ -122,14 +122,14 @@ const FormSection = ({ data, index, button, form }) => {
                         case 'Ckb':
                             return (
                                 <div
-                                    key={field.name}
+                                    key={`${fieldName}-${idx}`}
                                     className="flex items-center flex-wrap lg:flex-nowrap gap-2.5"
                                 >
                                     <label className="form-label max-w-56">
                                         {fieldData.title || title}
                                     </label>
                                     {fieldData.map((item, index) => (
-                                        <div className="flex" key={index}>
+                                        <div key={`${fieldName}-${index}-${idx}`} className="flex">
                                             <input
                                                 type="checkbox"
                                                 className="checkbox"
@@ -157,8 +157,9 @@ const FormSection = ({ data, index, button, form }) => {
                         case 'Man':
                             return (
                                 <FormSelect
-                                    key={fieldName}
+                                    key={`${fieldName}-${idx}`}
                                     field={field}
+                                    fieldName={fieldName}
                                     fieldData={fieldData}
                                     formState={formState}
                                     handleSelectChange={handleSelectChange}
@@ -166,12 +167,12 @@ const FormSection = ({ data, index, button, form }) => {
                             )
                         case 'Dta':
                             return (
-                                <div key={fieldName} className="w-full">
+                                <div key={`${fieldName}-${idx}`} className="w-full">
                                     <div className="flex items-baseline flex-wrap lg:flex-nowrap gap-2.5">
                                         <label className="form-label flex items-center gap-1 max-w-56">
                                             {fieldData.title || title}
                                         </label>
-                                        <Popover>
+                                        <Popover key={`${fieldName}-${idx}`}>
                                             <PopoverTrigger asChild>
                                                 <button
                                                     id="date"
@@ -225,7 +226,7 @@ const FormSection = ({ data, index, button, form }) => {
 
                 {button && (
                     <div className="flex justify-start">
-                        <button className="btn btn-success">
+                        <button type="submit" className="btn btn-success">
                             {form.submit_button}
                         </button>
                     </div>

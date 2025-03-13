@@ -61,3 +61,5 @@ AuthPage - tem AuthLayout que tem a versão branded e padrão, possivelmente loc
     https://lucide.dev/guide/packages/lucide-react
     https://www.radix-ui.com/
     https://mui.com/
+    https://daypicker.dev
+    https://omgovich.github.io/react-colorful/ (Adicionado)

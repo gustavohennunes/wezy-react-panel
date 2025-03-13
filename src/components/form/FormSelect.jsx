@@ -7,7 +7,7 @@ import {
 } from '@/components/ui/select'
 import { useState, useEffect } from 'react'
 
-const FormSelect = ({ field, fieldData, formState, handleSelectChange }) => {
+const FormSelect = ({ field, fieldName, fieldData, formState, handleSelectChange }) => {
     const [options, setOptions] = useState([])
 
     useEffect(() => {
@@ -52,9 +52,9 @@ const FormSelect = ({ field, fieldData, formState, handleSelectChange }) => {
                         const value =
                             option.value !== undefined && option.value !== null &&  option.value !== ''
                                 ? option.value
-                                : index
+                                : '-1'
                         return (
-                            <SelectItem key={index} value={value}>
+                            <SelectItem key={`${index}-${fieldName}`} value={value}>
                                 {option.label}
                             </SelectItem>
                         )

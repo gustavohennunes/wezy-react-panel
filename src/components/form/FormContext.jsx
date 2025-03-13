@@ -1,11 +1,19 @@
 import { useState, useEffect } from 'react'
+import qs from 'qs';
 import { FormSection } from './'
 import { ScreenLoader } from '@/components/loaders'
 import { api } from '@/services/api'
+import { toast } from 'sonner'
 import { buildApiUrl } from '@/utils/urlHelper'
+import { usePageData } from '@/context/PageDataContext'
+import { useAuth } from '@/auth/providers/JWTProvider'
 
 const FormContext = ({ data }) => {
     const [sections, setSections] = useState('')
+    const params = new URLSearchParams(window.location.search)
+    const acao = params.get('acao')
+    const { callApi } = usePageData()
+    const { auth, logout } = useAuth()
 
     useEffect(() => {
         if (data?.form?.fields) {
@@ -48,38 +56,71 @@ const FormContext = ({ data }) => {
         let response = ''
         const form = e.target
         const formData = new FormData(form)
-
-        const inserirValue = formData.get('Inserir')
-
-        for (const pair of formData.entries()) {
-            console.log(pair[0], pair[1])
-        }
+        const formDataObject = {};
+        formData.forEach((value, key) => {
+            formDataObject[key] = value;
+        });
 
         try {
-            const params = new URLSearchParams(window.location.search)
-            const slug = params.get('slug') ?? params.get('pag')
-            const urlFormulario = `?slug=${slug}&acao=Inserir`
+            const urlFormulario = window.location.search
 
-            response = await api.post(buildApiUrl(urlFormulario), formData, {
+            response = await api.post(buildApiUrl(urlFormulario), qs.stringify(formDataObject), {
                 headers: {
                     'Content-Type': 'application/x-www-form-urlencoded',
                 },
             })
-            console.log('Resposta da API:', response);
+            console.log('Resposta da API:', response)
+
+            const slug = params.get('slug') ?? params.get('pag')
+            params.delete('acao')
+            params.delete('id')
+            const urlRefresh = buildApiUrl(params)
+
+            /* callApi(urlRefresh)
+
+            toast(`Sucesso`, {
+                description: response?.success?.response?.data?.message,
+            }) */
         } catch (error) {
             console.log(error)
+            toast(`Erro ao carregar dados.`, {
+                description: response?.success?.response?.data?.message,
+            })
+            if(error.status == 401){
+                logout()
+            }
         }
     }
 
     return (
         <div className="grid grid gap-5 lg:gap-7.5 mx-auto">
-            <form encType="application/x-www-form-urlencoded" onSubmit={submitForm}>
-                <input
-                    type="hidden"
-                    name={'Inserir'}
-                    id={'Inserir'}
-                    value={data.form?.hidden_fields?.Inserir}
-                />
+            <form
+                encType="application/x-www-form-urlencoded"
+                onSubmit={submitForm}
+            >
+                {acao === 'Inserir' ? (
+                    <input
+                        type="hidden"
+                        name="Inserir"
+                        id="Inserir"
+                        value={data.form?.hidden_fields?.Inserir}
+                    />
+                ) : (
+                    <>
+                        <input
+                            type="hidden"
+                            name="Alterar"
+                            id="Alterar"
+                            value={data.form?.hidden_fields?.Alterar}
+                        />
+                        <input
+                            type="hidden"
+                            name="Id"
+                            id="Id"
+                            value={data.form?.hidden_fields?.id}
+                        />
+                    </>
+                )}
                 {sections.map((section, index) => (
                     <FormSection
                         key={index}

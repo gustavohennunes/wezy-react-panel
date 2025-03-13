@@ -13,7 +13,7 @@ export const buildApiUrl = (searchParams, defaultSlug = 'administracao') => {
 
     const allowedParams = [
         'p', 'setor', 'qua', 'qui', 'sex', 'slug', 'acao', 'id', 'toggle-status',
-        'busca', 'filters', 'limit', 'pagina', 'order-field', 'order-direction'
+        'busca', 'filters', 'limit', 'pagina', 'order-field', 'order-direction', 'inserir', 'alterar'
     ]
 
     // Remove parâmetros não permitidos

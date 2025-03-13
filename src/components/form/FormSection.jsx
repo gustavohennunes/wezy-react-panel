@@ -134,14 +134,14 @@ const FormSection = ({ data, index, button, form }) => {
                                                 type="checkbox"
                                                 className="checkbox"
                                                 name={fieldName}
+                                                value={formState[fieldName] || 0}
                                                 checked={
-                                                    formState[fieldName] ||
-                                                    false
+                                                    formState[fieldName] === 1
                                                 }
                                                 onChange={(e) =>
                                                     handleInputChange(
                                                         fieldName,
-                                                        e.target.checked
+                                                        e.target.checked ? 1 : 0
                                                     )
                                                 }
                                             />

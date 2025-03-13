@@ -1,4 +1,4 @@
-import {} from '@/components'
+import qs from 'qs'
 import {
     Menu,
     MenuToggle,
@@ -15,23 +15,47 @@ import { api } from '@/services/api'
 import { useLanguage } from '@/i18n'
 import { toast } from 'sonner'
 import { transformOldIcon } from '@/lib/transformOldIcon'
+import { usePageData } from '@/context/PageDataContext'
 const DataRowActionsMenu = ({ row }) => {
     const { isRTL } = useLanguage()
+    const { callApi } = usePageData()
 
-    const removeRow = (url) => {
-        //TODO excluir da API menu ações
-        let response = '';
-        console.log('Linha a ser excluida: ' + url)
+    const removeRow = async (itemId) => {
+        let response = ''
+        const data = {
+            items: [itemId],
+        };
+
+        const params = new URLSearchParams(window.location.search)
+        const slug = params.get('slug') ?? params.get('pag')
+        const urlExcluir = `?slug=${slug}&acao=remove-items`
         try {
-            //response = api.post(buildApiUrl(url));
-        } catch (err) {
-            toast(`Error atualizar`, {
-                description: `❌ Erro ao excluir item.`
-            })
-            setError(err)
-        } finally {
+            console.log(urlExcluir)
+            console.log(data)
+
+            response = await api.post(
+                buildApiUrl(urlExcluir),
+                qs.stringify(data),
+                {
+                    headers: {
+                        'Content-Type': 'application/x-www-form-urlencoded',
+                    },
+                }
+            )
+
+            const urlRefresh = buildApiUrl(
+                new URLSearchParams(window.location.search)
+            )
+
+            callApi(urlRefresh)
+
             toast(`Sucesso`, {
-                description: response?.success?.response.data.message
+                description: response?.success?.response?.data?.message,
+            })
+        } catch (err) {
+            console.log(err)
+            toast(`Error atualizar`, {
+                description: `❌ Erro ao excluir item.`,
             })
         }
     }
@@ -64,30 +88,38 @@ const DataRowActionsMenu = ({ row }) => {
                     {Array.isArray(row.content) && row.content.length > 0 ? (
                         row.content.map((item, index) => {
                             var icon = transformOldIcon(item.icon)
-                            return (<MenuItem
-                                key={index}
-                                path={item.url || '#'}
-                                target={item.target || '_self'}
-                                onClick={(e, props) => {
-                                    e.preventDefault()
-                                    const params = new URLSearchParams(props.path)
+                            return (
+                                <MenuItem
+                                    key={index}
+                                    path={item.url || '#'}
+                                    target={item.target || '_self'}
+                                    onClick={(e, props) => {
+                                        e.preventDefault()
+                                        const params = new URLSearchParams(
+                                            props.path
+                                        )
 
-                                    if (params.has("excluir")) {
-                                        const idExcluir = params.get("excluir");
-                                        removeRow(idExcluir)
-                                    } else {
-                                        //window.location.href = props.path
-                                    }
-                                }}
-                            >
-                                <MenuLink>
-                                    <MenuIcon>
-                                        <KeenIcon icon={icon.icon} style={icon.type} />
-                                    </MenuIcon>
-                                    <MenuTitle>{item.title}</MenuTitle>
-                                </MenuLink>
-                            </MenuItem>
-                        )})
+                                        if (params.has('excluir')) {
+                                            const idExcluir =
+                                                params.get('excluir')
+                                            removeRow(idExcluir)
+                                        } else {
+                                            window.location.href = props.path
+                                        }
+                                    }}
+                                >
+                                    <MenuLink>
+                                        <MenuIcon>
+                                            <KeenIcon
+                                                icon={icon.icon}
+                                                style={icon.type}
+                                            />
+                                        </MenuIcon>
+                                        <MenuTitle>{item.title}</MenuTitle>
+                                    </MenuLink>
+                                </MenuItem>
+                            )
+                        })
                     ) : (
                         <MenuItem>
                             <MenuLink>

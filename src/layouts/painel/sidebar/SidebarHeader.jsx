@@ -5,69 +5,47 @@ import { toAbsoluteUrl } from '@/utils'
 import { Menu, MenuItem, MenuLabel } from '@/components/menu'
 import { KeenIcon } from '@/components'
 import { useLanguage } from '@/i18n'
+
 const SidebarHeader = forwardRef((props, ref) => {
+    
     const { pathname } = useLocation()
     const { isRTL } = useLanguage()
     const handleInputChange = () => {}
-    useEffect(() => {}, [pathname])
+
     return (
         <div ref={ref}>
-            <div className="flex items-center gap-2.5 px-3.5 h-[70px]">
-                <Link to="/">
-                    <img
-                        src={toAbsoluteUrl('/media/app/mini-logo-circle.svg')}
-                        className="dark:hidden h-[42px]"
-                    />
-                    <img
-                        src={toAbsoluteUrl(
-                            '/media/app/mini-logo-circle-dark.svg'
-                        )}
-                        className="hidden dark:inline-block h-[42px]"
-                    />
-                </Link>
 
-                <Menu className="menu-default grow">
-                    <MenuItem
-                        className="grow"
-                        toggle="dropdown"
-                        trigger="hover"
-                        dropdownProps={{
-                            placement: isRTL() ? 'bottom-end' : 'bottom-start',
-                            modifiers: [
-                                {
-                                    name: 'offset',
-                                    options: {
-                                        offset: [0, 15], // [skid, distance]
-                                    },
-                                },
-                            ],
-                        }}
-                    >
-                        <MenuLabel className="text-gray-900 font-medium grow justify-between">
-                            <span className="text-base font-medium text-gray-900 grow justify-start">
-                                Wezy
-                            </span>
-                        </MenuLabel>
-                    </MenuItem>
-                </Menu>
+            <div className="flex gap-3 mb-5 items-center px-6 mt-8">
+                <img src="https://files.caymanweb.com.br/f7e00f1f7c8e403b99f72159635a3f34/789361520b89f2875dc46702abaccfdb/vymber-logo.png" className="dark:hidden" style={{filter: "brightness(1.6)", width: '135px'}} />
+                <img src="https://files.caymanweb.com.br/f7e00f1f7c8e403b99f72159635a3f34/789361520b89f2875dc46702abaccfdb/vymber-logo.png" className="hidden dark:block" style={{filter: "brightness(100)", width: '135px'}} />
+                <div className="text-2sm text-gray-600 leading-none flex items-center">
+                    |
+                </div>
+                <div className="text-2sm text-gray-600 leading-none font-medium flex items-center">
+                    Revenda
+                </div>
             </div>
 
             <div className="pt-2.5 px-3.5 mb-1">
                 <div className="input">
                     <KeenIcon icon="magnifier" />
                     <input
-                        placeholder="Search"
+                        placeholder="Busca"
                         type="text"
                         onChange={handleInputChange}
                         className="min-w-0"
                         value=""
                     />
                     <span className="text-2sm text-gray-700 text-nowrap">
-                        cmd + /
+                        Ctrl + /
                     </span>
                 </div>
             </div>
+
         </div>
-    )
-})
+
+    );
+
+});
+
 export { SidebarHeader }

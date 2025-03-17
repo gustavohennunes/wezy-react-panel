@@ -96,14 +96,14 @@ const SidebarHeader = forwardRef((props, ref) => {
                 <div className="input">
                     <KeenIcon icon="magnifier" />
                     <input
-                        placeholder="Search"
+                        placeholder="Busca"
                         type="text"
                         onChange={handleInputChange}
                         className="min-w-0"
                         value=""
                     />
                     <span className="text-2sm text-gray-700 text-nowrap">
-                        cmd + /
+                        Ctrl + /
                     </span>
                 </div>
             </div>

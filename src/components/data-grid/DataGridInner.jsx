@@ -5,8 +5,11 @@ import {
     DataGridTable,
     DataGridPagination,
 } from '.'
+
 const DataGridInner = () => {
+
     const { props, table, loading } = useDataGrid()
+
     return (
         <div
             className={cn(
@@ -16,8 +19,6 @@ const DataGridInner = () => {
         card
         [&>[data-container]]:border-x-0
         [&>[data-container]]:rounded-none
-        [&>[data-container]>[data-table]>thead>tr>th:first-child]:px-5
-        [&>[data-container]>[data-table]>tbody>tr>td:first-child]:px-5  
         [&>[data-toolbar]]:p-5
         [&>[data-pagination]]:px-5
         [&>[data-pagination]]:py-3
@@ -39,5 +40,7 @@ const DataGridInner = () => {
             {table.getRowModel().rows.length > 0 && <DataGridPagination />}
         </div>
     )
+
 }
+
 export { DataGridInner }

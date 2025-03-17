@@ -9,16 +9,15 @@ import {
     DropdownMenuSeparator,
     DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu'
-export function DataGridColumnHeader({
-    column,
-    title = '',
-    className,
-    filter,
-}) {
+
+export function DataGridColumnHeader({ column, title = '', className, filter }) {
+
     if (!filter && !column.getCanSort() && !column.getCanHide()) {
         return <div className={cn(className)}>{title}</div>
     }
+
     if (!filter && !column.getCanHide() && column.getCanSort()) {
+
         return (
             <Button
                 variant="ghost"
@@ -49,7 +48,9 @@ export function DataGridColumnHeader({
                 )}
             </Button>
         )
+
     }
+    
     return (
         <div className={cn('flex items-center space-x-2', className)}>
             <DropdownMenu>

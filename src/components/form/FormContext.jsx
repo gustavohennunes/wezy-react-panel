@@ -63,12 +63,15 @@ const FormContext = ({ data }) => {
     }, [data]); */
 
     useEffect(() => {
+
         if (data?.form?.fields) {
+
             const fields = data.form.fields
             const groupedSections = []
             let currentSection = null
 
             fields.forEach((field) => {
+
                 if (field.type === 'Cab') {
                     if (currentSection) {
                         groupedSections.push(currentSection)
@@ -81,15 +84,18 @@ const FormContext = ({ data }) => {
                 } else if (currentSection) {
                     currentSection.fields.push(field)
                 }
+
             })
 
-            // Adiciona a última seção ao array
+            // ADICIONA A ÚLTIMA SEÇÃO AO ARRAY
             if (currentSection) {
                 groupedSections.push(currentSection)
             }
 
             setSections(groupedSections)
+
         }
+        
     }, [data])
 
     if (!sections.length) {
@@ -138,7 +144,7 @@ const FormContext = ({ data }) => {
     }
 
     return (
-        <div className="grid grid gap-5 lg:gap-7.5 mx-auto">
+        <div className="grid gap-5 lg:gap-7.5 mx-auto">
             <form
                 encType="application/x-www-form-urlencoded"
                 onSubmit={submitForm}

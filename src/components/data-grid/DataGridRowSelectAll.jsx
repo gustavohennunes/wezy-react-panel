@@ -1,17 +1,22 @@
 import React, { useState, useEffect } from 'react'
 import { useDataGrid } from '.'
 import { Checkbox } from '@/components/ui/checkbox'
+
 const DataGridRowSelectAll = ({ setSelectedRows }) => {
-    const { table } = useDataGrid()
-    const [selectableRowIds, setSelectableRowIds] = useState([])
-    const [selectedRowIds, setSelectedRowIds] = useState([])
+    
+    const { table }                                       = useDataGrid()
+    const [selectableRowIds, setSelectableRowIds]         = useState([])
+    const [selectedRowIds, setSelectedRowIds]             = useState([])
     const [selectedDataTableIds, setSelectedDataTableIds] = useState([])
 
     useEffect(() => {
+        
         const selectableRows = table
             .getRowModel()
             .rows.filter((row) => row.original.columns[0].content !== '-')
-        setSelectableRowIds(selectableRows.map((row) => row.id))
+        
+            setSelectableRowIds(selectableRows.map((row) => row.id))
+
     }, [table])
 
     useEffect(() => {
@@ -19,14 +24,15 @@ const DataGridRowSelectAll = ({ setSelectedRows }) => {
     }, [selectedRowIds])
 
     const checkAllRows = (value) => {
+        
         const updatedSelected = value ? selectableRowIds : []
+        
         setSelectedRowIds(updatedSelected)
         selectableRowIds.forEach((id) => {
             table.getRow(id)?.toggleSelected(!!value)
         })
-    }
 
-    
+    }    
 
     return (
         <Checkbox
@@ -39,5 +45,7 @@ const DataGridRowSelectAll = ({ setSelectedRows }) => {
             className="align-[inherit]"
         />
     )
+
 }
+
 export { DataGridRowSelectAll }

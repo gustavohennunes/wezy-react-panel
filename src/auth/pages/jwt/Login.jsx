@@ -8,25 +8,27 @@ import { toAbsoluteUrl } from '@/utils'
 import { useAuthContext } from '@/auth'
 import { useLayout } from '@/providers'
 import { Alert } from '@/components'
+
 const loginSchema = Yup.object().shape({
     email: Yup.string()
-        .min(3, 'Minimum 3 symbols')
-        .max(50, 'Maximum 50 symbols')
-        .required('Email is required'),
+        .min(3, 'Digite pelo menos 3 caracteres')
+        .max(50, 'Digite no máximo 50 caracteres')
+        .required('Campo obrigatório'),
     password: Yup.string()
-        .min(3, 'Minimum 3 symbols')
-        .max(50, 'Maximum 50 symbols')
-        .required('Password is required'),
+        .min(3, 'Digite pelo menos 3 caracteres')
+        .max(50, 'Digite no máximo 50 caracteres')
+        .required('Campo obrigatório'),
     remember: Yup.boolean(),
 })
+
 const initialValues = {
-    //email: "demo@keenthemes.com",
-    //password: "demo1234",
-    email: 'admin',
-    password: 'admin',
+    email: '',
+    password: '',
     remember: false,
 }
+
 const Login = () => {
+
     const [loading, setLoading] = useState(false)
     const { login } = useAuthContext()
     const navigate = useNavigate()
@@ -34,6 +36,7 @@ const Login = () => {
     const from = location.state?.from?.pathname || '/'
     const [showPassword, setShowPassword] = useState(false)
     const { currentLayout } = useLayout()
+
     const formik = useFormik({
         initialValues,
         validationSchema: loginSchema,
@@ -41,7 +44,7 @@ const Login = () => {
             setLoading(true)
             try {
                 if (!login) {
-                    throw new Error('JWTProvider is required for this form.')
+                    throw new Error('Não foi possível concluir a operação. Tente novamente.')
                 }
                 await login(values.email, values.password)
                 if (values.remember) {
@@ -53,16 +56,18 @@ const Login = () => {
                     replace: true,
                 })
             } catch {
-                setStatus('The login details are incorrect')
+                setStatus('E-mail ou senha incorretos.')
                 setSubmitting(false)
             }
             setLoading(false)
-        },
+        }
     })
+    
     const togglePassword = (event) => {
         event.preventDefault()
         setShowPassword(!showPassword)
     }
+
     return (
         <div className="card max-w-[390px] w-full">
             <form
@@ -70,82 +75,30 @@ const Login = () => {
                 onSubmit={formik.handleSubmit}
                 noValidate
             >
-                <div className="text-center mb-2.5">
-                    <h3 className="text-lg font-semibold text-gray-900 leading-none mb-2.5">
-                        Sign in
-                    </h3>
-                    <div className="flex items-center justify-center font-medium">
-                        <span className="text-2sm text-gray-600 me-1.5">
-                            Need an account?
-                        </span>
-                        <Link
-                            to={
-                                currentLayout?.name === 'auth-branded'
-                                    ? '/auth/signup'
-                                    : '/auth/classic/signup'
-                            }
-                            className="text-2sm link"
-                        >
-                            Sign up
-                        </Link>
+                <div className="text-center mb-2">
+
+                    <div className="flex gap-3 mb-2.5 items-center">
+                        <img src="https://files.caymanweb.com.br/f7e00f1f7c8e403b99f72159635a3f34/789361520b89f2875dc46702abaccfdb/vymber-logo.png" className="dark:hidden" style={{filter: "brightness(1.6)", width: '135px'}} />
+                        <img src="https://files.caymanweb.com.br/f7e00f1f7c8e403b99f72159635a3f34/789361520b89f2875dc46702abaccfdb/vymber-logo.png" className="hidden dark:block" style={{filter: "brightness(100)", width: '135px'}} />
+                        <div className="text-2sm text-gray-600 leading-none flex items-center font-medium">
+                            |
+                        </div>
+                        <div className="text-2sm text-gray-600 leading-none flex items-center font-medium">
+                            Revenda
+                        </div>
                     </div>
+
                 </div>
-
-                <div className="grid grid-cols-2 gap-2.5">
-                    <a href="#" className="btn btn-light btn-sm justify-center">
-                        <img
-                            src={toAbsoluteUrl('/media/brand-logos/google.svg')}
-                            className="size-3.5 shrink-0"
-                        />
-                        Use Google
-                    </a>
-
-                    <a href="#" className="btn btn-light btn-sm justify-center">
-                        <img
-                            src={toAbsoluteUrl(
-                                '/media/brand-logos/apple-black.svg'
-                            )}
-                            className="size-3.5 shrink-0 dark:hidden"
-                        />
-                        <img
-                            src={toAbsoluteUrl(
-                                '/media/brand-logos/apple-white.svg'
-                            )}
-                            className="size-3.5 shrink-0 light:hidden"
-                        />
-                        Use Apple
-                    </a>
-                </div>
-
-                <div className="flex items-center gap-2">
-                    <span className="border-t border-gray-200 w-full"></span>
-                    <span className="text-2xs text-gray-500 font-medium uppercase">
-                        Or
-                    </span>
-                    <span className="border-t border-gray-200 w-full"></span>
-                </div>
-
-                <Alert variant="primary">
-                    Use{' '}
-                    <span className="font-semibold text-gray-900">
-                        demo@keenthemes.com
-                    </span>{' '}
-                    username and{' '}
-                    <span className="font-semibold text-gray-900">
-                        demo1234
-                    </span>{' '}
-                    password.
-                </Alert>
 
                 {formik.status && (
                     <Alert variant="danger">{formik.status}</Alert>
                 )}
 
                 <div className="flex flex-col gap-1">
-                    <label className="form-label text-gray-900">Email</label>
+                    <label className="form-label text-gray-900">E-mail</label>
                     <label className="input">
                         <input
-                            placeholder="Enter username"
+                            placeholder="Digite seu e-mail"
                             autoComplete="off"
                             {...formik.getFieldProps('email')}
                             className={clsx('form-control', {
@@ -164,23 +117,21 @@ const Login = () => {
                 <div className="flex flex-col gap-1">
                     <div className="flex items-center justify-between gap-1">
                         <label className="form-label text-gray-900">
-                            Password
+                            Senha
                         </label>
                         <Link
                             to={
-                                currentLayout?.name === 'auth-branded'
-                                    ? '/auth/reset-password'
-                                    : '/auth/classic/reset-password'
+                                currentLayout?.name === 'auth-branded' ? '/auth/reset-password' : '/auth/classic/reset-password'
                             }
                             className="text-2sm link shrink-0"
                         >
-                            Forgot Password?
+                            Esqueceu sua senha?
                         </Link>
                     </div>
                     <label className="input">
                         <input
                             type={showPassword ? 'text' : 'password'}
-                            placeholder="Enter Password"
+                            placeholder="Digite sua senha"
                             autoComplete="off"
                             {...formik.getFieldProps('password')}
                             className={clsx('form-control', {
@@ -220,18 +171,40 @@ const Login = () => {
                         type="checkbox"
                         {...formik.getFieldProps('remember')}
                     />
-                    <span className="checkbox-label">Remember me</span>
+                    <span className="checkbox-label">Lembrar este dispositivo</span>
                 </label>
 
                 <button
                     type="submit"
-                    className="btn btn-primary flex justify-center grow"
+                    className="btn btn-danger flex justify-center grow mb-2.5"
                     disabled={loading || formik.isSubmitting}
                 >
-                    {loading ? 'Please wait...' : 'Sign In'}
+                    {loading ? 'Carregando...' : 'Entrar'}
                 </button>
+
+                <div className="flex items-center justify-start font-medium">
+
+                    <span className="text-2sm text-gray-600 me-1.5">
+                        Não tem uma conta?
+                    </span>
+                    <Link
+                        to={
+                            currentLayout?.name === 'auth-branded'
+                                ? '/auth/signup'
+                                : '/auth/classic/signup'
+                        }
+                        className="text-2sm link"
+                    >
+                        Cadastre-se!
+                    </Link>
+                </div>
+
             </form>
+
         </div>
+
     )
+
 }
+
 export { Login }

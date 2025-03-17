@@ -3,26 +3,28 @@ import { flexRender } from '@tanstack/react-table'
 import { useDataGrid } from '.'
 import { cn } from '@/lib/utils'
 const DataGridTable = () => {
+
     const { table, props } = useDataGrid()
+
     const headCellSpacingOptions = {
-        xs: 'px-2.5',
-        sm: 'px-3',
-        md: 'px-4',
-        lg: 'px-6',
+        xs: '!px-[5px] !py-[6px]',
+        sm: '!px-[5px] !py-[6px]',
+        md: '!px-[5px] !py-[6px]',
+        lg: '!px-[5px] !py-[6px]',
     }
+
     const bodyCellSpacingOptions = {
-        xs: 'p-2.5',
-        sm: 'p-3',
-        md: 'p-4',
-        lg: 'p-6',
+        xs: 'px-[5px] !py-[6px]',
+        sm: 'px-[5px] !py-[6px]',
+        md: 'px-[5px] !py-[6px]',
+        lg: 'px-[5px] !py-[6px]',
     }
-    const headCellSpacing = props.layout?.cellSpacing
-        ? headCellSpacingOptions[props.layout?.cellSpacing]
-        : headCellSpacingOptions['md']
-    const bodyCellSpacing = props.layout?.cellSpacing
-        ? bodyCellSpacingOptions[props.layout?.cellSpacing]
-        : bodyCellSpacingOptions['md']
+
+    const headCellSpacing = props.layout?.cellSpacing ? headCellSpacingOptions[props.layout?.cellSpacing] : headCellSpacingOptions['md']
+    const bodyCellSpacing = props.layout?.cellSpacing ? bodyCellSpacingOptions[props.layout?.cellSpacing] : bodyCellSpacingOptions['md']
+
     const cellBorder = props.layout?.cellBorder ?? false
+
     return (
         <table
             className={cn(
@@ -47,9 +49,8 @@ const DataGridTable = () => {
                                 className={cn(
                                     headCellSpacing,
                                     cellBorder && 'border-e',
-                                    'h-12 min-w-[30px] text-left rtl:text-right align-middle font-medium text-muted-foreground [&:has([role=checkbox])]:pe-0',
-                                    header.column.columnDef.meta
-                                        ?.headerClassName
+                                    'h-12 min-w-[20px] text-left rtl:text-right align-middle font-medium text-muted-foreground [&:has([role=checkbox])]:pe-0',
+                                    header.column.columnDef.meta ?.headerClassName
                                 )}
                             >
                                 {header.isPlaceholder
@@ -64,7 +65,9 @@ const DataGridTable = () => {
                 ))}
             </thead>
             <tbody className="[&_tr:last-child]:border-0">
+
                 {table.getRowModel().rows.length ? (
+
                     table.getRowModel().rows.map((row) => (
                         <tr
                             key={row.id}
@@ -82,7 +85,7 @@ const DataGridTable = () => {
                                     className={cn(
                                         bodyCellSpacing,
                                         cellBorder && 'border-e',
-                                        'align-middle [&:has([role=checkbox])]:pe-0',
+                                        'align-middle [&:has([role=checkbox])]:pe-0 !text-[13px]',
                                         cell.column.columnDef.meta
                                             ?.cellClassName
                                     )}
@@ -95,11 +98,16 @@ const DataGridTable = () => {
                             ))}
                         </tr>
                     ))
+                    
                 ) : (
                     <DataGridEmpty />
                 )}
+
             </tbody>
+
         </table>
+
     )
+
 }
 export { DataGridTable }

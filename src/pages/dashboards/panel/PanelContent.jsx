@@ -6,21 +6,26 @@ import { PicturesContext } from '@/components/pictures/PicturesContext'
 import { ScreenLoader } from '@/components/loaders'
 
 const PanelContent = () => {
+
     const { pageData, loading } = usePageData()
     const [content, setContent] = useState(null)
 
     useEffect(() => {
+
         let newContent = ''
 
         if (pageData?.layout === 'photos') {
+            
             newContent = (
                 <PicturesContext data={pageData?.params} />
-            )
+            );
+
         } else if (pageData?.layout === 'funnel') {
             newContent = <FormContext data={pageData?.params} />
         } else if (pageData?.layout === 'form') {
             newContent = <FormContext data={pageData?.params} />
         } else {
+            
             newContent = (
                 <Models
                     model={pageData?.params?.list?.rows || []}
@@ -28,10 +33,11 @@ const PanelContent = () => {
                     btnAdd={pageData?.params?.add_button}
                     tabs={pageData?.params?.buttons?.list}
                     search={pageData?.params?.search}
-                    btnExcluir={pageData?.params?.footer}
+                    btnExcluir={pageData?.params?.footer.delete_button}
                     pagination={pageData?.params?.pagination}
                 />
             )
+
         }
 
         // javascript e css

@@ -7,14 +7,14 @@ const HeaderSearch = () => {
         <div className="input input-sm w-[36px] lg:w-60">
             <KeenIcon icon="magnifier" />
             <input
-                placeholder="Search"
+                placeholder="Busca"
                 type="text"
                 className="min-w-0"
                 value=""
                 onChange={handleInputChange}
             />
             <span className="text-2sm text-gray-700 text-nowrap hidden lg:inline">
-                cmd + /
+                Ctrl + /
             </span>
         </div>
     )

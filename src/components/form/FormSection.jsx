@@ -11,71 +11,76 @@ import { format } from 'date-fns'
 import { cn } from '@/lib/utils'
 
 const FormSection = ({ data, index, button, form }) => {
+
     const initialFormState = {};
     data.fields.forEach((field) => {
+
         const fieldName = field.field?.name || field.name;
         initialFormState[fieldName] = field.field?.value || '';
 
         if (field.type === 'Dta') {
+
             const dateValue = field.field?.value;
             if (dateValue && dateValue !== '00/00/0000') {
+               
                 const parsedDate = new Date(dateValue);
                 if (!isNaN(parsedDate)) {
                     initialFormState[fieldName] = parsedDate;
                 } else {
                     initialFormState[fieldName] = new Date();
                 }
+
             } else {
                 initialFormState[fieldName] = new Date();
             }
+
         }
+
         if (field.type === 'Cor') {
             initialFormState[fieldName] = initialFormState[fieldName] || "#aabbcc";
         }
+
     });
 
     const [formState, setFormState] = useState(initialFormState)
 
     const handleInputChange = (name, value) => {
+
         setFormState((prev) => ({
             ...prev,
             [name]: value,
-        }))
-        console.log(formState)
+        }));
+
     }
     
     const handleSelectChange = (name, value) => {
+
         setFormState((prev) => ({
             ...prev,
             [name]: value,
         }))
-        console.log(formState)
+        
     }
 
     const handleDateChange = (name, date) => {
+
         setFormState((prev) => ({
             ...prev,
             [name]: date,
         }));
+
     };
     
     return (
-        <div className="card pb-2.5">
+        <div className="card pb-2.5 mb-6">
             <div className="card-header justify-start" id="general_settings">
-                <span className="badge badge-primary mr-[8px]">0{index}</span>
+                {/* <span className="badge badge-primary mr-[8px]">0{index}</span> */}
                 <h3 className="card-title">{data.title}</h3>
             </div>
             <div className="card-body grid gap-5">
                 {data.fields.map((field, idx) => {
-                    const {
-                        type,
-                        title,
-                        subtitle,
-                        field: fieldData,
-                        required,
-                        name,
-                        fieldClass,
-                    } = field
+
+                    const { type, title, subtitle, field: fieldData, required, name, fieldClass } = field
                     const fieldName = fieldData?.name || name
 
                     if (!fieldData) return null
@@ -91,6 +96,7 @@ const FormSection = ({ data, index, button, form }) => {
                         case 'Fto':
                         case 'Din':
                         case 'Cor':
+                            
                             return (
                                 <FormInput
                                     key={`${fieldName}-${idx}`}
@@ -104,8 +110,10 @@ const FormSection = ({ data, index, button, form }) => {
                                     required={required}
                                     handleInputChange={handleInputChange}
                                 />
-                            )
+                            );
+
                         case 'Rdo':
+
                             return (
                                 <div
                                     key={`${fieldName}-${idx}`}
@@ -149,8 +157,10 @@ const FormSection = ({ data, index, button, form }) => {
                                         ))}
                                     </div>
                                 </div>
-                            )
+                            );
+
                         case 'Ckb':
+
                             return (
                                 <div
                                     key={`${fieldName}-${idx}`}
@@ -182,10 +192,12 @@ const FormSection = ({ data, index, button, form }) => {
                                         </div>
                                     ))}
                                 </div>
-                            )
+                            );
+
                         case 'Qnt':
                         case 'Sel':
                         case 'Man':
+
                             return (
                                 <FormSelect
                                     key={`${fieldName}-${idx}`}
@@ -195,8 +207,10 @@ const FormSection = ({ data, index, button, form }) => {
                                     formState={formState}
                                     handleSelectChange={handleSelectChange}
                                 />
-                            )
+                            );
+
                         case 'Dta':
+
                             return (
                                 <div key={`${fieldName}-${idx}`} className="w-full">
                                     <div className="flex items-baseline flex-wrap lg:flex-nowrap gap-2.5">
@@ -243,10 +257,11 @@ const FormSection = ({ data, index, button, form }) => {
                                         </Popover>
                                     </div>
                                 </div>
-                            )
+                            );
+
                         case 'Cod':
                             return fieldData?.value || '-'
-                            break
+                        break;
                         case 'Tab':
                         case 'Mul':
                         case 'Aut':
@@ -262,8 +277,11 @@ const FormSection = ({ data, index, button, form }) => {
                         </button>
                     </div>
                 )}
+                
             </div>
+
         </div>
+
     )
 }
 

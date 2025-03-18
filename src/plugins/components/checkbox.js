@@ -98,7 +98,6 @@ export default plugin(({ addComponents, theme }) => {
     addComponents({
         '.checkbox-group': {
             display: 'flex',
-            'align-items': 'center',
             gap: '0.4rem',
         },
         '.checkbox-label': {

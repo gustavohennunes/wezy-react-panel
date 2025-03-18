@@ -11,6 +11,7 @@ import { Alert } from '@/components'
 
 const loginSchema = Yup.object().shape({
     email: Yup.string()
+        .email('Formato de e-mail inválido')
         .min(3, 'Digite pelo menos 3 caracteres')
         .max(50, 'Digite no máximo 50 caracteres')
         .required('Campo obrigatório'),
@@ -78,8 +79,8 @@ const Login = () => {
                 <div className="text-center mb-2">
 
                     <div className="flex gap-3 mb-2.5 items-center">
-                        <img src="https://files.caymanweb.com.br/f7e00f1f7c8e403b99f72159635a3f34/789361520b89f2875dc46702abaccfdb/vymber-logo.png" className="dark:hidden" style={{filter: "brightness(1.6)", width: '135px'}} />
-                        <img src="https://files.caymanweb.com.br/f7e00f1f7c8e403b99f72159635a3f34/789361520b89f2875dc46702abaccfdb/vymber-logo.png" className="hidden dark:block" style={{filter: "brightness(100)", width: '135px'}} />
+                        <img src="https://files.caymanweb.com.br/f7e00f1f7c8e403b99f72159635a3f34/dfca77e57617844b2a0d41057e7b884a/logo-vymber.svg" className="dark:hidden" style={{width: '135px'}} />
+                        <img src="https://files.caymanweb.com.br/f7e00f1f7c8e403b99f72159635a3f34/dfca77e57617844b2a0d41057e7b884a/logo-vymber.svg" className="hidden dark:block" style={{filter: "brightness(100)", width: '135px'}} />
                         <div className="text-2sm text-gray-600 leading-none flex items-center font-medium">
                             |
                         </div>
@@ -90,12 +91,20 @@ const Login = () => {
 
                 </div>
 
+                <h3 className="text-left font-semibold">
+                    Acesse sua revenda
+                </h3>
+
                 {formik.status && (
                     <Alert variant="danger">{formik.status}</Alert>
                 )}
 
                 <div className="flex flex-col gap-1">
-                    <label className="form-label text-gray-900">E-mail</label>
+
+                    <label className="form-label text-gray-900 gap-[2px]">
+                        E-mail <span className="text-danger">*</span>
+                    </label>
+
                     <label className="input">
                         <input
                             placeholder="Digite seu e-mail"
@@ -116,13 +125,11 @@ const Login = () => {
 
                 <div className="flex flex-col gap-1">
                     <div className="flex items-center justify-between gap-1">
-                        <label className="form-label text-gray-900">
-                            Senha
+                        <label className="form-label text-gray-900 gap-[2px]">
+                            Senha <span className="text-danger">*</span>
                         </label>
                         <Link
-                            to={
-                                currentLayout?.name === 'auth-branded' ? '/auth/reset-password' : '/auth/classic/reset-password'
-                            }
+                            to="/auth/reset-password"
                             className="text-2sm link shrink-0"
                         >
                             Esqueceu sua senha?
@@ -188,11 +195,7 @@ const Login = () => {
                         Não tem uma conta?
                     </span>
                     <Link
-                        to={
-                            currentLayout?.name === 'auth-branded'
-                                ? '/auth/signup'
-                                : '/auth/classic/signup'
-                        }
+                        to="/auth/signup"
                         className="text-2sm link"
                     >
                         Cadastre-se!

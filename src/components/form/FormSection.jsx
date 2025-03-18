@@ -120,7 +120,16 @@ const FormSection = ({ data, index, button, form }) => {
                                     className="flex items-center flex-wrap lg:flex-nowrap gap-2.5"
                                 >
                                     <div className="form-label max-w-56">
-                                        {title}
+                                        <b>
+                                            {title} 
+                                            {
+                                                fieldClass !== undefined &&
+                                                fieldClass.indexOf('obg') !== -1 && (
+                                                    <span className="text-danger"> *</span>
+                                                )
+                                            }
+                                        </b>
+                                        {subtitle && <span className="text-[10px]"> {subtitle} </span>}
                                     </div>
                                     <div className="flex flex-col gap-3.5">
                                         {fieldData.map((item, index) => (
@@ -166,28 +175,43 @@ const FormSection = ({ data, index, button, form }) => {
                                     key={`${fieldName}-${idx}`}
                                     className="flex items-center flex-wrap lg:flex-nowrap gap-2.5"
                                 >
-                                    <label className="form-label max-w-56">
-                                        {fieldData.title || title}
-                                    </label>
+
+                                    <div className="form-label max-w-56">
+                                        <b>
+                                            {title} 
+                                            {
+                                                fieldClass !== undefined && 
+                                                fieldClass.indexOf('obg') !== -1 && (
+                                                    <span className="text-danger"> *</span>
+                                                )
+                                            }
+                                        </b>
+                                        {subtitle && <span className="text-[10px]"> {subtitle} </span>}
+                                    </div>
+
                                     {fieldData.map((item, index) => (
                                         <div key={`${fieldName}-${index}-${idx}`} className="flex">
-                                            <input
-                                                type="checkbox"
-                                                className="checkbox"
-                                                name={fieldName}
-                                                value={formState[fieldName] || 0}
-                                                checked={
-                                                    formState[fieldName] === 1
-                                                }
-                                                onChange={(e) =>
-                                                    handleInputChange(
-                                                        fieldName,
-                                                        e.target.checked ? 1 : 0
-                                                    )
-                                                }
-                                            />
-                                            <label className="form-label pl-2">
+                                            
+                                            <label className="form-label gap-2 items-center">
+                                                    
+                                                <input
+                                                    type="checkbox"
+                                                    className="checkbox"
+                                                    name={fieldName}
+                                                    value={formState[fieldName] || 0}
+                                                    checked={
+                                                        formState[fieldName] === 1
+                                                    }
+                                                    onChange={(e) =>
+                                                        handleInputChange(
+                                                            fieldName,
+                                                            e.target.checked ? 1 : 0
+                                                        )
+                                                    }
+                                                />
+                                                
                                                 {item.title}
+
                                             </label>
                                         </div>
                                     ))}
@@ -260,7 +284,7 @@ const FormSection = ({ data, index, button, form }) => {
                             );
 
                         case 'Cod':
-                            return fieldData?.value || '-'
+                            return fieldData?.value || '-';
                         break;
                         case 'Tab':
                         case 'Mul':

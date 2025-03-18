@@ -94,7 +94,7 @@ const SidebarHeader = forwardRef((props, ref) => {
 
             <div className="pt-2.5 px-3.5 mb-1">
                 <div className="input">
-                    <KeenIcon icon="magnifier" />
+                    <KeenIcon icon="magnifier" style="outline" />
                     <input
                         placeholder="Busca"
                         type="text"

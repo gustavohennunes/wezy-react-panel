@@ -39,31 +39,6 @@ const AuthPage = () => (
             />
             <Route path="*" element={<Navigate to="/error/404" />} />
         </Route>
-
-        <Route element={<AuthBrandedLayout />}>
-            <Route path="/classic/login" element={<Login />} />
-            <Route path="/classic/signup" element={<Signup />} />
-            <Route path="/classic/2fa" element={<TwoFactorAuth />} />
-            <Route path="/classic/check-email" element={<CheckEmail />} />
-            <Route path="/classic/reset-password" element={<ResetPassword />} />
-            <Route
-                path="/classic/reset-password/enter-email"
-                element={<ResetPasswordEnterEmail />}
-            />
-            <Route
-                path="/classic/reset-password/check-email"
-                element={<ResetPasswordCheckEmail />}
-            />
-            <Route
-                path="/classic/reset-password/change"
-                element={<ResetPasswordChange />}
-            />
-            <Route
-                path="/classic/reset-password/changed"
-                element={<ResetPasswordChanged />}
-            />
-            <Route path="*" element={<Navigate to="/error/404" />} />
-        </Route>
     </Routes>
 )
 export { AuthPage }

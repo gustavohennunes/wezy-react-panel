@@ -9,7 +9,9 @@ import { Alert, KeenIcon } from '@/components'
 import { useLayout } from '@/providers'
 
 const initialValues = {
+    name: '',
     email: '',
+    phone: '',
     password: '',
     changepassword: '',
     acceptTerms: false,
@@ -69,27 +71,21 @@ const Signup = () => {
                 if (!register) {
                     throw new Error('Não foi possível concluir a operação. Tente novamente.')
                 }
-
-                console.log(values.acceptTerms);
                 
-                await register(
-                    values.name,
-                    values.email,
-                    values.phone,
-                    values.password,
-                    values.changepassword,
-                    values.acceptTerms
-                );
+                await register(values.name, values.email, values.phone, values.password, values.changepassword, values.acceptTerms);
                 
                 navigate(from, {
                     replace: true,
                 });
 
             } catch (error) {
-                console.error(error)
-                setStatus('As informações de cadastro estão incorretas.')
-                setSubmitting(false)
-                setLoading(false)
+
+                setStatus(error.message);
+
+                setSubmitting(false);
+
+                setLoading(false);
+
             }
 
         }
@@ -117,29 +113,22 @@ const Signup = () => {
 
                 <div className="text-center mb-2.5">
 
-                    <h3 className="text-lg font-semibold text-gray-900 leading-none mb-2.5">
-                        Cadastro revenda Vymber
-                    </h3>
-
-                    <div className="flex items-center justify-center font-medium">
-
-                        <span className="text-2sm text-gray-600 me-1.5">
-                            Já possuí uma conta?
-                        </span>
-                        <Link
-                            to={
-                                currentLayout?.name === 'auth-branded'
-                                    ? '/auth/login'
-                                    : '/auth/classic/login'
-                            }
-                            className="text-2sm link"
-                        >
-                            Efetue login
-                        </Link>
-
+                    <div className="flex gap-3 mb-2.5 items-center">
+                        <img src="https://files.caymanweb.com.br/f7e00f1f7c8e403b99f72159635a3f34/dfca77e57617844b2a0d41057e7b884a/logo-vymber.svg" className="dark:hidden" style={{width: '135px'}} />
+                        <img src="https://files.caymanweb.com.br/f7e00f1f7c8e403b99f72159635a3f34/dfca77e57617844b2a0d41057e7b884a/logo-vymber.svg" className="hidden dark:block" style={{filter: "brightness(100)", width: '135px'}} />
+                        <div className="text-2sm text-gray-600 leading-none flex items-center font-medium">
+                            |
+                        </div>
+                        <div className="text-2sm text-gray-600 leading-none flex items-center font-medium">
+                            Revenda
+                        </div>
                     </div>
 
                 </div>
+                
+                <h3 className="text-left font-semibold">
+                    Efetuar cadastro
+                </h3>
 
                 {formik.status && (
                     <Alert variant="danger">{formik.status}</Alert>
@@ -147,7 +136,9 @@ const Signup = () => {
 
                 <div className="flex flex-col gap-1">
 
-                    <label className="form-label text-gray-900">Nome</label>
+                    <label className="form-label text-gray-900 gap-[2px]">
+                        Nome <span className="text-danger">*</span>
+                    </label>
 
                     <label className="input">
                         <input
@@ -176,7 +167,9 @@ const Signup = () => {
 
                 <div className="flex flex-col gap-1">
 
-                    <label className="form-label text-gray-900">E-mail</label>
+                    <label className="form-label text-gray-900 gap-[2px]">
+                        E-mail <span className="text-danger">*</span>
+                    </label>
 
                     <label className="input">
                         <input
@@ -205,7 +198,9 @@ const Signup = () => {
 
                 <div className="flex flex-col gap-1">
 
-                    <label className="form-label text-gray-900">Telefone (Whatsapp)</label>
+                    <label className="form-label text-gray-900 gap-[2px]">
+                        Telefone (Whatsapp) <span className="text-danger">*</span>
+                    </label>
 
                     <label className="input">
                         <input
@@ -235,7 +230,9 @@ const Signup = () => {
 
                 <div className="flex flex-col gap-1">
 
-                    <label className="form-label text-gray-900">Senha</label>
+                    <label className="form-label text-gray-900 gap-[2px]">
+                        Senha <span className="text-danger">*</span>
+                    </label>
 
                     <label className="input">
                         <input
@@ -284,8 +281,8 @@ const Signup = () => {
 
                 <div className="flex flex-col gap-1">
 
-                    <label className="form-label text-gray-900">
-                        Repetição de senha
+                    <label className="form-label text-gray-900 gap-[2px]">
+                        Repetição de senha <span className="text-danger">*</span>
                     </label>
 
                     <label className="input">
@@ -341,7 +338,7 @@ const Signup = () => {
 
                 </div>
 
-                <label className="checkbox-group flex-col !align-start">
+                <label className="checkbox-group flex-col align-start">
 
                     <div className="flex gap-2.5">
                         
@@ -370,11 +367,25 @@ const Signup = () => {
 
                 <button
                     type="submit"
-                    className="btn btn-danger flex justify-center grow"
+                    className="btn btn-danger flex justify-center grow mb-2.5"
                     disabled={loading || formik.isSubmitting}
                 >
                     {loading ? 'Carregando...' : 'Finalizar cadastro'}
                 </button>
+
+                <div className="flex items-center justify-start font-medium">
+
+                    <span className="text-2sm text-gray-600 me-1.5">
+                        Já possuí uma conta?
+                    </span>
+                    <Link
+                        to="/auth/login"
+                        className="text-2sm link"
+                    >
+                        Efetue login
+                    </Link>
+
+                </div>
 
             </form>
 

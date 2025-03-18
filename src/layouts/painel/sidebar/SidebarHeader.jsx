@@ -16,8 +16,8 @@ const SidebarHeader = forwardRef((props, ref) => {
         <div ref={ref}>
 
             <div className="flex gap-3 mb-5 items-center px-6 mt-8">
-                <img src="https://files.caymanweb.com.br/f7e00f1f7c8e403b99f72159635a3f34/789361520b89f2875dc46702abaccfdb/vymber-logo.png" className="dark:hidden" style={{filter: "brightness(1.6)", width: '135px'}} />
-                <img src="https://files.caymanweb.com.br/f7e00f1f7c8e403b99f72159635a3f34/789361520b89f2875dc46702abaccfdb/vymber-logo.png" className="hidden dark:block" style={{filter: "brightness(100)", width: '135px'}} />
+                <img src="https://files.caymanweb.com.br/f7e00f1f7c8e403b99f72159635a3f34/dfca77e57617844b2a0d41057e7b884a/logo-vymber.svg" className="dark:hidden" style={{width: '135px'}} />
+                <img src="https://files.caymanweb.com.br/f7e00f1f7c8e403b99f72159635a3f34/dfca77e57617844b2a0d41057e7b884a/logo-vymber.svg" className="hidden dark:block" style={{filter: "brightness(100)", width: '135px'}} />
                 <div className="text-2sm text-gray-600 leading-none flex items-center">
                     |
                 </div>
@@ -28,7 +28,7 @@ const SidebarHeader = forwardRef((props, ref) => {
 
             <div className="pt-2.5 px-3.5 mb-1">
                 <div className="input">
-                    <KeenIcon icon="magnifier" />
+                    <KeenIcon icon="magnifier" style="outline" />
                     <input
                         placeholder="Busca"
                         type="text"

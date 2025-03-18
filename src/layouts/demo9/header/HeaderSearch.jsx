@@ -5,7 +5,7 @@ const HeaderSearch = () => {
     }
     return (
         <div className="input input-sm w-[36px] lg:w-60">
-            <KeenIcon icon="magnifier" />
+            <KeenIcon icon="magnifier" style="outline" />
             <input
                 placeholder="Busca"
                 type="text"

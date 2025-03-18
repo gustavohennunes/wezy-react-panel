@@ -83,7 +83,7 @@ const DataRowActionsMenu = ({ row }) => {
 
                 <MenuSub
                     className="menu-default"
-                    rootClassName="w-full max-w-[175px]"
+                    rootClassName="w-full max-w-[250px]"
                 >
                     {Array.isArray(row.content) && row.content.length > 0 ? (
                         row.content.map((item, index) => {

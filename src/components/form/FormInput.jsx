@@ -172,7 +172,9 @@ const FormInput = ({
                 <div className={fieldData.class + ' text-[13px]'}>
                     <span
                         style={{ display: 'contents' }}
-                        dangerouslySetInnerHTML={{ __html: fieldData.extra_html }}
+                        dangerouslySetInnerHTML={{
+                            __html: fieldData.extra_html,
+                        }}
                     ></span>
                 </div>
             )

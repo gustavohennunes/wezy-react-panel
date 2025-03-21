@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react'
-import { useNavigate } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom'
 import qs from 'qs'
 import { FormSection } from './'
 import { FormTabs } from './'
@@ -16,7 +16,7 @@ const FormContext = ({ data }) => {
     const acao = params.get('acao')
     const { callApi } = usePageData()
     const { auth, logout } = useAuth()
-    const navigate = useNavigate();
+    const navigate = useNavigate()
 
     useEffect(() => {
         if (data?.form?.fields) {

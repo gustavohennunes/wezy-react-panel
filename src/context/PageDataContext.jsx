@@ -37,7 +37,7 @@ export const PageDataProvider = ({ children }) => {
 
     useEffect(() => {
         const urlApi = buildApiUrl(searchParams)
-        if(urlApi === false || urlApi === '/panel/module?slug=dashboard'){
+        if (urlApi === false || urlApi === '/panel/module?slug=dashboard') {
             let pageData = {
                 layout: 'dashboard',
             }

@@ -2,7 +2,6 @@ import React from 'react'
 import { Tabs } from '@/components/custom/tabs/tabs'
 
 export const FormTabs = ({ tabs }) => {
-
     return (
         <div className="w-f mx-1">
             {tabs?.before && Array.isArray(tabs?.before) ? (

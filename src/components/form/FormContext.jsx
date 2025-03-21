@@ -87,8 +87,9 @@ const FormContext = ({ data }) => {
             })
         } catch (error) {
             console.log(error)
-            toast(`Erro ao carregar dados.`, {
-                description: response?.success?.response?.data?.message,
+            console.log(response)
+            toast(`❌ Erro: `, {
+                description: error.response?.data?.error?.message || error.message,
             })
             if (error.status == 401) {
                 logout()

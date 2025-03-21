@@ -8,6 +8,7 @@ import {
 import { useSearchParams } from 'react-router-dom'
 import { api } from '@/services/api'
 import { buildApiUrl } from '@/utils/urlHelper'
+import { toast } from 'sonner'
 
 const PageDataContext = createContext()
 
@@ -29,7 +30,14 @@ export const PageDataProvider = ({ children }) => {
 
             setPageData(response.data.success.response.data)
         } catch (err) {
+            console.error('❌ Erro ao carregar dados da página:', err)
+            toast(`❌ Erro: `, {
+                description: response?.error?.message,
+            })
             setError(err)
+            if (error.status == 401) {
+                logout()
+            }
         } finally {
             setLoading(false)
         }

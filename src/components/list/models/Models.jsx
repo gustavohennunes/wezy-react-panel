@@ -80,6 +80,10 @@ const Models = ({ model, columnHeader, btnAdd, search, btnExcluir, pagination, t
                 new URLSearchParams(e.view.location.search)
             )
 
+            if(urlRefresh === false){
+                return;
+            }
+            
             callApi(urlRefresh)
 
             toast(`Sucesso`, {
@@ -322,7 +326,10 @@ const Models = ({ model, columnHeader, btnAdd, search, btnExcluir, pagination, t
                                         type="submit"
                                         className="btn btn-primary btn-sm ml-1"
                                     >
-                                        <KeenIcon icon="magnifier" />
+                                        <KeenIcon 
+                                            icon="magnifier"
+                                            className="!text-sm"
+                                         />
                                     </button>
 
                                 </form>

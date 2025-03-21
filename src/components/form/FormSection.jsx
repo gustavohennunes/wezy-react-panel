@@ -95,6 +95,7 @@ const FormSection = ({ data, index, button, form }) => {
                         case 'Arq':
                         case 'Fto':
                         case 'Din':
+                        case 'aut':
                         case 'Cor':
                             
                             return (
@@ -237,10 +238,13 @@ const FormSection = ({ data, index, button, form }) => {
 
                             return (
                                 <div key={`${fieldName}-${idx}`} className="w-full">
+
                                     <div className="flex items-baseline flex-wrap lg:flex-nowrap gap-2.5">
+
                                         <label className="form-label flex items-center gap-1 max-w-56">
                                             {fieldData.title || title}
                                         </label>
+
                                         <Popover key={`${fieldName}-${idx}`}>
                                             <PopoverTrigger asChild>
                                                 <button
@@ -288,13 +292,12 @@ const FormSection = ({ data, index, button, form }) => {
                         break;
                         case 'Tab':
                         case 'Mul':
-                        case 'Aut':
                         default:
                             return null
                     }
                 })}
 
-                {button && (
+                {button && form.submit_button && (
                     <div className="flex justify-start">
                         <button type="submit" className="btn btn-success">
                             {form.submit_button}

@@ -42,53 +42,57 @@ const signupSchema = Yup.object().shape({
         .required('Campo obrigatório')
         .oneOf(
             [Yup.ref('password')],
-            "Senha e confirmação de senha não conferem"
+            'Senha e confirmação de senha não conferem'
         ),
-    acceptTerms: Yup.bool()
-        .oneOf([true], 'Você precisa aceitar os termos de uso'),
+    acceptTerms: Yup.bool().oneOf(
+        [true],
+        'Você precisa aceitar os termos de uso'
+    ),
 })
 
 const Signup = () => {
-
-    const [loading, setLoading]                         = useState(false)
-    const { register }                                  = useAuthContext()
-    const navigate                                      = useNavigate()
-    const location                                      = useLocation()
-    const from                                          = location.state?.from?.pathname || '/'
-    const [showPassword, setShowPassword]               = useState(false)
+    const [loading, setLoading] = useState(false)
+    const { register } = useAuthContext()
+    const navigate = useNavigate()
+    const location = useLocation()
+    const from = location.state?.from?.pathname || '/'
+    const [showPassword, setShowPassword] = useState(false)
     const [showConfirmPassword, setShowConfirmPassword] = useState(false)
-    const { currentLayout }                             = useLayout()
+    const { currentLayout } = useLayout()
 
     const formik = useFormik({
         initialValues,
         validationSchema: signupSchema,
         onSubmit: async (values, { setStatus, setSubmitting }) => {
-
-            setLoading(true);
+            setLoading(true)
 
             try {
-
                 if (!register) {
-                    throw new Error('Não foi possível concluir a operação. Tente novamente.')
+                    throw new Error(
+                        'Não foi possível concluir a operação. Tente novamente.'
+                    )
                 }
-                
-                await register(values.name, values.email, values.phone, values.password, values.changepassword, values.acceptTerms);
-                
+
+                await register(
+                    values.name,
+                    values.email,
+                    values.phone,
+                    values.password,
+                    values.changepassword,
+                    values.acceptTerms
+                )
+
                 navigate(from, {
                     replace: true,
-                });
-
+                })
             } catch (error) {
+                setStatus(error.message)
 
-                setStatus(error.message);
+                setSubmitting(false)
 
-                setSubmitting(false);
-
-                setLoading(false);
-
+                setLoading(false)
             }
-
-        }
+        },
     })
 
     const togglePassword = (event) => {
@@ -102,20 +106,27 @@ const Signup = () => {
     }
 
     return (
-
         <div className="card max-w-[370px] w-full">
-
             <form
                 className="card-body flex flex-col gap-5 p-10"
                 noValidate
                 onSubmit={formik.handleSubmit}
             >
-
                 <div className="text-center mb-2.5">
-
                     <div className="flex gap-3 mb-2.5 items-center">
-                        <img src="https://files.caymanweb.com.br/f7e00f1f7c8e403b99f72159635a3f34/dfca77e57617844b2a0d41057e7b884a/logo-vymber.svg" className="dark:hidden" style={{width: '135px'}} />
-                        <img src="https://files.caymanweb.com.br/f7e00f1f7c8e403b99f72159635a3f34/dfca77e57617844b2a0d41057e7b884a/logo-vymber.svg" className="hidden dark:block" style={{filter: "brightness(100)", width: '135px'}} />
+                        <img
+                            src="https://files.caymanweb.com.br/f7e00f1f7c8e403b99f72159635a3f34/dfca77e57617844b2a0d41057e7b884a/logo-vymber.svg"
+                            className="dark:hidden"
+                            style={{ width: '135px' }}
+                        />
+                        <img
+                            src="https://files.caymanweb.com.br/f7e00f1f7c8e403b99f72159635a3f34/dfca77e57617844b2a0d41057e7b884a/logo-vymber.svg"
+                            className="hidden dark:block"
+                            style={{
+                                filter: 'brightness(100)',
+                                width: '135px',
+                            }}
+                        />
                         <div className="text-2sm text-gray-600 leading-none flex items-center font-medium">
                             |
                         </div>
@@ -123,19 +134,15 @@ const Signup = () => {
                             Revenda
                         </div>
                     </div>
-
                 </div>
-                
-                <h3 className="text-left font-semibold">
-                    Efetuar cadastro
-                </h3>
+
+                <h3 className="text-left font-semibold">Efetuar cadastro</h3>
 
                 {formik.status && (
                     <Alert variant="danger">{formik.status}</Alert>
                 )}
 
                 <div className="flex flex-col gap-1">
-
                     <label className="form-label text-gray-900 gap-[2px]">
                         Nome <span className="text-danger">*</span>
                     </label>
@@ -149,9 +156,14 @@ const Signup = () => {
                             className={clsx(
                                 'form-control bg-transparent',
                                 {
-                                    'is-invalid': formik.touched.name && formik.errors.name,
-                                }, {
-                                    'is-valid': formik.touched.name && !formik.errors.name,
+                                    'is-invalid':
+                                        formik.touched.name &&
+                                        formik.errors.name,
+                                },
+                                {
+                                    'is-valid':
+                                        formik.touched.name &&
+                                        !formik.errors.name,
                                 }
                             )}
                         />
@@ -162,11 +174,9 @@ const Signup = () => {
                             {formik.errors.name}
                         </span>
                     )}
-
                 </div>
 
                 <div className="flex flex-col gap-1">
-
                     <label className="form-label text-gray-900 gap-[2px]">
                         E-mail <span className="text-danger">*</span>
                     </label>
@@ -180,9 +190,14 @@ const Signup = () => {
                             className={clsx(
                                 'form-control bg-transparent',
                                 {
-                                    'is-invalid': formik.touched.email && formik.errors.email,
-                                }, {
-                                    'is-valid': formik.touched.email && !formik.errors.email,
+                                    'is-invalid':
+                                        formik.touched.email &&
+                                        formik.errors.email,
+                                },
+                                {
+                                    'is-valid':
+                                        formik.touched.email &&
+                                        !formik.errors.email,
                                 }
                             )}
                         />
@@ -193,13 +208,12 @@ const Signup = () => {
                             {formik.errors.email}
                         </span>
                     )}
-
                 </div>
 
                 <div className="flex flex-col gap-1">
-
                     <label className="form-label text-gray-900 gap-[2px]">
-                        Telefone (Whatsapp) <span className="text-danger">*</span>
+                        Telefone (Whatsapp){' '}
+                        <span className="text-danger">*</span>
                     </label>
 
                     <label className="input">
@@ -212,9 +226,14 @@ const Signup = () => {
                             className={clsx(
                                 'form-control bg-transparent',
                                 {
-                                    'is-invalid': formik.touched.phone && formik.errors.phone,
-                                }, {
-                                    'is-valid': formik.touched.phone && !formik.errors.phone,
+                                    'is-invalid':
+                                        formik.touched.phone &&
+                                        formik.errors.phone,
+                                },
+                                {
+                                    'is-valid':
+                                        formik.touched.phone &&
+                                        !formik.errors.phone,
                                 }
                             )}
                         />
@@ -225,11 +244,9 @@ const Signup = () => {
                             {formik.errors.phone}
                         </span>
                     )}
-
                 </div>
 
                 <div className="flex flex-col gap-1">
-
                     <label className="form-label text-gray-900 gap-[2px]">
                         Senha <span className="text-danger">*</span>
                     </label>
@@ -280,9 +297,9 @@ const Signup = () => {
                 </div>
 
                 <div className="flex flex-col gap-1">
-
                     <label className="form-label text-gray-900 gap-[2px]">
-                        Repetição de senha <span className="text-danger">*</span>
+                        Repetição de senha{' '}
+                        <span className="text-danger">*</span>
                     </label>
 
                     <label className="input">
@@ -309,7 +326,6 @@ const Signup = () => {
                             className="btn btn-icon"
                             onClick={toggleConfirmPassword}
                         >
-
                             <KeenIcon
                                 icon="eye"
                                 className={clsx('text-gray-500', {
@@ -322,48 +338,45 @@ const Signup = () => {
                                     hidden: !showConfirmPassword,
                                 })}
                             />
-
                         </button>
-
                     </label>
 
-                    {formik.touched.changepassword && formik.errors.changepassword && (
-                        <span
-                            role="alert"
-                            className="text-danger text-xs mt-1"
-                        >
-                            {formik.errors.changepassword}
-                        </span>
-                    )}
-
+                    {formik.touched.changepassword &&
+                        formik.errors.changepassword && (
+                            <span
+                                role="alert"
+                                className="text-danger text-xs mt-1"
+                            >
+                                {formik.errors.changepassword}
+                            </span>
+                        )}
                 </div>
 
                 <label className="checkbox-group flex-col align-start">
-
                     <div className="flex gap-2.5">
-                        
                         <input
                             className="checkbox checkbox-sm"
                             type="checkbox"
                             {...formik.getFieldProps('acceptTerms')}
                         />
                         <span className="checkbox-label">
-                            Eu aceito os {' '}
+                            Eu aceito os{' '}
                             <Link to="#" className="text-2sm link">
                                 Termos de uso
                             </Link>
                         </span>
-
                     </div>
 
-                    {formik.touched.acceptTerms && formik.errors.acceptTerms && (
-                        <span role="alert" className="text-danger text-xs mt-1">
-                            {formik.errors.acceptTerms}
-                        </span>
-                    )}
-
+                    {formik.touched.acceptTerms &&
+                        formik.errors.acceptTerms && (
+                            <span
+                                role="alert"
+                                className="text-danger text-xs mt-1"
+                            >
+                                {formik.errors.acceptTerms}
+                            </span>
+                        )}
                 </label>
-
 
                 <button
                     type="submit"
@@ -374,25 +387,16 @@ const Signup = () => {
                 </button>
 
                 <div className="flex items-center justify-start font-medium">
-
                     <span className="text-2sm text-gray-600 me-1.5">
                         Já possuí uma conta?
                     </span>
-                    <Link
-                        to="/auth/login"
-                        className="text-2sm link"
-                    >
+                    <Link to="/auth/login" className="text-2sm link">
                         Efetue login
                     </Link>
-
                 </div>
-
             </form>
-
         </div>
-
-    );
-
+    )
 }
 
 export { Signup }

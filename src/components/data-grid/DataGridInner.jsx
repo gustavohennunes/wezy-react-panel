@@ -7,7 +7,6 @@ import {
 } from '.'
 
 const DataGridInner = () => {
-
     const { props, table, loading } = useDataGrid()
 
     return (
@@ -40,7 +39,6 @@ const DataGridInner = () => {
             {table.getRowModel().rows.length > 0 && <DataGridPagination />}
         </div>
     )
-
 }
 
 export { DataGridInner }

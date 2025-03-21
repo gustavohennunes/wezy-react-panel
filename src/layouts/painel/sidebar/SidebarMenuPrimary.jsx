@@ -1,35 +1,37 @@
 import clsx from 'clsx'
 import { KeenIcon } from '@/components/keenicons'
-import { Menu, MenuArrow, MenuIcon, MenuItem, MenuLink, MenuSub, MenuTitle } from '@/components/menu'
+import {
+    Menu,
+    MenuArrow,
+    MenuIcon,
+    MenuItem,
+    MenuLink,
+    MenuSub,
+    MenuTitle,
+} from '@/components/menu'
 import { useMenus } from '@/providers'
 import { transformOldIcon } from '@/lib/transformOldIcon'
 
 const SidebarMenuPrimary = () => {
-
     const subIndetion = ['ps-7', 'ps-2.5', 'ps-2.5']
 
     const buildMenu = (items) => {
-        
         return items.map((item, index) => {
-
             if (!item.heading && !item.disabled && item.title != 'Dashboards') {
                 return buildMenuItemRoot(item, index, 0)
             }
-
-        });
-
+        })
     }
 
     const buildMenuItemRoot = (item, index, level) => {
-        
-        var icon = transformOldIcon(item.icon);
+        var icon = transformOldIcon(item.icon)
 
         if (item.children) {
             return (
                 <MenuItem key={index} toggle="accordion" trigger="click">
                     <MenuLink className="gap-2.5 py-2 px-2.5 rounded-md border border-transparent">
                         <MenuIcon className="items-start text-gray-600 text-lg menu-item-here:text-gray-800 menu-item-show:text-gray-800 menu-link-hover:text-gray-800 dark:menu-item-here:text-gray-900 dark:menu-item-show:text-gray-900 dark:menu-link-hover:text-gray-900">
-                            <KeenIcon icon={icon.icon} style={icon.type}  />
+                            <KeenIcon icon={icon.icon} style={icon.type} />
                         </MenuIcon>
                         <MenuTitle className="font-medium text-sm text-gray-800 menu-item-here:text-gray-900 menu-item-show:text-gray-900 menu-link-hover:text-gray-900">
                             {item.title}
@@ -46,9 +48,7 @@ const SidebarMenuPrimary = () => {
                     </MenuSub>
                 </MenuItem>
             )
-
         } else {
-
             return (
                 <MenuItem key={index}>
                     <MenuLink
@@ -66,29 +66,21 @@ const SidebarMenuPrimary = () => {
                         </MenuTitle>
                     </MenuLink>
                 </MenuItem>
-            );
-
+            )
         }
-
     }
 
     const buildMenuItemChildren = (items, index, level = 0) => {
-       
         return items.map((item, index) => {
-
             if (!item.disabled) {
                 return buildMenuItemChild(item, index, level)
             }
-
         })
-
     }
 
     const buildMenuItemChild = (item, index, level = 0) => {
-
         var icon = transformOldIcon(item.icon)
         if (item.children) {
-
             return (
                 <MenuItem
                     key={index}
@@ -131,9 +123,7 @@ const SidebarMenuPrimary = () => {
                     </MenuSub>
                 </MenuItem>
             )
-
         } else {
-
             return (
                 <MenuItem key={index}>
                     <MenuLink
@@ -149,13 +139,10 @@ const SidebarMenuPrimary = () => {
                     </MenuLink>
                 </MenuItem>
             )
-
         }
-
     }
 
     const buildMenuArrow = () => {
-
         return (
             <MenuArrow className="text-gray-600 menu-item-here:text-gray-800 menu-item-show:text-gray-800 menu-link-hover:text-gray-800">
                 <KeenIcon
@@ -168,7 +155,6 @@ const SidebarMenuPrimary = () => {
                 />
             </MenuArrow>
         )
-
     }
 
     const { getMenuConfig } = useMenus()
@@ -184,7 +170,6 @@ const SidebarMenuPrimary = () => {
             {menuConfig && buildMenu(menuConfig)}
         </Menu>
     )
-
 }
 
 export { SidebarMenuPrimary }

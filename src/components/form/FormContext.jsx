@@ -1,6 +1,8 @@
 import { useState, useEffect } from 'react'
-import qs from 'qs';
+import { useNavigate } from 'react-router-dom';
+import qs from 'qs'
 import { FormSection } from './'
+import { FormTabs } from './'
 import { ScreenLoader } from '@/components/loaders'
 import { api } from '@/services/api'
 import { toast } from 'sonner'
@@ -14,64 +16,15 @@ const FormContext = ({ data }) => {
     const acao = params.get('acao')
     const { callApi } = usePageData()
     const { auth, logout } = useAuth()
-
-    /* useEffect(() => {
-        if (data?.form?.fields) {
-            const fields = data.form.fields;
-            const groupedSections = [];
-            let currentSection = null;
-    
-            fields.forEach((field) => {
-                if (field.type === 'Cab') {
-                    if (currentSection) {
-                        groupedSections.push(currentSection);
-                    }
-                    currentSection = {
-                        title: field.field.value.title,
-                        number: field.field.value.number,
-                        fields: [],
-                    };
-                } else if (currentSection) {
-                    currentSection.fields.push(field);
-                }
-            });
-    
-            if (currentSection) {
-                groupedSections.push(currentSection);
-            }
-    
-            // Atualizar sections com initialValues
-            const updatedSections = groupedSections.map((section) => {
-                const updatedFields = section.fields.map((field) => {
-                    const fieldName = field.field?.name || field.name;
-                    const fieldValue = field.field?.value;
-                    if (fieldValue !== undefined && fieldValue !== null) {
-                        return {
-                            ...field,
-                            initialValue: {
-                                [fieldName]: fieldValue, 
-                            },
-                        };
-                    }
-                    return field;
-                });
-                return { ...section, fields: updatedFields };
-            });
-
-            setSections(updatedSections);
-        }
-    }, [data]); */
+    const navigate = useNavigate();
 
     useEffect(() => {
-
         if (data?.form?.fields) {
-
             const fields = data.form.fields
             const groupedSections = []
             let currentSection = null
 
             fields.forEach((field) => {
-
                 if (field.type === 'Cab') {
                     if (currentSection) {
                         groupedSections.push(currentSection)
@@ -84,18 +37,14 @@ const FormContext = ({ data }) => {
                 } else if (currentSection) {
                     currentSection.fields.push(field)
                 }
-
             })
 
-            // ADICIONA A ÚLTIMA SEÇÃO AO ARRAY
             if (currentSection) {
                 groupedSections.push(currentSection)
             }
 
             setSections(groupedSections)
-
         }
-        
     }, [data])
 
     if (!sections.length) {
@@ -107,19 +56,23 @@ const FormContext = ({ data }) => {
         let response = ''
         const form = e.target
         const formData = new FormData(form)
-        const formDataObject = {};
+        const formDataObject = {}
         formData.forEach((value, key) => {
-            formDataObject[key] = value;
-        });
+            formDataObject[key] = value
+        })
 
         try {
             const urlFormulario = window.location.search
 
-            response = await api.post(buildApiUrl(urlFormulario), qs.stringify(formDataObject), {
-                headers: {
-                    'Content-Type': 'application/x-www-form-urlencoded',
-                },
-            })
+            response = await api.post(
+                buildApiUrl(urlFormulario),
+                qs.stringify(formDataObject),
+                {
+                    headers: {
+                        'Content-Type': 'application/x-www-form-urlencoded',
+                    },
+                }
+            )
             console.log('Resposta da API:', response)
 
             const slug = params.get('slug') ?? params.get('pag')
@@ -127,24 +80,27 @@ const FormContext = ({ data }) => {
             params.delete('id')
             const urlRefresh = buildApiUrl(params)
 
-            /* callApi(urlRefresh)
+            callApi(urlRefresh)
 
             toast(`Sucesso`, {
                 description: response?.success?.response?.data?.message,
-            }) */
+            })
         } catch (error) {
             console.log(error)
             toast(`Erro ao carregar dados.`, {
                 description: response?.success?.response?.data?.message,
             })
-            if(error.status == 401){
+            if (error.status == 401) {
                 logout()
             }
         }
     }
 
+    console.log(data)
+
     return (
         <div className="grid gap-5 lg:gap-7.5 mx-auto">
+            {data.tabs && <FormTabs tabs={data.tabs} />}
             <form
                 encType="application/x-www-form-urlencoded"
                 onSubmit={submitForm}
@@ -182,6 +138,9 @@ const FormContext = ({ data }) => {
                     />
                 ))}
             </form>
+            <button type="button" onClick={() => navigate(-1)}>
+                Voltar
+            </button>
         </div>
     )
 }

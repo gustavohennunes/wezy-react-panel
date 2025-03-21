@@ -24,14 +24,13 @@ const DataRowActionsMenu = ({ row }) => {
         let response = ''
         const data = {
             items: [itemId],
-        };
+        }
 
         const params = new URLSearchParams(window.location.search)
         const slug = params.get('slug') ?? params.get('pag')
         const urlExcluir = `?slug=${slug}&acao=remove-items`
-        
-        try {
 
+        try {
             response = await api.post(
                 buildApiUrl(urlExcluir),
                 qs.stringify(data),
@@ -51,16 +50,12 @@ const DataRowActionsMenu = ({ row }) => {
             toast(`Sucesso`, {
                 description: response?.success?.response?.data?.message,
             })
-            
         } catch (err) {
-            
             console.log(err)
             toast(`Error atualizar`, {
                 description: `❌ Erro ao excluir item.`,
             })
-
         }
-
     }
 
     return (

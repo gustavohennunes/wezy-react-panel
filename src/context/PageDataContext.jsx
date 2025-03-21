@@ -1,64 +1,61 @@
-    import { createContext, useContext, useEffect, useState, useCallback } from 'react'
-    import { useSearchParams } from 'react-router-dom'
-    import { api } from '@/services/api'
-    import { buildApiUrl } from '@/utils/urlHelper'
+import {
+    createContext,
+    useContext,
+    useEffect,
+    useState,
+    useCallback,
+} from 'react'
+import { useSearchParams } from 'react-router-dom'
+import { api } from '@/services/api'
+import { buildApiUrl } from '@/utils/urlHelper'
 
-    const PageDataContext = createContext()
+const PageDataContext = createContext()
 
-    export const PageDataProvider = ({ children }) => {
-        
-        const [pageData, setPageData] = useState(null)
-        const [loading, setLoading]   = useState(true)
-        const [error, setError]       = useState(null)
-        const [searchParams]          = useSearchParams()
-        const [lastUrl, setLastUrl]   = useState(null)
+export const PageDataProvider = ({ children }) => {
+    const [pageData, setPageData] = useState(null)
+    const [loading, setLoading] = useState(true)
+    const [error, setError] = useState(null)
+    const [searchParams] = useSearchParams()
+    const [lastUrl, setLastUrl] = useState(null)
 
-        const callApi = useCallback(async (urlApi) => {
-            
-            if (urlApi === lastUrl) return
-            
-            setLoading(true)
-            setLastUrl(urlApi)
+    const callApi = useCallback(async (urlApi) => {
+        if (urlApi === lastUrl) return
 
-            try {
-                
-                const response = await api.get(urlApi)
-                
-                setPageData(response.data.success.response.data);
+        setLoading(true)
+        setLastUrl(urlApi)
 
-            } catch (err) {
-                setError(err)
-            } finally {
-                setLoading(false)
+        try {
+            const response = await api.get(urlApi)
+
+            setPageData(response.data.success.response.data)
+        } catch (err) {
+            setError(err)
+        } finally {
+            setLoading(false)
+        }
+    }, [])
+
+    useEffect(() => {
+        const urlApi = buildApiUrl(searchParams)
+        if (urlApi === false) {
+            let pageData = {
+                layout: 'dashboard',
             }
 
-        }, [])
+            setPageData(pageData)
+            setLoading(false)
 
-        useEffect(() => {
-            
-            const urlApi = buildApiUrl(searchParams)
-            if(urlApi === false){
-                
-                let pageData = {
-                    'layout': 'dashboard',
-                };
+            return
+        }
 
-                setPageData(pageData);
-                setLoading(false);
-                
-                return
+        callApi(urlApi)
+    }, [searchParams])
 
-            }
-            
-            callApi(urlApi)
+    return (
+        <PageDataContext.Provider value={{ pageData, loading, error, callApi }}>
+            {children}
+        </PageDataContext.Provider>
+    )
+}
 
-        }, [searchParams])
-
-        return (
-            <PageDataContext.Provider value={{ pageData, loading, error, callApi }}>
-                {children}
-            </PageDataContext.Provider>
-        )
-    }
-
-    export const usePageData = () => useContext(PageDataContext)
+export const usePageData = () => useContext(PageDataContext)

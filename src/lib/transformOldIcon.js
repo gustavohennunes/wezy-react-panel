@@ -148,35 +148,34 @@ export const transformOldIcon = (iconString) => {
         '7/20': 'scan-barcode-outline',
     }
 
-    iconString = iconString.replace(/figura-(black|white)\s*/i, '');
+    iconString = iconString.replace(/figura-(black|white)\s*/i, '')
 
-    const colMatch = iconString.match(/c(\d+)/i);
-    const rowMatch = iconString.match(/l(\d+)/i);
+    const colMatch = iconString.match(/c(\d+)/i)
+    const rowMatch = iconString.match(/l(\d+)/i)
 
     if (!colMatch || !rowMatch) {
-        return { icon: 'html', type: 'outline' };
+        return { icon: 'html', type: 'outline' }
     }
 
-    const col = colMatch[1];
-    const row = rowMatch[1];
-    const key = `${row}/${col}`;
+    const col = colMatch[1]
+    const row = rowMatch[1]
+    const key = `${row}/${col}`
 
     const mappedIcon = iconMap[key] || ''
 
     if (!mappedIcon) return { icon: 'html', type: 'outline' }
 
-    var iconName, type;
-    if(mappedIcon.substr(-7) === 'outline') {
-        iconName = mappedIcon.slice(0, -8);
-        type     = 'outline';
-    } else if(mappedIcon.substr(-7) === 'duotone') {
-        iconName = mappedIcon.slice(0, -8);
-        type     = 'duotone';
+    var iconName, type
+    if (mappedIcon.substr(-7) === 'outline') {
+        iconName = mappedIcon.slice(0, -8)
+        type = 'outline'
+    } else if (mappedIcon.substr(-7) === 'duotone') {
+        iconName = mappedIcon.slice(0, -8)
+        type = 'duotone'
     } else {
-        iconName = mappedIcon.slice(0, -6);
-        type     = 'solid';
+        iconName = mappedIcon.slice(0, -6)
+        type = 'solid'
     }
 
     return { icon: iconName, type: type || 'outline' }
-
 }

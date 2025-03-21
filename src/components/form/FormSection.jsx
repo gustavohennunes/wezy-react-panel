@@ -11,66 +11,54 @@ import { format } from 'date-fns'
 import { cn } from '@/lib/utils'
 
 const FormSection = ({ data, index, button, form }) => {
-
-    const initialFormState = {};
+    const initialFormState = {}
     data.fields.forEach((field) => {
-
-        const fieldName = field.field?.name || field.name;
-        initialFormState[fieldName] = field.field?.value || '';
+        const fieldName = field.field?.name || field.name
+        initialFormState[fieldName] = field.field?.value || ''
 
         if (field.type === 'Dta') {
-
-            const dateValue = field.field?.value;
+            const dateValue = field.field?.value
             if (dateValue && dateValue !== '00/00/0000') {
-               
-                const parsedDate = new Date(dateValue);
+                const parsedDate = new Date(dateValue)
                 if (!isNaN(parsedDate)) {
-                    initialFormState[fieldName] = parsedDate;
+                    initialFormState[fieldName] = parsedDate
                 } else {
-                    initialFormState[fieldName] = new Date();
+                    initialFormState[fieldName] = new Date()
                 }
-
             } else {
-                initialFormState[fieldName] = new Date();
+                initialFormState[fieldName] = new Date()
             }
-
         }
 
         if (field.type === 'Cor') {
-            initialFormState[fieldName] = initialFormState[fieldName] || "#aabbcc";
+            initialFormState[fieldName] =
+                initialFormState[fieldName] || '#aabbcc'
         }
-
-    });
+    })
 
     const [formState, setFormState] = useState(initialFormState)
 
     const handleInputChange = (name, value) => {
-
-        setFormState((prev) => ({
-            ...prev,
-            [name]: value,
-        }));
-
-    }
-    
-    const handleSelectChange = (name, value) => {
-
         setFormState((prev) => ({
             ...prev,
             [name]: value,
         }))
-        
+    }
+
+    const handleSelectChange = (name, value) => {
+        setFormState((prev) => ({
+            ...prev,
+            [name]: value,
+        }))
     }
 
     const handleDateChange = (name, date) => {
-
         setFormState((prev) => ({
             ...prev,
             [name]: date,
-        }));
+        }))
+    }
 
-    };
-    
     return (
         <div className="card pb-2.5 mb-6">
             <div className="card-header justify-start" id="general_settings">
@@ -79,8 +67,15 @@ const FormSection = ({ data, index, button, form }) => {
             </div>
             <div className="card-body grid gap-5">
                 {data.fields.map((field, idx) => {
-
-                    const { type, title, subtitle, field: fieldData, required, name, fieldClass } = field
+                    const {
+                        type,
+                        title,
+                        subtitle,
+                        field: fieldData,
+                        required,
+                        name,
+                        fieldClass,
+                    } = field
                     const fieldName = fieldData?.name || name
 
                     if (!fieldData) return null
@@ -97,7 +92,6 @@ const FormSection = ({ data, index, button, form }) => {
                         case 'Din':
                         case 'aut':
                         case 'Cor':
-                            
                             return (
                                 <FormInput
                                     key={`${fieldName}-${idx}`}
@@ -111,10 +105,9 @@ const FormSection = ({ data, index, button, form }) => {
                                     required={required}
                                     handleInputChange={handleInputChange}
                                 />
-                            );
+                            )
 
                         case 'Rdo':
-
                             return (
                                 <div
                                     key={`${fieldName}-${idx}`}
@@ -122,15 +115,22 @@ const FormSection = ({ data, index, button, form }) => {
                                 >
                                     <div className="form-label max-w-56">
                                         <b>
-                                            {title} 
-                                            {
-                                                fieldClass !== undefined &&
-                                                fieldClass.indexOf('obg') !== -1 && (
-                                                    <span className="text-danger"> *</span>
-                                                )
-                                            }
+                                            {title}
+                                            {fieldClass !== undefined &&
+                                                fieldClass.indexOf('obg') !==
+                                                    -1 && (
+                                                    <span className="text-danger">
+                                                        {' '}
+                                                        *
+                                                    </span>
+                                                )}
                                         </b>
-                                        {subtitle && <span className="text-[10px]"> {subtitle} </span>}
+                                        {subtitle && (
+                                            <span className="text-[10px]">
+                                                {' '}
+                                                {subtitle}{' '}
+                                            </span>
+                                        )}
                                     </div>
                                     <div className="flex flex-col gap-3.5">
                                         {fieldData.map((item, index) => (
@@ -167,62 +167,72 @@ const FormSection = ({ data, index, button, form }) => {
                                         ))}
                                     </div>
                                 </div>
-                            );
+                            )
 
                         case 'Ckb':
-
                             return (
                                 <div
                                     key={`${fieldName}-${idx}`}
                                     className="flex items-center flex-wrap lg:flex-nowrap gap-2.5"
                                 >
-
                                     <div className="form-label max-w-56">
                                         <b>
-                                            {title} 
-                                            {
-                                                fieldClass !== undefined && 
-                                                fieldClass.indexOf('obg') !== -1 && (
-                                                    <span className="text-danger"> *</span>
-                                                )
-                                            }
+                                            {title}
+                                            {fieldClass !== undefined &&
+                                                fieldClass.indexOf('obg') !==
+                                                    -1 && (
+                                                    <span className="text-danger">
+                                                        {' '}
+                                                        *
+                                                    </span>
+                                                )}
                                         </b>
-                                        {subtitle && <span className="text-[10px]"> {subtitle} </span>}
+                                        {subtitle && (
+                                            <span className="text-[10px]">
+                                                {' '}
+                                                {subtitle}{' '}
+                                            </span>
+                                        )}
                                     </div>
 
                                     {fieldData.map((item, index) => (
-                                        <div key={`${fieldName}-${index}-${idx}`} className="flex">
-                                            
+                                        <div
+                                            key={`${fieldName}-${index}-${idx}`}
+                                            className="flex"
+                                        >
                                             <label className="form-label gap-2 items-center">
-                                                    
                                                 <input
                                                     type="checkbox"
                                                     className="checkbox"
                                                     name={fieldName}
-                                                    value={formState[fieldName] || 0}
+                                                    value={
+                                                        formState[fieldName] ||
+                                                        0
+                                                    }
                                                     checked={
-                                                        formState[fieldName] === 1
+                                                        formState[fieldName] ===
+                                                        1
                                                     }
                                                     onChange={(e) =>
                                                         handleInputChange(
                                                             fieldName,
-                                                            e.target.checked ? 1 : 0
+                                                            e.target.checked
+                                                                ? 1
+                                                                : 0
                                                         )
                                                     }
                                                 />
-                                                
-                                                {item.title}
 
+                                                {item.title}
                                             </label>
                                         </div>
                                     ))}
                                 </div>
-                            );
+                            )
 
                         case 'Qnt':
                         case 'Sel':
                         case 'Man':
-
                             return (
                                 <FormSelect
                                     key={`${fieldName}-${idx}`}
@@ -232,15 +242,15 @@ const FormSection = ({ data, index, button, form }) => {
                                     formState={formState}
                                     handleSelectChange={handleSelectChange}
                                 />
-                            );
+                            )
 
                         case 'Dta':
-
                             return (
-                                <div key={`${fieldName}-${idx}`} className="w-full">
-
+                                <div
+                                    key={`${fieldName}-${idx}`}
+                                    className="w-full"
+                                >
                                     <div className="flex items-baseline flex-wrap lg:flex-nowrap gap-2.5">
-
                                         <label className="form-label flex items-center gap-1 max-w-56">
                                             {fieldData.title || title}
                                         </label>
@@ -261,11 +271,15 @@ const FormSection = ({ data, index, button, form }) => {
                                                     />
                                                     {formState[fieldName] ? (
                                                         format(
-                                                            formState[fieldName],
+                                                            formState[
+                                                                fieldName
+                                                            ],
                                                             'dd/MM/y'
                                                         )
                                                     ) : (
-                                                        <span>Selecione uma data</span>
+                                                        <span>
+                                                            Selecione uma data
+                                                        </span>
                                                     )}
                                                 </button>
                                             </PopoverTrigger>
@@ -276,20 +290,29 @@ const FormSection = ({ data, index, button, form }) => {
                                                 <Calendar
                                                     initialFocus
                                                     mode="single"
-                                                    defaultMonth={formState[fieldName]}
-                                                    selected={formState[fieldName]}
-                                                    onSelect={(date) => handleDateChange(fieldName, date)}
+                                                    defaultMonth={
+                                                        formState[fieldName]
+                                                    }
+                                                    selected={
+                                                        formState[fieldName]
+                                                    }
+                                                    onSelect={(date) =>
+                                                        handleDateChange(
+                                                            fieldName,
+                                                            date
+                                                        )
+                                                    }
                                                     numberOfMonths={1}
                                                 />
                                             </PopoverContent>
                                         </Popover>
                                     </div>
                                 </div>
-                            );
+                            )
 
                         case 'Cod':
-                            return fieldData?.value || '-';
-                        break;
+                            return fieldData?.value || '-'
+                            break
                         case 'Tab':
                         case 'Mul':
                         default:
@@ -304,11 +327,8 @@ const FormSection = ({ data, index, button, form }) => {
                         </button>
                     </div>
                 )}
-                
             </div>
-
         </div>
-
     )
 }
 

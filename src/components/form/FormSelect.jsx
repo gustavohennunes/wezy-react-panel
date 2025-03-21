@@ -7,7 +7,13 @@ import {
 } from '@/components/ui/select'
 import { useState, useEffect } from 'react'
 
-const FormSelect = ({ field, fieldName, fieldData, formState, handleSelectChange }) => {
+const FormSelect = ({
+    field,
+    fieldName,
+    fieldData,
+    formState,
+    handleSelectChange,
+}) => {
     const [options, setOptions] = useState([])
 
     useEffect(() => {
@@ -15,12 +21,15 @@ const FormSelect = ({ field, fieldName, fieldData, formState, handleSelectChange
             const maxValue = 12
             const step = 1
             const generatedOptions = []
-            if(fieldData.options.length == 1 ){
-                generatedOptions.push({ value: 0, label: fieldData.options[0].label })
+            if (fieldData.options.length == 1) {
+                generatedOptions.push({
+                    value: 0,
+                    label: fieldData.options[0].label,
+                })
                 for (let i = 1; i <= maxValue; i += step) {
                     generatedOptions.push({ value: i, label: i })
                 }
-            } else { 
+            } else {
                 for (let i = 0; i <= maxValue; i += step) {
                     generatedOptions.push({ value: i, label: i })
                 }
@@ -50,11 +59,16 @@ const FormSelect = ({ field, fieldName, fieldData, formState, handleSelectChange
                 <SelectContent className="w-full">
                     {options.map((option, index) => {
                         const value =
-                            option.value !== undefined && option.value !== null &&  option.value !== ''
+                            option.value !== undefined &&
+                            option.value !== null &&
+                            option.value !== ''
                                 ? option.value
                                 : '-1'
                         return (
-                            <SelectItem key={`${index}-${fieldName}`} value={value}>
+                            <SelectItem
+                                key={`${index}-${fieldName}`}
+                                value={value}
+                            >
                                 {option.label}
                             </SelectItem>
                         )

@@ -3,7 +3,6 @@ import { flexRender } from '@tanstack/react-table'
 import { useDataGrid } from '.'
 import { cn } from '@/lib/utils'
 const DataGridTable = () => {
-
     const { table, props } = useDataGrid()
 
     const headCellSpacingOptions = {
@@ -20,8 +19,12 @@ const DataGridTable = () => {
         lg: 'px-[5px] !py-[6px]',
     }
 
-    const headCellSpacing = props.layout?.cellSpacing ? headCellSpacingOptions[props.layout?.cellSpacing] : headCellSpacingOptions['md']
-    const bodyCellSpacing = props.layout?.cellSpacing ? bodyCellSpacingOptions[props.layout?.cellSpacing] : bodyCellSpacingOptions['md']
+    const headCellSpacing = props.layout?.cellSpacing
+        ? headCellSpacingOptions[props.layout?.cellSpacing]
+        : headCellSpacingOptions['md']
+    const bodyCellSpacing = props.layout?.cellSpacing
+        ? bodyCellSpacingOptions[props.layout?.cellSpacing]
+        : bodyCellSpacingOptions['md']
 
     const cellBorder = props.layout?.cellBorder ?? false
 
@@ -50,7 +53,8 @@ const DataGridTable = () => {
                                     headCellSpacing,
                                     cellBorder && 'border-e',
                                     'h-12 min-w-[20px] text-left rtl:text-right align-middle font-medium text-muted-foreground [&:has([role=checkbox])]:pe-0',
-                                    header.column.columnDef.meta ?.headerClassName
+                                    header.column.columnDef.meta
+                                        ?.headerClassName
                                 )}
                             >
                                 {header.isPlaceholder
@@ -65,9 +69,7 @@ const DataGridTable = () => {
                 ))}
             </thead>
             <tbody className="[&_tr:last-child]:border-0">
-
                 {table.getRowModel().rows.length ? (
-
                     table.getRowModel().rows.map((row) => (
                         <tr
                             key={row.id}
@@ -98,16 +100,11 @@ const DataGridTable = () => {
                             ))}
                         </tr>
                     ))
-                    
                 ) : (
                     <DataGridEmpty />
                 )}
-
             </tbody>
-
         </table>
-
     )
-
 }
 export { DataGridTable }

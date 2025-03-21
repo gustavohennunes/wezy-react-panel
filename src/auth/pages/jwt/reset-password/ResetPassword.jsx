@@ -22,24 +22,23 @@ const forgotPasswordSchema = Yup.object().shape({
 })
 
 const ResetPassword = () => {
-
-    const [loading, setLoading]        = useState(false);
-    const [hasErrors, setHasErrors]    = useState(undefined);
-    const { requestPasswordResetLink } = useAuthContext();
-    const { currentLayout }            = useLayout();
-    const navigate                     = useNavigate();
+    const [loading, setLoading] = useState(false)
+    const [hasErrors, setHasErrors] = useState(undefined)
+    const { requestPasswordResetLink } = useAuthContext()
+    const { currentLayout } = useLayout()
+    const navigate = useNavigate()
 
     const formik = useFormik({
         initialValues,
         validationSchema: forgotPasswordSchema,
         onSubmit: async (values, { setStatus, setSubmitting }) => {
-
             setLoading(true)
             setHasErrors(undefined)
             try {
-
                 if (!requestPasswordResetLink) {
-                    throw new Error('Não foi possível concluir a operação. Tente novamente.')
+                    throw new Error(
+                        'Não foi possível concluir a operação. Tente novamente.'
+                    )
                 }
 
                 await requestPasswordResetLink(values.email)
@@ -53,11 +52,9 @@ const ResetPassword = () => {
 
                 navigate({
                     pathname: '/auth/reset-password/check-email',
-                    search: params.toString()
+                    search: params.toString(),
                 })
-
             } catch (error) {
-
                 if (error instanceof AxiosError && error.response) {
                     setStatus(error.response.data.message)
                 } else {
@@ -67,27 +64,32 @@ const ResetPassword = () => {
                 setHasErrors(true)
                 setLoading(false)
                 setSubmitting(false)
-
             }
-
-        }
-
+        },
     })
 
     return (
         <div className="card max-w-[370px] w-full">
-
             <form
                 className="card-body flex flex-col gap-5 p-10"
                 noValidate
                 onSubmit={formik.handleSubmit}
             >
-
                 <div className="text-center mb-2.5">
-
                     <div className="flex gap-3 mb-2.5 items-center">
-                        <img src="https://files.caymanweb.com.br/f7e00f1f7c8e403b99f72159635a3f34/dfca77e57617844b2a0d41057e7b884a/logo-vymber.svg" className="dark:hidden" style={{ width: '135px' }} />
-                        <img src="https://files.caymanweb.com.br/f7e00f1f7c8e403b99f72159635a3f34/dfca77e57617844b2a0d41057e7b884a/logo-vymber.svg" className="hidden dark:block" style={{ filter: "brightness(100)", width: '135px' }} />
+                        <img
+                            src="https://files.caymanweb.com.br/f7e00f1f7c8e403b99f72159635a3f34/dfca77e57617844b2a0d41057e7b884a/logo-vymber.svg"
+                            className="dark:hidden"
+                            style={{ width: '135px' }}
+                        />
+                        <img
+                            src="https://files.caymanweb.com.br/f7e00f1f7c8e403b99f72159635a3f34/dfca77e57617844b2a0d41057e7b884a/logo-vymber.svg"
+                            className="hidden dark:block"
+                            style={{
+                                filter: 'brightness(100)',
+                                width: '135px',
+                            }}
+                        />
                         <div className="text-2sm text-gray-600 leading-none flex items-center font-medium">
                             |
                         </div>
@@ -95,23 +97,20 @@ const ResetPassword = () => {
                             Revenda
                         </div>
                     </div>
-
                 </div>
 
-                <h3 className="text-left font-semibold">
-                    Recupere sua senha
-                </h3>
+                <h3 className="text-left font-semibold">Recupere sua senha</h3>
 
                 {hasErrors && <Alert variant="danger">{formik.status}</Alert>}
 
                 {hasErrors === false && (
                     <Alert variant="success">
-                        E-mail enviado! Confira sua caixa de e-mails para continuar.
+                        E-mail enviado! Confira sua caixa de e-mails para
+                        continuar.
                     </Alert>
                 )}
 
                 <div className="flex flex-col gap-1">
-
                     <label className="form-label text-gray-900 gap-[2px]">
                         E-mail <span className="text-danger">*</span>
                     </label>
@@ -125,10 +124,14 @@ const ResetPassword = () => {
                             className={clsx(
                                 'form-control bg-transparent',
                                 {
-                                    'is-invalid': formik.touched.email && formik.errors.email,
+                                    'is-invalid':
+                                        formik.touched.email &&
+                                        formik.errors.email,
                                 },
                                 {
-                                    'is-valid': formik.touched.email && !formik.errors.email,
+                                    'is-valid':
+                                        formik.touched.email &&
+                                        !formik.errors.email,
                                 }
                             )}
                         />
@@ -139,11 +142,9 @@ const ResetPassword = () => {
                             {formik.errors.email}
                         </span>
                     )}
-
                 </div>
 
                 <div className="flex flex-col gap-5 items-stretch">
-
                     <button
                         type="submit"
                         className="btn btn-danger flex justify-center grow mb-2.5"
@@ -159,14 +160,10 @@ const ResetPassword = () => {
                         <KeenIcon icon="black-left" />
                         Voltar para login
                     </Link>
-
                 </div>
-
             </form>
-
         </div>
     )
-
 }
 
 export { ResetPassword }

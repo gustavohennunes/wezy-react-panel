@@ -37,7 +37,7 @@
         useEffect(() => {
             
             const urlApi = buildApiUrl(searchParams)
-            if(urlApi === false){
+            if(urlApi === false || urlApi === '/panel/module?slug=dashboard'){
                 
                 let pageData = {
                     'layout': 'dashboard',

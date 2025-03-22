@@ -3,37 +3,18 @@ import { CurrencyInput } from 'react-currency-mask'
 import { FormFile } from './'
 import { FormColorPicker } from './FormColorPicker'
 
-const FormInput = ({
-    type,
-    title,
-    subtitle = '',
-    fieldName,
-    fieldClass = '',
-    fieldData,
-    formState,
-    required = false,
-    handleInputChange,
-}) => {
+const FormInput = ({ type, title, subtitle = '', combinedClass, rowAttr, fieldName, fieldClass = '', fieldData, formState, required = false, handleInputChange }) => {
+
     let inputElement
 
     const handleFilesChange = (files) => {
         setSelectedFiles(files)
         console.log('Arquivos selecionados:', files)
     }
-
-    const toValue = (value) => {
-        if (typeof value !== 'number') {
-            return ''
-        }
-
-        return value.toLocaleString('pt-BR', {
-            style: 'currency',
-            currency: 'BRL',
-        })
-    }
-
+    
     switch (type) {
         case 'Frm':
+
             inputElement = (
                 <input
                     type={fieldData.type}
@@ -47,12 +28,13 @@ const FormInput = ({
                 />
             )
 
-            break
+        break
         case 'Val':
+
             inputElement = (
                 <CurrencyInput
                     onChangeValue={(event, originalValue, maskedValue) => {
-                        console.log(event, originalValue, maskedValue)
+                        
                     }}
                     defaultValue={formState[fieldName] || 0}
                     value={formState[fieldName] || 0}
@@ -71,8 +53,9 @@ const FormInput = ({
                 />
             )
 
-            break
+        break
         case 'Psw':
+
             inputElement = (
                 <div
                     className={`input ${fieldClass} ${fieldData.class}`}
@@ -96,8 +79,9 @@ const FormInput = ({
                 </div>
             )
 
-            break
+        break
         case 'Hdn':
+
             inputElement = (
                 <input
                     type="hidden"
@@ -111,8 +95,9 @@ const FormInput = ({
                 />
             )
 
-            break
+        break
         case 'Txt':
+
             inputElement = (
                 <textarea
                     className={`input min-h-[120px] ${fieldClass} ${fieldData.class}`}
@@ -125,8 +110,9 @@ const FormInput = ({
                 />
             )
 
-            break
+        break
         case 'Lis':
+
             inputElement = (
                 <div className={fieldData.class + ' text-[13px]'}>
                     {fieldData.value}
@@ -134,8 +120,9 @@ const FormInput = ({
                 </div>
             )
 
-            break
+        break
         case 'Fto':
+
             inputElement = (
                 <FormFile
                     fieldName={fieldName}
@@ -146,8 +133,9 @@ const FormInput = ({
                 />
             )
 
-            break
+        break
         case 'Arq':
+
             inputElement = (
                 <FormFile
                     fieldName={fieldName}
@@ -158,16 +146,18 @@ const FormInput = ({
                 />
             )
 
-            break
+        break
         case 'Din':
+
             inputElement = (
                 <div className={fieldData.class + ' text-[13px]'}>
                     {fieldData.extra_html}
                 </div>
             )
 
-            break
+        break
         case 'aut':
+
             inputElement = (
                 <div className={fieldData.class + ' text-[13px]'}>
                     <span
@@ -179,8 +169,9 @@ const FormInput = ({
                 </div>
             )
 
-            break
+        break
         case 'Cor':
+
             inputElement = (
                 <FormColorPicker
                     color={formState[fieldName]}
@@ -188,10 +179,10 @@ const FormInput = ({
                 />
             )
 
-            break
+        break
         default:
             inputElement = null
-            break
+        break
     }
 
     let requiredField = false
@@ -200,7 +191,7 @@ const FormInput = ({
     }
 
     return (
-        <div className="flex items-center flex-wrap lg:flex-nowrap gap-2.5">
+        <div className={combinedClass} {...rowAttr}>
             <div className="form-label max-w-56 flex-col">
                 <label>
                     <b>

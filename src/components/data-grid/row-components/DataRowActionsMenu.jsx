@@ -21,6 +21,7 @@ const DataRowActionsMenu = ({ row }) => {
     const { callApi } = usePageData()
 
     const removeRow = async (itemId) => {
+        
         let response = ''
         const data = {
             items: [itemId],
@@ -31,6 +32,7 @@ const DataRowActionsMenu = ({ row }) => {
         const urlExcluir = `?slug=${slug}&acao=remove-items`
 
         try {
+
             response = await api.post(
                 buildApiUrl(urlExcluir),
                 qs.stringify(data),
@@ -50,12 +52,15 @@ const DataRowActionsMenu = ({ row }) => {
             toast(`Sucesso`, {
                 description: response?.success?.response?.data?.message,
             })
+
         } catch (err) {
-            console.log(err)
+            
             toast(`Error atualizar`, {
                 description: `❌ Erro ao excluir item.`,
             })
+            
         }
+
     }
 
     return (

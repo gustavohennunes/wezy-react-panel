@@ -6,10 +6,10 @@ const DataGridTable = () => {
     const { table, props } = useDataGrid()
 
     const headCellSpacingOptions = {
-        xs: '!px-[5px] !py-[6px]',
-        sm: '!px-[5px] !py-[6px]',
-        md: '!px-[5px] !py-[6px]',
-        lg: '!px-[5px] !py-[6px]',
+        xs: '!px-[5px] !py-[6px] text-[13px]',
+        sm: '!px-[5px] !py-[6px] text-[13px]',
+        md: '!px-[5px] !py-[6px] text-[13px]',
+        lg: '!px-[5px] !py-[6px] text-[13px]',
     }
 
     const bodyCellSpacingOptions = {

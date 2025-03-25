@@ -3,35 +3,10 @@ import { Link } from 'react-router-dom'
 import { KeenIcon } from '@/components'
 import { toAbsoluteUrl } from '@/utils'
 
-const Options = () => {
-    const items = [
-        {
-            title: 'Minhas rádios',
-            icon: 'user',
-            desc: 'Gerencie em instantes suas rádios da revenda Vymber.',
-            path: '/account/members/team-info',
-        },
-        {
-            title: 'Dicas e tutoriais',
-            icon: 'youtube',
-            desc: 'Confira dicas exclusivas para turbinar suas vendas.',
-            path: '/account/security/security-log',
-        },
-        {
-            title: 'Pagamentos e assinatura',
-            icon: 'two-credit-cart',
-            desc: 'Visualize suas faturas, planos e métodos de pagamento.',
-            path: '/account/billing/basic',
-        },
-        {
-            title: 'Suporte técnico',
-            icon: 'message-programming',
-            desc: 'Está enfrentando problemas? Fale com nosso time de especialistas.',
-            path: '/account/members/roles',
-        },
-    ]
-
+const Options = ({ items }) => {
+    
     const renderItem = (item, index) => {
+        
         return (
             <div
                 key={index}
@@ -55,7 +30,9 @@ const Options = () => {
 
                 <div className="flex mb-4 items-center gap-1 cursor-pointer">
                     <Link
-                        to={`${item.path}`}
+                        to={item.path.url}
+                        title={item.path.title}
+                        target={item.path.target}
                         className="btn text-primary hover:text-primary-active px-0"
                     >
                         Ver mais

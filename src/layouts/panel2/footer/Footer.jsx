@@ -11,11 +11,11 @@ const Footer = () => {
                             {currentYear}&copy;
                         </span>
                         <a
-                            href="https://keenthemes.com"
+                            href="https://www.vymber.com.br"
                             target="_blank"
                             className="text-gray-600 hover:text-primary"
                         >
-                            Wezy
+                            Vymber
                         </a>
                     </div>
                 </div>

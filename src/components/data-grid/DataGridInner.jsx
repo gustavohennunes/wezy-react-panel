@@ -14,7 +14,7 @@ const DataGridInner = () => {
             className={cn(
                 'grid',
                 props.layout?.card &&
-                    `
+                `
         card
         [&>[data-container]]:border-x-0
         [&>[data-container]]:rounded-none

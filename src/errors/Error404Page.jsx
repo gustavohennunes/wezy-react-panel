@@ -20,20 +20,20 @@ const Error404Page = () => {
             </div>
 
             <span className="badge badge-primary badge-outline mb-3">
-                404 Error
+                404
             </span>
 
             <h3 className="text-2.5xl font-semibold text-gray-900 text-center mb-2">
-                We have lost this page
+                Página não encontrada
             </h3>
 
             <div className="text-md text-center text-gray-700 mb-10">
-                The requested page is missing. Check the URL or&nbsp;
+                A página requisitada não está disponível.<br /> Verifique a URL ou &nbsp;
                 <Link
                     to="/"
                     className="text-primary font-medium hover:text-primary-active"
                 >
-                    Return Home
+                    retorne para o início
                 </Link>
                 .
             </div>

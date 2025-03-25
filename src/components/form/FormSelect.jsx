@@ -49,7 +49,7 @@
         return (
             <div className={combinedClass} {...rowAttr}>
 
-                <div className="form-label max-w-56">
+                <div className="form-label flex flex-col max-w-56">
                     <b>
                         {fieldData.title || field.title}
                         {required && (

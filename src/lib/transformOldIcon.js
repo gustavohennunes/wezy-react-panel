@@ -1,4 +1,5 @@
 export const transformOldIcon = (iconString) => {
+
     const iconMap = {
         '1/1': '',
         '1/2': '',
@@ -178,4 +179,5 @@ export const transformOldIcon = (iconString) => {
     }
 
     return { icon: iconName, type: type || 'outline' }
+
 }

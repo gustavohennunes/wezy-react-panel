@@ -4,9 +4,9 @@ import { useState } from 'react'
 import { Link, useLocation, useNavigate } from 'react-router-dom'
 import * as Yup from 'yup'
 import { useAuthContext } from '../../useAuthContext'
-import { toAbsoluteUrl } from '@/utils'
 import { Alert, KeenIcon } from '@/components'
 import { useLayout } from '@/providers'
+import { IMaskInput } from 'react-imask'
 
 const initialValues = {
     name: '',
@@ -51,26 +51,28 @@ const signupSchema = Yup.object().shape({
 })
 
 const Signup = () => {
+
     const [loading, setLoading] = useState(false)
     const { register } = useAuthContext()
     const navigate = useNavigate()
-    const location = useLocation()
-    const from = location.state?.from?.pathname || '/'
     const [showPassword, setShowPassword] = useState(false)
     const [showConfirmPassword, setShowConfirmPassword] = useState(false)
-    const { currentLayout } = useLayout()
 
     const formik = useFormik({
         initialValues,
         validationSchema: signupSchema,
         onSubmit: async (values, { setStatus, setSubmitting }) => {
+
             setLoading(true)
 
             try {
+
                 if (!register) {
+
                     throw new Error(
                         'Não foi possível concluir a operação. Tente novamente.'
                     )
+
                 }
 
                 await register(
@@ -82,17 +84,22 @@ const Signup = () => {
                     values.acceptTerms
                 )
 
-                navigate(from, {
-                    replace: true,
+                navigate({
+                    pathname: '/',
+                    search: `?pag=perfil&action=finalizar-cadastro`,
                 })
+
             } catch (error) {
+
                 setStatus(error.message)
 
                 setSubmitting(false)
 
                 setLoading(false)
+
             }
-        },
+
+        }
     })
 
     const togglePassword = (event) => {
@@ -156,14 +163,10 @@ const Signup = () => {
                             className={clsx(
                                 'form-control bg-transparent',
                                 {
-                                    'is-invalid':
-                                        formik.touched.name &&
-                                        formik.errors.name,
+                                    'is-invalid': formik.touched.name && formik.errors.name,
                                 },
                                 {
-                                    'is-valid':
-                                        formik.touched.name &&
-                                        !formik.errors.name,
+                                    'is-valid': formik.touched.name && !formik.errors.name,
                                 }
                             )}
                         />
@@ -174,9 +177,11 @@ const Signup = () => {
                             {formik.errors.name}
                         </span>
                     )}
+
                 </div>
 
                 <div className="flex flex-col gap-1">
+
                     <label className="form-label text-gray-900 gap-[2px]">
                         E-mail <span className="text-danger">*</span>
                     </label>
@@ -208,16 +213,19 @@ const Signup = () => {
                             {formik.errors.email}
                         </span>
                     )}
+
                 </div>
 
                 <div className="flex flex-col gap-1">
+
                     <label className="form-label text-gray-900 gap-[2px]">
                         Telefone (Whatsapp){' '}
                         <span className="text-danger">*</span>
                     </label>
 
                     <label className="input">
-                        <input
+                        <IMaskInput
+                            mask="(00) 00000-0000"
                             placeholder="Digite seu telefone"
                             type="tel"
                             maxLength={15}
@@ -226,14 +234,10 @@ const Signup = () => {
                             className={clsx(
                                 'form-control bg-transparent',
                                 {
-                                    'is-invalid':
-                                        formik.touched.phone &&
-                                        formik.errors.phone,
+                                    'is-invalid': formik.touched.phone && formik.errors.phone,
                                 },
                                 {
-                                    'is-valid':
-                                        formik.touched.phone &&
-                                        !formik.errors.phone,
+                                    'is-valid': formik.touched.phone && !formik.errors.phone,
                                 }
                             )}
                         />
@@ -244,14 +248,17 @@ const Signup = () => {
                             {formik.errors.phone}
                         </span>
                     )}
+
                 </div>
 
                 <div className="flex flex-col gap-1">
+
                     <label className="form-label text-gray-900 gap-[2px]">
                         Senha <span className="text-danger">*</span>
                     </label>
 
                     <label className="input">
+
                         <input
                             type={showPassword ? 'text' : 'password'}
                             placeholder=""
@@ -260,18 +267,15 @@ const Signup = () => {
                             className={clsx(
                                 'form-control bg-transparent',
                                 {
-                                    'is-invalid':
-                                        formik.touched.password &&
-                                        formik.errors.password,
+                                    'is-invalid': formik.touched.password && formik.errors.password,
                                 },
                                 {
-                                    'is-valid':
-                                        formik.touched.password &&
-                                        !formik.errors.password,
+                                    'is-valid': formik.touched.password && !formik.errors.password,
                                 }
                             )}
                         />
                         <button
+                            type="button"
                             className="btn btn-icon"
                             onClick={togglePassword}
                         >
@@ -297,6 +301,7 @@ const Signup = () => {
                 </div>
 
                 <div className="flex flex-col gap-1">
+
                     <label className="form-label text-gray-900 gap-[2px]">
                         Repetição de senha{' '}
                         <span className="text-danger">*</span>
@@ -323,6 +328,7 @@ const Signup = () => {
                             )}
                         />
                         <button
+                            type="button"
                             className="btn btn-icon"
                             onClick={toggleConfirmPassword}
                         >

@@ -1,17 +1,16 @@
-import React from 'react'
+
+import React, { useState } from 'react'
 import { useDataGrid } from '.'
 import { ChevronRightIcon, ChevronLeftIcon } from 'lucide-react'
-import {
-    Select,
-    SelectContent,
-    SelectItem,
-    SelectTrigger,
-    SelectValue,
-} from '@/components/ui/select'
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import { Button } from '@/components/ui/button'
 import { cn } from '@/lib/utils'
+
 const DataGridPagination = () => {
+
     const { table, totalRows, props, loading } = useDataGrid()
+    const [useRowsPerPage, setUseRowsPerPage] = useState(false)
+
     const btnBaseClasses = 'size-7 p-0 text-[13px]'
     const btnArrowClasses = btnBaseClasses + ' rtl:transform rtl:rotate-180'
     const pageIndex = table.getState().pagination.pageIndex
@@ -19,30 +18,24 @@ const DataGridPagination = () => {
     const from = pageIndex * pageSize + 1
     const to = Math.min((pageIndex + 1) * pageSize, totalRows)
 
-    // Replace placeholders in paginationInfo
-    const paginationInfo = props.pagination?.info
-        ? props.pagination.info
-              .replace('{from}', from.toString())
-              .replace('{to}', to.toString())
-              .replace('{count}', totalRows.toString())
-        : `${from} - ${to} of ${totalRows}`
+    // REPLACE PLACEHOLDERS IN PAGINATIONINFO
+    const paginationInfo = props.pagination?.info ? props.pagination.info.replace('{from}', from.toString()).replace('{to}', to.toString()).replace('{count}', totalRows.toString()) : `${from} - ${to} of ${totalRows}`
 
-    // Pagination limit logic
+    // PAGINATION LIMIT LOGIC
     const pageCount = table.getPageCount()
     const paginationMoreLimit = props.pagination?.moreLimit || 5
 
-    // Determine the start and end of the pagination group
-    const currentGroupStart =
-        Math.floor(pageIndex / paginationMoreLimit) * paginationMoreLimit
-    const currentGroupEnd = Math.min(
-        currentGroupStart + paginationMoreLimit,
-        pageCount
-    )
+    // DETERMINE THE START AND END OF THE PAGINATION GROUP
+    const currentGroupStart = Math.floor(pageIndex / paginationMoreLimit) * paginationMoreLimit
+    const currentGroupEnd = Math.min(currentGroupStart + paginationMoreLimit, pageCount)
 
-    // Render page buttons based on the current group
+    // RENDER PAGE BUTTONS BASED ON THE CURRENT GROUP
     const renderPageButtons = () => {
+
         const buttons = []
+
         for (let i = currentGroupStart; i < currentGroupEnd; i++) {
+
             buttons.push(
                 <Button
                     key={i}
@@ -56,13 +49,18 @@ const DataGridPagination = () => {
                     {i + 1}
                 </Button>
             )
+
         }
+
         return buttons
+
     }
 
-    // Render a "previous" ellipsis button if there are previous pages to show
+    // RENDER A "PREVIOUS" ELLIPSIS BUTTON IF THERE ARE PREVIOUS PAGES TO SHOW
     const renderEllipsisPrevButton = () => {
+
         if (currentGroupStart > 0) {
+
             return (
                 <Button
                     className={btnBaseClasses}
@@ -73,12 +71,16 @@ const DataGridPagination = () => {
                     ...
                 </Button>
             )
+
         }
-        return null // No ellipsis needed if we're in the first group
+
+        return null
+
     }
 
     // Render a "next" ellipsis button if there are more pages to show after the current group
     const renderEllipsisNextButton = () => {
+
         if (currentGroupEnd < pageCount) {
             return (
                 <Button
@@ -91,38 +93,50 @@ const DataGridPagination = () => {
                 </Button>
             )
         }
+
         return null
+
     }
+
     return (
         <div
             className="flex flex-col md:flex-row justify-between items-center gap-5 md:gap-4"
             data-pagination
         >
+
             <div className="flex items-center space-x-2 order-2 md:order-1 pb-2 md:pb-0">
-                <div className="text-sm text-muted-foreground">
-                    Linhas por página
-                </div>
-                <Select
-                    value={`${table.getState().pagination.pageSize}`}
-                    onValueChange={(value) => {
-                        table.setPageSize(Number(value))
-                    }}
-                >
-                    <SelectTrigger className="w-[70px]" size="sm">
-                        <SelectValue
-                            placeholder={table.getState().pagination.pageSize}
-                        />
-                    </SelectTrigger>
-                    <SelectContent side="top">
-                        {props.pagination?.sizes?.map((pageSize) => (
-                            <SelectItem key={pageSize} value={`${pageSize}`}>
-                                {pageSize}
-                            </SelectItem>
-                        ))}
-                    </SelectContent>
-                </Select>
+
+                {useRowsPerPage && (
+                    <>
+                        <div className="text-sm text-muted-foreground">
+                            Linhas por página
+                        </div>
+                        <Select
+                            value={`${table.getState().pagination.pageSize}`}
+                            onValueChange={(value) => {
+                                table.setPageSize(Number(value))
+                            }}
+                        >
+                            <SelectTrigger className="w-[70px]" size="sm">
+                                <SelectValue
+                                    placeholder={table.getState().pagination.pageSize}
+                                />
+                            </SelectTrigger>
+                            <SelectContent side="top">
+                                {props.pagination?.sizes?.map((pageSize) => (
+                                    <SelectItem key={pageSize} value={`${pageSize}`}>
+                                        {pageSize}
+                                    </SelectItem>
+                                ))}
+                            </SelectContent>
+                        </Select>
+                    </>
+                )}
+
             </div>
+
             <div className="flex items-center gap-2 order-1 md:order-2 pt-2 md:pt-0">
+
                 <div className="text-sm text-muted-foreground">
                     {paginationInfo}
                 </div>

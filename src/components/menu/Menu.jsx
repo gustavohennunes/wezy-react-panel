@@ -15,7 +15,7 @@ const initalProps = {
     highlight: false,
     multipleExpand: false,
     dropdownTimeout: 0,
-    setOpenAccordion: (parentId, id) => {},
+    setOpenAccordion: (parentId, id) => { },
     isOpenAccordion: (parentId, id) => {
         return false
     },

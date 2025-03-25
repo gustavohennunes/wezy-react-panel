@@ -10,24 +10,28 @@
 
     const Models = ({ model, columnHeader, btnAdd, search, btnExcluir, pagination, tabs }) => {
 
-        const { callApi } = usePageData()
-        const [models, setModels] = useState(model || [])
-        const [footer, setFooter] = useState('')
-        const [gridPagination, setGridPagination] = useState({ size: 20 })
-        const [selectedRows, setSelectedRows] = useState([])
-        const data = useMemo(() => models, [models])
-        const [activeTab, setActiveTab] = useState('')
+        const { callApi }                           = usePageData()
+        const [ models, setModels ]                 = useState(model || [])
+        const [ footer, setFooter ]                 = useState('')
+        const [ gridPagination, setGridPagination ] = useState({ size: 20 })
+        const [ selectedRows, setSelectedRows ]     = useState([])
+        const data                                  = useMemo(() => models, [models])
+        const [activeTab, setActiveTab]             = useState('')
 
+        // ATUALIZA O ESTADO QUANDO O MODELO É ALTERADO
         useEffect(() => {
-
+            
             if (model && Array.isArray(model) && model.length > 0) {
                 setModels(model)
+            } else {
+                setModels([])
             }
 
-        }, [model])
+        }, [ model ])
 
+        // ATUALIZA A PAGINAÇÃO DO GRID
         useEffect(() => {
-
+            
             if (pagination) {
 
                 setGridPagination({
@@ -40,6 +44,7 @@
 
         }, [pagination])
 
+        // HANDLER PARA EXCLUIR ITENS SELECIONADOS
         const handleExcluir = async (e) => {
 
             try {
@@ -73,20 +78,31 @@
 
                 callApi(urlRefresh)
 
-                toast(`Sucesso`, {
-                    description: response?.success?.response?.data?.message,
-                })
+                toast(`✅ Sucesso!`, {
+                    description: <span style={{ 'color': 'white' }}>{response?.success?.response?.data?.message}</span>,
+                    style: {
+                        color: 'white',
+                        background: 'var(--tw-success',
+                        fontWeight: 'bold'
+                    }
+                });
 
             } catch (err) {
 
-                toast(`Error atualizar`, {
-                    description: `❌ Erro ao excluir item. ${err.response?.data?.error?.message ?? err}`,
-                })
+                toast(`❌ Erro`, {
+                    description: <span style={{ 'color': 'white' }}>{'Não foi possível excluir o item selecionado'}</span>,
+                    style: {
+                        color: 'white',
+                        background: 'var(--tw-danger)',
+                        fontWeight: 'bold'
+                    }
+                });
 
             }
 
         }
 
+        // HANDLER PARA ATUALIZAR STATUS DO ITEM
         const handleToggle = (rowId, colIndex) => {
 
             let response = ''
@@ -130,50 +146,61 @@
 
             } catch (err) {
 
-                toast(`Error atualizar`, {
-                    description: `❌ Erro ao atualizar item.`,
+                toast(`❌ Erro`, {
+                    description: <span style={{ 'color': 'white' }}>{'Não foi possível excluir este item'}</span>,
+                    style: {
+                        color: 'white',
+                        background: 'var(--tw-danger)',
+                        fontWeight: 'bold'
+                    }
                 })
 
                 setError(err)
 
             } finally {
 
-                toast(`Sucesso!`, {
-                    description: response?.success?.response.data.message,
+                toast(`✅ Sucesso!`, {
+                    description: <span style={{ 'color': 'white' }}>{response?.success?.response.data.message}</span>,
+                    style: {
+                        color: 'white',
+                        background: 'var(--tw-success',
+                        fontWeight: 'bold'
+                    }
                 })
 
             }
 
         }
 
+        // CRIA AS COLUNAS DO GRID
         const createColumns = (columnsData) => {
-
+            
             if (!columnsData) return false
 
             return columnsData.map((col, index) => {
                 
                 return {
                     accessorKey: `col_${index}`,
-                    id:
-                        col.component === 'select_all_checkbox'
-                            ? 'id'
-                            : col?.content?.toLowerCase().replace(/\s/g, '_'),
-                    header: ({ column }) =>
-                        col.component === 'select_all_checkbox' ? (
-                            <DataGridRowSelectAll
-                                setSelectedRows={setSelectedRows}
-                            />
-                        ) : (
-                            <DataGridColumnHeader
-                                title={col.content}
-                                column={column}
-                                filter={false}
-                            />
-                        ),
+                    id: col.component === 'select_all_checkbox' ? 'id' : col?.content?.toLowerCase().replace(/\s/g, '_'),
+                    header: ({ column }) => col.component === 'select_all_checkbox' ? (
+                        
+                        <DataGridRowSelectAll
+                            setSelectedRows={setSelectedRows}
+                        />
 
+                    ) : (
+
+                        <DataGridColumnHeader
+                            title={col.content}
+                            column={column}
+                            filter={false}
+                        />
+
+                    ),
                     enableSorting: false,
                     enableHiding: false,
                     cell: ({ row }) => {
+                        
                         return (
                             <DataRowContext
                                 fullRow={row}
@@ -184,67 +211,37 @@
                                 }
                             />
                         )
+
                     },
                     meta: {
                         headerClassName: [
-                            col.component === 'select_all_checkbox'
-                                ? 'w-[90px]'
-                                : col.width && col.width !== '0%'
-                                ? `w-[${col.width}] min-w-[${col.width}]`
-                                : 'w-full',
+                            col.component === 'select_all_checkbox' ? 'w-[90px]' : col.width && col.width !== '0%' ? `w-[${col.width}] min-w-[${col.width}]` : 'w-full',
                             col.class ? col.class : '',
-                            col.component === 'select_all_checkbox'
-                                ? '!px-[12px]'
-                                : col.align === 'left'
-                                ? 'text-left justify-items-start !px-[15px]'
-                                : col.align === 'center'
-                                    ? 'text-center justify-items-center'
-                                    : col.align === 'right'
-                                    ? 'text-right justify-items-end'
-                                    : '',
+                            col.component === 'select_all_checkbox' ? '!px-[12px]' : col.align === 'left' ? 'text-left justify-items-start !px-[15px]' : col.align === 'center' ? 'text-center justify-items-center' : col.align === 'right' ? 'text-right justify-items-end' : '',
                         ]
                             .filter(Boolean)
                             .join(' '),
 
                         cellClassName: [
-                            col.component === 'select_all_checkbox'
-                                ? 'w-[90px]'
-                                : col.width && col.width !== '0%'
-                                ? `w-[${col.width}] min-w-[${col.width}]`
-                                : 'w-full',
+                            col.component === 'select_all_checkbox' ? 'w-[90px]' : col.width && col.width !== '0%' ? `w-[${col.width}] min-w-[${col.width}]` : 'w-full',
                             'text-gray-800 font-normal',
-                            col.component === 'select_all_checkbox'
-                                ? '!px-[12px]'
-                                : col.align === 'left'
-                                ? 'text-left justify-items-start !px-[15px]'
-                                : col.align === 'center'
-                                    ? 'text-center justify-items-center'
-                                    : col.align === 'right'
-                                    ? 'text-right justify-items-end'
-                                    : '',
+                            col.component === 'select_all_checkbox' ? '!px-[12px]' : col.align === 'left' ? 'text-left justify-items-start !px-[15px]' : col.align === 'center' ? 'text-center justify-items-center' : col.align === 'right' ? 'text-right justify-items-end' : '',
                         ]
                             .filter(Boolean)
                             .join(' '),
 
-                        style: col.style
-                            ? Object.fromEntries(
-                                col.style
-                                    .split(';')
-                                    .map((rule) =>
-                                        rule.split(':').map((s) => s.trim())
-                                    )
-                                    .filter(([key, value]) => key && value)
-                            )
-                            : {},
+                        style: col.style ? Object.fromEntries(
+                            col.style
+                                .split(';')
+                                .map((rule) =>
+                                    rule.split(':').map((s) => s.trim())
+                                )
+                                .filter(([key, value]) => key && value)
+                        ) : {},
                     },
                 }
             })
         }
-
-        const column = useMemo(
-            () => (columnHeader ? createColumns(columnHeader) : []),
-            [columnHeader]
-        )
 
         const handleRowSelection = (state) => {
 
@@ -275,7 +272,7 @@
             const addBtn = btnAdd?.label ? (
 
                 <a
-                    className="btn btn-dark btn-sm"
+                    className="btn btn-primary btn-sm"
                     href={cleanUrl(btnAdd?.url)}
                     target="_self"
                 >
@@ -339,7 +336,7 @@
 
                                         <button
                                             type="submit"
-                                            className="btn btn-dark btn-sm ml-1"
+                                            className="btn btn-primary btn-sm ml-1"
                                         >
                                             <KeenIcon
                                                 icon="magnifier"
@@ -403,26 +400,27 @@
 
         }, [btnExcluir, selectedRows])
 
+        const column = useMemo(() => (columnHeader ? createColumns(columnHeader) : []), [columnHeader]);
+
         const fetchGridData = async (params) => {
             
             try {
 
                 if (params.pageIndex == 0) {
+
                     return {
                         data: data,
                         totalCount: pagination?.information?.total || 0,
                     }
+
                 }
 
                 let newUrl = await updateTablePagination(params)
                 const response = await api.get(newUrl)
 
                 return {
-                    data: response.data?.success?.response?.data?.params?.list
-                        ?.rows,
-                    totalCount:
-                        response?.data?.success?.response?.data?.params?.pagination
-                            ?.information?.total,
+                    data: response.data?.success?.response?.data?.params?.list?.rows,
+                    totalCount: response?.data?.success?.response?.data?.params?.pagination ?.information?.total,
                 }
 
             } catch (error) {

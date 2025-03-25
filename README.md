@@ -55,8 +55,8 @@ AuthPage - tem AuthLayout que tem a versão branded e padrão, possivelmente loc
 
     ponto de observação conferir os valors que vem do painel atualmente e sua conversão atual, alguns valores provavelmente não irão vir definidos e podem não apresentar css do tailwind corretamente, caso ocorra isso tem que incluir na safelist no tailind.config.js ou varificar outro modo e incluir como style diretamente.
 
-## Plugins de terceiros ou complementares ao Metronic
 
+## Plugins de terceiros ou complementares ao Metronic
     https://keenthemes.com/metronic/tailwind/docs/plugins/apexcharts
     https://lucide.dev/guide/packages/lucide-react
     https://www.radix-ui.com/

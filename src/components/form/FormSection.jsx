@@ -7,93 +7,99 @@
     import { format } from 'date-fns'
     import { cn } from '@/lib/utils'
 
-    const FormSection = ({ data, index, button, form }) => {
+    const FormSection = ({ data, index, button, form, loading }) => {
+
+        const [formState, setFormState] = useState({})
+        const [validRows, setValidRows] = useState({})
         
-        const initialFormState = {}
-        const initialValidRows = {}
-        data.fields.forEach((field) => {
+        useEffect(() => {
+        
+            const initialFormState = {}
+            const initialValidRows = {}
+            data.fields.forEach((field) => {
 
-            const fieldName = field.field?.name || field.name
-            
-            initialFormState[fieldName] = field.field?.value || ''
-
-            if (field.type === 'Dta') {
+                const fieldName = field.field?.name || field.name
                 
-                const dateValue = field.field?.value
-                if (dateValue && dateValue !== '00/00/0000') {
+                initialFormState[fieldName] = field.field?.value || ''
+
+                if (field.type === 'Dta') {
                     
-                    const parsedDate = new Date(dateValue)
-                    if (!isNaN(parsedDate)) {
-                        initialFormState[fieldName] = parsedDate
+                    const dateValue = field.field?.value
+                    if (dateValue && dateValue !== '00/00/0000') {
+                        
+                        const parsedDate = new Date(dateValue)
+                        if (!isNaN(parsedDate)) {
+                            initialFormState[fieldName] = parsedDate
+                        } else {
+                            initialFormState[fieldName] = new Date()
+                        }
+
                     } else {
                         initialFormState[fieldName] = new Date()
                     }
 
-                } else {
-                    initialFormState[fieldName] = new Date()
                 }
 
-            }
-
-            if (field.type === 'Ckb') {
-                
-                field.field.forEach((item) => {
+                if (field.type === 'Ckb') {
                     
-                    if (!initialFormState[item.name]){
-                        initialFormState[item.name] = [];
-                    }
-
-                    if (item.value && item.checked){
+                    field.field.forEach((item) => {
                         
-                        initialFormState[item.name].push(item.value);
-                        
-                        if (item.class.includes('valid valid-')) {
-    
-                            const key = item.class.split('valid valid-')[1];
-                            const newItem = { [key]: item.value };
-    
-                            initialValidRows[key] = item.value;
-    
+                        if (!initialFormState[item.name]){
+                            initialFormState[item.name] = [];
                         }
 
-                    }
+                        if (item.value && item.checked){
+                            
+                            initialFormState[item.name].push(item.value);
+                            
+                            if (item.class.includes('valid valid-')) {
+        
+                                const key = item.class.split('valid valid-')[1];
+        
+                                initialValidRows[key] = item.value;
+        
+                            }
 
-
-                });
-
-            }
-
-            if(field.type === 'Rdo'){
-                
-                field.field.forEach((item) => {
-                    
-                    if(item.checked){
-                        
-                        initialFormState[item.name] = item.value || 0;
-                        
-                        if (item.class.includes('valid valid-')) {
-    
-                            const key = item.class.split('valid valid-')[1];
-    
-                            initialValidRows[key] = item.value;
-    
                         }
 
-                    }
+
+                    });
+
+                }
+
+                if(field.type === 'Rdo'){
+                    
+                    field.field.forEach((item) => {
+                        
+                        if(item.checked){
+                            
+                            initialFormState[item.name] = item.value || 0;
+                            
+                            if (item.class.includes('valid valid-')) {
+        
+                                const key = item.class.split('valid valid-')[1];
+        
+                                initialValidRows[key] = item.value;
+        
+                            }
+
+                        }
 
 
-                });
+                    });
+                    
+                }
+
+                if (field.type === 'Cor') {
+                    initialFormState[fieldName] = initialFormState[fieldName] || '#aabbcc'
+                }
+
+            })
+
+            setFormState(initialFormState);
+            setValidRows(initialValidRows);
                 
-            }
-
-            if (field.type === 'Cor') {
-                initialFormState[fieldName] = initialFormState[fieldName] || '#aabbcc'
-            }
-
-        })
-
-        const [ formState, setFormState ] = useState(initialFormState)
-        const [validRows, setValidRows] = useState(initialValidRows)
+        }, [ data ]);
         
         const handleInputChange = (name, value) => {
             
@@ -128,14 +134,14 @@
                 
                 const key = className.split('valid valid-')[1];
                 const newItem = { [key]: value };
-                
+
                 setValidRows((prev) => ({ ...prev, ...newItem }));
 
             }
             
             setFormState((prev) => ({
                 ...prev,
-                [name]: value,
+                [name]: value + ' - 23:59',
             }))
 
         }
@@ -145,9 +151,20 @@
             if (className.includes('valid valid-')) {
 
                 const key = className.split('valid valid-')[1];
-                const newItem = { [key]: value };
+                if (validRows[key]) {
 
-                setValidRows((prev) => ({ ...prev, ...newItem }));
+                    const newValidRows = { ...validRows };
+                    delete newValidRows[key];
+
+                    setValidRows(newValidRows);
+
+                } else {
+
+                    const newItem = { [key]: value };
+
+                    setValidRows((prev) => ({ ...prev, ...newItem }));
+
+                }
 
             }
             
@@ -191,9 +208,9 @@
 
                 <div className="card-body grid gap-5">
 
-                    {data.fields.map((field, idx) => {
-
-                        const { type, title, subtitle, field: fieldData, required, name, fieldClass, row_attr } = field
+                    {data?.fields.map((field, idx) => {
+                        
+                        let { type, title, subtitle, field: fieldData, required, name, fieldClass, row_attr } = field
                         const fieldName = fieldData?.name || name
 
                         const parsedAttributes = parseAttributes(row_attr);
@@ -214,6 +231,10 @@
                         
                         if (!fieldData) return null
 
+                        if(fieldData?.class && fieldData?.class.includes('date-picker')){
+                            type = 'Dta';
+                        }
+
                         switch (type) {
                             case 'Frm':
                             case 'Psw':
@@ -233,6 +254,7 @@
                                         type={type}
                                         title={title}
                                         subtitle={subtitle}
+                                        fieldMask={fieldData.mask}
                                         fieldName={fieldName}
                                         fieldClass={fieldClass}
                                         fieldData={fieldData}
@@ -268,9 +290,7 @@
                                         </div>
                                         <div className="flex flex-col gap-3.5">
 
-                                            {fieldData.map((item, index) => (
-
-                                                
+                                            {fieldData.map((item, index) => (                                                
                                                 
                                                 <label
                                                     key={`${fieldName}-${index}-${idx}`}
@@ -442,6 +462,7 @@
                                                         }
                                                         numberOfMonths={1}
                                                     />
+
                                                 </PopoverContent>
                                             </Popover>
                                         </div>
@@ -459,11 +480,21 @@
                     })}
 
                     {button && form.submit_button && (
+
                         <div className="flex justify-start">
-                            <button type="submit" className="btn btn-success">
-                                {form.submit_button}
+                            <button type="submit" className="btn btn-success" disabled={loading ? true : false}>
+                                {loading ? (
+                                    <>
+                                        Carregando...
+                                    </>
+                                ) : (
+                                    <>
+                                        {form.submit_button}
+                                    </>
+                                )}
                             </button>
                         </div>
+                        
                     )}
 
                 </div>

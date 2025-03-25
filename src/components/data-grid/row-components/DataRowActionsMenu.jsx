@@ -21,7 +21,7 @@ const DataRowActionsMenu = ({ row }) => {
     const { callApi } = usePageData()
 
     const removeRow = async (itemId) => {
-        
+
         let response = ''
         const data = {
             items: [itemId],
@@ -49,16 +49,26 @@ const DataRowActionsMenu = ({ row }) => {
 
             callApi(urlRefresh)
 
-            toast(`Sucesso`, {
-                description: response?.success?.response?.data?.message,
+            toast(`✅ Sucesso`, {
+                description: <span style={{ 'color': 'white' }}>{response?.success?.response?.data?.message}</span>,
+                style: {
+                    color: 'white',
+                    background: 'var(--tw-success',
+                    fontWeight: 'bold'
+                }
             })
 
         } catch (err) {
-            
-            toast(`Error atualizar`, {
-                description: `❌ Erro ao excluir item.`,
+
+            toast(`❌ Erro`, {
+                description: <span style={{ 'color': 'white' }}>{'Não foi possível remover este item'}</span>,
+                style: {
+                    color: 'white',
+                    background: 'var(--tw-danger)',
+                    fontWeight: 'bold'
+                }
             })
-            
+
         }
 
     }

@@ -30,13 +30,13 @@ export default plugin(({ addComponents, theme }) => {
                 'box-shadow': 'var(--tw-input-focus-box-shadow)',
                 color: 'var(--tw-gray-700)',
                 '&::placeholder, input::placeholder': {
-                    color: 'var(--tw-gray-600)',
+                    color: 'var(--tw-gray-700)',
                 },
             },
             '&:active, &:has(input:active)': {
                 color: 'var(--tw-gray-700)',
                 '&::placeholder, input::placeholder': {
-                    color: 'var(--tw-gray-600)',
+                    color: 'var(--tw-gray-700)',
                 },
                 'box-shadow': 'none',
             },
@@ -73,11 +73,11 @@ export default plugin(({ addComponents, theme }) => {
             appearance: 'none',
             'box-shadow': 'none',
             outline: 'none',
-            color: 'var(--tw-gray-600)',
+            color: 'var(--tw-gray-700)',
             input: {
                 'flex-grow': '1',
-                'background-color': 'transparent',
                 'border-color': 'transparent',
+                'background': 'transparent',
                 color: 'inherit',
                 outline: 'none',
                 'font-size': 'inherit',

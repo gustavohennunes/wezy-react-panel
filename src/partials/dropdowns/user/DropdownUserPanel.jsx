@@ -1,4 +1,4 @@
-import { Fragment } from 'react'
+import { Fragment, useContext } from 'react'
 import { Link } from 'react-router-dom'
 import { FormattedMessage } from 'react-intl'
 import { useAuthContext } from '@/auth'
@@ -6,26 +6,32 @@ import { useLanguage } from '@/i18n'
 import { toAbsoluteUrl } from '@/utils'
 import { useSettings } from '@/providers/SettingsProvider'
 import { DefaultTooltip, KeenIcon } from '@/components'
-import {
-    MenuItem,
-    MenuLink,
-    MenuSub,
-    MenuTitle,
-    MenuSeparator,
-    MenuArrow,
-    MenuIcon,
-} from '@/components/menu'
+import { useMenus } from '@/providers'
+import { MenuItem, MenuLink, MenuSub, MenuTitle, MenuSeparator, MenuArrow, MenuIcon, } from '@/components/menu'
+import { transformOldIcon } from '@/lib/transformOldIcon'
+import { useAuth } from '@/auth/providers/JWTProvider'
+
 const DropdownUserPanel = ({ menuItemRef }) => {
-    const { settings, storeSettings } = useSettings()
-    const { logout } = useAuthContext()
-    const { isRTL } = useLanguage()
+
+    const { settings, storeSettings } = useSettings();
+    const { logout } = useAuthContext();
+    const { isRTL } = useLanguage();
+    const { getMenuConfig } = useMenus();
+    const { userInfos } = useAuth();
+
+    const menuConfig = getMenuConfig('primary')
+
     const handleThemeMode = (event) => {
+
         const newThemeMode = event.target.checked ? 'dark' : 'light'
         storeSettings({
             themeMode: newThemeMode,
         })
+
     }
+
     const buildHeader = () => {
+
         return (
             <div className="flex items-center justify-between px-5 py-1.5 gap-1.5">
                 <div className="flex items-center gap-2">
@@ -35,42 +41,54 @@ const DropdownUserPanel = ({ menuItemRef }) => {
                         alt=""
                     />
                     <div className="flex flex-col gap-1.5">
-                        <Link
-                            to="/account/hoteme/get-stard"
-                            className="text-sm text-gray-800 hover:text-primary font-semibold leading-none"
-                        >
-                            Admin teste
-                        </Link>
-                        <a
-                            href="mailto:teste@gmail.com"
-                            className="text-xs text-gray-600 hover:text-primary font-medium leading-none"
-                        >
-                            teste@gmail.com
-                        </a>
+                        <div className="text-sm text-gray-800 hover:text-primary font-semibold leading-none">
+                            {userInfos?.user?.full_name}
+                        </div>
+                        <div className="text-xs text-gray-600 hover:text-primary font-medium leading-none">
+                            {userInfos?.user?.email}
+                        </div>
                     </div>
                 </div>
             </div>
         )
+
     }
-    const buildMenu = () => {
+
+    const buildMenu = (menuConfig) => {
+
         return (
             <Fragment>
                 <MenuSeparator />
                 <div className="flex flex-col">
-                    <MenuItem>
-                        <MenuLink path="?pag=administracao">
-                            <MenuIcon className="menu-icon">
-                                <KeenIcon icon="badge" />
-                            </MenuIcon>
-                            <MenuTitle>Administração</MenuTitle>
-                        </MenuLink>
-                    </MenuItem>
-                    <MenuSeparator />
+
+                    {menuConfig?.user.map((item, index) => {
+
+                        var icon = transformOldIcon(item.icon)
+
+                        return (item.title && (
+                            <MenuItem key={index}>
+                                <MenuLink path={item.path}>
+                                    <MenuIcon className="menu-icon">
+                                        <KeenIcon icon={icon.icon} style={icon.type} />
+                                    </MenuIcon>
+                                    <MenuTitle>
+                                        {item.title}
+                                    </MenuTitle>
+                                </MenuLink>
+                            </MenuItem>
+                        ));
+
+                    })}
+
                 </div>
+                <MenuSeparator />
             </Fragment>
         )
+
     }
+
     const buildFooter = () => {
+
         return (
             <div className="flex flex-col">
                 <div className="menu-item mb-0.5">
@@ -103,16 +121,20 @@ const DropdownUserPanel = ({ menuItemRef }) => {
                 </div>
             </div>
         )
+
     }
+
     return (
         <MenuSub
             className="menu-default light:border-gray-300 w-[200px] md:w-[250px]"
             rootClassName="p-0"
         >
             {buildHeader()}
-            {buildMenu()}
+            {buildMenu(menuConfig)}
             {buildFooter()}
         </MenuSub>
     )
+
 }
+
 export { DropdownUserPanel }

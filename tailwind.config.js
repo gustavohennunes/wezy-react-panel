@@ -51,15 +51,15 @@ module.exports = {
                                 inverse: '#ffffff',
                             },
                             primary: {
-                                default: '#4f6dd5',
-                                active: '#4865c8',
+                                default: '#166abe',
+                                active: '#135ba3',
                                 light: '#EFF6FF',
                                 clarity: 'rgba(27, 132, 255, 0.20)',
                                 inverse: '#ffffff',
                             },
                             success: {
-                                default: '#17C653',
-                                active: '#04B440',
+                                default: '#16be5a',
+                                active: '#10a54d',
                                 light: '#EAFFF1',
                                 clarity: 'rgba(23, 198, 83, 0.20)',
                                 inverse: '#ffffff',
@@ -544,7 +544,7 @@ module.exports = {
                     },
                     sm: {
                         height: '2rem',
-                        px: '0.75rem',
+                        px: '1rem',
                         py: '0.45rem',
                         gap: '0.275rem',
                         fontSize: theme('fontSize.xs')[0],
@@ -555,7 +555,7 @@ module.exports = {
                     },
                     DEFAULT: {
                         height: '2.5rem',
-                        px: '1rem',
+                        px: '2.5rem',
                         py: '0.55rem',
                         gap: '0.375rem',
                         fontSize: theme('fontSize.2sm')[0],

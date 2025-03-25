@@ -12,48 +12,18 @@
 
     const FormContext = ({ data }) => {
 
-        const [sections, setSections] = useState('')
-        const params = new URLSearchParams(window.location.search)
-        const acao = params.get('acao')
-
-        const { callApi } = usePageData()
-        const { auth, logout } = useAuth()
         const navigate = useNavigate()
 
-        useEffect(() => {
-
-            if (data?.form?.fields) {
-
-                const fields = data.form.fields
-                const groupedSections = []
-                let currentSection = null
-
-                fields.forEach((field) => {
-                    if (field.type === 'Cab') {
-                        if (currentSection) {
-                            groupedSections.push(currentSection)
-                        }
-                        currentSection = {
-                            title: field.field.value.title,
-                            number: field.field.value.number,
-                            fields: [],
-                        }
-                    } else if (currentSection) {
-                        currentSection.fields.push(field)
-                    }
-                })
-
-                if (currentSection) {
-                    groupedSections.push(currentSection)
-                }
-
-                setSections(groupedSections)
-            }
-        }, [data])
-
-        if (!sections.length) {
-            return <ScreenLoader />
-        }
+        const params = new URLSearchParams(window.location.search)
+        
+        const acao = params.get('acao')
+        
+        const [ sections, setSections ]      = useState('')
+        const [ formTabs, setFormTabs ]      = useState('')
+        const [ loading, setLoading ]        = useState(false)
+        const [ activeTab, setActiveTab ]    = useState('');
+        const { callApi }                    = usePageData()
+        const { auth, logout, slug, action } = useAuth()
 
         async function submitForm(e) {
 
@@ -80,6 +50,8 @@
 
             })
 
+            setLoading(true);
+
             try {
 
                 const urlFormulario = window.location.search
@@ -90,26 +62,45 @@
                     {
                         headers: {
                             'Content-Type': 'application/x-www-form-urlencoded',
-                        },
+                        }
                     }
                 )
 
-                const slug = params.get('slug') ?? params.get('pag')
                 params.delete('acao')
                 params.delete('id')
-                const urlRefresh = buildApiUrl(params)
 
+                const urlRefresh = buildApiUrl(params)
+                
                 callApi(urlRefresh)
                 
-                toast(`Sucesso!`, {
-                    description: response?.data?.success?.response?.data?.message,
-                })
+                toast(`✅ Sucesso!`, {
+                    description: <span style={{'color':'white'}}>{response?.data?.success?.response?.data?.message}</span>,
+                    style: {
+                        color: 'white',
+                        background: 'var(--tw-success',
+                        fontWeight: 'bold'
+                    }
+                });
+
+                setLoading(false);
+
+                //CASO ESTEJA NA FINALIZAÇÃO DE CADASTRO, DIRECIONA PARA O DASHBOARD
+                if(slug === 'perfil' && action === 'finalizar-cadastro') {
+                    window.location.href = '/modulos'
+                }
 
             } catch (error) {
                 
                 toast(`❌ Erro: `, {
-                    description: error.response?.data?.error?.message || error.message,
+                    description: <span style={{'color':'white'}}>{error.response?.data?.error?.message || error.message}</span>,
+                    style: {
+                        color: 'white',
+                        background: 'var(--tw-danger)',
+                        fontWeight: 'bold'
+                    }
                 })
+
+                setLoading(false);
 
                 if (error.status == 401) {
                     logout()
@@ -117,12 +108,91 @@
 
             }
 
+            setLoading(false);
+
+        }
+
+        //TRANSFORMA A HTML EM OBJETO
+        const parseTabs = (tabs) => {
+
+            const tabsArray = tabs.split('</a>')
+            const tabsObject = {
+                before: [],
+                after: [],
+            }
+            
+            tabsArray.forEach((tab) => {
+                                    
+                let tabUrl  = tab.split('href="')[1];
+                    tabUrl  = tabUrl ? tabUrl.split('"')[0] : '';
+                let tabName = tab.split('href="')[1];
+                    tabName = tabName ? tabName.split('>')[1] : '';
+
+                if (tabUrl) {
+
+                    tabsObject.before.push({
+                        content: tabName,
+                        url: tabUrl,
+                    })
+
+                }
+
+            })
+            
+            setFormTabs(tabsObject)
+
+        }
+
+        useEffect(() => {
+
+            if (data?.form?.fields) {
+
+                const fields = data.form.fields
+                const groupedSections = []
+                let currentSection = null
+
+                fields.forEach((field) => {
+
+                    if (field.type === 'Cab') {
+
+                        if (currentSection) {
+                            groupedSections.push(currentSection)
+                        }
+
+                        currentSection = {
+                            title: field.field.value.title,
+                            number: field.field.value.number,
+                            fields: [],
+                        }
+
+                    } else if (currentSection) {
+                        currentSection.fields.push(field)
+                    }
+
+                })
+
+                if (currentSection) {
+                    groupedSections.push(currentSection)
+                }
+
+                setSections(groupedSections)
+
+            }
+
+            if (data?.buttons?.form) {
+                parseTabs(data.buttons.form)
+            }
+
+        }, [ data ]);
+
+        if (!sections.length) {
+            return <ScreenLoader />
         }
 
         return (
-            <div className="grid gap-5 lg:gap-7.5 mx-auto">
+            <div className="grid gap-1 mx-auto">
                 
-                {data.tabs && <FormTabs tabs={data.tabs} />}
+                {formTabs && <FormTabs tabs={formTabs} activeTab={activeTab} setActiveTab={setActiveTab} />}
                 
                 <form
                     encType="application/x-www-form-urlencoded"
@@ -158,6 +228,7 @@
                     {sections.map((section, index) => (
                         <FormSection
                             key={index}
+                            loading={loading}
                             data={section}
                             index={index + 1}
                             button={index === sections.length - 1}

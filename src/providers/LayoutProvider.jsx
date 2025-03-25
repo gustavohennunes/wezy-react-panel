@@ -14,9 +14,9 @@ const initialProps = {
         return {}
     },
     hasLayout: (name) => false,
-    updateLayout: (name, config) => {},
+    updateLayout: (name, config) => { },
     currentLayout: null,
-    setCurrentLayout: (layoutProvider) => {},
+    setCurrentLayout: (layoutProvider) => { },
 }
 
 const LayoutContext = createContext(initialProps)

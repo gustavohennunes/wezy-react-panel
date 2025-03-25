@@ -4,7 +4,7 @@ import { ScreenLoader } from '@/components/loaders'
 const PicturesGallery = ({ data }) => {
     const [sections, setSections] = useState('')
 
-    useEffect(() => {}, [data])
+    useEffect(() => { }, [data])
 
     if (!sections.length) {
         //return <ScreenLoader />

@@ -70,7 +70,7 @@ const MyBalance = ({ className, periods }) => {
         },
         yaxis: {
             min: 0,
-            max: 100,
+            max: 40,
             tickAmount: 5,
             axisTicks: {
                 show: false,
@@ -81,15 +81,16 @@ const MyBalance = ({ className, periods }) => {
                     fontSize: '12px',
                 },
                 formatter: (value) => {
-                    return `$${value}K`
+                    if(value === 0) return 'R$0'
+                    return `R$${value}k`
                 },
             },
         },
         tooltip: {
             enabled: true,
             custom({ series, seriesIndex, dataPointIndex, w }) {
-                const number =
-                    parseInt(series[seriesIndex][dataPointIndex]) * 1000
+                
+                const number = parseInt(series[seriesIndex][dataPointIndex])
                 const Mês = w.globals.seriesX[seriesIndex][dataPointIndex]
                 const MêsName = categories[Mês]
 

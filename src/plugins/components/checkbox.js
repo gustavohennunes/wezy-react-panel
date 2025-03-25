@@ -8,7 +8,7 @@ export default plugin(({ addComponents, theme }) => {
             'flex-shrink': '0',
             appearance: 'none',
             'box-shadow': 'none',
-            'background-color': 'var(--tw-light-light)',
+            'background-color': 'var(--tw-light-active)',
             '.dark &': {
                 'background-color': 'var(--tw-coal-500)',
             },
@@ -22,13 +22,13 @@ export default plugin(({ addComponents, theme }) => {
             'background-position': 'center',
             'background-size': 'auto',
             '&:checked, &[aria-checked="true"]': {
-                'background-color': 'var(--tw-primary)',
-                border: '1px solid var(--tw-primary)',
+                'background-color': 'var(--tw-gray-600)',
+                border: '1px solid var(--tw-gray-600)',
                 'background-image': `url("${svgToDataUri('<svg xmlns="http://www.w3.org/2000/svg" width="12" height="9" viewBox="0 0 12 9" fill="none"><path d="M10.3667 0.541643L4.80007 6.10831L1.56674 2.87498C1.41061 2.71977 1.1994 2.63265 0.979241 2.63265C0.759086 2.63265 0.547876 2.71977 0.391741 2.87498C0.236532 3.03111 0.149414 3.24232 0.149414 3.46248C0.149414 3.68263 0.236532 3.89384 0.391741 4.04998L4.21674 7.87498C4.37288 8.03019 4.58409 8.1173 4.80424 8.1173C5.0244 8.1173 5.23561 8.03019 5.39174 7.87498L11.5417 1.72498C11.6198 1.64751 11.6818 1.55534 11.7241 1.45379C11.7665 1.35224 11.7882 1.24332 11.7882 1.13331C11.7882 1.0233 11.7665 0.914379 11.7241 0.81283C11.6818 0.711281 11.6198 0.619113 11.5417 0.541643C11.3856 0.386434 11.1744 0.299316 10.9542 0.299316C10.7341 0.299316 10.5229 0.386434 10.3667 0.541643Z" fill="white"/></svg>')}")`,
             },
             '&:indeterminate': {
-                'background-color': 'var(--tw-primary)',
-                border: '1px solid var(--tw-primary)',
+                'background-color': 'var(--tw-gray-600)',
+                border: '1px solid var(--tw-gray-600)',
                 'background-image': `url("${svgToDataUri('<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20"><path fill="none" stroke="white" stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M6 10h8"/></svg>')}")`,
             },
             '&:focus-visible': {
@@ -36,7 +36,7 @@ export default plugin(({ addComponents, theme }) => {
                 'box-shadow': 'none',
             },
             '&:focus': {
-                'border-color': 'var(--tw-primary)',
+                'border-color': 'var(--tw-gray-600)',
                 'box-shadow': 'var(--tw-input-focus-box-shadow)',
                 color: 'var(--tw-gray-700)',
                 '&::placeholder': {

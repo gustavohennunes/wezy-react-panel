@@ -8,7 +8,7 @@ const PicturesForm = ({ data }) => {
     const [formState, setFormState] = useState({})
     const [selectedFiles, setSelectedFiles] = useState([])
 
-    useEffect(() => {}, [data])
+    useEffect(() => { }, [data])
 
     const handleFilesChange = (files) => {
         setSelectedFiles(files)

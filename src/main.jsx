@@ -1,3 +1,4 @@
+
 import '@/components/keenicons/assets/styles.css'
 import './styles/globals.css'
 import axios from 'axios'
@@ -13,7 +14,9 @@ import React from 'react'
  * @see https://github.com/axios/axios#interceptors
  */
 setupAxios(axios)
+
 const root = ReactDOM.createRoot(document.getElementById('root'))
+
 root.render(
     <React.StrictMode>
         <ProvidersWrapper>

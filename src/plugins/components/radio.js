@@ -8,7 +8,7 @@ export default plugin(({ addComponents, theme }) => {
             'flex-shrink': '0',
             appearance: 'none',
             'box-shadow': 'none',
-            'background-color': 'var(--tw-light-light)',
+            'background-color': 'var(--tw-light-active)',
             '.dark &': {
                 'background-color': 'var(--tw-coal-500)',
             },
@@ -20,8 +20,8 @@ export default plugin(({ addComponents, theme }) => {
             'background-size': 'contain',
             'background-position': 'center',
             '&:checked, &[aria-checked="true"]': {
-                'background-color': 'var(--tw-primary)',
-                border: '1px solid var(--tw-primary)',
+                'background-color': 'var(--tw-gray-600)',
+                border: '1px solid var(--tw-gray-600)',
                 'background-image': `url("${svgToDataUri('<svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 22 22" fill="none"><circle cx="10.9995" cy="11" r="5.86667" fill="white"/></svg>')}")`,
             },
             '&:focus-visible': {
@@ -29,7 +29,7 @@ export default plugin(({ addComponents, theme }) => {
                 'box-shadow': 'none',
             },
             '&:focus': {
-                'border-color': 'var(--tw-primary)',
+                'border-color': 'var(--tw-gray-600)',
                 'box-shadow': 'var(--tw-input-focus-box-shadow)',
                 color: 'var(--tw-gray-700)',
                 '&::placeholder': {

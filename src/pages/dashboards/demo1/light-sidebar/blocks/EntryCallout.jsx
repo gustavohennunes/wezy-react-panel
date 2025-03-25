@@ -24,27 +24,10 @@ const EntryCallout = ({ className }) => {
             </style>
 
             <div className={`card h-full ${className}`}>
-                <div className="card-body p-10 bg-[length:80%] rtl:[background-position:-70%_25%] [background-position:175%_25%] bg-no-repeat entry-callout-bg">
+
+                <div className="card-body px-10 py-16 bg-[length:80%] rtl:[background-position:-70%_25%] [background-position:175%_25%] bg-no-repeat entry-callout-bg">
+
                     <div className="flex flex-col justify-center gap-4">
-                        <CommonAvatars
-                            size="size-10"
-                            group={[
-                                {
-                                    filename: '300-4.png',
-                                },
-                                {
-                                    filename: '300-1.png',
-                                },
-                                {
-                                    filename: '300-2.png',
-                                },
-                                {
-                                    fallback: 'S',
-                                    variant:
-                                        'text-success-inverse text-xs ring-success-light bg-success',
-                                },
-                            ]}
-                        />
 
                         <h2 className="text-1.5xl font-semibold text-gray-900">
                             Seja bem-vindo(a) <br />à sua{' '}
@@ -57,9 +40,13 @@ const EntryCallout = ({ className }) => {
                             rádio indoor para ambientes, e agora é sua <br />
                             vez de faturar alto com nossa revenda!
                         </p>
+
                     </div>
+
                 </div>
+
             </div>
+
         </Fragment>
     )
 }

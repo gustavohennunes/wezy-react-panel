@@ -7,17 +7,18 @@ const Tabs = ({ activeTab, setActiveTab, className, tabs }) => {
     return (
         <div
             data-tabs="true"
-            className={`flex flex-col sm:flex-row items-stretch sm:items-center flex-wrap gap-2.5 border-gray-300 ${className}`}
+            className={`tabs w-f mb-3`}
         >
             {tabs?.map((tab, i) => {
-                let tabSelected =
-                    activeTab === tab.content || (i === 0 && activeTab === '')
+
+                let tabSelected = activeTab === tab.content || (i === 0 && activeTab === '')
+
                 const isInvalidUrl = !tab.url || tab.url === 'javascript:;'
 
                 return isInvalidUrl ? (
                     <button
                         key={i}
-                        className={`${tabSelected ? 'active' : ''} group btn btn-primary px-3 hover:text-secundary tab-active:bg-secundary-light tab-active:border-secundary-clarity tab-active:text-secundary ${tab.class}`}
+                        className={`${tabSelected ? 'active' : ''} tab`}
                         onClick={() => setActiveTab(tab.content)}
                     >
                         {tab.content}
@@ -25,7 +26,7 @@ const Tabs = ({ activeTab, setActiveTab, className, tabs }) => {
                 ) : (
                     <a
                         key={i}
-                        className={`${tabSelected ? 'active' : ''} group btn btn-primary px-3 hover:text-secundary tab-active:bg-secundary-light tab-active:border-secundary-clarity tab-active:text-secundary ${tab.class}`}
+                        className={`${tabSelected ? 'active' : ''} tab`}
                         href={cleanUrl(tab.url)}
                         onClick={() => setActiveTab(tab.content)}
                         target={tab.target ?? '_self'}

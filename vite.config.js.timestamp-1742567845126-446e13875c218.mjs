@@ -12,7 +12,7 @@ var vite_config_default = defineConfig({
             plugins: [tailwindcss()],
         },
     },
-    base: '/modulos',
+    base: '/',
     resolve: {
         alias: {
             '@': fileURLToPath(

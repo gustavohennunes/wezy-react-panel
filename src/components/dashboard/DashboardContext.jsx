@@ -151,10 +151,10 @@
 
                 <EntryCallout className="h-full" />
 
-                <div className="grid lg:grid-cols-3 gap-y-5 lg:gap-7.5 items-stretch">
+                <div className="grid grid-cols-1 lg:grid-cols-2 2xl:grid-cols-3 gap-y-5 lg:gap-7.5 items-stretch">
                     
                     {finalizedRegister === false && (
-                        <div className="lg:col-span-1">
+                        <div className="col-span-1">
                             <ReportSettings
                                 className="h-full"
                                 title="Falta muito pouco!"
@@ -164,7 +164,7 @@
                         </div>
                     )}
 
-                    <div className={finalizedRegister === false ? 'lg:col-span-2' : 'lg:col-span-3'}>
+                    <div className={finalizedRegister === false ? 'col-span-1 lg:col-span-1 2xl:col-span-2' : 'col-span-2 xl:col-span-3'}>
                         <div className={finalizedRegister === false ? 'grid grid-cols-2 gap-5 lg:gap-7.5 h-full items-stretch' : 'grid grid-cols-2 sm:grid-cols-4 gap-5 lg:gap-7.5 h-full items-stretch'}>
                             <ChannelStats title="Canais" items={itemsChannel} />
                         </div>
@@ -173,6 +173,7 @@
                 </div>
 
                 <div className="grid lg:grid-cols-3 gap-y-5 lg:gap-7.5 items-stretch">
+
                     <div className="lg:col-span-2">
                         <div className="grid md:grid-cols-2 gap-5 lg:gap-7.5 h-full items-stretch">
                             <Options 

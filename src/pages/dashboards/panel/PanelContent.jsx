@@ -5,6 +5,7 @@
     import { DashboardContext } from '@/components/dashboard/DashboardContext'
     import { PicturesContext } from '@/components/pictures/PicturesContext'
     import { ScreenLoader } from '@/components/loaders'
+    import { Plans } from '../../account/billing/plans/blocks/Plans'
 
     const PanelContent = () => {
         
@@ -16,6 +17,8 @@
             let newContent = ''
             if (pageData?.layout === 'dashboard') {
                 newContent = <DashboardContext />
+            } else if (pageData?.layout === 'plans') {
+                newContent = <Plans />
             } else if (pageData?.layout === 'photos') {
                 newContent = <PicturesContext data={pageData?.params} />
             } else if (pageData?.layout === 'funnel') {

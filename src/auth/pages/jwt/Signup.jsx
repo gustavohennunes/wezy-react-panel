@@ -114,12 +114,15 @@ const Signup = () => {
 
     return (
         <div className="card max-w-[370px] w-full">
+            
             <form
                 className="card-body flex flex-col gap-5 p-10"
                 noValidate
                 onSubmit={formik.handleSubmit}
             >
+
                 <div className="text-center mb-2.5">
+
                     <div className="flex gap-3 mb-2.5 items-center">
                         <img
                             src="https://files.caymanweb.com.br/f7e00f1f7c8e403b99f72159635a3f34/dfca77e57617844b2a0d41057e7b884a/logo-vymber.svg"
@@ -141,6 +144,7 @@ const Signup = () => {
                             Revenda
                         </div>
                     </div>
+
                 </div>
 
                 <h3 className="text-left font-semibold">Efetuar cadastro</h3>
@@ -367,7 +371,7 @@ const Signup = () => {
                         />
                         <span className="checkbox-label">
                             Eu aceito os{' '}
-                            <Link to="#" className="text-2sm link">
+                            <Link to="/auth/terms" className="text-2sm link">
                                 Termos de uso
                             </Link>
                         </span>

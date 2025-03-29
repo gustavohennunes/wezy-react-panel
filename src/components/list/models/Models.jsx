@@ -303,11 +303,9 @@
 
                         <div className="card-header flex-wrap my-2 gap-2 border-b-0 px-5">
 
-                            <h3 className="card-title font-medium text-sm">
-                                {addBtn}
-                            </h3>
-
-                            {search !== undefined && (
+                            {addBtn}
+                            
+                            {search !== undefined && search !== false && (
 
                                 <div className="flex flex-wrap gap-2 lg:gap-5">
 

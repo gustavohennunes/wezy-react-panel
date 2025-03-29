@@ -55,16 +55,16 @@
             try {
 
                 const urlFormulario = window.location.search
-                
+
                 response = await api.post(
                     buildApiUrl(urlFormulario),
-                    qs.stringify(formDataObject),
+                    formData,
                     {
                         headers: {
-                            'Content-Type': 'application/x-www-form-urlencoded',
+                            'Content-Type': 'multipart/form-data',
                         }
                     }
-                )
+                );
 
                 params.delete('acao')
                 params.delete('id')
@@ -86,7 +86,7 @@
 
                 //CASO ESTEJA NA FINALIZAÇÃO DE CADASTRO, DIRECIONA PARA O DASHBOARD
                 if(slug === 'perfil' && action === 'finalizar-cadastro') {
-                    window.location.href = '/modulos'
+                    window.location.href = '/'
                 }
 
             } catch (error) {

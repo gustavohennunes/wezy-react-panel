@@ -1,4 +1,4 @@
-    import { createContext, useContext, useEffect, useState, useCallback } from 'react'
+    import { createContext, useContext, useEffect, useState, useCallback, useRef } from 'react'
     import { useSearchParams } from 'react-router-dom'
     import { api } from '@/services/api'
     import { buildApiUrl } from '@/utils/urlHelper'
@@ -9,25 +9,25 @@
 
     export const PageDataProvider = ({ children }) => {
 
-        const [pageData, setPageData] = useState(null)
-        const [loading, setLoading]   = useState(true)
-        const [error, setError]       = useState(null)
-        const [searchParams]          = useSearchParams()
-        const [lastUrl, setLastUrl]   = useState(null)
-        const { auth, logout }        = useAuth()
+        const [pageData, setPageData] = useState(null);
+        const [loading, setLoading]   = useState(true);
+        const [error, setError]       = useState(null);
+        const [searchParams]          = useSearchParams();
+        const [lastUrl, setLastUrl]   = useState(null);
+        const { auth, logout }        = useAuth();        
 
         const callApi = useCallback(async (urlApi) => {
             
             if (urlApi === lastUrl) return
 
-            setLoading(true)
-            setLastUrl(urlApi)
+            setLoading(true);
+            setLastUrl(urlApi);
 
             try {
                 
-                const response = await api.get(urlApi)
-
-                setPageData(response.data.success.response.data)
+                const response = await api.get(urlApi);
+                
+                setPageData(response.data.success.response.data);
 
             } catch (err) {
 
@@ -65,12 +65,24 @@
                 setPageData(pageData)
                 setLoading(false)
 
-                return
+                return;
+
+            } else if (urlApi === '/panel/module?slug=planos') {
+
+                let pageData = {
+                    layout: 'plans',
+                }
+
+                setPageData(pageData)
+                setLoading(false)
+
+                return;
+
             }
 
             callApi(urlApi)
 
-        }, [searchParams])
+        }, [ searchParams ])
 
         return (
             <PageDataContext.Provider value={{ pageData, loading, error, callApi }}>

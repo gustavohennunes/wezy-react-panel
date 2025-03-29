@@ -141,7 +141,7 @@
             
             setFormState((prev) => ({
                 ...prev,
-                [name]: value + ' - 23:59',
+                [name]: value,
             }))
 
         }

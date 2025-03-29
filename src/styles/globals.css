@@ -8,3 +8,30 @@
 
 /* Shadcn UI */
 @import 'shadcn.ui';
+
+
+
+.pagina-conteudo {
+    min-height: 35px;
+    margin-top: 10px;
+    border: 1px solid hsl(var(--border));
+    padding: 15px;
+    border-radius:0.75rem;
+}
+.pagina-conteudo .periodo-busca {
+    font-size: 12px;
+    height: 13px;
+    line-height: 12px;
+}
+.pagina-conteudo .filter-field .periodo-busca {
+    margin-bottom:5px;
+}
+select.campo-filtro{
+    border: 0px;
+    background-color: transparent;
+    appearance: none;
+    outline: none;
+}
+.clearfix{
+    clear: both;
+}

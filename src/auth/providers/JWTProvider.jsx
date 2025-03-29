@@ -166,7 +166,7 @@
             let response = ''
             try{
 
-                response = await api.get('/panel/module?slug=user-infos')
+                response = await api.get('/panel/module?slug=user-infos');
                 
                 return response.data.success.response.data
 
@@ -191,11 +191,11 @@
             return {
                 data: {
                     id: 1,
-                    first_name: 'Douglas',
-                    last_name: 'Feuser',
+                    first_name: 'User',
+                    last_name: 'Name',
                     role: 'user',
                     status: 'active',
-                    email: 'douglas.feuser@gmail.com',
+                    email: 'suporte@cayman.com.br',
                 },
             }
 
@@ -210,9 +210,9 @@
             
             const getUserInfos = await getUser();
             if (getUserInfos.user.register_complete === false && slug !== 'perfil') {
-                window.location.href = '/modulos?pag=perfil&action=finalizar-cadastro';
+                window.location.href = '/?pag=perfil&action=finalizar-cadastro';
             } else if (getUserInfos.user.register_complete === true && slug === 'perfil' && action === 'finalizar-cadastro') {
-                window.location.href = '/modulos';
+                window.location.href = '/';
             } else {
                 setUserInfos(getUserInfos);
             }

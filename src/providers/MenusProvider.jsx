@@ -45,7 +45,7 @@
             try {
 
                 await axios
-                    .get('https://painel.amazon.cayman.com.br/api/v1/panel/menus', {
+                    .get('https://painel.wezy.com.br/api/v1/panel/menus', {
                         headers: {
                             'Content-Type': 'application/x-www-form-urlencoded',
                             'Customer-Host': CUSTOMER_HOST,

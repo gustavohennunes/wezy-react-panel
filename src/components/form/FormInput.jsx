@@ -132,6 +132,7 @@
                     <FormFile
                         fieldName={fieldName}
                         multiple={true}
+                        value={formState[fieldName] || ''}
                         accept="image/*"
                         maxSize={5 * 1024 * 1024}
                         onFilesChange={handleFilesChange}
@@ -164,7 +165,7 @@
             case 'aut':
 
                 inputElement = (
-                    <div className={fieldData.class + ' text-[13px]'}>
+                    <div className={fieldData.class + ' text-[13px] w-full'}>
                         <span
                             style={{ display: 'contents' }}
                             dangerouslySetInnerHTML={{
@@ -179,6 +180,7 @@
 
                 inputElement = (
                     <FormColorPicker
+                        fieldName={fieldName}
                         color={formState[fieldName]}
                         onChange={(color) => handleInputChange(fieldName, color)}
                     />
@@ -194,9 +196,11 @@
         if ((fieldClass + fieldData.class).indexOf('obg') !== -1) {
             requiredField = true
         }
-
+        
         return (
             <div className={combinedClass} {...rowAttr}>
+                
+                {title !== false && (
                 <div className="form-label max-w-56 flex-col">
                     <label>
                         <b>
@@ -208,7 +212,10 @@
                     </label>
                     {subtitle && <span className="text-[10px]"> {subtitle} </span>}
                 </div>
+                )}
+
                 {inputElement}
+
             </div>
         )
 

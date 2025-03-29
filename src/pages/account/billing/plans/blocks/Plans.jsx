@@ -2,6 +2,7 @@ import { Fragment } from 'react'
 import { KeenIcon } from '@/components'
 import { useAuth } from '@/auth/providers/JWTProvider'
 import { Link } from 'react-router-dom'
+import { useEffect } from 'react'
 
 const Plans = () => {
 
@@ -21,10 +22,10 @@ const Plans = () => {
 
                     <div className="flex items-end gap-1.5">
                         
-                        {info?.price && (
+                        {info[1]?.price && (
                             <>
                                 <div className="text-2xl text-gray-900 font-semibold leading-none">
-                                    {info.price}
+                                    {info[1].price}
                                 </div>
                                 <div className="text-gray-700 text-2xs">
                                     por rádio
@@ -38,7 +39,7 @@ const Plans = () => {
 
                 <div>  
 
-                    {type === 0 ? (
+                    {info[1].current === true ? (
                         <button className='btn btn-secondary btn-sm text-center flex justify-center w-full'>
                             Plano atual
                         </button>
@@ -59,13 +60,13 @@ const Plans = () => {
 
     const renderFeatureDetail = (detail) => {
 
-        if (detail.indexOf('false') !== -1) {
+        if (detail?.indexOf('false') !== -1) {
             return detail ? (
                 <KeenIcon icon="cross" className="text-danger text-lg" />
             ) : null
         }
 
-        if (detail.indexOf('true') !== -1) {
+        if (detail?.indexOf('true') !== -1) {
             return detail ? (
                 <KeenIcon icon="check" className="text-success text-lg" />
             ) : null
@@ -110,7 +111,7 @@ const Plans = () => {
                         {userInfos?.plans?.info && typeof userInfos?.plans?.info === 'object' && Object.entries(userInfos?.plans?.info).map((plan, index) => (
                         <td key={index} className="!border-b-0 table-border-s table-border-t card-rounded-tl bg-light-active dark:bg-coal-100 !p-5 !pt-7.5 relative">
                             
-                            {index === 0 && (
+                            {plan[1].current === true && (
                             <span className="absolute badge badge-sm badge-outline badge-success absolutes top-0 start-1/2 rtl:translate-x-1/2 -translate-x-1/2 -translate-y-1/2">
                                 Plano atual
                             </span>

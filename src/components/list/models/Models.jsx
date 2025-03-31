@@ -425,10 +425,6 @@
 
                 toast(`Error de dados`, {
                     description: `❌ Erro ao carregar dados da página.`,
-                    action: {
-                        label: 'Ok',
-                        onClick: () => console.log('Ok'),
-                    },
                 })
 
                 return {

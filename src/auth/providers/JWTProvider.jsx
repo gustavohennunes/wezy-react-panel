@@ -10,8 +10,8 @@
 
     export const CAYMAN_LOGIN_URL    = `${CAYMAN_API_URL}/panel/login`
     export const CAYMAN_REGISTER_URL = `${CAYMAN_API_URL}/panel/signup`
-    export const FORGOT_PASSWORD_URL = `${API_URL}/forgot-password`
-    export const RESET_PASSWORD_URL  = `${API_URL}/reset-password`
+    export const FORGOT_PASSWORD_URL = `${CAYMAN_API_URL}/panel/forgot-password`
+    // export const RESET_PASSWORD_URL  = `${API_URL}/reset-password`
     export const GET_USER_URL        = `${CAYMAN_API_URL}/user-infos`
 
     const BTOKEN        = import.meta.env.VITE_BTOKEN

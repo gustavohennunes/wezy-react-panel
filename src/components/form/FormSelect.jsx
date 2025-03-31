@@ -42,10 +42,10 @@
 
                 setOptions(fieldData.options)
 
-            }
+            } 
 
         }, [field, fieldData]);
-
+        
         return (
             <div className={combinedClass} {...rowAttr}>
 
@@ -66,9 +66,9 @@
 
                 <Select
                     value={formState[fieldData.name || field.name] || ''}
-                    onValueChange={(value) =>
+                    onValueChange={(value) => {
                         handleSelectChange(fieldData.name || field.name, value)
-                    }
+                    }}
                 >
 
                     <SelectTrigger className="w-full">
@@ -76,13 +76,11 @@
                     </SelectTrigger>
 
                     <SelectContent className="w-full">
+                        
                         {options.map((option, index) => {
-                            const value =
-                                option.value !== undefined &&
-                                option.value !== null &&
-                                option.value !== ''
-                                    ? option.value
-                                    : '-1'
+                            
+                            const value = option.value !== undefined && option.value !== null && option.value !== '' ? option.value : '-1'
+
                             return (
                                 <SelectItem
                                     key={`${index}-${fieldName}`}
@@ -91,6 +89,7 @@
                                     {option.label}
                                 </SelectItem>
                             )
+
                         })}
 
                     </SelectContent>

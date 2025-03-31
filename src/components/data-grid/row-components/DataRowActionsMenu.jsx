@@ -105,18 +105,29 @@
                                         path={item.url || '#'}
                                         target={item.target || '_self'}
                                         onClick={(e, props) => {
+
                                             e.preventDefault()
+
                                             const params = new URLSearchParams(
                                                 props.path
                                             )
 
                                             if (params.has('excluir')) {
-                                                const idExcluir =
-                                                    params.get('excluir')
+                                                
+                                                const idExcluir = params.get('excluir')
+                                                
                                                 removeRow(idExcluir)
+
                                             } else {
-                                                window.location.href = props.path
+                                                
+                                                if(props.target.indexOf('_blank') !== -1) {
+                                                    window.open(props.path, '_blank')
+                                                } else {
+                                                    window.location.href = props.path
+                                                }
+
                                             }
+
                                         }}
                                     >
                                         <MenuLink>

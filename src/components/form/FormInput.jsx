@@ -10,7 +10,6 @@
 
         const handleFilesChange = (files) => {
             setSelectedFiles(files)
-            console.log('Arquivos selecionados:', files)
         }
 
         if (fieldMask == 'Number'){

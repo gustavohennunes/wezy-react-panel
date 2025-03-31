@@ -12,40 +12,40 @@
 
     const FormContext = ({ data }) => {
 
-        const navigate = useNavigate()
+        const navigate = useNavigate();
 
-        const params = new URLSearchParams(window.location.search)
+        const params = new URLSearchParams(window.location.search);
         
-        const acao = params.get('acao')
+        const acao = params.get('acao');
         
-        const [ sections, setSections ]      = useState('')
-        const [ formTabs, setFormTabs ]      = useState('')
-        const [ loading, setLoading ]        = useState(false)
+        const [ sections, setSections ]      = useState('');
+        const [ formTabs, setFormTabs ]      = useState('');
+        const [ loading, setLoading ]        = useState(false);
         const [ activeTab, setActiveTab ]    = useState('');
-        const { callApi }                    = usePageData()
-        const { auth, logout, slug, action } = useAuth()
+        const { callApi }                    = usePageData();
+        const { auth, logout, slug, action } = useAuth();
 
         async function submitForm(e) {
 
-            e.preventDefault()
+            e.preventDefault();
 
-            let response = ''
-            const form = e.target
-            const formData = new FormData(form)
-            const formDataObject = {}
+            let response = '';
+            const form = e.target;
+            const formData = new FormData(form);
+            const formDataObject = {};
             
             formData.forEach((value, key) => {
                 
                 if (formDataObject[key] !== undefined) {
                     
                     if (!Array.isArray(formDataObject[key])) {
-                        formDataObject[key] = [formDataObject[key]]
+                        formDataObject[key] = [formDataObject[key]];
                     }
 
-                    formDataObject[key].push(value)
+                    formDataObject[key].push(value);
 
                 } else {
-                    formDataObject[key] = value
+                    formDataObject[key] = value;
                 }
 
             })
@@ -54,7 +54,7 @@
 
             try {
 
-                const urlFormulario = window.location.search
+                const urlFormulario = window.location.search;
 
                 response = await api.post(
                     buildApiUrl(urlFormulario),
@@ -65,6 +65,10 @@
                         }
                     }
                 );
+
+                if(response?.data?.success?.response?.data?.redirect) {
+                    window.location.href = response?.data?.success?.response?.data?.redirect
+                }
 
                 params.delete('acao')
                 params.delete('id')
@@ -154,13 +158,23 @@
                 fields.forEach((field) => {
 
                     if (field.type === 'Cab') {
-
+                            
                         if (currentSection) {
                             groupedSections.push(currentSection)
                         }
+                        
+                        let subTitle = field?.field?.value?.title?.split('//');
+                        let title = field.field.value.title;
+                        if(subTitle.length > 1) {
+                            title    = subTitle[0].trim();
+                            subTitle = subTitle[1].trim();
+                        } else {
+                            subTitle = ''
+                        }
 
                         currentSection = {
-                            title: field.field.value.title,
+                            title: title,
+                            subTitle: subTitle,
                             number: field.field.value.number,
                             fields: [],
                         }

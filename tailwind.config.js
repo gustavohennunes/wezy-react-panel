@@ -627,7 +627,7 @@ module.exports = {
                     },
                 },
                 card: {
-                    px: theme('spacing')['7.5'],
+                    px: theme('spacing')['4'],
                     py: {
                         header: theme('spacing.3'),
                         body: theme('spacing.5'),

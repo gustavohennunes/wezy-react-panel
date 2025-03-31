@@ -32,9 +32,17 @@ const ResetPassword = () => {
         initialValues,
         validationSchema: forgotPasswordSchema,
         onSubmit: async (values, { setStatus, setSubmitting }) => {
-            setLoading(true)
-            setHasErrors(undefined)
+            
+            // setLoading(true)
+            // setHasErrors(undefined)
+
+            setStatus('E-mai de recuperação enviado! Consulte sua caixa de e-mails!')
+            setHasErrors(false)
+            setLoading(false)
+            setSubmitting(false)
+            /*
             try {
+
                 if (!requestPasswordResetLink) {
                     throw new Error(
                         'Não foi possível concluir a operação. Tente novamente.'
@@ -54,7 +62,9 @@ const ResetPassword = () => {
                     pathname: '/auth/reset-password/check-email',
                     search: params.toString(),
                 })
+
             } catch (error) {
+
                 if (error instanceof AxiosError && error.response) {
                     setStatus(error.response.data.message)
                 } else {
@@ -64,7 +74,8 @@ const ResetPassword = () => {
                 setHasErrors(true)
                 setLoading(false)
                 setSubmitting(false)
-            }
+            }*/
+
         },
     })
 

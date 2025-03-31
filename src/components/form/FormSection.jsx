@@ -112,6 +112,10 @@
 
         const handleSelectChange = (name, value) => {
 
+            if(value == ''){
+                return;
+            }
+            
             setFormState((prev) => ({
                 ...prev,
                 [name]: value,
@@ -198,12 +202,13 @@
             return attributes;
 
         };
-
+        
         return (
             <div className="card pb-2.5 mb-6">
 
-                <div className="card-header justify-start" id="general_settings">
+                <div className="card-header justify-start flex-col items-start" id="general_settings">
                     <h3 className="card-title">{data.title}</h3>
+                    {data.subTitle && (<p className="text-2sm text-gray-700">{data.subTitle}</p>)}
                 </div>
 
                 <div className="card-body grid gap-5">
@@ -234,7 +239,7 @@
                         if(fieldData?.class && fieldData?.class.includes('date-picker')){
                             type = 'Dta';
                         }
-
+                        
                         switch (type) {
                             case 'Frm':
                             case 'Psw':

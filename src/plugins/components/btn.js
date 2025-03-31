@@ -7,7 +7,7 @@ export default plugin(({ addComponents, theme }) => {
             display: 'inline-flex',
             'align-items': 'center',
             cursor: 'pointer',
-            'line-height': '1',
+            'line-height': '1.4',
             'border-radius': theme('custom.components.common.borderRadius.btn'),
             height: theme('custom.components.btn.DEFAULT.height'),
             'padding-inline-start': theme('custom.components.btn.DEFAULT.px'),

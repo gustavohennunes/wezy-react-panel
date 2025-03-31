@@ -1,6 +1,7 @@
     /* eslint-disable no-unused-vars */
     import React, { forwardRef, useEffect, useRef, useState } from 'react'
     import { KeenIcon } from '@/components'
+    import { Link } from 'react-router-dom'
 
     const SidebarHeader = forwardRef(({ search, setSearch, ...props }, ref) => {
     
@@ -31,16 +32,18 @@
         return (
             <div ref={ref}>
                 <div className="flex gap-3 mb-5 items-center px-6 mt-8">
-                    <img
-                        src="https://files.caymanweb.com.br/f7e00f1f7c8e403b99f72159635a3f34/dfca77e57617844b2a0d41057e7b884a/logo-vymber.svg"
-                        className="dark:hidden"
-                        style={{ width: '135px' }}
-                    />
-                    <img
-                        src="https://files.caymanweb.com.br/f7e00f1f7c8e403b99f72159635a3f34/dfca77e57617844b2a0d41057e7b884a/logo-vymber.svg"
-                        className="hidden dark:block"
-                        style={{ filter: 'brightness(100)', width: '135px' }}
-                    />
+                    <Link to="/?pag=dashboard">
+                        <img
+                            src="https://files.caymanweb.com.br/f7e00f1f7c8e403b99f72159635a3f34/dfca77e57617844b2a0d41057e7b884a/logo-vymber.svg"
+                            className="dark:hidden"
+                            style={{ width: '135px' }}
+                        />
+                        <img
+                            src="https://files.caymanweb.com.br/f7e00f1f7c8e403b99f72159635a3f34/dfca77e57617844b2a0d41057e7b884a/logo-vymber.svg"
+                            className="hidden dark:block"
+                            style={{ filter: 'brightness(100)', width: '135px' }}
+                        />
+                    </Link>
                     <div className="text-2sm text-gray-600 leading-none flex items-center">
                         |
                     </div>

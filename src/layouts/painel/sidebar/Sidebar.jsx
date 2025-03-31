@@ -18,7 +18,7 @@
         const [ scrollableHeight, setScrollableHeight]    = useState(0)
         const [ search, setSearch ]                       = useState('')
         
-        const scrollableOffset = 50
+        const scrollableOffset = 0
 
         const handleMobileSidebarClose = () => {
             setMobileSidebarOpen(false)
@@ -50,17 +50,9 @@
 
         useEffect(() => {
 
-            if (headerRef.current && footerRef.current) {
-                
-                const headerHeight = getHeight(headerRef.current)
-                const footerHeight = getHeight(footerRef.current)
-                const availableHeight = viewportHeight - headerHeight - footerHeight - scrollableOffset
+            const availableHeight = viewportHeight - 320
 
-                setScrollableHeight(availableHeight)
-
-            } else {
-                setScrollableHeight(viewportHeight)
-            }
+            setScrollableHeight(availableHeight)
 
         }, [viewportHeight])
 

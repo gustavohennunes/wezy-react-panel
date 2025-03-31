@@ -17,13 +17,20 @@
         const [ paymentsPeriods, setPaymentsPeriods ]     = useState({data: [], categories: []})
         const [ cardsItems, setCardsItems ]               = useState([])
         const [ finalizedRegister, setFinalizedRegister ] = useState(false)
+        const [ nameMessage, setNameMessage ]             = useState('')
 
         useEffect(() => {
             
             if (userInfos) {
-
+                
                 if(userInfos?.user?.config_domains && userInfos?.user?.config_personalized && userInfos?.indicators?.users > 0) {
                     setFinalizedRegister(true)
+                }
+
+                if(userInfos?.user?.first_name){
+                    setNameMessage(userInfos?.user?.first_name);
+                } else {
+                    setNameMessage('');
                 }
 
                 setItemsChannel([
@@ -73,7 +80,7 @@
                         title: 'Configurar seu domínio',
                         description: '',
                         path: {
-                            url: '?pag=dominios',
+                            url: '?pag=meus-dominios',
                             title: 'Meus domínios',
                         },
                         checked: userInfos?.user?.config_domains,
@@ -149,7 +156,7 @@
         return (
             <div className="grid gap-5 lg:gap-7.5">
 
-                <EntryCallout className="h-full" />
+                <EntryCallout className="h-full" nameMessage={nameMessage} />
 
                 <div className="grid grid-cols-1 lg:grid-cols-2 2xl:grid-cols-3 gap-y-5 lg:gap-7.5 items-stretch">
                     

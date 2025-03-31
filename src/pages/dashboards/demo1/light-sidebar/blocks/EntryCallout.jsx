@@ -2,7 +2,7 @@ import { Fragment } from 'react'
 import { Link } from 'react-router-dom'
 import { toAbsoluteUrl } from '@/utils/Assets'
 import { CommonAvatars } from '@/partials/common'
-const EntryCallout = ({ className }) => {
+const EntryCallout = ({ className, nameMessage }) => {
     return (
         <Fragment>
             <style>
@@ -30,6 +30,11 @@ const EntryCallout = ({ className }) => {
                     <div className="flex flex-col justify-center gap-4">
 
                         <h2 className="text-1.5xl font-semibold text-gray-900">
+                            {nameMessage && (
+                                <>
+                                Olá, <b><span className="text-danger">{nameMessage}</span></b>!<br />
+                                </>
+                            )}
                             Seja bem-vindo(a) <br />à sua{' '}
                             <span className="text-danger">revenda Vymber!</span>
                         </h2>

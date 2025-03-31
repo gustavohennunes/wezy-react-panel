@@ -55,8 +55,14 @@
                 //VERIFICA SE O TITLE BATE COM O SEARCH
                 if (search == '' || (search && item.title.toLowerCase().includes(search.toLowerCase()))) {
 
+                    //VERIFICA SE O ITEM É O ATUAL
+                    let className = "";
+                    if (item.path == window.location.search) {
+                        className = "active"
+                    }
+
                     return (
-                        <MenuItem key={index}>
+                        <MenuItem key={index} className={className}>
                             <MenuLink
                                 path={item.path}
                                 className={clsx(

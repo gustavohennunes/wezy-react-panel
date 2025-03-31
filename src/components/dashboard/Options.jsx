@@ -13,10 +13,13 @@ const Options = ({ items }) => {
                 className="card px-5 lg:px-7.5 h-full bg-[length:85%] [background-position:9rem_-4rem] rtl:[background-position:-4rem_-4rem] bg-no-repeat channel-stats-bg"
             >
                 <div className="flex flex-col gap-4 pt-6">
+                    
+                    {item.icon && (
                     <KeenIcon
                         icon={item.icon}
                         className="text-2xl text-gray-600"
                     />
+                    )}
 
                     <div className="flex flex-col gap-2.5 mb-2">
                         <h3 className="text-base font-medium leading-none text-gray-900">

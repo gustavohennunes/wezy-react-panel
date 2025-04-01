@@ -126,7 +126,7 @@ const DropdownUserPanel = ({ menuItemRef }) => {
 
     return (
         <MenuSub
-            className="menu-default light:border-gray-300 w-[200px] md:w-[250px]"
+            className="menu-default light:border-gray-300 w-[250px]"
             rootClassName="p-0"
         >
             {buildHeader()}

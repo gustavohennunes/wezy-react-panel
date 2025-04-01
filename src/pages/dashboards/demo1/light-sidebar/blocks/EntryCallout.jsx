@@ -17,7 +17,7 @@ const EntryCallout = ({ className, nameMessage }) => {
                     }
                     @media (max-width: 1250px) {
                         .entry-callout-bg {
-                            background:none;
+                            background:none !important;
                         }
                     }
                     `}

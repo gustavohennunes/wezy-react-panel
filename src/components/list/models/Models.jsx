@@ -285,94 +285,96 @@
             )
 
             return (
-                <div className="bg-transparent">
-
+                <>
+                
                     {tabs?.before && Array.isArray(tabs?.before) ? (
 
-                        <div className="card-header flex-wrap gap-2 border-b-0 px-5">
-                            <Tabs
-                                activeTab={activeTab}
-                                setActiveTab={setActiveTab}
-                                tabs={tabs?.before}
-                            />
-                        </div>
+                        <Tabs
+                            activeTab={activeTab}
+                            setActiveTab={setActiveTab}
+                            tabs={tabs?.before}
+                            className="tabs w-f px-6"
+                        />
 
                     ) : null}
 
-                    {search !== undefined && addBtn !== undefined && (
+                    <div className="bg-transparent">
 
-                        <div className="card-header flex-wrap my-2 gap-2 border-b-0 px-5">
+                        {search !== undefined && addBtn !== undefined && (
 
-                            {addBtn}
-                            
-                            {search !== undefined && search !== false && (
+                            <div className="card-header flex-wrap my-2 gap-2 border-b-0 px-5">
 
-                                <div className="flex flex-wrap gap-2 lg:gap-5">
+                                {addBtn}
+                                
+                                {search !== undefined && search !== false && (
 
-                                    <form
-                                        id="form2"
-                                        name="form2"
-                                        method="post"
-                                        action={search?.action}
-                                        onSubmit={(e) => submitSearch(e)}
-                                        className="flex form-busca"
-                                    >
+                                    <div className="flex flex-wrap gap-2 lg:gap-5">
 
-                                        <label className="input input-sm">
-                                            <input
-                                                type="text"
-                                                name="FrmBusca"
-                                                id="FrmBusca"
-                                                className="inputBusca"
-                                                placeholder={search?.placeholder}
-                                                value={searchInput}
-                                                onChange={(e) =>
-                                                    setSearchInput(e.target.value)
-                                                }
-                                            />
-                                        </label>
-
-                                        <button
-                                            type="submit"
-                                            className="btn btn-primary btn-sm ml-1"
+                                        <form
+                                            id="form2"
+                                            name="form2"
+                                            method="post"
+                                            action={search?.action}
+                                            onSubmit={(e) => submitSearch(e)}
+                                            className="flex form-busca"
                                         >
-                                            <KeenIcon
-                                                icon="magnifier"
-                                                className="!text-sm"
-                                            />
-                                        </button>
 
-                                    </form>
+                                            <label className="input input-sm">
+                                                <input
+                                                    type="text"
+                                                    name="FrmBusca"
+                                                    id="FrmBusca"
+                                                    className="inputBusca"
+                                                    placeholder={search?.placeholder}
+                                                    value={searchInput}
+                                                    onChange={(e) =>
+                                                        setSearchInput(e.target.value)
+                                                    }
+                                                />
+                                            </label>
 
-                                </div>
+                                            <button
+                                                type="submit"
+                                                className="btn btn-primary btn-sm ml-1"
+                                            >
+                                                <KeenIcon
+                                                    icon="magnifier"
+                                                    className="!text-sm"
+                                                />
+                                            </button>
 
-                            )}
+                                        </form>
 
-                        </div>
-                    )}
+                                    </div>
 
-                    {tabs?.after && Array.isArray(tabs?.after) ? (
-                        <div className="card-header justify-start flex-wrap gap-2 border-b-0 px-5">
-                            {tabs?.after?.map((afterTab, i) => {
-                                return (
-                                    <a
-                                        key={i}
-                                        className="btn btn-primary"
-                                        href={
-                                            !afterTab.url ||
-                                            afterTab.url === 'javascript:;'
-                                                ? ''
-                                                : cleanUrl(afterTab.url)
-                                        }
-                                        target={afterTab.target ?? '_self'}
-                                    >
-                                        {afterTab.content}
-                                    </a>
-                                )
-                            })}
-                        </div>
-                    ) : null}
-                </div>
+                                )}
+
+                            </div>
+                        )}
+
+                        {tabs?.after && Array.isArray(tabs?.after) ? (
+                            <div className="card-header justify-start flex-wrap gap-2 border-b-0 px-5">
+                                {tabs?.after?.map((afterTab, i) => {
+                                    return (
+                                        <a
+                                            key={i}
+                                            className="btn btn-primary"
+                                            href={
+                                                !afterTab.url ||
+                                                afterTab.url === 'javascript:;'
+                                                    ? ''
+                                                    : cleanUrl(afterTab.url)
+                                            }
+                                            target={afterTab.target ?? '_self'}
+                                        >
+                                            {afterTab.content}
+                                        </a>
+                                    )
+                                })}
+                            </div>
+                        ) : null}
+                    </div>
+                </>
             )
         }
 

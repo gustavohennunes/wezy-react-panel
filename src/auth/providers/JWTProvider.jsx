@@ -27,12 +27,24 @@
         const [ slug, setSlug ]               = useState('')
         const [ action, setAction ]           = useState('')
         const [ userInfos, setUserInfos ]     = useState({});
+        const [ publicInfos, setPublicInfos ] = useState({});
+        const [ isLogged, setIsLogged ]       = useState(false);
+
+        window.api = api;
 
         useEffect(() => {
 
             const params = new URLSearchParams(window.location.search)
 
-            setSlug(params.get('slug') ?? params.get('pag'));
+            let useSlug = params.get('slug') ?? params.get('pag');
+            if(useSlug === ''){
+                useSlug = 'dashboard';
+            }
+
+            if (slug !== useSlug) {
+                setSlug(useSlug);
+            }
+
             setAction(params.get('action') ?? '');
 
         }, [ window.location.search ]);
@@ -161,6 +173,23 @@
             await axios.post(RESET_PASSWORD_URL, { email, token, password, password_confirmation })
         }
 
+        const getPublicInfos = async () => {
+
+            let response = '';
+
+            try{
+
+                response = await api.get('/panel/module?slug=public-webservice');
+                
+                setPublicInfos(response.data.success.response.data)
+
+            } catch (error) {
+                
+                setPublicInfos({});
+            }
+
+        }
+
         const getUser = async () => {
             
             let response = ''
@@ -172,14 +201,14 @@
 
             } catch (error) {
 
-                toast(`❌ Erro: `, {
+                /* toast(`❌ Erro: `, {
                     description: <span style={{ 'color': 'white' }}>{error.response?.data?.error?.message || error.message}</span>,
                     style: {
                         color: 'white',
                         background: 'var(--tw-danger)',
                         fontWeight: 'bold'
                     }
-                })
+                }) */
 
             }
 
@@ -209,9 +238,9 @@
         const fetchUserInfos = async (slug, action) => {
             
             const getUserInfos = await getUser();
-            if (getUserInfos.user.register_complete === false && slug !== 'perfil') {
+            if (getUserInfos?.user?.register_complete === false && slug !== 'perfil' && slug !== '') {
                 window.location.href = '/?pag=perfil&action=finalizar-cadastro';
-            } else if (getUserInfos.user.register_complete === true && slug === 'perfil' && action === 'finalizar-cadastro') {
+            } else if (getUserInfos?.user?.register_complete === true && slug === 'perfil' && action === 'finalizar-cadastro') {
                 window.location.href = '/';
             } else {
                 setUserInfos(getUserInfos);
@@ -220,12 +249,11 @@
         };
 
         useEffect(() => {
-            
-            if(slug != ''){
-                fetchUserInfos(slug, action);
-            }
 
-        }, [ slug ]);
+            fetchUserInfos(slug, action);
+            getPublicInfos();
+
+        }, [slug, auth ]);        
 
         return (
             <AuthContext.Provider
@@ -246,6 +274,8 @@
                     verify,
                     userInfos,
                     setUserInfos,
+                    publicInfos,
+                    setPublicInfos,
                     slug,
                     action
                 }}

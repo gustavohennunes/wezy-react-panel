@@ -1,8 +1,8 @@
 import { Fragment } from 'react'
-import { KeenIcon } from '@/components'
+import { DefaultTooltip, KeenIcon } from '@/components'
 import { useAuth } from '@/auth/providers/JWTProvider'
 import { Link } from 'react-router-dom'
-import { useEffect } from 'react'
+import { FormattedMessage } from 'react-intl'
 
 const Plans = () => {
 
@@ -39,7 +39,7 @@ const Plans = () => {
 
                 <div>  
 
-                    {info[1].current === true ? (
+                    {info[1]?.url !== '' && (info[1].current === true ? (
                         <button className='btn btn-secondary btn-sm text-center flex justify-center w-full'>
                             Plano atual
                         </button>
@@ -49,7 +49,7 @@ const Plans = () => {
                             Entrar em contato
                         </button>
                     </Link>
-                    )}
+                    ))}
 
                 </div>
                 
@@ -80,10 +80,26 @@ const Plans = () => {
         
         return (
             <tr key={index}>
-                <td className="table-border-s !px-5 !py-3.5">
-                    <div className="text-gray-900 text-2sm leading-none font-medium">
-                        {feature.title}
+            
+                <td className="table-border-s flex !px-5 !py-3.5">
+
+                    <div className="flex-1 min-w-0 text-gray-900 text-2sm leading-2 font-medium mr-2">                        
+                        {feature.title}                        
                     </div>
+
+                    {feature.tooltip && (
+                        <DefaultTooltip
+                            title={feature.tooltip}
+                            placement="top"
+                            className="max-w-48 pl-1 flex-shrink-0 "
+                        >
+                            <KeenIcon
+                                icon="information-2"
+                                className="text-gray-500 text-md"
+                            />
+                        </DefaultTooltip>
+                    )}
+
                 </td>
                 
                 {feature?.plans && typeof feature.plans === 'object' && Object.entries(feature.plans).map(([planKey, planValue], item) => (

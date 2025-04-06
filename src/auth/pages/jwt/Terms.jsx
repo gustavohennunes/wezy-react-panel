@@ -1,9 +1,18 @@
 import { Link } from 'react-router-dom'
 import { KeenIcon } from '@/components'
+import { useAuth } from '@/auth/providers/JWTProvider'
+import { useEffect } from 'react'
 
 const Terms = () => {
+
+    const { publicInfos } = useAuth()
+
+    useEffect(() => {
+        console.log('1', publicInfos);
+    }, [publicInfos])
+
     return (
-        <div className="card max-w-[440px] w-full">
+        <div className="card max-w-[600px] !w-full">
             
             <div className="card-body flex flex-col gap-6 p-10">
                 
@@ -32,15 +41,8 @@ const Terms = () => {
                 <h3 className="text-left font-semibold">
                     Termos de uso
                 </h3>
-                <div className="text-2sm text-start text-gray-700">
-
-                    Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.
-                    <br/><br/>
-                    Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.
-                    <br/><br/>
-                    Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.
-                    
-
+                <div className="scrollable-y-auto max-h-[500px] text-2sm text-start text-gray-700">
+                    {publicInfos?.termos ? (<span dangerouslySetInnerHTML={{ __html: publicInfos?.termos }} />) : 'Nenhum termo de uso encontrado.'}
                 </div>
 
                 <div className="flex items-start justify-start gap-1">

@@ -44,6 +44,8 @@
             'parametro',
             'parametros',
             'usuario',
+            'start',
+            'end',
         ]
 
         // Remove parâmetros não permitidos

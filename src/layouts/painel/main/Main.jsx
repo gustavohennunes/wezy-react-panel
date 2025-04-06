@@ -158,15 +158,15 @@
 
             };
 
-            const container = document.querySelector('.custom-form');
-            if (container) {
+            const containers = document.querySelectorAll('.custom-form');
+            containers.forEach((container) => {
                 container.addEventListener('submit', handleFormSubmit);
-            }
+            });
 
             return () => {
-                if (container) {
+                containers.forEach((container) => {
                     container.removeEventListener('submit', handleFormSubmit);
-                }
+                });
             };
 
         });
@@ -189,7 +189,9 @@
                     )}
 
                     {pageJs && (
-                        <script src={"data:text/javascript;base64," + pageJs} />   
+                        <script>  
+                            {atob(pageJs)}
+                        </script>
                     )}
 
                 </Helmet>

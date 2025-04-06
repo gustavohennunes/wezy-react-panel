@@ -206,7 +206,7 @@
         return (
             <div className="card pb-2.5 mb-6">
 
-                <div className="card-header justify-start flex-col items-start" id="general_settings">
+                <div className="card-header justify-center flex-col items-start" id="general_settings">
                     <h3 className="card-title">{data.title}</h3>
                     {data.subTitle && (<p className="text-2sm text-gray-700">{data.subTitle}</p>)}
                 </div>
@@ -302,7 +302,7 @@
                                                     className="form-label flex items-center gap-2.5"
                                                 >
                                                     <input
-                                                        className="radio radio-sm"
+                                                        className={"radio radio-sm " + item.class}
                                                         name={item.name}
                                                         id={item.id}
                                                         checked={

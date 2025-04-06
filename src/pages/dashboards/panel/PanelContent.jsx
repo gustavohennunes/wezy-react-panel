@@ -15,7 +15,10 @@
         useEffect(() => {
             
             let newContent = ''
-            if (pageData?.layout === 'dashboard') {
+            
+            if (pageData?.extra_html_content && pageData?.extra_html_content.length > 0) {
+                newContent = <div dangerouslySetInnerHTML={{ __html: pageData?.extra_html_content }} />
+            } else if (pageData?.layout === 'dashboard') {
                 newContent = <DashboardContext />
             } else if (pageData?.layout === 'plans') {
                 newContent = <Plans />
@@ -37,13 +40,6 @@
                         pagination={pageData?.params?.pagination}
                     />
                 )
-            }
-
-            // javascript e css
-            if (pageData?.javascript) {
-            }
-
-            if (pageData?.css) {
             }
 
             setContent(newContent)

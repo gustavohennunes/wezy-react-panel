@@ -100,7 +100,7 @@
             setValidRows(initialValidRows);
                 
         }, [ data ]);
-        
+
         const handleInputChange = (name, value) => {
             
             setFormState((prev) => ({

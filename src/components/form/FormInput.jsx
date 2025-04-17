@@ -37,9 +37,9 @@
 
                 inputElement = (
                     <CurrencyInput
+                        hideSymbol={true}
                         onChangeValue={(event, originalValue, maskedValue) => {
-                            const sanitizedValue = maskedValue.replace(/\s/g, '');
-                            handleInputChange(fieldName, sanitizedValue);
+                            
                         }}
                         defaultValue={formState[fieldName] || 0}
                         value={formState[fieldName] || 0}
@@ -53,6 +53,7 @@
                                 onChange={(e) =>
                                     handleInputChange(fieldName, e.target.value)
                                 }
+                                maxLength='10'
                             />
                         }
                     />

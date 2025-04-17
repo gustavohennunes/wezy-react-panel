@@ -38,7 +38,8 @@
                 inputElement = (
                     <CurrencyInput
                         onChangeValue={(event, originalValue, maskedValue) => {
-                            
+                            const sanitizedValue = maskedValue.replace(/\s/g, '');
+                            handleInputChange(fieldName, sanitizedValue);
                         }}
                         defaultValue={formState[fieldName] || 0}
                         value={formState[fieldName] || 0}

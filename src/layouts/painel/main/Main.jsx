@@ -232,6 +232,10 @@
 
                                     <Outlet />
 
+                                    {footerContent && (
+                                        <div className="w-full" style={{padding: '10px 30px'}} dangerouslySetInnerHTML={{ __html: footerContent }} />
+                                    )}
+
                                 </main>
 
                                 <Footer />

@@ -111,7 +111,6 @@ const Login = () => {
                     <label className="input">
                         <input
                             placeholder="Digite seu e-mail"
-                            autoComplete="off"
                             {...formik.getFieldProps('email')}
                             className={clsx('form-control', {
                                 'is-invalid':

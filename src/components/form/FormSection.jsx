@@ -1,11 +1,6 @@
 
     import { useState, useEffect } from 'react'
-    import { FormInput, FormSelect } from './'
-    import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover'
-    import { KeenIcon } from '@/components'
-    import { Calendar } from '@/components/ui/calendar'
-    import { format } from 'date-fns'
-    import { cn } from '@/lib/utils'
+    import { FormInput, FormSelect, FormDate } from './'
 
     const FormSection = ({ data, index, button, form, loading }) => {
 
@@ -16,26 +11,47 @@
         
             const initialFormState = {}
             const initialValidRows = {}
+            
             data.fields.forEach((field) => {
 
                 const fieldName = field.field?.name || field.name
                 
                 initialFormState[fieldName] = field.field?.value || ''
+                
+                if (field.type === 'Frm' && field.field?.class.indexOf('data-hora') !== -1) {
+                    
+                    if(!field.field?.value || field.field?.value === '0000-00-00 00:00:00' || field.field?.value == ''){
+                        initialFormState[fieldName] = null
+                    } else {
+
+                        const parseDate = field?.field?.value?.split(' ');
+                        const dateValue = parseDate[0].split('/');
+                        const timeValue = parseDate[1].split(':');
+                        
+                        const parsedDate = new Date(dateValue[2] + '-' + dateValue[1] + '-' + dateValue[0] + 'T' + timeValue[0] + ':' + timeValue[1] + ':00Z');
+                        
+                        if (!isNaN(parsedDate)) {
+                            initialFormState[fieldName] = parsedDate
+                        }
+
+                    }
+
+                }
 
                 if (field.type === 'Dta') {
                     
                     const dateValue = field.field?.value
-                    if (dateValue && dateValue !== '00/00/0000') {
+                    
+                    if (dateValue && dateValue !== '00/00/0000' && dateValue != '') {
+                         
+                        const parseDate = dateValue?.split('/');
                         
-                        const parsedDate = new Date(dateValue)
+                        const parsedDate = new Date(parseDate[2] + '-' + parseDate[1] + '-' + parseDate[0]+'T12:00:00Z');
+                        
                         if (!isNaN(parsedDate)) {
                             initialFormState[fieldName] = parsedDate
-                        } else {
-                            initialFormState[fieldName] = new Date()
                         }
 
-                    } else {
-                        initialFormState[fieldName] = new Date()
                     }
 
                 }
@@ -95,7 +111,7 @@
                 }
 
             })
-
+            
             setFormState(initialFormState);
             setValidRows(initialValidRows);
                 
@@ -124,7 +140,7 @@
         }
 
         const handleDateChange = (name, date) => {
-
+            
             setFormState((prev) => ({
                 ...prev,
                 [name]: date,
@@ -252,25 +268,47 @@
                             case 'Din':
                             case 'aut':
                             case 'Cor':
+                                
+                                if (fieldData.class.indexOf('data-hora') !== -1){
 
-                                return (
-                                    <FormInput
-                                        key={`${fieldName}-${idx}`}
-                                        type={type}
-                                        title={title}
-                                        subtitle={subtitle}
-                                        fieldMask={fieldData.mask}
-                                        fieldName={fieldName}
-                                        fieldClass={fieldClass}
-                                        fieldData={fieldData}
-                                        formState={formState}
-                                        required={required}
-                                        combinedClass={combinedClassName}
-                                        rowAttr={parsedAttributes}
-                                        handleInputChange={handleInputChange}
-                                    />
-                                )
+                                    return (
+                                        <FormDate
+                                            key={`${fieldName}-${idx}`}
+                                            title={title}
+                                            idx={idx}
+                                            ampm={true}
+                                            fieldName={fieldName}
+                                            fieldData={fieldData}
+                                            formState={formState}
+                                            fieldClass={fieldClass}
+                                            combinedClass={combinedClassName}
+                                            parsedAttributes={parsedAttributes}
+                                            handleDateChange={handleDateChange}
+                                        />
+                                    )
 
+                                } else {
+
+                                    return (
+                                        <FormInput
+                                            key={`${fieldName}-${idx}`}
+                                            type={type}
+                                            title={title}
+                                            subtitle={subtitle}
+                                            fieldMask={fieldData.mask}
+                                            fieldName={fieldName}
+                                            fieldClass={fieldClass}
+                                            fieldData={fieldData}
+                                            formState={formState}
+                                            required={required}
+                                            combinedClass={combinedClassName}
+                                            rowAttr={parsedAttributes}
+                                            handleInputChange={handleInputChange}
+                                        />
+                                    )
+
+                                }
+                                
                             case 'Rdo':
 
                                 return (
@@ -408,70 +446,18 @@
                             case 'Dta':
 
                                 return (
-                                    <div
+                                    <FormDate
                                         key={`${fieldName}-${idx}`}
-                                        className="w-full"
-                                    >
-                                        <div className={combinedClassName} {...parsedAttributes}>
-
-                                            <label className="form-label flex items-center gap-1 max-w-56">
-                                                {fieldData.title || title}
-                                            </label>
-
-                                            <Popover key={`${fieldName}-${idx}`}>
-                                                <PopoverTrigger asChild>
-                                                    <button
-                                                        id={`btn-date-${fieldName}`}
-                                                        className={cn(
-                                                            'input data-[state=open]:border-primary',
-                                                            !formState[fieldName] &&
-                                                                'text-muted-foreground'
-                                                        )}
-                                                    >
-                                                        <KeenIcon
-                                                            icon="calendar"
-                                                            className="-ms-0.5"
-                                                        />
-                                                        {formState[fieldName] ? (
-                                                            format(
-                                                                formState[
-                                                                    fieldName
-                                                                ],
-                                                                'dd/MM/y'
-                                                            )
-                                                        ) : (
-                                                            <span>
-                                                                Selecione uma data
-                                                            </span>
-                                                        )}
-                                                    </button>
-                                                </PopoverTrigger>
-                                                <PopoverContent
-                                                    className="w-auto p-0"
-                                                    align="start"
-                                                >
-                                                    <Calendar
-                                                        initialFocus
-                                                        mode="single"
-                                                        defaultMonth={
-                                                            formState[fieldName]
-                                                        }
-                                                        selected={
-                                                            formState[fieldName]
-                                                        }
-                                                        onSelect={(date) =>
-                                                            handleDateChange(
-                                                                fieldName,
-                                                                date
-                                                            )
-                                                        }
-                                                        numberOfMonths={1}
-                                                    />
-
-                                                </PopoverContent>
-                                            </Popover>
-                                        </div>
-                                    </div>
+                                        title={title}
+                                        idx={idx}
+                                        fieldName={fieldName}
+                                        fieldData={fieldData}
+                                        formState={formState}
+                                        fieldClass={fieldClass}
+                                        combinedClass={combinedClassName}
+                                        parsedAttributes={parsedAttributes}
+                                        handleDateChange={handleDateChange}
+                                    />
                                 )
 
                             case 'Cod':

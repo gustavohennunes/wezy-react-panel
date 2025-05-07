@@ -43,6 +43,8 @@
             'cliente',
             'parametro',
             'parametros',
+            'mes',
+            'ano',
             'usuario',
             'start',
             'end',

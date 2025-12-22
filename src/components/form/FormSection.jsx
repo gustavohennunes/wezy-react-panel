@@ -20,11 +20,11 @@
                 
                 if (field.type === 'Frm' && field.field?.class.indexOf('data-hora') !== -1) {
                     
-                    if(field.field?.value === '0000-00-00 00:00:00'){
+                    if(!field.field?.value || field.field?.value === '0000-00-00 00:00:00' || field.field?.value == ''){
                         initialFormState[fieldName] = null
                     } else {
 
-                        const parseDate = field.field.value.split(' ');
+                        const parseDate = field?.field?.value?.split(' ');
                         const dateValue = parseDate[0].split('/');
                         const timeValue = parseDate[1].split(':');
                         
@@ -42,9 +42,9 @@
                     
                     const dateValue = field.field?.value
                     
-                    if (dateValue && dateValue !== '00/00/0000') {
+                    if (dateValue && dateValue !== '00/00/0000' && dateValue != '') {
                          
-                        const parseDate = dateValue.split('/');
+                        const parseDate = dateValue?.split('/');
                         
                         const parsedDate = new Date(parseDate[2] + '-' + parseDate[1] + '-' + parseDate[0]+'T12:00:00Z');
                         
@@ -140,7 +140,7 @@
         }
 
         const handleDateChange = (name, date) => {
-            console.log(date);
+            
             setFormState((prev) => ({
                 ...prev,
                 [name]: date,

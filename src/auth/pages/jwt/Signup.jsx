@@ -1,11 +1,10 @@
 import clsx from 'clsx'
 import { useFormik } from 'formik'
 import { useState } from 'react'
-import { Link, useLocation, useNavigate } from 'react-router-dom'
+import { Link, useNavigate } from 'react-router-dom'
 import * as Yup from 'yup'
 import { useAuthContext } from '../../useAuthContext'
 import { Alert, KeenIcon } from '@/components'
-import { useLayout } from '@/providers'
 import { IMaskInput } from 'react-imask'
 
 const initialValues = {
@@ -154,6 +153,7 @@ const Signup = () => {
                 )}
 
                 <div className="flex flex-col gap-1">
+                    
                     <label className="form-label text-gray-900 gap-[2px]">
                         Nome <span className="text-danger">*</span>
                     </label>
@@ -163,6 +163,7 @@ const Signup = () => {
                             placeholder="Digite seu nome completo"
                             type="text"
                             autoComplete="off"
+                            onInput={(e) => formik.setFieldValue("name", e.target.value)}
                             {...formik.getFieldProps('name')}
                             className={clsx(
                                 'form-control bg-transparent',
@@ -195,6 +196,7 @@ const Signup = () => {
                             placeholder="Digite seu e-mail"
                             type="email"
                             autoComplete="off"
+                            onInput={(e) => formik.setFieldValue("email", e.target.value)}
                             {...formik.getFieldProps('email')}
                             className={clsx(
                                 'form-control bg-transparent',
@@ -234,6 +236,7 @@ const Signup = () => {
                             type="tel"
                             maxLength={15}
                             autoComplete="off"
+                            onInput={(e) => formik.setFieldValue("phone", e.target.value)}
                             {...formik.getFieldProps('phone')}
                             className={clsx(
                                 'form-control bg-transparent',

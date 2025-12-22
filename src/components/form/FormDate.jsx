@@ -105,7 +105,7 @@ import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
                             value={parseDate(formState[fieldName])}
                             required={requiredField}
                             onChange={(newValue) => {
-                                const utcValue = newValue ? newValue.utc(true).format('YYYY-MM-DD HH:mm') : null;
+                                const utcValue = newValue ? newValue.utc(true).format('DD/MM/YYYY - HH:mm') : null;
                                 handleDateChange(fieldName, utcValue);
                             }}   
                         />

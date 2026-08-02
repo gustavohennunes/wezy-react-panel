@@ -5,12 +5,14 @@ import {
     LoadersProvider,
     MenusProvider,
     SettingsProvider,
+    SystemProvider,
     TranslationProvider,
 } from '@/providers'
 import { HelmetProvider } from 'react-helmet-async'
 const queryClient = new QueryClient()
 const ProvidersWrapper = ({ children }) => {
     return (
+        <SystemProvider>
         <QueryClientProvider client={queryClient}>
             <AuthProvider>
                 <SettingsProvider>
@@ -26,6 +28,7 @@ const ProvidersWrapper = ({ children }) => {
                 </SettingsProvider>
             </AuthProvider>
         </QueryClientProvider>
+        </SystemProvider>
     )
 }
 export { ProvidersWrapper }

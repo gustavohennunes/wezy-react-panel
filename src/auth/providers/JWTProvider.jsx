@@ -2,20 +2,21 @@
     import axios from 'axios'
     import { createContext, useState, useContext, useMemo, useEffect } from 'react'
     import * as authHelper from '../_helpers'
-    import { api } from '@/services/api'    
+    import { api } from '@/services/api'
     import { buildApiUrl } from '@/utils/urlHelper'
+    import { getCustomerHost, setCustomerHost, clearCustomerHost } from '@/utils/customerHost'
+    import { isSystemNotFoundError, notifySystemNotFound } from '@/utils/systemStatus'
 
     const API_URL = import.meta.env.VITE_APP_API_URL
     const CAYMAN_API_URL = import.meta.env.VITE_CAYMAN_API_URL
 
-    export const CAYMAN_LOGIN_URL    = `${CAYMAN_API_URL}/panel/login`
+    export const AUTH_MASTER_URL     = `${CAYMAN_API_URL}/auth/master`
     export const CAYMAN_REGISTER_URL = `${CAYMAN_API_URL}/panel/signup`
     export const FORGOT_PASSWORD_URL = `${CAYMAN_API_URL}/panel/forgot-password`
     // export const RESET_PASSWORD_URL  = `${API_URL}/reset-password`
     export const GET_USER_URL        = `${CAYMAN_API_URL}/user-infos`
 
     const BTOKEN        = import.meta.env.VITE_BTOKEN
-    const CUSTOMER_HOST = import.meta.env.VITE_CUSTOMER_HOST
 
     const AuthContext = createContext(null)
 
@@ -73,12 +74,13 @@
 
                 authHelper.setAuth(auth)
 
-                if (auth.success) {
+                // Auth centralizada (/auth/master) ou formato antigo do webservice
+                const sessionToken =
+                    auth.data?.session_token ??
+                    auth.success?.response?.data?.session_token
 
-                    authHelper.setLocalAuth(
-                        auth.success.response.data.session_token
-                    )
-
+                if (sessionToken) {
+                    authHelper.setLocalAuth(sessionToken)
                 }
 
             } else {
@@ -87,24 +89,43 @@
 
         }
 
-        const login = async (login, senha) => {
+        /**
+         * Autentica na API centralizada (/auth/master) do domínio pai.
+         *
+         * Quando o mesmo login/senha existe em mais de um painel, a API
+         * responde 409 com a lista de painéis; nesse caso é lançado um erro
+         * com `code = 'MULTIPLE_PANELS'` e `paineis`, para a tela de login
+         * exibir a escolha e reenviar com `idPainelCliente`.
+         */
+        const login = async (login, senha, idPainelCliente = null) => {
 
             try {
 
                 const { data: auth } = await axios.post(
-                    CAYMAN_LOGIN_URL,
+                    AUTH_MASTER_URL,
                     {
-                        login: login,
+                        email: login,
                         senha: senha,
+                        ...(idPainelCliente
+                            ? { id_painel_cliente: idPainelCliente }
+                            : {}),
                     },
                     {
                         headers: {
-                            'Content-Type': 'application/x-www-form-urlencoded',
-                            'Customer-Host': CUSTOMER_HOST,
-                            Authorization: `Bearer ${BTOKEN}`,
+                            'Content-Type': 'application/json',
                         },
                     }
                 )
+
+                if (!auth?.status || !auth?.data?.session_token) {
+                    throw new Error(
+                        auth?.message || 'Usuário ou senha inválidos.'
+                    )
+                }
+
+                // As demais APIs do painel resolvem o cliente pelo host,
+                // então o domínio retornado passa a ser o Customer-Host
+                setCustomerHost(auth.data.dominio)
 
                 saveAuth(auth)
 
@@ -114,9 +135,27 @@
 
             } catch (error) {
 
+                const response = error.response
+
+                if (
+                    response?.status === 409 &&
+                    Array.isArray(response.data?.paineis)
+                ) {
+                    const choiceError = new Error(response.data.message)
+                    choiceError.code = 'MULTIPLE_PANELS'
+                    choiceError.paineis = response.data.paineis
+                    throw choiceError
+                }
+
+                if (isSystemNotFoundError(error)) notifySystemNotFound()
+
                 saveAuth(undefined)
 
-                throw new Error(`Error ${error}`)
+                throw new Error(
+                    response?.data?.message ||
+                        error.message ||
+                        'Não foi possível autenticar. Tente novamente.'
+                )
 
             }
 
@@ -139,12 +178,12 @@
                     {
                         headers: {
                             'Content-Type': 'application/x-www-form-urlencoded',
-                            'Customer-Host': CUSTOMER_HOST,
+                            'Customer-Host': getCustomerHost(),
                             Authorization: `Bearer ${BTOKEN}`,
                         },
                     }
                 )
-                
+
                 saveAuth(auth)
 
                 const { data: user } = await newUser()
@@ -152,6 +191,8 @@
                 setCurrentUser(user)
 
             } catch (error) {
+
+                if (isSystemNotFoundError(error)) notifySystemNotFound()
 
                 saveAuth(undefined)
 
@@ -233,6 +274,8 @@
         const logout = () => {
             saveAuth(undefined)
             setCurrentUser(undefined)
+            // O próximo login pode pertencer a outro painel
+            clearCustomerHost()
         }
 
         const fetchUserInfos = async (slug, action) => {

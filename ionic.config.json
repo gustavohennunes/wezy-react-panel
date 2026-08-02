@@ -1,0 +1,7 @@
+{
+    "name": "wezy-panel",
+    "type": "custom",
+    "integrations": {
+        "capacitor": {}
+    }
+}

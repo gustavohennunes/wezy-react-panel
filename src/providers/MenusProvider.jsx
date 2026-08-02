@@ -1,8 +1,11 @@
     import { createContext, useContext, useState, useEffect } from 'react'
     import { useAuth } from '../auth/providers/JWTProvider'
+    import { getCustomerHost } from '@/utils/customerHost'
+    import {
+        isSystemNotFoundError,
+        notifySystemNotFound,
+    } from '@/utils/systemStatus'
     import axios from 'axios'
-
-    const CUSTOMER_HOST = import.meta.env.VITE_CUSTOMER_HOST
 
     const initialProps = {
         configs: new Map(),
@@ -48,7 +51,7 @@
                     .get('https://painel.wezy.com.br/api/v1/panel/menus', {
                         headers: {
                             'Content-Type': 'application/x-www-form-urlencoded',
-                            'Customer-Host': CUSTOMER_HOST,
+                            'Customer-Host': getCustomerHost(),
                         },
                     })
                     .then((response) => {
@@ -57,11 +60,19 @@
                         return data
                     })
                     .catch((error) => {
+                        if (isSystemNotFoundError(error)) {
+                            notifySystemNotFound()
+                            return
+                        }
                         logout()
                         console.log(error)
                     })
 
             } catch (error) {
+                if (isSystemNotFoundError(error)) {
+                    notifySystemNotFound()
+                    return
+                }
                 logout()
                 console.error('Erro ao buscar menu:', error)
             }

@@ -11,7 +11,6 @@ import { Alert } from '@/components'
 
 const loginSchema = Yup.object().shape({
     email: Yup.string()
-        .email('Formato de e-mail inválido')
         .min(3, 'Digite pelo menos 3 caracteres')
         .max(50, 'Digite no máximo 50 caracteres')
         .required('Campo obrigatório'),
@@ -33,33 +32,51 @@ const Login = () => {
     const location = useLocation()
     const from = location.state?.from?.pathname || '/'
     const [showPassword, setShowPassword] = useState(false)
+    // Painéis retornados pela API quando o usuário existe em mais de um (409)
+    const [paineis, setPaineis] = useState(null)
     const { currentLayout } = useLayout()
 
     const formik = useFormik({
         initialValues,
         validationSchema: loginSchema,
-        onSubmit: async (values, { setStatus, setSubmitting }) => {
-            setLoading(true)
-
-            try {
-                if (!login) {
-                    throw new Error(
-                        'Não foi possível concluir a operação. Tente novamente.'
-                    )
-                }
-
-                await login(values.email, values.password)
-
-                navigate(from, {
-                    replace: true,
-                })
-            } catch {
-                setStatus('E-mail ou senha incorretos.')
-                setSubmitting(false)
-            }
-            setLoading(false)
+        onSubmit: async (values) => {
+            await handleLogin(values)
         },
     })
+
+    const handleLogin = async (values, idPainelCliente = null) => {
+        setLoading(true)
+        formik.setStatus()
+
+        try {
+            if (!login) {
+                throw new Error(
+                    'Não foi possível concluir a operação. Tente novamente.'
+                )
+            }
+
+            await login(values.email, values.password, idPainelCliente)
+
+            navigate(from, {
+                replace: true,
+            })
+        } catch (error) {
+            if (error?.code === 'MULTIPLE_PANELS') {
+                setPaineis(error.paineis)
+                formik.setStatus(
+                    'Seu usuário existe em mais de um painel. Escolha abaixo qual deseja acessar.'
+                )
+            } else {
+                setPaineis(null)
+                formik.setStatus(
+                    error?.message || 'E-mail ou senha incorretos.'
+                )
+            }
+            formik.setSubmitting(false)
+        }
+
+        setLoading(false)
+    }
 
     const togglePassword = (event) => {
         event.preventDefault()
@@ -100,17 +117,47 @@ const Login = () => {
                 <h3 className="text-left font-semibold">Acesse sua revenda</h3>
 
                 {formik.status && (
-                    <Alert variant="danger">{formik.status}</Alert>
+                    <Alert variant={paineis ? 'warning' : 'danger'}>
+                        {formik.status}
+                    </Alert>
+                )}
+
+                {paineis && (
+                    <div className="flex flex-col gap-2">
+                        {paineis.map((painel) => (
+                            <button
+                                key={painel.id_painel_cliente}
+                                type="button"
+                                className="btn btn-light justify-start"
+                                disabled={loading}
+                                onClick={() =>
+                                    handleLogin(
+                                        formik.values,
+                                        painel.id_painel_cliente
+                                    )
+                                }
+                            >
+                                <span className="flex flex-col items-start">
+                                    <span className="font-medium">
+                                        {painel.cliente}
+                                    </span>
+                                    <span className="text-2sm text-gray-600">
+                                        {painel.dominio}
+                                    </span>
+                                </span>
+                            </button>
+                        ))}
+                    </div>
                 )}
 
                 <div className="flex flex-col gap-1">
                     <label className="form-label text-gray-900 gap-[2px]">
-                        E-mail <span className="text-danger">*</span>
+                        E-mail ou login <span className="text-danger">*</span>
                     </label>
 
                     <label className="input">
                         <input
-                            placeholder="Digite seu e-mail"
+                            placeholder="Digite seu e-mail ou login"
                             {...formik.getFieldProps('email')}
                             className={clsx('form-control', {
                                 'is-invalid':

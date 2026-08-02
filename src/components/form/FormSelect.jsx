@@ -38,18 +38,18 @@
 
                 setOptions(fieldData.options)
 
-            } else if (field.type === 'Man') {
+            } else if (field.type === 'Man' || field.type === 'Ico') {
 
-                setOptions(fieldData.options)
+                setOptions(fieldData.options || [])
 
-            } 
+            }
 
         }, [field, fieldData]);
         
         return (
             <div className={combinedClass} {...rowAttr}>
 
-                <div className="form-label flex flex-col max-w-56">
+                <div className="form-label flex flex-col w-full lg:w-56 lg:min-w-56 lg:shrink-0 h-full justify-center">
                     <b>
                         {fieldData.title || field.title}
                         {required && (

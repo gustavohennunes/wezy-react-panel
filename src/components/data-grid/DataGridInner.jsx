@@ -36,7 +36,14 @@ const DataGridInner = () => {
                 <DataGridTable />
                 {loading && <DataGridLoader />}
             </div>
-            {table.getRowModel().rows.length > 0 && <DataGridPagination />}
+            {/* layout.hidePagination: usado pelo modo "Carregar mais conteúdo", que substitui
+                a navegação por páginas por um rodapé próprio (props.footer) */}
+            {!props.layout?.hidePagination && table.getRowModel().rows.length > 0 && (
+                <DataGridPagination />
+            )}
+
+            {/* RODAPÉ CUSTOMIZADO — FICA DENTRO DO CARD, JUNTO DA TABELA */}
+            {props.footer}
         </div>
     )
 }

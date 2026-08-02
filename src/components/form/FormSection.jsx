@@ -1,6 +1,7 @@
 
     import { useState, useEffect } from 'react'
-    import { FormInput, FormSelect, FormDate } from './'
+    import { FormInput, FormSelect, FormMultiSelect, FormDate } from './'
+    import { CustomCheckbox, CustomRadio } from './CustomFields'
 
     const FormSection = ({ data, index, button, form, loading }) => {
 
@@ -15,8 +16,22 @@
             data.fields.forEach((field) => {
 
                 const fieldName = field.field?.name || field.name
-                
+
                 initialFormState[fieldName] = field.field?.value || ''
+
+                //Man/Ico NÃO RECEBEM value DA PONTE — O VALOR ATUAL VEM NO selected DAS OPTIONS.
+                //SEM ISSO, ABRIR O "ALTERAR" E SALVAR SEM TOCAR APAGARIA O VALOR GRAVADO.
+                if (!initialFormState[fieldName] && Array.isArray(field.field?.options)) {
+
+                    const selectedOption = field.field.options.find(
+                        (option) => option.selected === true || option.selected === 'selected'
+                    )
+
+                    if (selectedOption) {
+                        initialFormState[fieldName] = selectedOption.value
+                    }
+
+                }
                 
                 if (field.type === 'Frm' && field.field?.class.indexOf('data-hora') !== -1) {
                     
@@ -131,7 +146,12 @@
             if(value == ''){
                 return;
             }
-            
+
+            //'-1' É O PLACEHOLDER "Selecione uma opção" DO FormSelect — GRAVA VAZIO, NÃO '-1'
+            if (value === '-1') {
+                value = ''
+            }
+
             setFormState((prev) => ({
                 ...prev,
                 [name]: value,
@@ -219,15 +239,46 @@
 
         };
         
-        return (
-            <div className="card pb-2.5 mb-6">
+        //NUMERAÇÃO DA SEÇÃO (campo Cab) — a ponte já envia a contagem incremental
+        const temNumero       = data.number || data.number === 0
+        const numeroFormatado = temNumero ? String(data.number).padStart(2, '0') : ''
 
-                <div className="card-header justify-center flex-col items-start" id="general_settings">
-                    <h3 className="card-title">{data.title}</h3>
-                    {data.subTitle && (<p className="text-2sm text-gray-700">{data.subTitle}</p>)}
+        return (
+            <div className="card mb-3">
+
+                <div className="card-header !min-h-[46px] !py-2.5 bg-[rgb(250_250_250)] rounded-t-[8px]" id="general_settings">
+
+                    <div className="flex items-center gap-2.5">
+
+                        {/* NUMERAÇÃO DA SEÇÃO — compacta para não disputar atenção com o título */}
+                        {temNumero && (
+                            <span className="flex size-[22px] shrink-0 items-center justify-center rounded bg-primary text-[11px] font-semibold tabular-nums text-primary-inverse">
+                                {numeroFormatado}
+                            </span>
+                        )}
+
+                        <div className="flex flex-col gap-px">
+
+                            <h3 className="text-[13px] font-semibold leading-tight text-gray-900">
+                                {data.title}
+                            </h3>
+
+                            {data.subTitle && (
+                                <p className="text-[11px] font-normal leading-tight text-gray-500">
+                                    {data.subTitle}
+                                </p>
+                            )}
+
+                        </div>
+
+                    </div>
+
                 </div>
 
-                <div className="card-body grid gap-5">
+                {/* CADA CAMPO GANHA UMA LINHA SEPARADORA ACIMA (EXCETO O PRIMEIRO).
+                    O padding lateral SAI do container e vai para cada linha, senão a borda
+                    ficaria recuada nas laterais em vez de atravessar o card inteiro. */}
+                <div className="card-body !px-0 grid gap-4 [&>*+*]:border-t [&>*+*]:border-[#e6e6e7] [&>*+*]:pt-4">
 
                     {data?.fields.map((field, idx) => {
                         
@@ -236,7 +287,8 @@
 
                         const parsedAttributes = parseAttributes(row_attr);
 
-                        let combinedClassName = `flex items-center flex-wrap lg:flex-nowrap gap-2.5 ${parsedAttributes.class || ''}`;
+                        //px-4 = mesmo recuo que o .card-body tinha (custom.components.card.px)
+                        let combinedClassName = `flex items-start flex-wrap lg:flex-nowrap gap-2.5 lg:gap-4 px-4 ${parsedAttributes.class || ''}`;
                         delete parsedAttributes.class; 
                         
                         //VERIFICA SE EXISTE UMA KEY COMEÇANDO COM OS CARACTERES 'data-valid-' NO parsedAttributes
@@ -257,15 +309,19 @@
                         }
                         
                         switch (type) {
+                            //Hdn NÃO RENDERIZA LINHA — OS VALORES VÊM EM form.hidden_fields (FormContext)
+                            case 'Hdn':
+                                return null
+
                             case 'Frm':
                             case 'Psw':
                             case 'Val':
-                            case 'Hdn':
                             case 'Txt':
                             case 'Lis':
                             case 'Arq':
                             case 'Fto':
                             case 'Din':
+                            case 'Cod':
                             case 'aut':
                             case 'Cor':
                                 
@@ -317,7 +373,7 @@
                                         className={combinedClassName}
                                         {...parsedAttributes}
                                     >
-                                        <div className="form-label max-w-56">
+                                        <div className="form-label w-full lg:w-56 lg:min-w-56 lg:shrink-0 flex-col h-full justify-center">
                                             <b>
                                                 {title}
                                                 {required && (
@@ -325,41 +381,26 @@
                                                 )}
                                             </b>
                                             {subtitle && (
-                                                <span className="text-[10px]">
+                                                <span className="text-[10px] text-gray-600">
                                                     {' '}
                                                     {subtitle}{' '}
                                                 </span>
                                             )}
                                         </div>
-                                        <div className="flex flex-col gap-3.5">
+                                        <div className="flex flex-col gap-1">
 
-                                            {fieldData.map((item, index) => (                                                
-                                                
-                                                <label
+                                            {fieldData.map((item, index) => (
+
+                                                <CustomRadio
                                                     key={`${fieldName}-${index}-${idx}`}
-                                                    className="form-label flex items-center gap-2.5"
-                                                >
-                                                    <input
-                                                        className={"radio radio-sm " + item.class}
-                                                        name={item.name}
-                                                        id={item.id}
-                                                        checked={
-                                                            formState[item.name] === item.value
-                                                        }
-                                                        onChange={(e) =>
-                                                            handleRadioChange(fieldName, e.target.value, item.class)
-                                                        }
-                                                        type="radio"
-                                                        value={item.value}
-                                                    />
-
-                                                    <div className="flex flex-col gap-0.5">
-                                                        <div className="text-[13px] font-semibold text-gray-900">
-                                                            {item.title}
-                                                        </div>
-                                                    </div>
-
-                                                </label>
+                                                    name={item.name}
+                                                    value={item.value}
+                                                    checked={formState[item.name] === item.value}
+                                                    onChange={(e) =>
+                                                        handleRadioChange(fieldName, e.target.value, item.class)
+                                                    }
+                                                    label={item.title}
+                                                />
 
                                             ))}
 
@@ -377,7 +418,7 @@
                                         {...parsedAttributes}
                                     >
 
-                                        <div className="form-label max-w-56">
+                                        <div className="form-label w-full lg:w-56 lg:min-w-56 lg:shrink-0 flex-col h-full justify-center">
                                             <b>
                                                 {title}
                                                 {required && (
@@ -385,38 +426,27 @@
                                                 )}
                                             </b>
                                             {subtitle && (
-                                                <span className="text-[10px]">
+                                                <span className="text-[10px] text-gray-600">
                                                     {' '}
                                                     {subtitle}{' '}
                                                 </span>
                                             )}
                                         </div>
 
-                                        <div className={'flex flex-col gap-2 text-[13px]'}>
+                                        <div className={'flex flex-col gap-1 text-[13px]'}>
 
                                             {fieldData.map((item, index) => (
 
-                                                <div
+                                                <CustomCheckbox
                                                     key={`${item.name}-${index}-${idx}`}
-                                                    className="flex"
-                                                >
-                                                    <label className="form-label gap-2 items-center">
-
-                                                        <input
-                                                            type="checkbox"
-                                                            className="checkbox"
-                                                            name={item.name}
-                                                            value={item.value}
-                                                            checked={(formState[item.name] || []).includes(item.value)}
-                                                            onChange={(e) =>
-                                                                handleCheckBoxChange(item.name, item.value, e.target.checked, item.class)
-                                                            }
-                                                        />
-
-                                                        {item.title}
-
-                                                    </label>
-                                                </div>
+                                                    name={item.name}
+                                                    value={item.value}
+                                                    checked={(formState[item.name] || []).includes(item.value)}
+                                                    onChange={(e) =>
+                                                        handleCheckBoxChange(item.name, item.value, e.target.checked, item.class)
+                                                    }
+                                                    label={item.title}
+                                                />
 
                                             ))}
 
@@ -428,6 +458,7 @@
                             case 'Qnt':
                             case 'Sel':
                             case 'Man':
+                            case 'Ico':
 
                                 return (
                                     <FormSelect
@@ -460,11 +491,77 @@
                                     />
                                 )
 
-                            case 'Cod':
-                                return fieldData?.value || '-'
-                            break;
-                            case 'Tab':
                             case 'Mul':
+
+                                return (
+                                    <FormMultiSelect
+                                        key={`${fieldName}-${idx}`}
+                                        title={title}
+                                        subtitle={subtitle}
+                                        fieldName={fieldName}
+                                        fieldData={fieldData}
+                                        required={required}
+                                        combinedClass={combinedClassName}
+                                        rowAttr={parsedAttributes}
+                                    />
+                                )
+
+                            case 'Tab':
+
+                                //TABELA READ-ONLY ({header, rows}) — A PONTE ATUAL NÃO ENVIA OS DADOS
+                                //DO Tab (field chega vazio); NESSE CASO NÃO RENDERIZA NADA
+                                if (!(fieldData.header?.length || fieldData.rows?.length)) {
+                                    return null
+                                }
+
+                                return (
+                                    <div key={`${fieldName}-${idx}`} className={combinedClassName} {...parsedAttributes}>
+
+                                        {title !== false && (
+                                            <div className="form-label w-full lg:w-56 lg:min-w-56 lg:shrink-0 flex-col h-full justify-center">
+                                                <b>{title}</b>
+                                                {subtitle && (<span className="text-[10px] text-gray-600"> {subtitle} </span>)}
+                                            </div>
+                                        )}
+
+                                        <div className="w-full overflow-x-auto">
+                                            <table className="table table-auto w-full text-[13px]">
+
+                                                {(fieldData.header || []).length > 0 && (
+                                                    <thead>
+                                                        {fieldData.header.map((headerRow, hIdx) => (
+                                                            <tr key={`tab-h-${hIdx}`}>
+                                                                {(headerRow.columns || []).map((col, cIdx) => (
+                                                                    <th
+                                                                        key={`tab-h-${hIdx}-${cIdx}`}
+                                                                        style={{ width: col.width || 'auto', textAlign: col.align || 'left' }}
+                                                                        dangerouslySetInnerHTML={{ __html: col.content }}
+                                                                    />
+                                                                ))}
+                                                            </tr>
+                                                        ))}
+                                                    </thead>
+                                                )}
+
+                                                <tbody>
+                                                    {(fieldData.rows || []).map((row, rIdx) => (
+                                                        <tr key={`tab-r-${rIdx}`}>
+                                                            {(row.columns || []).map((col, cIdx) => (
+                                                                <td
+                                                                    key={`tab-r-${rIdx}-${cIdx}`}
+                                                                    dangerouslySetInnerHTML={{ __html: col.content }}
+                                                                />
+                                                            ))}
+                                                        </tr>
+                                                    ))}
+                                                </tbody>
+
+                                            </table>
+                                        </div>
+
+                                    </div>
+                                )
+
                             default:
                                 return null
                         }
@@ -472,20 +569,27 @@
 
                     {button && form.submit_button && (
 
-                        <div className="flex justify-start">
-                            <button type="submit" className="btn btn-success" disabled={loading ? true : false}>
-                                {loading ? (
-                                    <>
-                                        Carregando...
-                                    </>
-                                ) : (
-                                    <>
-                                        {form.submit_button}
-                                    </>
-                                )}
-                            </button>
+                        // ALINHADO COM A COLUNA DOS CAMPOS (O SEPARADOR VEM DO CONTAINER)
+                        <div className="flex flex-wrap lg:flex-nowrap gap-2.5 lg:gap-4 px-4">
+
+                            <div className="hidden lg:block lg:w-56 lg:min-w-56 lg:shrink-0"></div>
+
+                            <div className="w-full lg:flex-1">
+                                <button type="submit" className="btn btn-success" disabled={loading ? true : false}>
+                                    {loading ? (
+                                        <>
+                                            Carregando...
+                                        </>
+                                    ) : (
+                                        <>
+                                            {form.submit_button}
+                                        </>
+                                    )}
+                                </button>
+                            </div>
+
                         </div>
-                        
+
                     )}
 
                 </div>

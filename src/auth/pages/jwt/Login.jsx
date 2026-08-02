@@ -1,4 +1,5 @@
 import { useState } from 'react'
+import { PANEL_LOGO } from '@/config/branding'
 import { Link, useLocation, useNavigate } from 'react-router-dom'
 import clsx from 'clsx'
 import * as Yup from 'yup'
@@ -93,28 +94,22 @@ const Login = () => {
                 <div className="text-center mb-2">
                     <div className="flex gap-3 mb-2.5 items-center">
                         <img
-                            src="https://files.caymanweb.com.br/f7e00f1f7c8e403b99f72159635a3f34/dfca77e57617844b2a0d41057e7b884a/logo-vymber.svg"
+                            src={PANEL_LOGO}
                             className="dark:hidden"
                             style={{ width: '135px' }}
                         />
                         <img
-                            src="https://files.caymanweb.com.br/f7e00f1f7c8e403b99f72159635a3f34/dfca77e57617844b2a0d41057e7b884a/logo-vymber.svg"
+                            src={PANEL_LOGO}
                             className="hidden dark:block"
                             style={{
                                 filter: 'brightness(100)',
                                 width: '135px',
                             }}
                         />
-                        <div className="text-2sm text-gray-600 leading-none flex items-center font-medium">
-                            |
-                        </div>
-                        <div className="text-2sm text-gray-600 leading-none flex items-center font-medium">
-                            Revenda
-                        </div>
                     </div>
                 </div>
 
-                <h3 className="text-left font-semibold">Acesse sua revenda</h3>
+                <h3 className="text-left font-semibold">Acesse seu sistema</h3>
 
                 {formik.status && (
                     <Alert variant={paineis ? 'warning' : 'danger'}>

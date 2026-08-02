@@ -15,9 +15,13 @@
         useEffect(() => {
             
             let newContent = ''
-            
-            if (pageData?.extra_html_content && pageData?.extra_html_content.length > 0) {
-                newContent = <div dangerouslySetInnerHTML={{ __html: pageData?.extra_html_content }} />
+
+            //A PONTE EMITE A CHAVE COM HÍFEN (PanelModule.php:10). O UNDERSCORE FICA
+            //ACEITO POR COMPATIBILIDADE COM RETORNOS ANTIGOS.
+            const extraHtml = pageData?.['extra-html-content'] || pageData?.extra_html_content || ''
+
+            if (extraHtml.length > 0) {
+                newContent = <div dangerouslySetInnerHTML={{ __html: extraHtml }} />
             } else if (pageData?.layout === 'dashboard') {
                 newContent = <DashboardContext />
             } else if (pageData?.layout === 'plans') {
@@ -33,10 +37,11 @@
                     <Models
                         model={pageData?.params?.list?.rows || []}
                         columnHeader={pageData?.params?.list?.header}
+                        content={pageData?.params?.list?.content}
                         btnAdd={pageData?.params?.add_button}
                         tabs={pageData?.params?.buttons?.list}
                         search={pageData?.params?.search}
-                        btnExcluir={pageData?.params?.footer.delete_button}
+                        btnExcluir={pageData?.params?.footer?.delete_button}
                         pagination={pageData?.params?.pagination}
                     />
                 )

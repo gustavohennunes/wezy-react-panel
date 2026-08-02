@@ -17,7 +17,7 @@ const DropdownUserPanel = ({ menuItemRef }) => {
     const { logout } = useAuthContext();
     const { isRTL } = useLanguage();
     const { getMenuConfig } = useMenus();
-    const { userInfos } = useAuth();
+    const { usuarioLogado } = useAuth();
 
     const menuConfig = getMenuConfig('primary')
 
@@ -36,16 +36,17 @@ const DropdownUserPanel = ({ menuItemRef }) => {
             <div className="flex items-center justify-between px-5 py-1.5 gap-1.5">
                 <div className="flex items-center gap-2">
                     <img
-                        className="size-9 rounded-full border-2 border-success"
-                        src={toAbsoluteUrl('/media/avatars/gray/6.png')}
+                        className="size-9 rounded-full border-2 border-success object-cover"
+                        src={usuarioLogado?.foto || toAbsoluteUrl('/media/avatars/gray/6.png')}
+                        onError={(e) => { e.currentTarget.src = toAbsoluteUrl('/media/avatars/gray/6.png') }}
                         alt=""
                     />
                     <div className="flex flex-col gap-1.5">
                         <div className="text-sm text-gray-800 hover:text-primary font-semibold leading-none">
-                            {userInfos?.user?.full_name}
+                            {usuarioLogado?.nome}
                         </div>
                         <div className="text-xs text-gray-600 hover:text-primary font-medium leading-none">
-                            {userInfos?.user?.email}
+                            {usuarioLogado?.email}
                         </div>
                     </div>
                 </div>

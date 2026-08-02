@@ -1,5 +1,6 @@
     /* eslint-disable no-unused-vars */
     import React, { forwardRef, useEffect, useRef, useState } from 'react'
+    import { PANEL_LOGO } from '@/config/branding'
     import { KeenIcon } from '@/components'
     import { Link } from 'react-router-dom'
 
@@ -34,22 +35,16 @@
                 <div className="flex gap-3 mb-5 items-center px-6 mt-8">
                     <Link to="/?pag=dashboard">
                         <img
-                            src="https://files.caymanweb.com.br/f7e00f1f7c8e403b99f72159635a3f34/dfca77e57617844b2a0d41057e7b884a/logo-vymber.svg"
+                            src={PANEL_LOGO}
                             className="dark:hidden"
                             style={{ width: '135px' }}
                         />
                         <img
-                            src="https://files.caymanweb.com.br/f7e00f1f7c8e403b99f72159635a3f34/dfca77e57617844b2a0d41057e7b884a/logo-vymber.svg"
+                            src={PANEL_LOGO}
                             className="hidden dark:block"
                             style={{ filter: 'brightness(100)', width: '135px' }}
                         />
                     </Link>
-                    <div className="text-2sm text-gray-600 leading-none flex items-center">
-                        |
-                    </div>
-                    <div className="text-2sm text-gray-600 leading-none font-medium flex items-center">
-                        Revenda
-                    </div>
                 </div>
 
                 <div className="pt-2.5 px-3.5 mb-1">

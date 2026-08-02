@@ -110,7 +110,7 @@
                     {
                         title: 'Minhas rádios',
                         icon: 'user',
-                        desc: 'Gerencie em instantes suas rádios da revenda Vymber.',
+                        desc: '',
                         path: {
                             url: '?pag=minhas-radios',
                             title: 'Minhas rádios',

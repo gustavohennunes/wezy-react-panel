@@ -1,0 +1,124 @@
+/* CHECKBOX E RADIOBUTTON NO ESTILO DO PAINEL-PHP (css/custom-fields.css do legado).
+   ÚNICA ADAPTAÇÃO: o container é um <label> (clique nativo, sem precisar do
+   custom-fields.js de delegação do painel antigo). */
+
+/* CHECKBOX */
+
+[data-custom-field='checkbox'] {
+    display: flex;
+    overflow: hidden;
+    position: relative;
+    margin-left: -9px;
+    margin-top: 4px;
+}
+[data-custom-field='checkbox'] .custom-checkbox {
+    display: flex;
+    align-items: center;
+    font-weight: bold;
+    cursor: pointer;
+}
+[data-custom-field='checkbox'] input {
+    position: absolute;
+    top: -50px;
+}
+[data-custom-field='checkbox'] .custom-checkbox .custom-checkbox-icon {
+    width: 34px;
+    height: 34px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin-right: 2px;
+    border-radius: 50px;
+}
+[data-custom-field='checkbox'] input[type='checkbox']:focus ~ .custom-checkbox .custom-checkbox-icon,
+[data-custom-field='checkbox'] .custom-checkbox:hover .custom-checkbox-icon {
+    background-color: #f1f0f5;
+}
+[data-custom-field='checkbox'] .custom-checkbox:active .custom-checkbox-icon {
+    background-color: #e5e7f1;
+}
+[data-custom-field='checkbox'] .custom-checkbox .custom-checkbox-icon > span {
+    width: 18px;
+    height: 18px;
+    border-radius: 3px;
+    border: 2px solid #ccc;
+    display: block;
+    background-color: #fff;
+    transition: 0.5s;
+}
+[data-custom-field='checkbox'] .custom-checkbox .custom-checkbox-icon > span svg {
+    opacity: 0;
+    width: 10px;
+    margin: 2px;
+    margin-top: -1px;
+    transition: 0.5s;
+}
+[data-custom-field='checkbox'] input[type='checkbox']:checked ~ .custom-checkbox .custom-checkbox-icon > span {
+    background: #0075a7;
+    border-color: #0075a7;
+    transition: 0.5s;
+}
+[data-custom-field='checkbox'] input[type='checkbox']:checked ~ .custom-checkbox .custom-checkbox-icon > span svg {
+    opacity: 1;
+    transition: 0.5s;
+}
+
+/* RADIOBUTTON */
+
+[data-custom-field='radiobutton'] {
+    display: flex;
+    overflow: hidden;
+    position: relative;
+    margin-left: -9px;
+    margin-top: 4px;
+}
+[data-custom-field='radiobutton'] .custom-radiobutton {
+    display: flex;
+    align-items: center;
+    font-weight: bold;
+    cursor: pointer;
+}
+[data-custom-field='radiobutton'] input {
+    position: absolute;
+    top: -50px;
+    left: -50px;
+}
+[data-custom-field='radiobutton'] .custom-radiobutton .custom-radiobutton-icon {
+    width: 34px;
+    height: 34px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin-right: 2px;
+    border-radius: 50px;
+}
+[data-custom-field='radiobutton'] input[type='radio']:focus ~ .custom-radiobutton .custom-radiobutton-icon,
+[data-custom-field='radiobutton'] .custom-radiobutton:hover .custom-radiobutton-icon {
+    background-color: #f1f0f5;
+}
+[data-custom-field='radiobutton'] .custom-radiobutton:active .custom-radiobutton-icon {
+    background-color: #e5e7f1;
+}
+[data-custom-field='radiobutton'] .custom-radiobutton .custom-radiobutton-icon > span {
+    width: 18px;
+    height: 18px;
+    border-radius: 50px;
+    border: 2px solid #ccc;
+    display: block;
+    background-color: #fff;
+    transition: 0.5s;
+}
+[data-custom-field='radiobutton'] input[type='radio']:checked ~ .custom-radiobutton .custom-radiobutton-icon > span {
+    background: #0075a7;
+    border-color: #0075a7;
+    transition: 0.5s;
+}
+[data-custom-field='radiobutton'] input[type='radio']:checked ~ .custom-radiobutton .custom-radiobutton-icon > span:before {
+    content: '';
+    width: 8px;
+    height: 8px;
+    background: #fff;
+    display: block;
+    border-radius: 50px;
+    margin: 3px;
+}

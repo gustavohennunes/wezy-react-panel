@@ -510,7 +510,7 @@ module.exports = {
                         progress: theme('borderRadius.lg'),
                         dropdown: theme('borderRadius.xl'),
                         badge: theme('borderRadius.DEFAULT'),
-                        card: theme('borderRadius.xl'),
+                        card: '8px',
                         tooltip: theme('borderRadius.lg'),
                         popover: theme('borderRadius.lg'),
                         modal: theme('borderRadius.xl'),
@@ -526,8 +526,8 @@ module.exports = {
                     },
                     fluid: {
                         px: {
-                            DEFAULT: theme('spacing')['6'],
-                            xl: theme('spacing')['7.5'],
+                            DEFAULT: theme('spacing')['5'],
+                            xl: theme('spacing')['5'],
                         },
                     },
                 },

@@ -11,11 +11,11 @@ const Footer = () => {
                             {currentYear}&copy;
                         </span>
                         <a
-                            href="https://www.vymber.com.br"
+                            href="https://www.cayman.com.br"
                             target="_blank"
                             className="text-gray-600 hover:text-primary"
                         >
-                            Vymber
+                            Cayman Sistemas
                         </a>
                     </div>
                 </div>

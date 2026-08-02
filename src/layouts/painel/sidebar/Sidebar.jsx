@@ -49,7 +49,7 @@
         }
 
         useEffect(() => {
-            
+
             const availableHeight = viewportHeight - 250
 
             setScrollableHeight(availableHeight)

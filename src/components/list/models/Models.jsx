@@ -3,46 +3,115 @@
     import { DataGrid, KeenIcon, DataGridColumnHeader, DataGridRowSelectAll, DataRowContext } from '@/components'
     import { toast } from 'sonner'
     import { Input } from '@/components/ui/input'
-    import { updateTablePagination, buildApiUrl, cleanUrl } from '@/utils/urlHelper'
+    import { buildApiUrl, cleanUrl } from '@/utils/urlHelper'
     import { api } from '@/services/api'
     import { Tabs } from '@/components/custom/tabs/tabs'
     import { usePageData } from '@/context/PageDataContext'
+    import { LegacyList } from './LegacyList'
 
-    const Models = ({ model, columnHeader, btnAdd, search, btnExcluir, pagination, tabs }) => {
+    const Models = ({ model, columnHeader, btnAdd, search, btnExcluir, pagination, tabs, content }) => {
 
         const { callApi }                           = usePageData()
         const [ models, setModels ]                 = useState(model || [])
         const [ footer, setFooter ]                 = useState('')
-        const [ gridPagination, setGridPagination ] = useState({ size: 20 })
+        //TAMANHO GIGANTE DESDE O PRIMEIRO RENDER: O DataGridProvider CAPTURA O pageSize
+        //NA MONTAGEM, E COM O VALOR ANTIGO (20) A TABELA CORTAVA A EXIBIÇÃO EM 20 LINHAS —
+        //O "Carregar mais" ACUMULAVA REGISTROS QUE NUNCA APARECIAM
+        const [ gridPagination, setGridPagination ] = useState({ size: 1000000 })
         const [ selectedRows, setSelectedRows ]     = useState([])
         const data                                  = useMemo(() => models, [models])
         const [activeTab, setActiveTab]             = useState('')
 
+        // MODO "CARREGAR MAIS": em vez de trocar de página, os registros vão se acumulando na
+        // MESMA tabela. É o que permite ao drag-and-drop mover um item para uma posição que
+        // antes estaria em outra página (a reordenação envia a lista inteira em tela).
+        const [ paginaCarregada, setPaginaCarregada ] = useState(1)
+        const [ carregandoMais, setCarregandoMais ]   = useState(false)
+        const [ totalRegistros, setTotalRegistros ]   = useState(0)
+
         // ATUALIZA O ESTADO QUANDO O MODELO É ALTERADO
         useEffect(() => {
-            
+
             if (model && Array.isArray(model) && model.length > 0) {
                 setModels(model)
             } else {
                 setModels([])
             }
 
+            //TROCA DE MÓDULO/BUSCA REINICIA O ACUMULADO
+            const paginaUrl = parseInt(new URLSearchParams(window.location.search).get('pagina') || '1', 10)
+            setPaginaCarregada(isNaN(paginaUrl) ? 1 : paginaUrl)
+
         }, [ model ])
+
+        // BUSCA A PRÓXIMA PÁGINA E CONCATENA NO QUE JÁ ESTÁ NA TELA
+        const carregarMais = async () => {
+
+            if (carregandoMais) return
+
+            setCarregandoMais(true)
+
+            try {
+
+                const url = new URL(window.location.href)
+                url.searchParams.set('pagina', String(paginaCarregada + 1))
+
+                const response = await api.get(buildApiUrl(url.searchParams.toString()))
+                const novos    = response?.data?.success?.response?.data?.params?.list?.rows || []
+
+                if (novos.length > 0) {
+
+                    //EVITA DUPLICAR SE A MESMA PÁGINA FOR CARREGADA DUAS VEZES
+                    setModels((prev) => {
+
+                        const existentes = new Set(prev.map((linha) => linha['row-id']))
+
+                        return [...prev, ...novos.filter((linha) => !existentes.has(linha['row-id']))]
+
+                    })
+
+                    setPaginaCarregada((pagina) => pagina + 1)
+
+                }
+
+            } catch (err) {
+
+                toast(`❌ Erro`, {
+                    description: <span style={{ 'color': 'white' }}>{'Não foi possível carregar mais conteúdo'}</span>,
+                    style: {
+                        color: 'white',
+                        background: 'var(--tw-danger)',
+                        fontWeight: 'bold'
+                    }
+                })
+
+            } finally {
+                setCarregandoMais(false)
+            }
+
+        }
 
         // ATUALIZA A PAGINAÇÃO DO GRID
         useEffect(() => {
-            
-            if (pagination) {
 
-                setGridPagination({
-                    size: pagination?.information?.end || 0,
-                    rowCount: pagination?.information?.total || 0,
-                    pageCount: pagination?.buttons?.content?.length - 1 || 0,
-                })
+            const info = pagination?.information
 
-            }
+            // QUANDO O CARD ESCONDE O "Exibindo de X até Y" ($bloqExibindo), A PONTE NÃO ENVIA
+            // pagination.information — E O RODAPÉ MOSTRAVA "1 - 0 de 0" MESMO COM REGISTROS NA
+            // TELA. NESSE CASO CONSIDERAMOS QUE TUDO QUE FOI CARREGADO ESTÁ NA PÁGINA ATUAL.
+            const total = typeof info?.total === 'number' ? info.total : (model?.length || 0)
 
-        }, [pagination])
+            setTotalRegistros(total)
+
+            //TUDO QUE FOI CARREGADO FICA EM UMA ÚNICA "PÁGINA" — QUEM CONTROLA O
+            //CARREGAMENTO É O BOTÃO "Carregar mais conteúdo" DO RODAPÉ
+            setGridPagination({
+                size: 1000000,
+                rowCount: total,
+                pageCount: 1,
+            })
+
+        }, [pagination, model])
 
         // HANDLER PARA EXCLUIR ITENS SELECIONADOS
         const handleExcluir = async (e) => {
@@ -103,51 +172,36 @@
         }
 
         // HANDLER PARA ATUALIZAR STATUS DO ITEM
-        const handleToggle = (rowId, colIndex) => {
+        // RECEBE A PRÓPRIA CÉLULA (cell) DO GRID — FUNCIONA EM QUALQUER PÁGINA, SEM DEPENDER
+        // DO ESTADO `models`. O VISUAL OTIMISTA/ROLLBACK FICA NO DataRowToggle, QUE LÊ O
+        // RETORNO (true/false) DESTA FUNÇÃO.
+        const handleToggle = async (rowId, colIndex, cell) => {
 
-            let response = ''
+            const toggleAction = cell?.action || models.find((row) => row['row-id'] === rowId)?.columns?.[colIndex]?.action
+
+            if (!toggleAction) {
+                return false
+            }
+
             try {
 
-                setModels((prevModels) => {
+                const response = await api.post(buildApiUrl(toggleAction.toString()))
 
-                    const updatedModels = prevModels.map((row) => {
-
-                        if (row['row-id'] === rowId) {
-
-                            const updatedRow = { ...row }
-                            updatedRow.columns = updatedRow.columns.map((col, i) => {
-
-                                    if (i === colIndex) {
-
-                                        response = api.post(
-                                            buildApiUrl(col.action.toString())
-                                        )
-
-                                        return { ...col, content: !col.content }
-                                    }
-
-                                    return col
-
-                                }
-
-                            )
-
-                            return updatedRow
-
-                        }
-
-                        return row
-                        
-                    })
-
-                    return updatedModels
-
+                toast(`✅ Sucesso!`, {
+                    description: <span style={{ 'color': 'white' }}>{response?.data?.success?.response?.data?.message || 'Status alterado com sucesso!'}</span>,
+                    style: {
+                        color: 'white',
+                        background: 'var(--tw-success)',
+                        fontWeight: 'bold'
+                    }
                 })
+
+                return true
 
             } catch (err) {
 
                 toast(`❌ Erro`, {
-                    description: <span style={{ 'color': 'white' }}>{'Não foi possível excluir este item'}</span>,
+                    description: <span style={{ 'color': 'white' }}>{'Não foi possível alterar o status deste item'}</span>,
                     style: {
                         color: 'white',
                         background: 'var(--tw-danger)',
@@ -155,18 +209,7 @@
                     }
                 })
 
-                setError(err)
-
-            } finally {
-
-                toast(`✅ Sucesso!`, {
-                    description: <span style={{ 'color': 'white' }}>{response?.success?.response.data.message}</span>,
-                    style: {
-                        color: 'white',
-                        background: 'var(--tw-success',
-                        fontWeight: 'bold'
-                    }
-                })
+                return false
 
             }
 
@@ -178,7 +221,36 @@
             if (!columnsData) return false
 
             return columnsData.map((col, index) => {
-                
+
+                const isCheckbox = col.component === 'select_all_checkbox'
+
+                // A LARGURA VEM DA PONTE COMO '12.9%' OU '110px'. ANTES ERA APLICADA VIA
+                // CLASSE TAILWIND DINÂMICA (w-[${col.width}]) — QUE NUNCA FUNCIONA, PORQUE O
+                // JIT SÓ GERA CSS DAS CLASSES QUE ENXERGA EM TEMPO DE BUILD. RESULTADO: TODAS
+                // AS COLUNAS FICAVAM COM LARGURA AUTOMÁTICA E O TEXTO QUEBRAVA EM VÁRIAS LINHAS.
+                const hasWidth = col.width && col.width !== '0%' && col.width !== '0'
+
+                const columnStyle = {}
+
+                if (isCheckbox) {
+                    columnStyle.width = '52px'
+                    columnStyle.minWidth = '52px'
+                } else if (hasWidth) {
+                    columnStyle.width = col.width
+                }
+
+                columnStyle.textAlign = col.align === 'center' ? 'center' : col.align === 'right' ? 'right' : 'left'
+
+                // ESTILO INLINE DECLARADO PELO CARD (ex.: 'color:#F00;')
+                const backendStyle = col.style
+                    ? Object.fromEntries(
+                        col.style
+                            .split(';')
+                            .map((rule) => rule.split(':').map((s) => s.trim()))
+                            .filter(([key, value]) => key && value)
+                    )
+                    : {}
+
                 return {
                     accessorKey: `col_${index}`,
                     id: col.component === 'select_all_checkbox' ? 'id' : col?.content?.toLowerCase().replace(/\s/g, '_'),
@@ -200,44 +272,37 @@
                     enableSorting: false,
                     enableHiding: false,
                     cell: ({ row }) => {
-                        
+
                         return (
                             <DataRowContext
                                 fullRow={row}
                                 row={row.original.columns[index]}
                                 index={index}
-                                handleToggle={() =>
-                                    handleToggle(row.original['row-id'], index)
-                                }
+                                //PASSA A FUNÇÃO DIRETO: uma closure aqui descartaria os argumentos
+                                //que o DataRowContext envia (id, índice e a própria célula com o action)
+                                handleToggle={handleToggle}
                             />
                         )
 
                     },
                     meta: {
                         headerClassName: [
-                            col.component === 'select_all_checkbox' ? 'w-[90px]' : col.width && col.width !== '0%' ? `w-[${col.width}] min-w-[${col.width}]` : 'w-full',
+                            isCheckbox ? '!ps-4 !pe-2' : '!px-3',
+                            'whitespace-nowrap',
                             col.class ? col.class : '',
-                            col.component === 'select_all_checkbox' ? '!px-[12px]' : col.align === 'left' ? 'text-left justify-items-start !px-[15px]' : col.align === 'center' ? 'text-center justify-items-center' : col.align === 'right' ? 'text-right justify-items-end' : '',
                         ]
                             .filter(Boolean)
                             .join(' '),
 
                         cellClassName: [
-                            col.component === 'select_all_checkbox' ? 'w-[90px]' : col.width && col.width !== '0%' ? `w-[${col.width}] min-w-[${col.width}]` : 'w-full',
-                            'text-gray-800 font-normal',
-                            col.component === 'select_all_checkbox' ? '!px-[12px]' : col.align === 'left' ? 'text-left justify-items-start !px-[15px]' : col.align === 'center' ? 'text-center justify-items-center' : col.align === 'right' ? 'text-right justify-items-end' : '',
+                            isCheckbox ? '!ps-4 !pe-2' : '!px-3',
+                            'text-gray-800 font-normal align-middle',
                         ]
                             .filter(Boolean)
                             .join(' '),
 
-                        style: col.style ? Object.fromEntries(
-                            col.style
-                                .split(';')
-                                .map((rule) =>
-                                    rule.split(':').map((s) => s.trim())
-                                )
-                                .filter(([key, value]) => key && value)
-                        ) : {},
+                        headerStyle: columnStyle,
+                        cellStyle: { ...columnStyle, ...backendStyle },
                     },
                 }
             })
@@ -264,10 +329,25 @@
                 const url = new URL(search?.action, window.location.origin)
 
                 url.searchParams.set('busca', searchInput)
+                url.searchParams.delete('pagina')
 
                 window.location.href = url.toString()
 
             }
+
+            // LIMPA A BUSCA — MESMO COMPORTAMENTO DO LINK "LIMPAR" DO PAINEL-PHP
+            const limparBusca = () => {
+
+                const url = new URL(window.location.href)
+
+                url.searchParams.delete('busca')
+                url.searchParams.delete('pagina')
+
+                window.location.href = url.toString()
+
+            }
+
+            const buscaAtiva = (search?.value || '') !== ''
 
             const addBtn = btnAdd?.label ? (
 
@@ -302,7 +382,7 @@
 
                         {search !== undefined && addBtn !== undefined && (
 
-                            <div className="card-header flex-wrap my-2 gap-2 border-b-0 px-5">
+                            <div className="card-header flex-wrap my-0 gap-2 border-b-0 px-3">
 
                                 {addBtn}
                                 
@@ -343,6 +423,17 @@
                                                 />
                                             </button>
 
+                                            {buscaAtiva && (
+                                                <button
+                                                    type="button"
+                                                    className="btn btn-light btn-sm ml-1"
+                                                    onClick={limparBusca}
+                                                    title="Limpar busca"
+                                                >
+                                                    LIMPAR
+                                                </button>
+                                            )}
+
                                         </form>
 
                                     </div>
@@ -378,19 +469,34 @@
             )
         }
 
+        // BOTÃO DE EXCLUSÃO EM LOTE — SEMPRE VISÍVEL; SEM SELEÇÃO FICA ESMAECIDO E
+        // INCLICÁVEL, COM SELEÇÃO GANHA OPACIDADE TOTAL E MOSTRA O CONTADOR
         useEffect(() => {
 
             if (btnExcluir !== false) {
 
+                const hasSelection = selectedRows.length > 0
+
                 setFooter(
-                    <div className="card-title font-medium text-sm mt-3">
+                    <div className="flex items-center gap-3 mt-3">
+
                         <button
-                            className={`btn btn-sm btn-danger ${selectedRows.length === 0 ? 'opacity-50 cursor-not-allowed' : ''}`}
-                            disabled={selectedRows.length === 0}
+                            className={`btn btn-sm btn-danger transition-opacity ${hasSelection ? '' : 'opacity-40 cursor-not-allowed'}`}
+                            disabled={!hasSelection}
                             onClick={handleExcluir}
                         >
+                            <i className="ki-filled ki-trash"></i>
                             Excluir selecionados
                         </button>
+
+                        {hasSelection && (
+                            <span className="text-2sm text-gray-700">
+                                {selectedRows.length === 1
+                                    ? '1 item selecionado'
+                                    : `${selectedRows.length} itens selecionados`}
+                            </span>
+                        )}
+
                     </div>
                 )
 
@@ -402,53 +508,62 @@
 
         const column = useMemo(() => (columnHeader ? createColumns(columnHeader) : []), [columnHeader]);
 
-        const fetchGridData = async (params) => {
-            
-            try {
+        // HTML DA LISTAGEM MONTADO PELO PRÓPRIO CARD ($novoResultadoInicial) — CHEGA EM
+        // list.content, ÀS VEZES ANINHADO EM ARRAYS, ENTÃO ACHATAMOS ANTES DE RENDERIZAR
+        const legacyHtml = useMemo(() => {
 
-                if (params.pageIndex == 0) {
+            const flatten = (value) => {
 
-                    return {
-                        data: data,
-                        totalCount: pagination?.information?.total || 0,
-                    }
+                if (typeof value === 'string') return value
+                if (Array.isArray(value)) return value.map(flatten).join('')
 
-                }
+                return ''
 
-                let newUrl = await updateTablePagination(params)
-                const response = await api.get(newUrl)
-
-                return {
-                    data: response.data?.success?.response?.data?.params?.list?.rows,
-                    totalCount: response?.data?.success?.response?.data?.params?.pagination ?.information?.total,
-                }
-
-            } catch (error) {
-
-                toast(`Error de dados`, {
-                    description: `❌ Erro ao carregar dados da página.`,
-                })
-
-                return {
-                    data: [],
-                    totalCount: 0,
-                }
-
-            } finally {
-                //setLoading(false);
             }
+
+            return flatten(content).trim()
+
+        }, [content])
+
+        // O CARD MONTOU A LISTAGEM INTEIRA EM HTML E NÃO HÁ LINHAS ESTRUTURADAS
+        // (é o caso de $bloqResultados = true no painel-php): renderiza o HTML do card
+        // no lugar do DataGrid, preservando a barra de ferramentas (busca, abas, adicionar)
+        if (legacyHtml !== '' && data.length === 0) {
+
+            return (
+                <div>
+                    <div className="card card-grid min-w-full">
+
+                        <Toolbar />
+
+                        <div className="card-body">
+                            <LegacyList html={legacyHtml} columnHeader={columnHeader} />
+                        </div>
+
+                    </div>
+                </div>
+            )
 
         }
 
         return (
             <div>
+
+                {/* LINHAS EXTRAS DECLARADAS PELO CARD, EXIBIDAS ACIMA DA LISTAGEM PADRÃO */}
+                {legacyHtml !== '' && (
+                    <LegacyList
+                        html={legacyHtml}
+                        columnHeader={columnHeader}
+                        showHeader={false}
+                    />
+                )}
+
                 <DataGrid
                     columns={column}
                     data={data}
                     rowSelection={true}
                     onRowSelectionChange={handleRowSelection}
                     pagination={gridPagination}
-                    onFetchData={fetchGridData}
                     getRowId={(row) => row['row-id']}
                     sorting={[
                         {
@@ -456,12 +571,44 @@
                             desc: false,
                         },
                     ]}
-                    serverSide={true}
+                    //TODOS OS REGISTROS JÁ CARREGADOS FICAM NA TELA; A BUSCA DA PRÓXIMA
+                    //PÁGINA É FEITA PELO BOTÃO DO RODAPÉ, NÃO PELO GRID
+                    serverSide={false}
                     toolbar={<Toolbar />}
                     layout={{
                         card: true,
+                        hidePagination: true,
                     }}
+                    //RODAPÉ DENTRO DO CARD (mesma posição da paginação que ele substitui).
+                    //data-pagination faz herdar o padding do layout de card.
+                    footer={
+                        models.length > 0 ? (
+
+                            <div data-pagination className="flex flex-col items-center gap-2">
+
+                                {totalRegistros > models.length && (
+                                    <button
+                                        type="button"
+                                        className="btn btn-light btn-sm"
+                                        onClick={carregarMais}
+                                        disabled={carregandoMais}
+                                    >
+                                        {carregandoMais ? 'Carregando...' : 'Carregar mais conteúdo'}
+                                    </button>
+                                )}
+
+                                {totalRegistros > 0 && (
+                                    <span className="text-2sm text-gray-600">
+                                        Mostrando {models.length} de {totalRegistros} {totalRegistros === 1 ? 'resultado' : 'resultados'}
+                                    </span>
+                                )}
+
+                            </div>
+
+                        ) : null
+                    }
                 />
+
                 {footer}
             </div>
         )

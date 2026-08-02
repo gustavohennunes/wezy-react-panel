@@ -8,13 +8,26 @@
 
         let inputElement
 
-        const handleFilesChange = (files) => {
-            setSelectedFiles(files)
-        }
-
         if (fieldMask == 'Number'){
             fieldMask = Number;
         }
+
+        //FORMATOS PERMITIDOS ENVIADOS PELA PONTE (panel/module) VIRAM O accept DO INPUT
+        const buildAccept = (fallback) => {
+
+            if (Array.isArray(fieldData.formats) && fieldData.formats.length > 0) {
+                return fieldData.formats.map((format) => `.${format}`).join(',')
+            }
+
+            return fallback
+
+        }
+
+        //EXTRAI O maxlength DO attr LEGADO (STRING HTML) QUANDO EXISTIR
+        const attrMaxLength = (() => {
+            const match = /maxlength="(\d+)"/.exec(fieldData.attr || '')
+            return match ? parseInt(match[1], 10) : undefined
+        })()
         
         switch (type) {
             case 'Frm':
@@ -22,7 +35,7 @@
                 inputElement = (
                     <IMaskInput
                         mask={fieldMask}
-                        className={`input ${fieldClass} ${fieldData.class}`}
+                        className={`input w-full ${fieldClass} ${fieldData.class}`}
                         name={fieldName}
                         value={formState[fieldName] || ''}
                         required={required}
@@ -38,22 +51,17 @@
                 inputElement = (
                     <CurrencyInput
                         hideSymbol={true}
-                        onChangeValue={(event, originalValue, maskedValue) => {
-                            
-                        }}
-                        defaultValue={formState[fieldName] || 0}
+                        onChangeValue={(event, originalValue, maskedValue) =>
+                            handleInputChange(fieldName, maskedValue)
+                        }
                         value={formState[fieldName] || 0}
                         InputElement={
                             <input
                                 type={fieldData.type}
-                                className={`input ${fieldClass} ${fieldData.class}`}
+                                className={`input w-full ${fieldClass} ${fieldData.class}`}
                                 name={fieldName}
-                                value={formState[fieldName] || 0}
                                 required={required}
-                                onChange={(e) =>
-                                    handleInputChange(fieldName, e.target.value)
-                                }
-                                maxLength='10'
+                                maxLength={attrMaxLength || 13}
                             />
                         }
                     />
@@ -64,7 +72,7 @@
 
                 inputElement = (
                     <div
-                        className={`input ${fieldClass} ${fieldData.class}`}
+                        className={`input w-full ${fieldClass} ${fieldData.class}`}
                         data-toggle-password="true"
                     >
                         <input
@@ -106,7 +114,7 @@
 
                 inputElement = (
                     <textarea
-                        className={`input min-h-[120px] ${fieldClass} ${fieldData.class}`}
+                        className={`input w-full min-h-[140px] py-2 leading-relaxed ${fieldClass} ${fieldData.class}`}
                         name={fieldName}
                         value={formState[fieldName] || ''}
                         required={required}
@@ -118,12 +126,17 @@
 
             break
             case 'Lis':
+            case 'Cod':
+            case 'Din':
 
+                //A PONTE PODE MANDAR HTML NO VALOR (LINKS DE DOWNLOAD, <br>) — RENDERIZA COMO HTML
                 inputElement = (
-                    <div className={fieldData.class + ' text-[13px]'}>
-                        {fieldData.value}
-                        {fieldData.extra_html}
-                    </div>
+                    <div
+                        className={fieldData.class + ' text-[13px]'}
+                        dangerouslySetInnerHTML={{
+                            __html: (fieldData.value || '') + (fieldData.extra_html || ''),
+                        }}
+                    />
                 )
 
             break
@@ -134,9 +147,8 @@
                         fieldName={fieldName}
                         multiple={true}
                         value={formState[fieldName] || ''}
-                        accept="image/*"
+                        accept={buildAccept('image/*')}
                         maxSize={5 * 1024 * 1024}
-                        onFilesChange={handleFilesChange}
                     />
                 )
 
@@ -147,19 +159,9 @@
                     <FormFile
                         fieldName={fieldName}
                         multiple={true}
-                        accept="*"
+                        accept={buildAccept('*')}
                         maxSize={5 * 1024 * 1024}
-                        onFilesChange={handleFilesChange}
                     />
-                )
-
-            break
-            case 'Din':
-
-                inputElement = (
-                    <div className={fieldData.class + ' text-[13px]'}>
-                        {fieldData.extra_html}
-                    </div>
                 )
 
             break
@@ -200,22 +202,24 @@
         
         return (
             <div className={combinedClass} {...rowAttr}>
-                
+
                 {title !== false && (
-                <div className="form-label max-w-56 flex-col">
-                    <label>
-                        <b>
-                            {title}
-                            {requiredField && (
-                                <span className="text-danger"> *</span>
-                            )}
-                        </b>
-                    </label>
-                    {subtitle && <span className="text-[10px]"> {subtitle} </span>}
-                </div>
+                    <div className="form-label w-full lg:w-56 lg:min-w-56 lg:shrink-0 flex-col h-full justify-center">
+                        <label>
+                            <b>
+                                {title}
+                                {requiredField && (
+                                    <span className="text-danger"> *</span>
+                                )}
+                            </b>
+                        </label>
+                        {subtitle && <span className="text-[10px] text-gray-600"> {subtitle} </span>}
+                    </div>
                 )}
 
-                {inputElement}
+                <div className="w-full lg:flex-1 min-w-0">
+                    {inputElement}
+                </div>
 
             </div>
         )

@@ -1,0 +1,82 @@
+/* UTILITÁRIOS DA ERA BOOTSTRAP USADOS PELO HTML DOS CARDS LEGADOS (campos `aut`).
+   O TAILWIND NÃO OS DEFINE — SEM ELES O GRID DE ÍCONES DO MÓDULO EMPILHA NA VERTICAL. */
+
+.pull-left {
+    float: left;
+}
+
+.clearfix::after {
+    content: '';
+    display: block;
+    clear: both;
+}
+
+/* GRID DE SELEÇÃO DE ÍCONE DO MÓDULO */
+.lista-icones {
+    cursor: pointer;
+}
+
+/* BOTÕES DOS CARDS LEGADOS.
+   .padrao vem do css/style.css do painel antigo; .btt-expandir / .btt-novo-cinza vinham do
+   <style> que o próprio CARD emite (e que a API descarta). Replicado aqui com os MESMOS
+   valores — nada é alterado no painel-php, então o painel antigo segue intacto. */
+
+form a.padrao {
+    cursor: pointer;
+    min-width: 35px;
+    height: 35px;
+    line-height: 35px;
+    text-align: center;
+    background-color: #3598db;
+    color: #fff !important;
+    float: left;
+    border-radius: 4px;
+    margin-bottom: 0 !important;
+    text-decoration: none;
+    font-size: 13px;
+}
+
+form a.padrao.btt-expandir {
+    color: #fff !important;
+    margin: 10px 0;
+    padding: 0 30px;
+}
+
+/* ABAS (Principal / Ajax / Funções / CSS / JS / Instalador) */
+form a.padrao.btt-novo-cinza {
+    background: #eee;
+    color: #333 !important;
+    border-radius: 0;
+    border-left: 1px solid #ddd;
+    width: 16.666666%;
+    padding: 0;
+    margin: 0;
+}
+
+form a.padrao.btt-novo-cinza:hover,
+form a.padrao.btt-novo-cinza.btt-ativo {
+    background: #ddd;
+}
+
+/* EDITOR EM TELA CHEIA (classe aplicada pelo botão Expandir) */
+.ace_editor.openEditor {
+    position: fixed;
+    left: 0;
+    top: 0;
+    width: 100% !important;
+    height: 100% !important;
+    z-index: 9999;
+}
+
+/* SELECT CRU DOS CARDS (ex.: #SelSetor) GANHA APARÊNCIA DE CAMPO */
+form select.legacy-select {
+    width: 100%;
+    max-width: 420px;
+    height: 2.5rem;
+    padding: 0 0.75rem;
+    border: 1px solid var(--tw-gray-300, #dbdfe9);
+    border-radius: 0.375rem;
+    background-color: #fff;
+    font-size: 13px;
+    color: var(--tw-gray-700, #4b5675);
+}

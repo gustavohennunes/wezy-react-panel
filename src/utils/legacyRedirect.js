@@ -1,0 +1,134 @@
+    import { cleanUrl } from './urlHelper'
+
+    // O PAINEL ANTIGO REDIRECIONA EMITINDO <script>window.location="..."</script> (função loc() do PHP).
+    // O React insere esse HTML via dangerouslySetInnerHTML, e o navegador NÃO executa <script> vindo de
+    // innerHTML — então o redirect simplesmente se perdia. Aqui detectamos o padrão e navegamos.
+    //
+    // Os padrões exigem ATRIBUIÇÃO seguida de string literal, então usos de leitura
+    // (ex.: if (window.location.href.includes('x')) ou == ) não disparam falso positivo.
+    const REDIRECT_PATTERNS = [
+        /window\.location(?:\.href)?\s*=\s*["']([^"']+)["']/i,
+        /window\.location\.(?:replace|assign)\s*\(\s*["']([^"']+)["']\s*\)/i,
+        /window\.top\.location(?:\.href)?\s*=\s*["']([^"']+)["']/i,
+        /location\.href\s*=\s*["']([^"']+)["']/i,
+    ]
+
+    // PROCURA O REDIRECT EM UMA STRING
+    export const findLegacyRedirect = (value) => {
+
+        if (typeof value !== 'string' || value.indexOf('location') === -1) {
+            return null
+        }
+
+        for (const pattern of REDIRECT_PATTERNS) {
+
+            const match = pattern.exec(value)
+            if (match && match[1]) {
+                return match[1]
+            }
+
+        }
+
+        return null
+
+    }
+
+    // VARRE A RESPOSTA INTEIRA (extra-html-content, campos aut, células da listagem, mensagens...)
+    export const findLegacyRedirectDeep = (data, depth = 0) => {
+
+        if (!data || depth > 8) {
+            return null
+        }
+
+        if (typeof data === 'string') {
+            return findLegacyRedirect(data)
+        }
+
+        if (Array.isArray(data)) {
+
+            for (const item of data) {
+
+                const found = findLegacyRedirectDeep(item, depth + 1)
+                if (found) return found
+
+            }
+
+            return null
+
+        }
+
+        if (typeof data === 'object') {
+
+            for (const key of Object.keys(data)) {
+
+                const found = findLegacyRedirectDeep(data[key], depth + 1)
+                if (found) return found
+
+            }
+
+        }
+
+        return null
+
+    }
+
+    // EXECUTA O REDIRECT: link externo sai do SPA; interno usa a navegação do React Router.
+    // Devolve true quando navegou (para o chamador interromper o fluxo).
+    export const applyLegacyRedirect = (url, navigate = null) => {
+
+        if (!url) {
+            return false
+        }
+
+        const isAbsolute = /^https?:\/\//i.test(url)
+
+        if (isAbsolute) {
+
+            let destino = null
+
+            try {
+                destino = new URL(url)
+            } catch {
+                return false
+            }
+
+            // OUTRO HOST (ex.: acesso ao painel do cliente por hash) — sai do SPA
+            if (destino.origin !== window.location.origin) {
+
+                window.location.href = url
+
+                return true
+
+            }
+
+            // MESMO HOST — evita recarregar na mesma URL (loop)
+            if (destino.pathname + destino.search === window.location.pathname + window.location.search) {
+                return false
+            }
+
+            if (navigate) {
+                navigate(destino.pathname + destino.search, { replace: true })
+            } else {
+                window.location.href = url
+            }
+
+            return true
+
+        }
+
+        // RELATIVO (ex.: index.php?pag=clientes&erro=x ou ?pag=...)
+        const interno = cleanUrl(url)
+
+        if (interno === window.location.search || interno === window.location.pathname + window.location.search) {
+            return false
+        }
+
+        if (navigate) {
+            navigate(interno.startsWith('?') || interno.startsWith('/') ? interno : '/' + interno, { replace: true })
+        } else {
+            window.location.href = interno
+        }
+
+        return true
+
+    }

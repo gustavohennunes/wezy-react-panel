@@ -13,10 +13,10 @@ const DataGridTable = () => {
     }
 
     const bodyCellSpacingOptions = {
-        xs: 'px-[5px] !py-[6px]',
-        sm: 'px-[5px] !py-[6px]',
-        md: 'px-[5px] !py-[6px]',
-        lg: 'px-[5px] !py-[6px]',
+        xs: 'px-[5px] !py-1',
+        sm: 'px-[5px] !py-1',
+        md: 'px-[5px] !py-1',
+        lg: 'px-[5px] !py-1.5',
     }
 
     const headCellSpacing = props.layout?.cellSpacing
@@ -49,10 +49,11 @@ const DataGridTable = () => {
                             <th
                                 key={header.id}
                                 colSpan={header.colSpan}
+                                style={header.column.columnDef.meta?.headerStyle}
                                 className={cn(
                                     headCellSpacing,
                                     cellBorder && 'border-e',
-                                    'h-12 min-w-[20px] text-left rtl:text-right align-middle font-medium text-muted-foreground [&:has([role=checkbox])]:pe-0',
+                                    'h-11 min-w-[20px] text-left rtl:text-right align-middle font-medium text-muted-foreground [&:has([role=checkbox])]:pe-0',
                                     header.column.columnDef.meta
                                         ?.headerClassName
                                 )}
@@ -84,6 +85,7 @@ const DataGridTable = () => {
                             {row.getVisibleCells().map((cell) => (
                                 <td
                                     key={cell.id}
+                                    style={cell.column.columnDef.meta?.cellStyle}
                                     className={cn(
                                         bodyCellSpacing,
                                         cellBorder && 'border-e',

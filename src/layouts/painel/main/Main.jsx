@@ -7,6 +7,7 @@
     import { useMenus } from '@/providers'
     import { useResponsive } from '@/hooks'
     import { buildApiUrl } from '@/utils/urlHelper'
+    import { resolveModuleTitle, resolveModuleBreadcrumbs } from '@/utils/moduleHeading'
     import { api } from '@/services/api'
     import { usePageData } from '@/context/PageDataContext'
     import { useAuth } from '../../../auth/providers/JWTProvider'
@@ -21,7 +22,7 @@
         const menuConfig        = getMenuConfig('primary');
         const menuItem          = useMenuCurrentItem(pathname, menuConfig);
         const { pageData }      = usePageData();
-        const { action }        = useAuth();
+        const { action, slug }  = useAuth();
         const containerRef      = useRef(null);
 
         const [ pageMessage, setPageMessage ]     = useState('');
@@ -32,8 +33,8 @@
         const [ pageCss, setPageCss ]             = useState('');
         const [ pageJs, setPageJs ]               = useState('');
 
-        const [ titleMetatag, setTitleMetatag ]             = useState('Revenda Vymber');
-        const [ descriptionMetatag, setDescriptionMetatag ] = useState('A Vymber é a plataforma número 1 em rádio indoor para ambientes, e agora é sua vez de faturar alto com nossa revenda!');
+        const [ titleMetatag, setTitleMetatag ]             = useState('Cayman Sistemas');
+        const [ descriptionMetatag, setDescriptionMetatag ] = useState('');
         const [ faviconMetatag, setFaviconMetatag ]         = useState('https://files.caymanweb.com.br/f7e00f1f7c8e403b99f72159635a3f34/90426c66d0ad4e8318e8a9fba07dd9cb/favicon.png');
         
         const [ pageTitle, setPageTitle ] = useState(titleMetatag);
@@ -45,22 +46,29 @@
                 window.location.href = pageData.params.redirect;
             }
 
+            //A PONTE NÃO RESOLVE O NOME DOS SUBMÓDULOS (VER utils/moduleHeading.js),
+            //ENTÃO TÍTULO E MIGALHAS SÃO COMPLETADOS PELA ÁRVORE DO panel/menus
+            const slugAtual = slug || new URLSearchParams(window.location.search).get('pag') || '';
+            const acaoAtual = new URLSearchParams(window.location.search).get('acao') || '';
+
+            const tituloPagina = resolveModuleTitle(pageData?.params?.title, menuConfig, slugAtual);
+
             //SETA O TÍTULO DA METATAG
             let useTitle = titleMetatag;
-            if(pageData?.params?.title){
-                useTitle = pageData?.params?.title + ' - ' + titleMetatag;
+            if(tituloPagina){
+                useTitle = tituloPagina + ' - ' + titleMetatag;
             }
 
             setPageTitle(useTitle);
 
             //SETA O TÍTULO PRINCIPAL DA PÁGINA
-            setTitle(pageData?.params?.title);
+            setTitle(tituloPagina);
 
             //SETA O BREADCRUMBS DA PÁGINA
             setBreadcrumbs(
-                (pageData?.params?.breadcrumbs || '')
+                resolveModuleBreadcrumbs(pageData?.params?.breadcrumbs, menuConfig, slugAtual, acaoAtual)
                     .replaceAll('index.php', '')
-                    .replaceAll('class="', 'class="text-[14px] ')
+                    .replaceAll('class="', 'class="text-[13px] ')
                     .replaceAll(' > ', '<i class="ki-filled ki-right text-gray-500 !text-[11px] mx-1"></i>')
             );
 
@@ -68,7 +76,7 @@
             if(pageData?.params?.message) {
                 setPageMessage(pageData.params.message);
             } else if (action == 'finalizar-cadastro'){
-                setPageMessage('Você está quase lá! Complete seu cadastro para começar a utilizar sua revenda Vymber!');
+                setPageMessage('Você está quase lá! Complete seu cadastro!');
             } else {
                 setPageMessage('');
             }
@@ -98,7 +106,8 @@
                 setPageJs('');
             }
 
-        }, [ pageData ]);
+        //menuConfig ENTRA NA LISTA PORQUE O MENU PODE CHEGAR DEPOIS DO MÓDULO
+        }, [ pageData, menuConfig, slug ]);
 
         useEffect(() => {
             

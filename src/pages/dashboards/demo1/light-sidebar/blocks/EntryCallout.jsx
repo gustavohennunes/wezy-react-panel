@@ -35,15 +35,11 @@ const EntryCallout = ({ className, nameMessage }) => {
                                 Olá, <b><span className="text-danger">{nameMessage}</span></b>!<br />
                                 </>
                             )}
-                            Seja bem-vindo(a) <br />à sua{' '}
-                            <span className="text-danger">revenda Vymber!</span>
+                            Seja bem-vindo(a) <br />ao seu sistema!
                         </h2>
 
                         <p className="text-sm font-normal text-gray-700 leading-5.5">
-                            A Vymber é a plataforma número 1 em
-                            <br />
-                            rádio indoor para ambientes, e agora é sua <br />
-                            vez de faturar alto com nossa revenda!
+                            
                         </p>
 
                     </div>

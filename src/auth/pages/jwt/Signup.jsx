@@ -1,4 +1,5 @@
 import clsx from 'clsx'
+import { PANEL_LOGO } from '@/config/branding'
 import { useFormik } from 'formik'
 import { useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
@@ -124,24 +125,18 @@ const Signup = () => {
 
                     <div className="flex gap-3 mb-2.5 items-center">
                         <img
-                            src="https://files.caymanweb.com.br/f7e00f1f7c8e403b99f72159635a3f34/dfca77e57617844b2a0d41057e7b884a/logo-vymber.svg"
+                            src={PANEL_LOGO}
                             className="dark:hidden"
                             style={{ width: '135px' }}
                         />
                         <img
-                            src="https://files.caymanweb.com.br/f7e00f1f7c8e403b99f72159635a3f34/dfca77e57617844b2a0d41057e7b884a/logo-vymber.svg"
+                            src={PANEL_LOGO}
                             className="hidden dark:block"
                             style={{
                                 filter: 'brightness(100)',
                                 width: '135px',
                             }}
                         />
-                        <div className="text-2sm text-gray-600 leading-none flex items-center font-medium">
-                            |
-                        </div>
-                        <div className="text-2sm text-gray-600 leading-none flex items-center font-medium">
-                            Revenda
-                        </div>
                     </div>
 
                 </div>

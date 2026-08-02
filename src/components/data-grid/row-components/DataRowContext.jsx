@@ -21,7 +21,7 @@ export const DataRowContext = ({ fullRow, row, index, handleToggle }) => {
                 row={row}
                 fullRow={fullRow}
                 handleToggle={() =>
-                    handleToggle(fullRow.original['row-id'], index)
+                    handleToggle(fullRow.original['row-id'], index, row)
                 }
             />
         )

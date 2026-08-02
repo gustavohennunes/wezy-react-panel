@@ -70,7 +70,7 @@ import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
         return (
             <div className={combinedClass} {...rowAttr}>
 
-                <label className="form-label flex items-center gap-1 max-w-56">
+                <label className="form-label flex items-center gap-1 w-full lg:w-56 lg:min-w-56 lg:shrink-0 h-full justify-center">
                     <b>
                         {fieldData.title || title}
                         {requiredField && (

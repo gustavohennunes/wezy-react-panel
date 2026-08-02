@@ -74,6 +74,16 @@ export const DataGridProvider = (props) => {
         pageSize: props.pagination?.size ?? 10,
     })
 
+    // O pageSize É CAPTURADO NO useState ACIMA SÓ NA MONTAGEM; SE O PAI TROCAR
+    // props.pagination.size DEPOIS (ex.: modo "Carregar mais" do Models), A TABELA
+    // FICAVA PRESA NO TAMANHO INICIAL E ESCONDIA AS LINHAS EXCEDENTES
+    useEffect(() => {
+        const size = props.pagination?.size
+        if (size && size !== pagination.pageSize) {
+            setPagination((prev) => ({ ...prev, pageSize: size }))
+        }
+    }, [props.pagination?.size])
+
     const [rowSelection, setRowSelection] = useState(mergedProps.rowSelection)
     const [sorting, setSorting] = useState(mergedProps.sorting ?? [])
     const [columnFilters, setColumnFilters] = useState([])

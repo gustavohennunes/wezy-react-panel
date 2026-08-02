@@ -9,21 +9,26 @@
     import { buildApiUrl } from '@/utils/urlHelper'
     import { usePageData } from '@/context/PageDataContext'
     import { useAuth } from '@/auth/providers/JWTProvider'
+    import { useLegacyCodeEditor } from './LegacyCodeEditor'
+    import { findLegacyRedirectDeep, applyLegacyRedirect } from '@/utils/legacyRedirect'
 
     const FormContext = ({ data }) => {
 
         const navigate = useNavigate();
 
         const params = new URLSearchParams(window.location.search);
-        
+
         const acao = params.get('acao');
-        
-        const [ sections, setSections ]      = useState('');
+
+        const [ sections, setSections ]      = useState([]);
         const [ formTabs, setFormTabs ]      = useState('');
         const [ loading, setLoading ]        = useState(false);
         const [ activeTab, setActiveTab ]    = useState('');
         const { callApi }                    = usePageData();
         const { auth, logout, slug, action } = useAuth();
+
+        //ATIVA O EDITOR ACE NOS CARDS DE CÓDIGO (ex.: ?pag=modulos) — NO-OP NOS DEMAIS
+        useLegacyCodeEditor(data);
 
         async function submitForm(e) {
 
@@ -66,8 +71,24 @@
                     }
                 );
 
-                if(response?.data?.success?.response?.data?.redirect) {
-                    window.location.href = response?.data?.success?.response?.data?.redirect
+                //REDIRECT EMITIDO PELO CARD COMO <script>window.location="..."</script>.
+                //VARRE A RESPOSTA BRUTA: COM exit(loc(...)) O PHP DEVOLVE HTML CRU, SEM O JSON.
+                const redirectLegado = findLegacyRedirectDeep(response?.data)
+                if(redirectLegado && applyLegacyRedirect(redirectLegado, navigate)) {
+                    setLoading(false)
+                    return
+                }
+
+                const dadosResposta = response?.data?.success?.response?.data
+
+                //REDIRECT DECLARADO PELA PONTE (URL no formato legado index.php?pag=...)
+                if(dadosResposta?.redirect) {
+
+                    if(applyLegacyRedirect(dadosResposta.redirect, navigate)) {
+                        setLoading(false)
+                        return
+                    }
+
                 }
 
                 params.delete('acao')
@@ -149,49 +170,54 @@
 
         useEffect(() => {
 
-            if (data?.form?.fields) {
+            const fields = Array.isArray(data?.form?.fields) ? data.form.fields : []
 
-                const fields = data.form.fields
-                const groupedSections = []
-                let currentSection = null
+            const groupedSections = []
+            let currentSection = null
 
-                fields.forEach((field) => {
+            fields.forEach((field) => {
 
-                    if (field.type === 'Cab') {
-                            
-                        if (currentSection) {
-                            groupedSections.push(currentSection)
-                        }
-                        
-                        let subTitle = field?.field?.value?.title?.split('//');
-                        let title = field.field.value.title;
-                        if(subTitle.length > 1) {
-                            title    = subTitle[0].trim();
-                            subTitle = subTitle[1].trim();
-                        } else {
-                            subTitle = ''
-                        }
+                if (field.type === 'Cab') {
 
-                        currentSection = {
-                            title: title,
-                            subTitle: subTitle,
-                            number: field.field.value.number,
-                            fields: [],
-                        }
-
-                    } else if (currentSection) {
-                        currentSection.fields.push(field)
+                    if (currentSection) {
+                        groupedSections.push(currentSection)
                     }
 
-                })
+                    let subTitle = field?.field?.value?.title?.split('//');
+                    let title = field.field.value.title;
+                    if(subTitle?.length > 1) {
+                        title    = subTitle[0].trim();
+                        subTitle = subTitle[1].trim();
+                    } else {
+                        subTitle = ''
+                    }
 
-                if (currentSection) {
-                    groupedSections.push(currentSection)
+                    currentSection = {
+                        title: title,
+                        subTitle: subTitle,
+                        number: field.field.value.number,
+                        fields: [],
+                    }
+
+                } else {
+
+                    //CAMPO ANTES DO PRIMEIRO Cab: ABRE UMA SEÇÃO SEM CABEÇALHO EM VEZ
+                    //DE DESCARTÁ-LO. O CARD NÃO É OBRIGADO A COMEÇAR COM Cab.
+                    if (!currentSection) {
+                        currentSection = { title: '', subTitle: '', number: '', fields: [] }
+                    }
+
+                    currentSection.fields.push(field)
+
                 }
 
-                setSections(groupedSections)
+            })
 
+            if (currentSection) {
+                groupedSections.push(currentSection)
             }
+
+            setSections(groupedSections)
 
             if (data?.buttons?.form) {
                 parseTabs(data.buttons.form)
@@ -199,15 +225,28 @@
 
         }, [ data ]);
 
-        if (!sections.length) {
+        //O LOADER VALE APENAS ENQUANTO A PONTE NÃO RESPONDEU. UM FORMULÁRIO SEM CAMPOS
+        //É UM RESULTADO VÁLIDO (CARD COM $lista = false E $array VAZIO, QUE NO PAINEL-PHP
+        //MONTA A TELA POR echo) — ANTES ISSO PRENDIA A PÁGINA NO ScreenLoader PARA SEMPRE.
+        if (!data) {
             return <ScreenLoader />
         }
 
         return (
             <div className="grid gap-1 mx-auto">
-                
+
                 {formTabs && <FormTabs tabs={formTabs} activeTab={activeTab} setActiveTab={setActiveTab} />}
-                
+
+                {sections.length === 0 && (
+                    <div className="card">
+                        <div className="card-body text-2sm text-gray-700">
+                            Este módulo não devolveu campos para exibir.
+                        </div>
+                    </div>
+                )}
+
+                {/* SEM SEÇÕES NÃO HÁ CAMPOS NEM BOTÃO DE ENVIO: O FORM SERIA SÓ HIDDENS */}
+                {sections.length > 0 && (
                 <form
                     encType="application/x-www-form-urlencoded"
                     onSubmit={submitForm}
@@ -239,6 +278,20 @@
                         </>
                     )}
 
+                    {/* CAMPOS Hdn DECLARADOS PELO CARD — A PONTE OS ENVIA EM form.hidden_fields */}
+                    {data.form?.hidden_fields &&
+                        Object.entries(data.form.hidden_fields)
+                            .filter(([name]) => !['Inserir', 'Alterar', 'id'].includes(name))
+                            .map(([name, value]) => (
+                                <input
+                                    key={`hidden-${name}`}
+                                    type="hidden"
+                                    name={name}
+                                    id={name}
+                                    value={value ?? ''}
+                                />
+                            ))}
+
                     {sections.map((section, index) => (
                         <FormSection
                             key={index}
@@ -251,6 +304,7 @@
                     ))}
 
                 </form>
+                )}
 
                 <button type="button" onClick={() => navigate(-1)}>
                     Voltar

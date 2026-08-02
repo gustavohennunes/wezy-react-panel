@@ -1,4 +1,5 @@
     import { KeenIcon } from '@/components'
+    import { PANEL_LOGO } from '@/config/branding'
     import { Container } from '@/components/container'
     import { toAbsoluteUrl } from '@/utils'
     import { Link } from 'react-router-dom'
@@ -16,12 +17,12 @@
                 <Container className="flex items-center justify-between flex-wrap gap-3">
                     <Link to="/">
                         <img
-                            src="https://files.caymanweb.com.br/f7e00f1f7c8e403b99f72159635a3f34/dfca77e57617844b2a0d41057e7b884a/logo-vymber.svg"
+                            src={PANEL_LOGO}
                             className="dark:hidden"
                             style={{ width: '135px' }}
                         />
                         <img
-                            src="https://files.caymanweb.com.br/f7e00f1f7c8e403b99f72159635a3f34/dfca77e57617844b2a0d41057e7b884a/logo-vymber.svg"
+                            src={PANEL_LOGO}
                             className="hidden dark:block"
                             style={{
                                 filter: 'brightness(100)',

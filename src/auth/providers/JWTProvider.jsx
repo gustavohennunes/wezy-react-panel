@@ -14,7 +14,6 @@
     export const CAYMAN_REGISTER_URL = `${CAYMAN_API_URL}/panel/signup`
     export const FORGOT_PASSWORD_URL = `${CAYMAN_API_URL}/panel/forgot-password`
     // export const RESET_PASSWORD_URL  = `${API_URL}/reset-password`
-    export const GET_USER_URL        = `${CAYMAN_API_URL}/user-infos`
 
     const BTOKEN        = import.meta.env.VITE_BTOKEN
 
@@ -27,8 +26,6 @@
         const [ currentUser, setCurrentUser ] = useState()
         const [ slug, setSlug ]               = useState('')
         const [ action, setAction ]           = useState('')
-        const [ userInfos, setUserInfos ]     = useState({});
-        const [ publicInfos, setPublicInfos ] = useState({});
         const [ isLogged, setIsLogged ]       = useState(false);
 
         window.api = api;
@@ -214,47 +211,6 @@
             await axios.post(RESET_PASSWORD_URL, { email, token, password, password_confirmation })
         }
 
-        const getPublicInfos = async () => {
-
-            let response = '';
-
-            try{
-
-                response = await api.get('/panel/module?slug=public-webservice');
-                
-                setPublicInfos(response.data.success.response.data)
-
-            } catch (error) {
-                
-                setPublicInfos({});
-            }
-
-        }
-
-        const getUser = async () => {
-            
-            let response = ''
-            try{
-
-                response = await api.get('/panel/module?slug=user-infos');
-                
-                return response.data.success.response.data
-
-            } catch (error) {
-
-                /* toast(`❌ Erro: `, {
-                    description: <span style={{ 'color': 'white' }}>{error.response?.data?.error?.message || error.message}</span>,
-                    style: {
-                        color: 'white',
-                        background: 'var(--tw-danger)',
-                        fontWeight: 'bold'
-                    }
-                }) */
-
-            }
-
-        }
-
         const newUser = async () => {
 
             //TODO
@@ -271,32 +227,30 @@
 
         }
 
+        //DADOS DO USUÁRIO LOGADO — VÊM DO PRÓPRIO /auth/master (data.usuario),
+        //QUE JÁ FICA SALVO NO localStorage. NÃO EXIGE REQUISIÇÃO EXTRA.
+        const usuarioLogado = useMemo(() => {
+
+            const usuario = auth?.data?.usuario
+            if (!usuario) return null
+
+            return {
+                id: usuario.id,
+                nome: usuario.nome,
+                email: usuario.login,
+                foto: usuario.foto,
+                acesso: usuario.acesso,
+                categoria: usuario.categoria,
+            }
+
+        }, [ auth ])
+
         const logout = () => {
             saveAuth(undefined)
             setCurrentUser(undefined)
             // O próximo login pode pertencer a outro painel
             clearCustomerHost()
         }
-
-        const fetchUserInfos = async (slug, action) => {
-            
-            const getUserInfos = await getUser();
-            if (getUserInfos?.user?.register_complete === false && slug !== 'perfil' && slug !== '') {
-                window.location.href = '/?pag=perfil&action=finalizar-cadastro';
-            } else if (getUserInfos?.user?.register_complete === true && slug === 'perfil' && action === 'finalizar-cadastro') {
-                window.location.href = '/';
-            } else {
-                setUserInfos(getUserInfos);
-            }
-
-        };
-
-        useEffect(() => {
-
-            fetchUserInfos(slug, action);
-            getPublicInfos();
-
-        }, [slug, auth ]);        
 
         return (
             <AuthContext.Provider
@@ -307,18 +261,14 @@
                     saveAuth,
                     currentUser,
                     setCurrentUser,
+                    usuarioLogado,
                     login,
                     register,
                     requestPasswordResetLink,
                     changePassword,
-                    getUser,
                     newUser,
                     logout,
                     verify,
-                    userInfos,
-                    setUserInfos,
-                    publicInfos,
-                    setPublicInfos,
                     slug,
                     action
                 }}

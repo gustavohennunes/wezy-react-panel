@@ -32,7 +32,7 @@ const HeaderLogo = () => {
 
             <div className="flex items-center">
                 <h3 className="text-gray-700 text-base hidden md:block">
-                    Vymber
+                    Cayman Sistemas
                 </h3>
             </div>
         </div>

@@ -6,12 +6,11 @@ export default plugin(({ addComponents, theme }) => {
         '.card': {
             display: 'flex',
             'flex-direction': 'column',
-            'box-shadow': 'var(--tw-card-box-shadow)',
             'background-color': 'var(--tw-card-background-color)',
             'border-radius': theme(
                 'custom.components.common.borderRadius.card'
             ),
-            border: 'var(--tw-card-border)',
+            border: '1px solid #e6e6e7',
         },
         '.card-title': {
             'font-size': theme('fontSize.base'),

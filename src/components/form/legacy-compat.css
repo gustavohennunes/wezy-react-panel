@@ -21,6 +21,24 @@
    <style> que o próprio CARD emite (e que a API descarta). Replicado aqui com os MESMOS
    valores — nada é alterado no painel-php, então o painel antigo segue intacto. */
 
+/* NO LIGHT, AS CORES ORIGINAIS DO PAINEL-PHP; NO DARK, EQUIVALENTES DAS --tw-gray-*
+   (SEM ISSO AS ABAS DO EDITOR E O SELECT FICAVAM CLARÕES NO DARK MODE). O AZUL
+   #3598db DO .padrao É ACENTO E FUNCIONA NOS DOIS MODOS. */
+:root {
+    --legacy-tab-bg: #eee;
+    --legacy-tab-text: #333;
+    --legacy-tab-border: #ddd;
+    --legacy-tab-hover: #ddd;
+    --legacy-field-bg: #fff;
+}
+.dark {
+    --legacy-tab-bg: var(--tw-gray-200);
+    --legacy-tab-text: var(--tw-gray-800);
+    --legacy-tab-border: var(--tw-gray-300);
+    --legacy-tab-hover: var(--tw-gray-300);
+    --legacy-field-bg: var(--tw-gray-100);
+}
+
 form a.padrao {
     cursor: pointer;
     min-width: 35px;
@@ -44,10 +62,10 @@ form a.padrao.btt-expandir {
 
 /* ABAS (Principal / Ajax / Funções / CSS / JS / Instalador) */
 form a.padrao.btt-novo-cinza {
-    background: #eee;
-    color: #333 !important;
+    background: var(--legacy-tab-bg);
+    color: var(--legacy-tab-text) !important;
     border-radius: 0;
-    border-left: 1px solid #ddd;
+    border-left: 1px solid var(--legacy-tab-border);
     width: 16.666666%;
     padding: 0;
     margin: 0;
@@ -55,7 +73,7 @@ form a.padrao.btt-novo-cinza {
 
 form a.padrao.btt-novo-cinza:hover,
 form a.padrao.btt-novo-cinza.btt-ativo {
-    background: #ddd;
+    background: var(--legacy-tab-hover);
 }
 
 /* EDITOR EM TELA CHEIA (classe aplicada pelo botão Expandir) */
@@ -76,7 +94,7 @@ form select.legacy-select {
     padding: 0 0.75rem;
     border: 1px solid var(--tw-gray-300, #dbdfe9);
     border-radius: 0.375rem;
-    background-color: #fff;
+    background-color: var(--legacy-field-bg);
     font-size: 13px;
     color: var(--tw-gray-700, #4b5675);
 }

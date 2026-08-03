@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react'
 import { useDataGrid } from '.'
-import { Checkbox } from '@/components/ui/checkbox'
+import { CustomCheckbox } from '@/components/form/CustomFields'
 
 const DataGridRowSelectAll = ({ setSelectedRows }) => {
     const { table } = useDataGrid()
@@ -29,15 +29,16 @@ const DataGridRowSelectAll = ({ setSelectedRows }) => {
         })
     }
 
+    // MESMO CHECKBOX DO FORMULÁRIO (estilo painel-php), VARIANTE cf-grid
     return (
-        <Checkbox
+        <CustomCheckbox
             checked={
                 selectedRowIds.length === selectableRowIds.length &&
                 selectableRowIds.length > 0
             }
-            onCheckedChange={(value) => checkAllRows(value)}
-            aria-label="Select all"
-            className="align-[inherit]"
+            onChange={(e) => checkAllRows(e.target.checked)}
+            ariaLabel="Select all"
+            className="cf-grid"
         />
     )
 }

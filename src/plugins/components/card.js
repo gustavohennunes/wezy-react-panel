@@ -10,7 +10,9 @@ export default plugin(({ addComponents, theme }) => {
             'border-radius': theme(
                 'custom.components.common.borderRadius.card'
             ),
-            border: '1px solid #e6e6e7',
+            // COR VIA VARIÁVEL (globals.css): #e6e6e7 NO LIGHT, --tw-gray-100 NO DARK.
+            // CHUMBADA AQUI, QUEBRAVA O DARK MODE. MUDOU ESTE ARQUIVO? REINICIE O DEV SERVER.
+            border: '1px solid var(--card-border-color)',
         },
         '.card-title': {
             'font-size': theme('fontSize.base'),

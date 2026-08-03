@@ -1,12 +1,15 @@
 import React from 'react'
-import { Checkbox } from '@/components/ui/checkbox'
+import { CustomCheckbox } from '@/components/form/CustomFields'
+
+// MESMO CHECKBOX DO FORMULÁRIO (estilo painel-php) — A VARIANTE cf-grid SÓ
+// REMOVE OS DESLOCAMENTOS DE FORMULÁRIO PARA ALINHAR NA CÉLULA DA TABELA
 const DataGridRowSelect = ({ row }) => {
     return (
-        <Checkbox
+        <CustomCheckbox
             checked={row.getIsSelected()}
-            onCheckedChange={(value) => row.toggleSelected(!!value)}
-            aria-label="Select row"
-            className="align-[inherit]"
+            onChange={(e) => row.toggleSelected(e.target.checked)}
+            ariaLabel="Select row"
+            className="cf-grid"
         />
     )
 }

@@ -2,6 +2,28 @@
    ÚNICA ADAPTAÇÃO: o container é um <label> (clique nativo, sem precisar do
    custom-fields.js de delegação do painel antigo). */
 
+/* NO LIGHT AS CORES SÃO AS MESMAS DO PAINEL-PHP; NO DARK CADA UMA GANHA O
+   EQUIVALENTE DAS --tw-gray-* DO TEMA (darkMode: 'class'). O AZUL #0075a7 DO
+   ESTADO MARCADO É ACENTO DA MARCA E FUNCIONA NOS DOIS MODOS. */
+:root {
+    --cf-hover: #f1f0f5;
+    --cf-active: #e5e7f1;
+    --cf-box-border: #ccc;
+    --cf-box-bg: #fff;
+}
+.dark {
+    --cf-hover: var(--tw-gray-200);
+    --cf-active: var(--tw-gray-300);
+    --cf-box-border: var(--tw-gray-400);
+    --cf-box-bg: var(--tw-gray-100);
+}
+
+/* VARIANTE PARA AS CÉLULAS DA LISTAGEM: MESMO VISUAL, SEM OS DESLOCAMENTOS
+   DE FORMULÁRIO (margin -9px/4px) QUE DESALINHARIAM A CÉLULA DA TABELA */
+[data-custom-field='checkbox'].cf-grid {
+    margin: 0;
+}
+
 /* CHECKBOX */
 
 [data-custom-field='checkbox'] {
@@ -32,18 +54,18 @@
 }
 [data-custom-field='checkbox'] input[type='checkbox']:focus ~ .custom-checkbox .custom-checkbox-icon,
 [data-custom-field='checkbox'] .custom-checkbox:hover .custom-checkbox-icon {
-    background-color: #f1f0f5;
+    background-color: var(--cf-hover);
 }
 [data-custom-field='checkbox'] .custom-checkbox:active .custom-checkbox-icon {
-    background-color: #e5e7f1;
+    background-color: var(--cf-active);
 }
 [data-custom-field='checkbox'] .custom-checkbox .custom-checkbox-icon > span {
     width: 18px;
     height: 18px;
     border-radius: 3px;
-    border: 2px solid #ccc;
+    border: 2px solid var(--cf-box-border);
     display: block;
-    background-color: #fff;
+    background-color: var(--cf-box-bg);
     transition: 0.5s;
 }
 [data-custom-field='checkbox'] .custom-checkbox .custom-checkbox-icon > span svg {
@@ -94,18 +116,18 @@
 }
 [data-custom-field='radiobutton'] input[type='radio']:focus ~ .custom-radiobutton .custom-radiobutton-icon,
 [data-custom-field='radiobutton'] .custom-radiobutton:hover .custom-radiobutton-icon {
-    background-color: #f1f0f5;
+    background-color: var(--cf-hover);
 }
 [data-custom-field='radiobutton'] .custom-radiobutton:active .custom-radiobutton-icon {
-    background-color: #e5e7f1;
+    background-color: var(--cf-active);
 }
 [data-custom-field='radiobutton'] .custom-radiobutton .custom-radiobutton-icon > span {
     width: 18px;
     height: 18px;
     border-radius: 50px;
-    border: 2px solid #ccc;
+    border: 2px solid var(--cf-box-border);
     display: block;
-    background-color: #fff;
+    background-color: var(--cf-box-bg);
     transition: 0.5s;
 }
 [data-custom-field='radiobutton'] input[type='radio']:checked ~ .custom-radiobutton .custom-radiobutton-icon > span {

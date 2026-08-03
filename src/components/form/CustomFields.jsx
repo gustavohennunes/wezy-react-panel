@@ -18,20 +18,25 @@
         </svg>
     )
 
-    const CustomCheckbox = ({ name, value, checked, onChange, label }) => (
-        <label data-custom-field="checkbox">
+    // className EXTRA PERMITE VARIANTES (ex.: 'cf-grid' NAS CÉLULAS DA LISTAGEM);
+    // ariaLabel COBRE O USO SEM TEXTO VISÍVEL (select all / select row)
+    const CustomCheckbox = ({ name, value, checked, onChange, label, className = '', ariaLabel }) => (
+        <label data-custom-field="checkbox" className={className}>
             <input
                 type="checkbox"
                 name={name}
                 value={value}
                 checked={checked}
                 onChange={onChange}
+                aria-label={ariaLabel}
             />
             <div className="custom-checkbox">
                 <div className="custom-checkbox-icon">
                     <span>{CHECK_SVG}</span>
                 </div>
-                <span className="text-[13px] text-gray-900">{label}</span>
+                {label !== '' && label !== undefined && (
+                    <span className="text-[13px] text-gray-900">{label}</span>
+                )}
             </div>
         </label>
     )

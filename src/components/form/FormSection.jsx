@@ -296,7 +296,7 @@
                                     
                             const key = Object.keys(parsedAttributes).find(key => key.startsWith('data-valid-')).replace('data-valid-', '');
                             
-                            if (parsedAttributes['data-valid-' + key] != validRows[key]){
+                            if (parsedAttributes['data-valid-' + key] != (validRows[key] ?? '')){
                                 return;
                             }
                                 

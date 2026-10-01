@@ -6,6 +6,7 @@
     import { PicturesContext } from '@/components/pictures/PicturesContext'
     import { ScreenLoader } from '@/components/loaders'
     import { Plans } from '../../account/billing/plans/blocks/Plans'
+    import { Com379Content } from './Com379Content'
 
     const PanelContent = () => {
         
@@ -20,7 +21,9 @@
             //ACEITO POR COMPATIBILIDADE COM RETORNOS ANTIGOS.
             const extraHtml = pageData?.['extra-html-content'] || pageData?.extra_html_content || ''
 
-            if (extraHtml.length > 0) {
+            if (pageData?.layout === 'com379' && pageData?.params?.com379) {
+                newContent = <Com379Content data={pageData.params.com379} />
+            } else if (extraHtml.length > 0) {
                 newContent = <div dangerouslySetInnerHTML={{ __html: extraHtml }} />
             } else if (pageData?.layout === 'dashboard') {
                 newContent = <DashboardContext />

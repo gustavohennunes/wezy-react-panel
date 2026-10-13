@@ -2,30 +2,8 @@
     import { api } from '@/services/api'
     import { toast } from 'sonner'
     import qs from 'qs'
+    import { injectLegacyIconsCss } from '@/utils/legacyIcons'
     import './legacy-compat.css'
-
-    //ORIGEM DO PAINEL LEGADO (assets como css/icons.css e o sprite de ícones)
-    const LEGACY_ORIGIN = (() => {
-        try {
-            return new URL(import.meta.env.VITE_CAYMAN_API_URL).origin
-        } catch {
-            return 'https://painel.wezy.com.br'
-        }
-    })()
-
-    //CARREGA O CSS DE ÍCONES (sprite) DO PAINEL LEGADO UMA ÚNICA VEZ — AS URLS RELATIVAS
-    //DENTRO DELE (../imagens/icons-black.svg) RESOLVEM CONTRA O HOST DO PAINEL
-    const injectLegacyIconsCss = () => {
-
-        if (document.getElementById('legacy-icons-css')) return
-
-        const link = document.createElement('link')
-        link.id   = 'legacy-icons-css'
-        link.rel  = 'stylesheet'
-        link.href = LEGACY_ORIGIN + '/css/icons.css'
-        document.head.appendChild(link)
-
-    }
 
     //REESCREVE LINKS LEGADOS (index.php?pag=...) PARA AS ROTAS DO SPA
     const rewriteLegacyLinks = (root) => {

@@ -562,6 +562,30 @@
                                     </div>
                                 )
 
+                            //Cab CONDICIONAL DENTRO DA SEÇÃO (VER FormContext) — TÍTULO EM LINHA, COM OS ATRIBUTOS
+                            //DA PONTE PARA O JS DO CARD (ex.: useLegacyModoCriacao) PODER ESCONDÊ-LO
+                            case 'Cab': {
+
+                                const numero = fieldData?.value?.number
+                                const titulo = String(fieldData?.value?.title || '').split('//')[0].trim()
+
+                                return (
+                                    <div
+                                        key={`${fieldName}-${idx}`}
+                                        className="flex items-center gap-2.5 px-4"
+                                        {...parsedAttributes}
+                                    >
+                                        {(numero || numero === 0) && (
+                                            <span className="flex size-[22px] shrink-0 items-center justify-center rounded bg-primary text-[11px] font-semibold tabular-nums text-primary-inverse">
+                                                {String(numero).padStart(2, '0')}
+                                            </span>
+                                        )}
+                                        <h3 className="text-[13px] font-semibold leading-tight text-gray-900">{titulo}</h3>
+                                    </div>
+                                )
+
+                            }
+
                             default:
                                 return null
                         }

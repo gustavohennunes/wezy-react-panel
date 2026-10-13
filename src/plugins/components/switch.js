@@ -19,7 +19,9 @@ export default plugin(({ addVariant, addComponents, theme, e }) => {
                 'border-radius': theme(
                     'custom.components.switch.DEFAULT.height'
                 ),
-                transition: 'all .15s ease-in-out',
+                transition: 'background-color .15s ease-in-out',
+                //DISTÂNCIA QUE A BOLINHA ANDA: LARGURA DO TRILHO - BOLINHA - 2x O RECUO DE 0.25rem
+                '--tw-switch-travel': `calc(${theme('custom.components.switch.DEFAULT.width')} - 1rem - 0.5rem)`,
                 '&:before': {
                     display: 'flex',
                     position: 'absolute',
@@ -32,16 +34,15 @@ export default plugin(({ addVariant, addComponents, theme, e }) => {
                     top: '50%',
                     transform: 'translateY(-50%)',
                     filter: 'drop-shadow(0px 3px 4px rgba(0, 0, 0, 0.03))',
-                    transition: 'all .15s ease-in-out',
+                    //SÓ O transform ANIMA. ANTES inset-inline-start E transform MUDAVAM JUNTOS; COM CLIQUES
+                    //RÁPIDOS AS DUAS TRANSIÇÕES SE INTERROMPIAM EM PONTOS DIFERENTES E A BOLINHA SAÍA DO TRILHO
+                    transition: 'transform .15s ease-in-out, background-color .15s ease-in-out',
                 },
                 '&:checked, &[aria-checked="true"]': {
                     'background-color': 'var(--tw-primary)',
-                    transition: 'all .15s ease-in-out',
                     '&:before': {
                         'background-color': '#ffffff',
-                        transition: 'all .15s ease-in-out',
-                        'inset-inline-start': 'calc(100% - 0.25rem)', // Logical property for RTL/LTR
-                        transform: 'translate(-100%, -50%)',
+                        transform: 'translate(var(--tw-switch-travel), -50%)',
                         filter: 'none',
                     },
                 },
@@ -81,6 +82,7 @@ export default plugin(({ addVariant, addComponents, theme, e }) => {
             'input[type=checkbox]': {
                 height: theme('custom.components.switch.sm.height'),
                 width: theme('custom.components.switch.sm.width'),
+                '--tw-switch-travel': `calc(${theme('custom.components.switch.sm.width')} - 0.75rem - 0.5rem)`,
                 'border-radius': theme('custom.components.switch.sm.height'),
                 '&:before': {
                     height: '0.75rem',
@@ -95,6 +97,7 @@ export default plugin(({ addVariant, addComponents, theme, e }) => {
             'input[type=checkbox]': {
                 height: theme('custom.components.switch.lg.height'),
                 width: theme('custom.components.switch.lg.width'),
+                '--tw-switch-travel': `calc(${theme('custom.components.switch.lg.width')} - 1.25rem - 0.5rem)`,
                 'border-radius': theme('custom.components.switch.lg.height'),
                 '&:before': {
                     height: '1.25rem',
@@ -109,7 +112,7 @@ export default plugin(({ addVariant, addComponents, theme, e }) => {
             'input[type=checkbox]': {
                 '&:checked, &[aria-checked="true"]': {
                     '&:before': {
-                        transform: 'translate(100%, -50%)',
+                        transform: 'translate(calc(var(--tw-switch-travel) * -1), -50%)',
                     },
                 },
             },

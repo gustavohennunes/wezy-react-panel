@@ -72,6 +72,21 @@
 
     }
 
+    // URL ABSOLUTA PARA OUTRO HOST (SAI DO SPA)
+    export const isExternalUrl = (url) => {
+
+        if (!/^https?:\/\//i.test(url || '')) {
+            return false
+        }
+
+        try {
+            return new URL(url).origin !== window.location.origin
+        } catch {
+            return false
+        }
+
+    }
+
     // EXECUTA O REDIRECT: link externo sai do SPA; interno usa a navegação do React Router.
     // Devolve true quando navegou (para o chamador interromper o fluxo).
     export const applyLegacyRedirect = (url, navigate = null) => {

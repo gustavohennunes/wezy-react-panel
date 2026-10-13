@@ -93,14 +93,16 @@ const DropdownUserPanel = ({ menuItemRef }) => {
         return (
             <div className="flex flex-col">
                 <div className="menu-item mb-0.5">
-                    <div className="menu-link">
+                    {/* A LINHA INTEIRA É O <label>: CLICAR NO ÍCONE OU NO TEXTO TAMBÉM ALTERNA O MODO ESCURO.
+                        O .switch VIROU <span> PORQUE <label> DENTRO DE <label> NÃO É VÁLIDO */}
+                    <label className="menu-link cursor-pointer">
                         <span className="menu-icon">
                             <KeenIcon icon="moon" />
                         </span>
                         <span className="menu-title">
                             <FormattedMessage id="USER.MENU.DARK_MODE" />
                         </span>
-                        <label className="switch switch-sm">
+                        <span className="switch switch-sm">
                             <input
                                 name="theme"
                                 type="checkbox"
@@ -108,8 +110,8 @@ const DropdownUserPanel = ({ menuItemRef }) => {
                                 onChange={handleThemeMode}
                                 value="1"
                             />
-                        </label>
-                    </div>
+                        </span>
+                    </label>
                 </div>
 
                 <div className="menu-item px-4 py-1.5">

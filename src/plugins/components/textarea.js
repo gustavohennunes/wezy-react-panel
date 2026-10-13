@@ -16,7 +16,7 @@ export default plugin(({ addComponents, theme }) => {
             'border-radius': theme('custom.components.common.borderRadius.btn'),
             padding: `${theme('custom.components.btn.DEFAULT.py')} ${theme('custom.components.input.DEFAULT.px')}`,
             border: '1px solid var(--tw-gray-300)',
-            color: 'var(--tw-gray-700)',
+            color: 'var(--form-control-text)',
             '&::placeholder': {
                 color: 'var(--tw-gray-500)',
             },
@@ -26,13 +26,13 @@ export default plugin(({ addComponents, theme }) => {
             '&:focus': {
                 'border-color': 'var(--tw-primary)',
                 'box-shadow': 'var(--tw-form-input-focus-box-shadow)',
-                color: 'var(--tw-gray-700)',
+                color: 'var(--form-control-text)',
                 '&::placeholder': {
                     color: 'var(--tw-gray-600)',
                 },
             },
             '&:active': {
-                color: 'var(--tw-gray-700)',
+                color: 'var(--form-control-text)',
                 '&::placeholder': {
                     color: 'var(--tw-gray-600)',
                 },

@@ -60,6 +60,21 @@
         return `/panel/module?${params.toString()}`
     }
 
+    // URL DA EXCLUSÃO EM LOTE A PARTIR DA PÁGINA ATUAL — MANTÉM OS PARÂMETROS DE CONTEXTO
+    // (ex.: cliente, parametro, setor). SEM O cliente, O CARD DE MÓDULOS REDIRECIONA PARA
+    // ?pag=clientes&erro=nenhum-cliente-selecionado E NÃO EXCLUI NADA.
+    export const buildRemoveItemsUrl = () => {
+
+        const params = new URLSearchParams(window.location.search)
+
+        params.set('acao', 'remove-items')
+        params.delete('id')
+        params.delete('excluir')
+
+        return buildApiUrl(params)
+
+    }
+
     export const updateTablePagination = async (params) => {
 
         const url = new URL(window.location.href)

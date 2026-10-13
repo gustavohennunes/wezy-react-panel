@@ -33,20 +33,20 @@ export default plugin(({ addComponents, theme }) => {
             'padding-inline-start': theme('custom.components.input.DEFAULT.px'), // Logical property for RTL/LTR
             'padding-inline-end': theme('custom.components.input.DEFAULT.px'), // Logical property for RTL/LTR
             border: '1px solid var(--tw-gray-300)',
-            color: 'var(--tw-gray-700)',
+            color: 'var(--form-control-text)',
             '&:hover': {
                 'border-color': 'var(--tw-gray-400)',
             },
             '&:focus': {
                 'border-color': 'var(--tw-primary)',
                 'box-shadow': 'var(--tw-input-focus-box-shadow)',
-                color: 'var(--tw-gray-700)',
+                color: 'var(--form-control-text)',
                 '&::placeholder': {
                     color: 'var(--tw-gray-600)',
                 },
             },
             '&:active': {
-                color: 'var(--tw-gray-700)',
+                color: 'var(--form-control-text)',
                 '&::placeholder': {
                     color: 'var(--tw-gray-600)',
                 },

@@ -1,8 +1,8 @@
     
-    import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
     import { useState, useEffect } from 'react'
+    import { Combobox } from './FormCombobox'
 
-    const FormSelect = ({ field, fieldName, fieldData, formState, handleSelectChange, combinedClass, rowAttr = '', required }) => {
+    const FormSelect = ({ field, fieldData, formState, handleSelectChange, combinedClass, rowAttr = '', required }) => {
 
         const [options, setOptions] = useState([])
         
@@ -64,37 +64,15 @@
                     )}
                 </div>
 
-                <Select
-                    value={formState[fieldData.name || field.name] || ''}
-                    onValueChange={(value) => {
-                        handleSelectChange(fieldData.name || field.name, value)
+                <Combobox
+                    options={options}
+                    value={formState[fieldData.name || field.name] ?? ''}
+                    placeholder={options[0]?.label}
+                    onChange={(value) => {
+                        //OPÇÃO SEM VALOR ("Selecione uma opção") VAI COMO '-1', QUE O handleSelectChange GRAVA VAZIO
+                        handleSelectChange(fieldData.name || field.name, value === '' || value === null || value === undefined ? '-1' : String(value))
                     }}
-                >
-
-                    <SelectTrigger className="w-full">
-                        <SelectValue placeholder={options[0]?.label} />
-                    </SelectTrigger>
-
-                    <SelectContent className="w-full">
-                        
-                        {options.map((option, index) => {
-                            
-                            const value = option.value !== undefined && option.value !== null && option.value !== '' ? option.value : '-1'
-
-                            return (
-                                <SelectItem
-                                    key={`${index}-${fieldName}`}
-                                    value={value}
-                                >
-                                    {option.label}
-                                </SelectItem>
-                            )
-
-                        })}
-
-                    </SelectContent>
-
-                </Select>
+                />
 
                 <input
                     type="hidden"

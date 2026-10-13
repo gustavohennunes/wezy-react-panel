@@ -5,7 +5,7 @@
     import { toast } from 'sonner'
     import { useAuth } from '@/auth/providers/JWTProvider'
     import { useMenus } from '@/providers/MenusProvider'
-    import { findLegacyRedirectDeep, applyLegacyRedirect } from '@/utils/legacyRedirect'
+    import { findLegacyRedirectDeep, applyLegacyRedirect, isExternalUrl } from '@/utils/legacyRedirect'
 
     const PageDataContext = createContext()
 
@@ -16,6 +16,7 @@
         const [error, setError]       = useState(null);
         const [searchParams]          = useSearchParams();
         const [lastUrl, setLastUrl]   = useState(null);
+        const [redirecting, setRedirecting] = useState(false);
         const { auth, logout }        = useAuth();
         const { getMenuConfig }       = useMenus();
         const navigate                = useNavigate();
@@ -38,6 +39,13 @@
                 //POR ISSO A BUSCA PELO REDIRECT VEM ANTES DE LER A ESTRUTURA success.response.data.
                 const redirectLegado = findLegacyRedirectDeep(response.data);
                 if (redirectLegado && applyLegacyRedirect(redirectLegado, navigate)) {
+
+                    //SAINDO DO SPA (OUTRO HOST, ex.: acao=Painel) — O NAVEGADOR AINDA LEVA UM TEMPO PARA
+                    //TROCAR DE PÁGINA, ENTÃO O LAYOUT CONTINUA ESCONDIDO ATRÁS DO LOADER ATÉ LÁ
+                    if (isExternalUrl(redirectLegado)) {
+                        setRedirecting(true);
+                    }
+
                     return;
                 }
 
@@ -149,7 +157,7 @@
         }, [ searchParams, menuConfig ])
 
         return (
-            <PageDataContext.Provider value={{ pageData, loading, error, callApi }}>
+            <PageDataContext.Provider value={{ pageData, loading, error, callApi, redirecting }}>
                 {children}
             </PageDataContext.Provider>
         )

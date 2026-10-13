@@ -31,13 +31,13 @@ export default plugin(({ addComponents, theme }) => {
             '&:focus': {
                 'border-color': 'var(--tw-gray-600)',
                 'box-shadow': 'var(--tw-input-focus-box-shadow)',
-                color: 'var(--tw-gray-700)',
+                color: 'var(--form-control-text)',
                 '&::placeholder': {
                     color: 'var(--tw-gray-600)',
                 },
             },
             '&:active': {
-                color: 'var(--tw-gray-700)',
+                color: 'var(--form-control-text)',
                 '&::placeholder': {
                     color: 'var(--tw-gray-600)',
                 },

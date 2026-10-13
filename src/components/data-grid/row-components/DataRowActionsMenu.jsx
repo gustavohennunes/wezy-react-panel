@@ -1,32 +1,43 @@
     import qs from 'qs'
-    import { Menu, MenuToggle, KeenIcon, MenuIcon, MenuItem, MenuLink, MenuSeparator, MenuSub, MenuTitle } from '@/components'
-    import { buildApiUrl } from '@/utils/urlHelper'
+    import { useEffect } from 'react'
+    import { KeenIcon } from '@/components'
+    import { buildApiUrl, buildRemoveItemsUrl, cleanUrl } from '@/utils/urlHelper'
     import { api } from '@/services/api'
-    import { useLanguage } from '@/i18n'
     import { toast } from 'sonner'
     import { transformOldIcon } from '@/lib/transformOldIcon'
     import { usePageData } from '@/context/PageDataContext'
-    
+    import { useConfirm } from '@/components/ui/confirm-dialog'
+    import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip'
+    import { injectLegacyIconsCss } from '@/utils/legacyIcons'
+
     const DataRowActionsMenu = ({ row }) => {
 
-        const { isRTL } = useLanguage()
         const { callApi } = usePageData()
+        const [confirm, confirmDialog] = useConfirm()
+
+        //OS ÍCONES DAS AÇÕES VÊM DO SPRITE DO PAINEL ANTIGO (css/icons.css)
+        useEffect(() => {
+            injectLegacyIconsCss()
+        }, [])
 
         const removeRow = async (itemId) => {
+
+            const confirmado = await confirm({
+                title: 'Excluir item?',
+                description: 'Tem certeza que deseja excluir este item? Essa ação não pode ser desfeita.',
+            })
+
+            if (!confirmado) return
 
             let response = ''
             const data = {
                 items: [itemId],
             }
 
-            const params = new URLSearchParams(window.location.search)
-            const slug = params.get('slug') ?? params.get('pag')
-            const urlExcluir = `?slug=${slug}&acao=remove-items`
-
             try {
 
                 response = await api.post(
-                    buildApiUrl(urlExcluir),
+                    buildRemoveItemsUrl(),
                     qs.stringify(data),
                     {
                         headers: {
@@ -35,6 +46,13 @@
                     }
                 )
 
+                //SEM success O CARD NÃO EXCLUIU (ex.: RESPONDEU COM <script>window.location=...?erro=...);
+                //status false É RECUSA DO PRÓPRIO BACKEND (ex.: SEM PERMISSÃO) E TRAZ A MENSAGEM
+                const resultado = response.data?.success?.response
+                if (!resultado || resultado.status === false || resultado.data?.status === false) {
+                    throw new Error(resultado?.message || resultado?.data?.message || '')
+                }
+
                 const urlRefresh = buildApiUrl(
                     new URLSearchParams(window.location.search)
                 )
@@ -42,7 +60,7 @@
                 callApi(urlRefresh)
 
                 toast(`✅ Sucesso`, {
-                    description: <span style={{ 'color': 'white' }}>{response?.success?.response?.data?.message}</span>,
+                    description: <span style={{ 'color': 'white' }}>{response.data?.success?.response?.data?.message}</span>,
                     style: {
                         color: 'white',
                         background: 'var(--tw-success',
@@ -53,7 +71,7 @@
             } catch (err) {
 
                 toast(`❌ Erro`, {
-                    description: <span style={{ 'color': 'white' }}>{'Não foi possível remover este item'}</span>,
+                    description: <span style={{ 'color': 'white' }}>{err?.message || 'Não foi possível remover este item'}</span>,
                     style: {
                         color: 'white',
                         background: 'var(--tw-danger)',
@@ -65,102 +83,77 @@
 
         }
 
+        //ÍCONE DO SPRITE DO PAINEL ANTIGO: A PONTE MANDA "figura-black l4 c1" (ÀS VEZES SÓ "l1 c14")
+        const spriteDoIcone = (icon) => {
+            const linha  = /\bl(\d+)\b/.exec(icon || '')
+            const coluna = /\bc(\d+)\b/.exec(icon || '')
+            return linha && coluna ? `figura-black l${linha[1]} c${coluna[1]}` : null
+        }
+
+        const onClickAcao = (e, item) => {
+
+            const params = new URLSearchParams(item.url || '')
+
+            //EXCLUIR É POR API (COM CONFIRMAÇÃO); OS DEMAIS SEGUEM O LINK NORMALMENTE
+            if (params.has('excluir')) {
+                e.preventDefault()
+                removeRow(params.get('excluir'))
+            }
+
+        }
+
+        // AÇÕES LADO A LADO COMO NO PAINEL ANTIGO (Versões, Alterar, Excluir...), COM TOOLTIP NO TÍTULO
         return (
-            <Menu className="inline-flex">
+            <>
+                {confirmDialog}
 
-                <MenuItem
-                    toggle="dropdown"
-                    trigger="click"
-                    dropdownProps={{
-                        placement: isRTL() ? 'bottom-start' : 'bottom-end',
-                        modifiers: [
-                            {
-                                name: 'offset',
-                                options: {
-                                    offset: isRTL() ? [0, -10] : [0, 10], // [skid, distance]
-                                },
-                            },
-                        ],
-                    }}
-                >
-
-                    <MenuToggle className="btn btn-sm btn-icon btn-light btn-clear">
-                        <KeenIcon icon="dots-vertical" />
-                    </MenuToggle>
-
-                    <MenuSub
-                        className="menu-default"
-                        rootClassName="w-full max-w-[250px]"
-                    >
+                <TooltipProvider delayDuration={200}>
+                    <div className="inline-flex items-center justify-center gap-2.5">
 
                         {Array.isArray(row.content) && row.content.length > 0 ? (
 
                             row.content.map((item, index) => {
 
-                                var icon = transformOldIcon(item.icon)
-                                
+                                const sprite = spriteDoIcone(item.icon)
+                                const keen   = sprite ? null : transformOldIcon(item.icon)
+
                                 return (
-                                    <MenuItem
-                                        key={index}
-                                        path={item.url || '#'}
-                                        target={item.target || '_self'}
-                                        onClick={(e, props) => {
-
-                                            e.preventDefault()
-
-                                            const params = new URLSearchParams(
-                                                props.path
-                                            )
-
-                                            if (params.has('excluir')) {
-                                                
-                                                const idExcluir = params.get('excluir')
-                                                
-                                                removeRow(idExcluir)
-
-                                            } else {
-                                                
-                                                if(props.target.indexOf('_blank') !== -1) {
-                                                    window.open(props.path, '_blank')
-                                                } else {
-                                                    window.location.href = props.path
-                                                }
-
-                                            }
-
-                                        }}
-                                    >
-                                        <MenuLink>
-                                            <MenuIcon>
-                                                <KeenIcon
-                                                    icon={icon.icon}
-                                                    style={icon.type}
-                                                />
-                                            </MenuIcon>
-                                            <MenuTitle>{item.title}</MenuTitle>
-                                        </MenuLink>
-                                    </MenuItem>
+                                    <Tooltip key={index}>
+                                        <TooltipTrigger asChild>
+                                            <a
+                                                href={cleanUrl(item.url) || '#'}
+                                                target={item.target || '_self'}
+                                                rel={(item.target || '').includes('_blank') ? 'noopener noreferrer' : undefined}
+                                                aria-label={item.title}
+                                                className="inline-flex items-center opacity-80 hover:opacity-100 transition-opacity"
+                                                onClick={(e) => onClickAcao(e, item)}
+                                            >
+                                                {sprite ? (
+                                                    <span className="icones">
+                                                        <span className={sprite} />
+                                                    </span>
+                                                ) : keen?.icon ? (
+                                                    <KeenIcon icon={keen.icon} style={keen.type} />
+                                                ) : (
+                                                    <span className="text-2sm">{item.title}</span>
+                                                )}
+                                            </a>
+                                        </TooltipTrigger>
+                                        <TooltipContent className="text-xs py-1 px-2">{item.title}</TooltipContent>
+                                    </Tooltip>
                                 )
 
                             })
 
                         ) : (
 
-                            <MenuItem>
-                                <MenuLink>
-                                    <MenuTitle className="text-gray-500">
-                                        Sem ações
-                                    </MenuTitle>
-                                </MenuLink>
-                            </MenuItem>
+                            <span className="text-gray-500">-</span>
 
                         )}
 
-                    </MenuSub>
-
-                </MenuItem>
-
-            </Menu>
+                    </div>
+                </TooltipProvider>
+            </>
         )
 
     }

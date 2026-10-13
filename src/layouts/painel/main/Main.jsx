@@ -224,7 +224,11 @@
                                         {title && <ToolbarHeading title={title} />}
 
                                         {breadcrumbs && (
-                                            <div className="breadcrumbs mt-0.5" dangerouslySetInnerHTML={{ __html: breadcrumbs }} />
+                                            //HOVER SÓ NOS ITENS NAVEGÁVEIS — O ÚLTIMO (PÁGINA ATUAL) VEM COM href="javascript:void(0);"
+                                            <div
+                                                className="breadcrumbs mt-0.5 [&_a]:transition-colors [&_a:not([href^='javascript']):hover]:text-primary [&_a:not([href^='javascript']):hover]:underline [&_a:not([href^='javascript']):hover]:underline-offset-2 [&_a[href^='javascript']]:cursor-default"
+                                                dangerouslySetInnerHTML={{ __html: breadcrumbs }}
+                                            />
                                         )}
 
                                         {pageMessage && (

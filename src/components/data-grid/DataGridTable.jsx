@@ -17,6 +17,8 @@ const DataGridTable = () => {
         sm: 'px-[5px] !py-1',
         md: 'px-[5px] !py-1',
         lg: 'px-[5px] !py-1.5',
+        //LINHAS ESPAÇADAS (ex.: listagem de clientes, ONDE AS LINHAS FICAVAM COLADAS)
+        xl: 'px-[5px] !py-3',
     }
 
     const headCellSpacing = props.layout?.cellSpacing

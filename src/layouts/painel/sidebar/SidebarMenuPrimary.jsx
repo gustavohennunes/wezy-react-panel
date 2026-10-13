@@ -6,6 +6,17 @@
     import { transformOldIcon } from '@/lib/transformOldIcon'
     import { useEffect } from 'react'
 
+    //ÍCONE DO MENU POR PÁGINA, QUANDO O DO SPRITE ANTIGO NÃO COMBINA COM O MÓDULO
+    //(ex.: "Usuários" usa o sprite l1 c13, que vira um "check")
+    const ICONE_POR_PAGINA = {
+        liberaracesso: { icon: 'users', type: 'outline' },
+    }
+
+    const iconeDoItem = (item) => {
+        const pagina = /[?&]pag=([^&]+)/.exec(item?.path || '')?.[1]
+        return ICONE_POR_PAGINA[pagina] || transformOldIcon(item?.icon)
+    }
+
     const SidebarMenuPrimary = ({ search, setSearch }) => {
 
         const subIndetion = ['ps-7', 'ps-2.5', 'ps-2.5']
@@ -24,7 +35,7 @@
 
         const buildMenuItemRoot = (item, index, level) => {
 
-            var icon = transformOldIcon(item.icon)
+            var icon = iconeDoItem(item)
 
             if (item.children) {
 
@@ -100,7 +111,7 @@
 
         const buildMenuItemChild = (item, index, level = 0) => {
 
-            var icon = transformOldIcon(item.icon)
+            var icon = iconeDoItem(item)
 
             if (item.children) {
 

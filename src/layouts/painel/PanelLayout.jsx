@@ -1,6 +1,34 @@
+import { useSearchParams } from 'react-router-dom'
 import useBodyClasses from '@/hooks/useBodyClasses'
 import { PanelLayoutProvider, Main } from './'
-import { PageDataProvider } from '@/context/PageDataContext'
+import { PageDataProvider, usePageData } from '@/context/PageDataContext'
+import { ScreenLoader } from '@/components/loaders'
+import { LegacySelectEnhancer } from '@/components/form/LegacySelectEnhancer'
+
+//acao QUE ABREM TELA DE FORMULÁRIO. AS DEMAIS (ex.: Painel, Phpmyadmin, InterfaceWezy) COSTUMAM
+//SER LINKS QUE O CARD RESPONDE COM exit(loc(...)) — ATÉ A API RESPONDER, MOSTRA SÓ O LOADER
+//EM TELA CHEIA PARA O USUÁRIO NÃO VER O PAINEL ANTES DO REDIRECT
+const ACOES_DE_TELA = ['Alterar', 'Inserir']
+
+const PanelBody = () => {
+    const { loading, redirecting } = usePageData()
+    const [searchParams] = useSearchParams()
+
+    const acao = searchParams.get('acao')
+    const acaoDeRedirect = acao && !ACOES_DE_TELA.includes(acao)
+
+    if (redirecting || (acaoDeRedirect && loading)) {
+        return <ScreenLoader />
+    }
+
+    return (
+        <PanelLayoutProvider>
+            <Main />
+            <LegacySelectEnhancer />
+        </PanelLayoutProvider>
+    )
+}
+
 const PanelLayout = () => {
     useBodyClasses(`
     [--tw-page-bg:#F6F6F9]
@@ -16,9 +44,7 @@ const PanelLayout = () => {
   `)
     return (
         <PageDataProvider>
-            <PanelLayoutProvider>
-                <Main />
-            </PanelLayoutProvider>
+            <PanelBody />
         </PageDataProvider>
     )
 }

@@ -1,17 +1,31 @@
     import qs from 'qs'
     import { useMemo, useState, useEffect } from 'react'
+    import { useNavigate } from 'react-router-dom'
     import { DataGrid, KeenIcon, DataGridColumnHeader, DataGridRowSelectAll, DataRowContext } from '@/components'
     import { toast } from 'sonner'
     import { Input } from '@/components/ui/input'
-    import { buildApiUrl, cleanUrl } from '@/utils/urlHelper'
+    import { buildApiUrl, buildRemoveItemsUrl, cleanUrl } from '@/utils/urlHelper'
     import { api } from '@/services/api'
     import { Tabs } from '@/components/custom/tabs/tabs'
     import { usePageData } from '@/context/PageDataContext'
     import { LegacyList } from './LegacyList'
+    import { useConfirm } from '@/components/ui/confirm-dialog'
+    import { contemTodasAsPalavras, textoDoHtml } from '@/utils/textSearch'
+
+    //ESPAÇAMENTO VERTICAL DAS LINHAS POR MÓDULO (?pag=). O PADRÃO (md) É COMPACTO
+    const ESPACAMENTO_POR_PAGINA = {
+        clientes: 'xl',
+    }
+
+    const espacamentoDaListagem = () => {
+        const params = new URLSearchParams(window.location.search)
+        return ESPACAMENTO_POR_PAGINA[params.get('pag') ?? params.get('slug')] || 'md'
+    }
 
     const Models = ({ model, columnHeader, btnAdd, search, btnExcluir, pagination, tabs, content }) => {
 
         const { callApi }                           = usePageData()
+        const [ confirm, confirmDialog ]            = useConfirm()
         const [ models, setModels ]                 = useState(model || [])
         const [ footer, setFooter ]                 = useState('')
         //TAMANHO GIGANTE DESDE O PRIMEIRO RENDER: O DataGridProvider CAPTURA O pageSize
@@ -19,8 +33,37 @@
         //O "Carregar mais" ACUMULAVA REGISTROS QUE NUNCA APARECIAM
         const [ gridPagination, setGridPagination ] = useState({ size: 1000000 })
         const [ selectedRows, setSelectedRows ]     = useState([])
-        const data                                  = useMemo(() => models, [models])
         const [activeTab, setActiveTab]             = useState('')
+        const [ searchInput, setSearchInput ]       = useState(search?.value || '')
+        const navigate                              = useNavigate()
+
+        //A BUSCA DO SERVIDOR MUDOU (NOVA RESPOSTA DA PONTE) — O CAMPO ACOMPANHA
+        useEffect(() => {
+            setSearchInput(search?.value || '')
+        }, [search?.value])
+
+        //FILTRO AO DIGITAR: ATUA SÓ NAS LINHAS JÁ CARREGADAS, SEM CHAMAR A API. ENQUANTO O TEXTO FOR
+        //IGUAL AO ?busca= JÁ APLICADO, NÃO FILTRA — O SERVIDOR PODE TER ACHADO O TERMO EM CAMPOS QUE
+        //NÃO APARECEM NA TABELA, E ESSAS LINHAS SUMIRIAM
+        const filtroLocal = searchInput.trim() !== (search?.value || '').trim() ? searchInput.trim() : ''
+
+        const textoDasLinhas = useMemo(() => {
+            const textos = new Map()
+            models.forEach((linha) => {
+                textos.set(
+                    linha,
+                    (linha.columns || [])
+                        .map((coluna) => (typeof coluna?.content === 'string' ? textoDoHtml(coluna.content) : ''))
+                        .join(' ')
+                )
+            })
+            return textos
+        }, [models])
+
+        const data = useMemo(
+            () => (filtroLocal === '' ? models : models.filter((linha) => contemTodasAsPalavras(textoDasLinhas.get(linha), filtroLocal))),
+            [models, filtroLocal, textoDasLinhas]
+        )
 
         // MODO "CARREGAR MAIS": em vez de trocar de página, os registros vão se acumulando na
         // MESMA tabela. É o que permite ao drag-and-drop mover um item para uma posição que
@@ -114,21 +157,26 @@
         }, [pagination, model])
 
         // HANDLER PARA EXCLUIR ITENS SELECIONADOS
-        const handleExcluir = async (e) => {
+        const handleExcluir = async () => {
+
+            const quantidade = selectedRows.length
+            const confirmado = await confirm({
+                title: quantidade === 1 ? 'Excluir item?' : `Excluir ${quantidade} itens?`,
+                description: quantidade === 1
+                    ? 'Tem certeza que deseja excluir o item selecionado? Essa ação não pode ser desfeita.'
+                    : `Tem certeza que deseja excluir os ${quantidade} itens selecionados? Essa ação não pode ser desfeita.`,
+            })
+
+            if (!confirmado) return
 
             try {
 
-                const params = new URLSearchParams(e.view.location.search)
-                const slug = params.get('slug') ?? params.get('pag')
                 const data = {
                     items: selectedRows,
                 }
 
-                let response = ''
-                const urlExcluir = `?slug=${slug}&acao=remove-items`
-
-                response = await api.post(
-                    buildApiUrl(urlExcluir),
+                const response = await api.post(
+                    buildRemoveItemsUrl(),
                     qs.stringify(data),
                     {
                         headers: {
@@ -137,8 +185,15 @@
                     }
                 )
 
+                //SEM success O CARD NÃO EXCLUIU (ex.: RESPONDEU COM <script>window.location=...?erro=...);
+                //status false É RECUSA DO PRÓPRIO BACKEND (ex.: SEM PERMISSÃO) E TRAZ A MENSAGEM
+                const resultado = response.data?.success?.response
+                if (!resultado || resultado.status === false || resultado.data?.status === false) {
+                    throw new Error(resultado?.message || resultado?.data?.message || '')
+                }
+
                 const urlRefresh = buildApiUrl(
-                    new URLSearchParams(e.view.location.search)
+                    new URLSearchParams(window.location.search)
                 )
 
                 if (urlRefresh === false) {
@@ -148,7 +203,7 @@
                 callApi(urlRefresh)
 
                 toast(`✅ Sucesso!`, {
-                    description: <span style={{ 'color': 'white' }}>{response?.success?.response?.data?.message}</span>,
+                    description: <span style={{ 'color': 'white' }}>{response.data?.success?.response?.data?.message}</span>,
                     style: {
                         color: 'white',
                         background: 'var(--tw-success',
@@ -159,7 +214,7 @@
             } catch (err) {
 
                 toast(`❌ Erro`, {
-                    description: <span style={{ 'color': 'white' }}>{'Não foi possível excluir o item selecionado'}</span>,
+                    description: <span style={{ 'color': 'white' }}>{err?.message || 'Não foi possível excluir o item selecionado'}</span>,
                     style: {
                         color: 'white',
                         background: 'var(--tw-danger)',
@@ -318,36 +373,43 @@
 
         }
 
-        const Toolbar = () => {
+        //BUSCA SEM RECARREGAR A PÁGINA: SÓ TROCA O ?busca= NA URL. O PageDataContext ESCUTA OS
+        //searchParams E REFAZ A CHAMADA DA LISTAGEM. PARTE DA URL ATUAL (E NÃO DO search.action
+        //DA PONTE) PARA NÃO PERDER PARÂMETROS DE CONTEXTO COMO O cliente
+        const aplicaBusca = (termo) => {
 
-            const [searchInput, setSearchInput] = useState(search?.value || '')
+            const params = new URLSearchParams(window.location.search)
 
-            const submitSearch = (e) => {
-
-                e.preventDefault()
-
-                const url = new URL(search?.action, window.location.origin)
-
-                url.searchParams.set('busca', searchInput)
-                url.searchParams.delete('pagina')
-
-                window.location.href = url.toString()
-
+            if (termo) {
+                params.set('busca', termo)
+            } else {
+                params.delete('busca')
             }
+            params.delete('pagina')
 
-            // LIMPA A BUSCA — MESMO COMPORTAMENTO DO LINK "LIMPAR" DO PAINEL-PHP
-            const limparBusca = () => {
+            navigate({ search: '?' + params.toString() })
 
-                const url = new URL(window.location.href)
+        }
 
-                url.searchParams.delete('busca')
-                url.searchParams.delete('pagina')
+        //ENTER → BUSCA NO SERVIDOR (?busca=termo)
+        const submitSearch = (e) => {
+            e.preventDefault()
+            aplicaBusca(searchInput.trim())
+        }
 
-                window.location.href = url.toString()
-
+        // LIMPA A BUSCA — MESMO COMPORTAMENTO DO LINK "LIMPAR" DO PAINEL-PHP
+        const limparBusca = () => {
+            setSearchInput('')
+            if ((search?.value || '') !== '') {
+                aplicaBusca('')
             }
+        }
 
-            const buscaAtiva = (search?.value || '') !== ''
+        //FUNÇÃO DE RENDER (E NÃO COMPONENTE): UM COMPONENTE DECLARADO AQUI DENTRO SERIA RECRIADO A
+        //CADA RENDER DO Models — COM O FILTRO AO DIGITAR, O INPUT PERDERIA O FOCO A CADA LETRA
+        const renderToolbar = () => {
+
+            const buscaAtiva = (search?.value || '') !== '' || searchInput !== ''
 
             const addBtn = btnAdd?.label ? (
 
@@ -393,8 +455,7 @@
                                         <form
                                             id="form2"
                                             name="form2"
-                                            method="post"
-                                            action={search?.action}
+                                            role="search"
                                             onSubmit={(e) => submitSearch(e)}
                                             className="flex form-busca"
                                         >
@@ -528,13 +589,13 @@
         // O CARD MONTOU A LISTAGEM INTEIRA EM HTML E NÃO HÁ LINHAS ESTRUTURADAS
         // (é o caso de $bloqResultados = true no painel-php): renderiza o HTML do card
         // no lugar do DataGrid, preservando a barra de ferramentas (busca, abas, adicionar)
-        if (legacyHtml !== '' && data.length === 0) {
+        if (legacyHtml !== '' && models.length === 0) {
 
             return (
                 <div>
                     <div className="card card-grid min-w-full">
 
-                        <Toolbar />
+                        {renderToolbar()}
 
                         <div className="card-body">
                             <LegacyList html={legacyHtml} columnHeader={columnHeader} />
@@ -548,6 +609,8 @@
 
         return (
             <div>
+
+                {confirmDialog}
 
                 {/* LINHAS EXTRAS DECLARADAS PELO CARD, EXIBIDAS ACIMA DA LISTAGEM PADRÃO */}
                 {legacyHtml !== '' && (
@@ -574,10 +637,11 @@
                     //TODOS OS REGISTROS JÁ CARREGADOS FICAM NA TELA; A BUSCA DA PRÓXIMA
                     //PÁGINA É FEITA PELO BOTÃO DO RODAPÉ, NÃO PELO GRID
                     serverSide={false}
-                    toolbar={<Toolbar />}
+                    toolbar={renderToolbar()}
                     layout={{
                         card: true,
                         hidePagination: true,
+                        cellSpacing: espacamentoDaListagem(),
                     }}
                     //RODAPÉ DENTRO DO CARD (mesma posição da paginação que ele substitui).
                     //data-pagination faz herdar o padding do layout de card.

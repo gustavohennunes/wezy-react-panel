@@ -10,6 +10,7 @@
     import { usePageData } from '@/context/PageDataContext'
     import { useAuth } from '@/auth/providers/JWTProvider'
     import { useLegacyCodeEditor } from './LegacyCodeEditor'
+    import { useLegacyModoCriacao } from './LegacyModoCriacao'
     import { findLegacyRedirectDeep, applyLegacyRedirect } from '@/utils/legacyRedirect'
 
     const FormContext = ({ data }) => {
@@ -29,6 +30,7 @@
 
         //ATIVA O EDITOR ACE NOS CARDS DE CÓDIGO (ex.: ?pag=modulos) — NO-OP NOS DEMAIS
         useLegacyCodeEditor(data);
+        useLegacyModoCriacao(data);
 
         async function submitForm(e) {
 
@@ -177,7 +179,13 @@
 
             fields.forEach((field) => {
 
-                if (field.type === 'Cab') {
+                //Cab COM ATRIBUTO CONDICIONAL (ex.: data-modo-abertura="2" NO CARD DE CLIENTES) NÃO ABRE CARD
+                //NOVO: NO PAINEL ANTIGO ELE ERA UMA <tr> DA MESMA TABELA, ESCONDIDA SOZINHA PELO JS DO CARD
+                //SEM LEVAR OS CAMPOS SEGUINTES. AQUI VIRA UMA LINHA DE TÍTULO DENTRO DA SEÇÃO ATUAL.
+                const cabCondicional = field.type === 'Cab' && currentSection &&
+                    /\bdata-(?!type=)[\w-]+=/.test(field.row_attr || '')
+
+                if (field.type === 'Cab' && !cabCondicional) {
 
                     if (currentSection) {
                         groupedSections.push(currentSection)

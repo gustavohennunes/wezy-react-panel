@@ -1,5 +1,5 @@
-    import React, { useEffect, useState } from 'react'
-    import { CustomCheckbox } from './CustomFields'
+    import { useEffect, useState } from 'react'
+    import { Combobox } from './FormCombobox'
 
     // CAMPO Mul DO PAINEL LEGADO — A PONTE (panel/module) ENVIA type 'select-multiple'
     // COM name JÁ SUFIXADO COM [] E options [{label, value, selected}].
@@ -10,9 +10,8 @@
 
         const isTags = (fieldData.class || '').includes('select-tag')
 
-        const [options, setOptions] = useState([])
+        const [options, setOptions]   = useState([])
         const [selected, setSelected] = useState([])
-        const [tagText, setTagText] = useState('')
 
         useEffect(() => {
 
@@ -26,34 +25,18 @@
 
         }, [fieldData])
 
-        const toggleValue = (value, checked) => {
+        const handleChange = (values) => {
 
-            const useValue = String(value)
+            //TAG CRIADA PELO USUÁRIO ENTRA NA LISTA DE OPÇÕES PARA CONTINUAR APARECENDO NA BUSCA
+            if (isTags) {
+                setOptions((prev) => {
+                    const novas = values.filter((value) => !prev.some((option) => String(option.value) === value))
+                    return novas.length ? [...prev, ...novas.map((value) => ({ label: value, value }))] : prev
+                })
+            }
 
-            setSelected((prev) =>
-                checked ? [...prev, useValue] : prev.filter((item) => item !== useValue)
-            )
+            setSelected(values)
 
-        }
-
-        const addTag = () => {
-
-            const tag = tagText.trim()
-            if (tag === '') return
-
-            setOptions((prev) =>
-                prev.some((option) => String(option.value) === tag)
-                    ? prev
-                    : [...prev, { label: tag, value: tag, selected: true }]
-            )
-
-            setSelected((prev) => (prev.includes(tag) ? prev : [...prev, tag]))
-            setTagText('')
-
-        }
-
-        const removeTag = (value) => {
-            setSelected((prev) => prev.filter((item) => item !== String(value)))
         }
 
         return (
@@ -71,68 +54,22 @@
                     </div>
                 )}
 
-                {isTags ? (
+                <div className="w-full min-w-0">
 
-                    <div className="w-full">
+                    <Combobox
+                        multiple
+                        creatable={isTags}
+                        options={options}
+                        value={selected}
+                        onChange={handleChange}
+                        placeholder={isTags ? 'Digite para adicionar' : options.length ? 'Selecione' : 'Nenhuma opção disponível'}
+                    />
 
-                        <div className="flex flex-wrap gap-1.5 mb-2">
-                            {selected.map((value) => (
-                                <span
-                                    key={value}
-                                    className="badge badge-sm badge-outline flex items-center gap-1"
-                                >
-                                    {value}
-                                    <button
-                                        type="button"
-                                        className="cursor-pointer"
-                                        onClick={() => removeTag(value)}
-                                    >
-                                        &times;
-                                    </button>
-                                    <input type="hidden" name={fieldName} value={value} />
-                                </span>
-                            ))}
-                        </div>
+                    {selected.map((value) => (
+                        <input key={value} type="hidden" name={fieldName} value={value} />
+                    ))}
 
-                        <input
-                            type="text"
-                            className="input"
-                            placeholder="Digite e pressione Enter para adicionar"
-                            value={tagText}
-                            onChange={(e) => setTagText(e.target.value)}
-                            onKeyDown={(e) => {
-                                if (e.key === 'Enter') {
-                                    e.preventDefault()
-                                    addTag()
-                                }
-                            }}
-                            onBlur={addTag}
-                        />
-
-                    </div>
-
-                ) : (
-
-                    <div className="flex flex-col gap-1 text-[13px] w-full max-h-56 overflow-y-auto">
-
-                        {options.map((option, index) => (
-                            <CustomCheckbox
-                                key={`${fieldName}-${option.value}-${index}`}
-                                name={fieldName}
-                                value={option.value}
-                                checked={selected.includes(String(option.value))}
-                                onChange={(e) => toggleValue(option.value, e.target.checked)}
-                                label={option.label}
-                            />
-                        ))}
-
-                        {options.length === 0 && (
-                            <span className="text-gray-600">Nenhuma opção disponível</span>
-                        )}
-
-                    </div>
-
-                )}
+                </div>
 
             </div>
         )

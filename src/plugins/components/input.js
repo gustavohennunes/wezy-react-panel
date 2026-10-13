@@ -18,7 +18,7 @@ export default plugin(({ addComponents, theme }) => {
             'padding-inline-start': theme('custom.components.input.DEFAULT.px'),
             'padding-inline-end': theme('custom.components.input.DEFAULT.px'),
             border: '1px solid var(--tw-gray-300)',
-            color: 'var(--tw-gray-700)',
+            color: 'var(--form-control-text)',
             '&::placeholder, input::placeholder': {
                 color: 'var(--tw-gray-500)',
             },
@@ -28,15 +28,15 @@ export default plugin(({ addComponents, theme }) => {
             '&:focus, &:has(input:focus)': {
                 'border-color': 'var(--tw-primary)',
                 'box-shadow': 'var(--tw-input-focus-box-shadow)',
-                color: 'var(--tw-gray-700)',
+                color: 'var(--form-control-text)',
                 '&::placeholder, input::placeholder': {
-                    color: 'var(--tw-gray-700)',
+                    color: 'var(--form-control-text)',
                 },
             },
             '&:active, &:has(input:active)': {
-                color: 'var(--tw-gray-700)',
+                color: 'var(--form-control-text)',
                 '&::placeholder, input::placeholder': {
-                    color: 'var(--tw-gray-700)',
+                    color: 'var(--form-control-text)',
                 },
                 'box-shadow': 'none',
             },
@@ -73,11 +73,11 @@ export default plugin(({ addComponents, theme }) => {
             appearance: 'none',
             'box-shadow': 'none',
             outline: 'none',
-            color: 'var(--tw-gray-700)',
+            color: 'var(--form-control-text)',
             input: {
                 'flex-grow': '1',
                 'border-color': 'transparent',
-                'background': 'transparent',
+                background: 'transparent',
                 color: 'inherit',
                 outline: 'none',
                 'font-size': 'inherit',

@@ -66,16 +66,20 @@
                     )}
                 </div>
 
-                <Combobox
-                    ariaLabel={fieldData.title || field.title || undefined}
-                    options={options}
-                    value={formState[fieldData.name || field.name] ?? ''}
-                    placeholder={options[0]?.label}
-                    onChange={(value) => {
-                        //OPÇÃO SEM VALOR ("Selecione uma opção") VAI COMO '-1', QUE O handleSelectChange GRAVA VAZIO
-                        handleSelectChange(fieldData.name || field.name, value === '' || value === null || value === undefined ? '-1' : String(value))
-                    }}
-                />
+                <div className="w-full lg:flex-1 min-w-0 max-w-[420px]">
+
+                    <Combobox
+                        ariaLabel={fieldData.title || field.title || undefined}
+                        options={options}
+                        value={formState[fieldData.name || field.name] ?? ''}
+                        placeholder={options[0]?.label}
+                        onChange={(value) => {
+                            //OPÇÃO SEM VALOR ("Selecione uma opção") VAI COMO '-1', QUE O handleSelectChange GRAVA VAZIO
+                            handleSelectChange(fieldData.name || field.name, value === '' || value === null || value === undefined ? '-1' : String(value))
+                        }}
+                    />
+
+                </div>
 
                 <input
                     type="hidden"

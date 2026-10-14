@@ -130,7 +130,7 @@
                                 )}
 
                                 {selecionados.map((valor) => (
-                                    <span key={valor} className="badge badge-sm badge-outline flex items-center gap-1 max-w-full">
+                                    <span key={valor} className="badge flex items-center gap-1.5 max-w-full px-2 py-1 text-2sm font-medium !text-[var(--form-control-text)] !bg-gray-200 !border-gray-300">
                                         <LabelComCor option={labelDoValor(valor)} />
                                         <button
                                             type="button"

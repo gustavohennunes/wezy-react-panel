@@ -58,14 +58,15 @@
         const paginaCarregada                         = useRef(1)
         const [ carregandoMais, setCarregandoMais ]   = useState(false)
 
-        // ATUALIZA O ESTADO QUANDO O MODELO É ALTERADO
-        useEffect(() => {
+        // ATUALIZA O ESTADO QUANDO O MODELO É ALTERADO — DURANTE O RENDER, E NÃO NUM useEffect: COM O EFFECT,
+        // O PRIMEIRO RENDER DEPOIS DO LOADER AINDA MOSTRAVA AS LINHAS ANTERIORES (OU "Nenhum conteúdo encontrado!")
+        const [ modeloAnterior, setModeloAnterior ] = useState(model)
+        if (model !== modeloAnterior) {
+            setModeloAnterior(model)
+            setModels(Array.isArray(model) ? model : [])
+        }
 
-            if (model && Array.isArray(model) && model.length > 0) {
-                setModels(model)
-            } else {
-                setModels([])
-            }
+        useEffect(() => {
 
             //TROCA DE MÓDULO/BUSCA REINICIA O ACUMULADO
             const paginaUrl = parseInt(new URLSearchParams(window.location.search).get('pagina') || '1', 10)

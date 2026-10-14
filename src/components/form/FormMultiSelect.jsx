@@ -55,7 +55,8 @@
                     </div>
                 )}
 
-                <div className="w-full min-w-0">
+                {/* max-width:500px VEM DO PRÓPRIO CARD LEGADO (ex.: Domínios adicionais em ?pag=clientes) */}
+                <div className="w-full min-w-0 max-w-[500px]">
 
                     <Combobox
                         ariaLabel={title || undefined}

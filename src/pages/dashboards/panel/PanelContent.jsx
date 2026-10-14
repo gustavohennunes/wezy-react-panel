@@ -1,4 +1,4 @@
-    import { useEffect, useState } from 'react'
+    import { useMemo } from 'react'
     import { usePageData } from '@/context/PageDataContext'
     import { Models } from '@/components/list/models'
     import { FormContext } from '@/components/form/FormContext'
@@ -11,10 +11,11 @@
     const PanelContent = () => {
         
         const { pageData, loading } = usePageData()
-        const [content, setContent] = useState(null)
+        //DERIVADO NO RENDER (useMemo) E NÃO COPIADO PARA UM STATE POR useEffect: COM O EFFECT, O RENDER QUE
+        //TIRAVA O LOADER AINDA MOSTRAVA O CONTEÚDO ANTERIOR (A LISTA VAZIA DO PRIMEIRO RENDER, COM
+        //"Nenhum conteúdo encontrado!") POR ALGUNS FRAMES ATÉ O EFFECT TROCAR PELO NOVO
+        const content = useMemo(() => {
 
-        useEffect(() => {
-            
             let newContent = ''
 
             //A PONTE EMITE A CHAVE COM HÍFEN (PanelModule.php:10). O UNDERSCORE FICA
@@ -50,7 +51,7 @@
                 )
             }
 
-            setContent(newContent)
+            return newContent
 
         }, [pageData])
 

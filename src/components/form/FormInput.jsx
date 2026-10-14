@@ -4,6 +4,11 @@
     import { FormFile } from './'
     import { FormColorPicker } from './FormColorPicker'
 
+    //CAMPOS NÃO OCUPAM A LINHA TODA: O CONTEÚDO É CURTO E O INPUT GIGANTE FICAVA VAZIO.
+    //O TEXTAREA É MAIS LARGO; O EDITOR DE CÓDIGO (ace) CONTINUA 100% PORQUE NASCE NO WRAPPER
+    const LARGURA_CAMPO = 'max-w-[420px]'
+    const LARGURA_TEXTO = 'max-w-[700px]'
+
     const FormInput = ({ type, title, subtitle = '', combinedClass, rowAttr, fieldName, fieldMask, fieldClass = '', fieldData, formState, required = false, handleInputChange }) => {
 
         let inputElement
@@ -38,7 +43,7 @@
                 inputElement = (
                     <IMaskInput
                         mask={fieldMask}
-                        className={`input w-full ${fieldClass} ${fieldData.class}`}
+                        className={`input w-full ${LARGURA_CAMPO} ${fieldClass} ${fieldData.class}`}
                         name={fieldName}
                         id={inputId}
                         value={formState[fieldName] || ''}
@@ -62,7 +67,7 @@
                         InputElement={
                             <input
                                 type={fieldData.type}
-                                className={`input w-full ${fieldClass} ${fieldData.class}`}
+                                className={`input w-full ${LARGURA_CAMPO} ${fieldClass} ${fieldData.class}`}
                                 name={fieldName}
                                 id={inputId}
                                 required={required}
@@ -77,7 +82,7 @@
 
                 inputElement = (
                     <div
-                        className={`input w-full ${fieldClass} ${fieldData.class}`}
+                        className={`input w-full ${LARGURA_CAMPO} ${fieldClass} ${fieldData.class}`}
                         data-toggle-password="true"
                     >
                         <input
@@ -120,7 +125,7 @@
 
                 inputElement = (
                     <textarea
-                        className={`input w-full min-h-[140px] py-2 leading-relaxed ${fieldClass} ${fieldData.class}`}
+                        className={`input w-full ${LARGURA_TEXTO} min-h-[140px] py-2 leading-relaxed ${fieldClass} ${fieldData.class}`}
                         name={fieldName}
                         id={inputId}
                         value={formState[fieldName] || ''}

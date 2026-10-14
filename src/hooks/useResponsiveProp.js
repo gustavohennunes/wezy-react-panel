@@ -1,20 +1,24 @@
-/* eslint-disable react-hooks/rules-of-hooks */
-import { useResponsive } from '.'
+import { mediaQueryFor } from './useResponsive'
+import { useMediaQueries, MEDIA_QUERIES_SEPARATOR } from './useMediaQuery'
+
+//PROP RESPONSIVA: { up: breakpoint } / { down: breakpoint }. ANTES O useResponsive ERA CHAMADO
+//DENTRO DO for/if, E A QUANTIDADE DE HOOKS MUDAVA ENTRE RENDERS. AGORA TODAS AS QUERIES SÃO
+//AVALIADAS POR UM ÚNICO HOOK, COM O MESMO RESULTADO DE ANTES.
 export default function useResponsiveProp(prop, defaultProp = null) {
+    const condicoes =
+        prop && typeof prop === 'object'
+            ? Object.keys(prop).filter((condition) => condition === 'up' || condition === 'down')
+            : []
+    const queries = condicoes.map((condition) => mediaQueryFor(condition, prop[condition]) || 'not all')
+    const matches = useMediaQueries(queries.join(MEDIA_QUERIES_SEPARATOR))
+
     let value = prop
-    if (prop) {
-        for (const condition in prop) {
+    condicoes.forEach((condition, index) => {
+        if (matches[index] === '1') {
             const breakpoint = prop[condition]
-            if (condition === 'up' && useResponsive('up', breakpoint)) {
-                value = prop[condition][breakpoint]
-            } else if (
-                condition === 'down' &&
-                useResponsive('down', breakpoint)
-            ) {
-                value = prop[condition][breakpoint]
-            }
+            value = prop[condition][breakpoint]
         }
-    }
+    })
     value = value ?? defaultProp
     return value
 }

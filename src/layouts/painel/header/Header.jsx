@@ -18,11 +18,13 @@
                     <Link to="/">
                         <img
                             src={PANEL_LOGO}
+                            alt="Logo"
                             className="dark:hidden"
                             style={{ width: '135px' }}
                         />
                         <img
                             src={PANEL_LOGO}
+                            alt="Logo"
                             className="hidden dark:block"
                             style={{
                                 filter: 'brightness(100)',
@@ -32,8 +34,10 @@
                     </Link>
 
                     <button
+                        type="button"
                         onClick={handleMobileSidebarOpen}
                         className="btn btn-icon btn-light btn-clear btn-sm me-2"
+                        aria-label="Abrir menu"
                     >
                         <KeenIcon icon="menu" />
                     </button>

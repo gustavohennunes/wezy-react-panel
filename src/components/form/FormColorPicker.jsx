@@ -16,10 +16,12 @@
         return (
             <div className="picker">
 
-                <div
-                    className="swatch"
+                <button
+                    type="button"
+                    className="swatch p-0"
                     style={{ backgroundColor: color }}
                     onClick={() => toggle(true)}
+                    aria-label="Escolher cor"
                 />
 
                 {isOpen && (

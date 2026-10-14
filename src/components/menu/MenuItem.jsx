@@ -1,4 +1,3 @@
-/* eslint-disable react-hooks/exhaustive-deps */
 import { ClickAwayListener, Popper } from '@mui/base'
 import clsx from 'clsx'
 import React, {
@@ -9,6 +8,7 @@ import React, {
     memo,
     useEffect,
     useImperativeHandle,
+    useLayoutEffect,
     useRef,
     useState,
 } from 'react'
@@ -22,8 +22,8 @@ import {
     MenuToggle,
     useMenu,
 } from './'
-import { usePathname } from '@/providers'
-import { getMenuLinkPath, hasMenuActiveChild } from './utils'
+import { useLocation } from 'react-router-dom'
+import { getMenuLinkPath, hasMenuActiveChild, moduloDaUrl } from './utils'
 const MenuItemComponent = forwardRef(function MenuItem(props, ref) {
     const {
         toggle,
@@ -59,7 +59,11 @@ const MenuItemComponent = forwardRef(function MenuItem(props, ref) {
     const menuContainerRef = useRef(null)
 
     const hideTimeoutRef = useRef(null)
-    const { pathname, prevPathname } = usePathname()
+    //PÁGINA ATUAL = PATHNAME + MÓDULO (?pag=). SÓ O PATHNAME NÃO SERVE: NESTE PAINEL ELE É SEMPRE "/"
+    //E OS EFFECTS DE ABRIR/FECHAR O MENU NUNCA DISPARAVAM AO NAVEGAR
+    const location = useLocation()
+    const rotaAtual = location.pathname + '|' + moduloDaUrl(location.search)
+    const rotaAnterior = useRef(rotaAtual)
     const { match } = useMatchPath(path)
     const propToggle = useResponsiveProp(toggle, 'accordion')
     const propTrigger = useResponsiveProp(trigger, 'click')
@@ -276,56 +280,82 @@ const MenuItemComponent = forwardRef(function MenuItem(props, ref) {
         })
         return modifiedChildren
     }
+    // VALORES MAIS RECENTES DO RENDER PARA OS EFFECTS ABAIXO (MESMO PAPEL DO useEffectEvent DO REACT).
+    // OS EFFECTS SÃO "QUANDO X MUDA, FAÇA Y": DISPARAM SÓ COM show / accordionShow / rotaAtual, MAS
+    // PRECISAM LER children, onShow, handleHide... ATUAIS. COLOCAR ESSES VALORES NAS DEPENDÊNCIAS FARIA
+    // OS EFFECTS RODAREM A CADA RENDER (children E CALLBACKS SÃO NOVOS A CADA RENDER DO PAI), FECHANDO
+    // ACCORDIONS ABERTOS À MÃO E DISPARANDO onShow SEM PARAR.
+    const atual = useRef({})
+    useLayoutEffect(() => {
+        atual.current = {
+            show,
+            onShow,
+            onHide,
+            handleShow,
+            handleHide,
+            children,
+            highlight,
+            propToggle,
+            multipleExpand,
+            hasSub,
+            location,
+        }
+    })
     useImperativeHandle(
         ref,
         () => ({
             current: menuItemRef.current,
             show: () => {
-                handleShow()
+                atual.current.handleShow()
             },
             hide: () => {
-                handleHide()
+                atual.current.handleHide()
             },
             isOpen: () => {
-                return show
+                return atual.current.show
             },
         }),
-        [show]
+        []
     )
     useEffect(() => {
+        const { onShow: aoAbrir, onHide: aoFechar } = atual.current
         if (show) {
-            if (onShow) {
-                onShow()
+            if (aoAbrir) {
+                aoAbrir()
             }
         } else {
-            if (onHide) {
-                onHide()
+            if (aoFechar) {
+                aoFechar()
             }
         }
     }, [show])
     useEffect(() => {
-        if (propToggle === 'accordion' && multipleExpand === false) {
+        const { propToggle: modo, multipleExpand: variosAbertos } = atual.current
+        if (modo === 'accordion' && variosAbertos === false) {
             setShow(accordionShow)
         }
     }, [accordionShow])
     useEffect(() => {
-        if (highlight) {
-            if (hasMenuActiveChild(pathname, children)) {
-                if (propToggle === 'accordion') {
+        const { highlight: destacar, children: filhos, propToggle: modo, hasSub: temSub, handleHide: esconde, location: local } = atual.current
+        const mudouDePagina = rotaAnterior.current !== rotaAtual
+        rotaAnterior.current = rotaAtual
+        if (destacar) {
+            if (hasMenuActiveChild(local, filhos)) {
+                if (modo === 'accordion') {
                     setShow(true)
                 }
                 setHere(true)
             } else {
-                if (propToggle === 'accordion') {
+                if (modo === 'accordion') {
                     setShow(false)
                 }
                 setHere(false)
             }
         }
-        if (prevPathname !== pathname && hasSub && propToggle === 'dropdown') {
-            handleHide()
+        if (mudouDePagina && temSub && modo === 'dropdown') {
+            esconde()
         }
-    }, [pathname])
+    }, [rotaAtual])
 
     // Cleanup: ensure that any timeouts are cleared when the component unmounts
     useEffect(() => {

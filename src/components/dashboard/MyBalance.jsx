@@ -5,6 +5,9 @@ import clsx from 'clsx'
 import { useLanguage } from '@/i18n'
 import { DropdownCard2 } from '@/partials/dropdowns/general'
 
+//CRIADO UMA VEZ: O TOOLTIP DO GRÁFICO CHAMA A FORMATAÇÃO A CADA MOVIMENTO DO MOUSE
+const FORMATO_REAL = new Intl.NumberFormat('pt-br', { style: 'currency', currency: 'BRL' })
+
 const MyBalance = ({ className, periods }) => {
     const [activePeriod, setActivePeriod] = useState('Hoje')
     const { isRTL } = useLanguage()
@@ -94,12 +97,7 @@ const MyBalance = ({ className, periods }) => {
                 const Mês = w.globals.seriesX[seriesIndex][dataPointIndex]
                 const MêsName = categories[Mês]
 
-                const formatter = new Intl.NumberFormat('pt-br', {
-                    style: 'currency',
-                    currency: 'BRL',
-                })
-
-                const formattedNumber = formatter.format(number)
+                const formattedNumber = FORMATO_REAL.format(number)
 
                 return `
                     <div class="flex flex-col gap-2 p-3.5">

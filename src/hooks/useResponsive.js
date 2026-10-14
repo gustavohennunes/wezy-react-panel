@@ -1,21 +1,28 @@
-/* eslint-disable react-hooks/rules-of-hooks */
 import tailwindConfig from 'tailwindcss/defaultConfig'
 import { useMediaQuery } from './useMediaQuery'
 const breakpoints = ['sm', 'md', 'lg', 'xl', '2xl']
-const useResponsive = (query, key, start, end) => {
+
+//MONTA A MEDIA QUERY ('up' | 'down' | 'between'). null QUANDO OS PARÂMETROS NÃO FORMAM UMA QUERY
+const mediaQueryFor = (query, key, start, end) => {
     const screens = tailwindConfig?.theme?.screens
+    const resolve = (value) => (breakpoints.includes(value) && screens ? screens[value] : value)
     if (query === 'up' && key) {
-        key = breakpoints.includes(key) && screens ? screens[key] : key
-        return useMediaQuery(`(min-width: ${key})`)
+        return `(min-width: ${resolve(key)})`
     }
     if (query === 'down' && key) {
-        key = breakpoints.includes(key) && screens ? screens[key] : key
-        return useMediaQuery(`(max-width: ${key})`)
+        return `(max-width: ${resolve(key)})`
     }
     if (query === 'between' && start && end) {
-        start = breakpoints.includes(start) && screens ? screens[start] : start
-        end = breakpoints.includes(end) && screens ? screens[end] : end
-        return useMediaQuery(`(min-width: ${start}) and (max-width: ${end})`)
+        return `(min-width: ${resolve(start)}) and (max-width: ${resolve(end)})`
     }
+    return null
 }
-export { useResponsive }
+
+//O useMediaQuery É CHAMADO SEMPRE (REGRA DOS HOOKS); SEM QUERY VÁLIDA USA 'not all', QUE NUNCA
+//CASA, E DEVOLVE undefined COMO ANTES
+const useResponsive = (query, key, start, end) => {
+    const mediaQuery = mediaQueryFor(query, key, start, end)
+    const matches = useMediaQuery(mediaQuery || 'not all')
+    return mediaQuery ? matches : undefined
+}
+export { useResponsive, mediaQueryFor }

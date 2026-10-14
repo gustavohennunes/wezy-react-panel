@@ -91,14 +91,15 @@ const ResetPasswordChange = () => {
                 {hasErrors && <Alert variant="danger">{formik.status}</Alert>}
 
                 <div className="flex flex-col gap-1">
-                    <label className="form-label text-gray-900">
+                    <label htmlFor="nova-senha" className="form-label text-gray-900">
                         New Password
                     </label>
-                    <label className="input">
+                    <div className="input">
                         <input
                             type={showNewPassword ? 'text' : 'password'}
                             placeholder="Enter a new password"
                             autoComplete="off"
+                            id="nova-senha"
                             {...formik.getFieldProps('newPassword')}
                             className={clsx(
                                 'form-control bg-transparent',
@@ -115,6 +116,8 @@ const ResetPasswordChange = () => {
                             )}
                         />
                         <button
+                            type="button"
+                            aria-label={showNewPassword ? 'Ocultar senha' : 'Mostrar senha'}
                             className="btn btn-icon"
                             onClick={(e) => {
                                 e.preventDefault()
@@ -134,7 +137,7 @@ const ResetPasswordChange = () => {
                                 })}
                             />
                         </button>
-                    </label>
+                    </div>
                     {formik.touched.newPassword &&
                         formik.errors.newPassword && (
                             <span
@@ -147,10 +150,10 @@ const ResetPasswordChange = () => {
                 </div>
 
                 <div className="flex flex-col gap-1">
-                    <label className="form-label font-normal text-gray-900">
+                    <label htmlFor="confirma-senha" className="form-label font-normal text-gray-900">
                         Confirm New Password
                     </label>
-                    <label className="input">
+                    <div className="input">
                         <input
                             type={
                                 showNewPasswordConfirmation
@@ -159,6 +162,7 @@ const ResetPasswordChange = () => {
                             }
                             placeholder="Re-enter a new Password"
                             autoComplete="off"
+                            id="confirma-senha"
                             {...formik.getFieldProps('confirmPassword')}
                             className={clsx(
                                 'form-control bg-transparent',
@@ -175,6 +179,8 @@ const ResetPasswordChange = () => {
                             )}
                         />
                         <button
+                            type="button"
+                            aria-label={showNewPasswordConfirmation ? 'Ocultar senha' : 'Mostrar senha'}
                             className="btn btn-icon"
                             onClick={(e) => {
                                 e.preventDefault()
@@ -196,7 +202,7 @@ const ResetPasswordChange = () => {
                                 })}
                             />
                         </button>
-                    </label>
+                    </div>
                     {formik.touched.confirmPassword &&
                         formik.errors.confirmPassword && (
                             <span

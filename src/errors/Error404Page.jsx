@@ -10,12 +10,12 @@ const Error404Page = () => {
                 <img
                     src={toAbsoluteUrl('/media/illustrations/19.svg')}
                     className="dark:hidden max-h-[160px]"
-                    alt="image"
+                    alt=""
                 />
                 <img
                     src={toAbsoluteUrl('/media/illustrations/19-dark.svg')}
                     className="light:hidden max-h-[160px]"
-                    alt="image"
+                    alt=""
                 />
             </div>
 

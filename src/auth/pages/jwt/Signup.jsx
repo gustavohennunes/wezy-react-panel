@@ -95,6 +95,8 @@ const Signup = () => {
 
                 setSubmitting(false)
 
+            } finally {
+
                 setLoading(false)
 
             }
@@ -126,11 +128,13 @@ const Signup = () => {
                     <div className="flex gap-3 mb-2.5 items-center">
                         <img
                             src={PANEL_LOGO}
+                            alt="Logo"
                             className="dark:hidden"
                             style={{ width: '135px' }}
                         />
                         <img
                             src={PANEL_LOGO}
+                            alt="Logo"
                             className="hidden dark:block"
                             style={{
                                 filter: 'brightness(100)',
@@ -149,7 +153,7 @@ const Signup = () => {
 
                 <div className="flex flex-col gap-1">
                     
-                    <label className="form-label text-gray-900 gap-[2px]">
+                    <label htmlFor="signup-name" className="form-label text-gray-900 gap-[2px]">
                         Nome <span className="text-danger">*</span>
                     </label>
 
@@ -159,6 +163,7 @@ const Signup = () => {
                             type="text"
                             autoComplete="off"
                             onInput={(e) => formik.setFieldValue("name", e.target.value)}
+                            id="signup-name"
                             {...formik.getFieldProps('name')}
                             className={clsx(
                                 'form-control bg-transparent',
@@ -182,7 +187,7 @@ const Signup = () => {
 
                 <div className="flex flex-col gap-1">
 
-                    <label className="form-label text-gray-900 gap-[2px]">
+                    <label htmlFor="signup-email" className="form-label text-gray-900 gap-[2px]">
                         E-mail <span className="text-danger">*</span>
                     </label>
 
@@ -192,6 +197,7 @@ const Signup = () => {
                             type="email"
                             autoComplete="off"
                             onInput={(e) => formik.setFieldValue("email", e.target.value)}
+                            id="signup-email"
                             {...formik.getFieldProps('email')}
                             className={clsx(
                                 'form-control bg-transparent',
@@ -219,7 +225,7 @@ const Signup = () => {
 
                 <div className="flex flex-col gap-1">
 
-                    <label className="form-label text-gray-900 gap-[2px]">
+                    <label htmlFor="signup-phone" className="form-label text-gray-900 gap-[2px]">
                         Telefone (Whatsapp){' '}
                         <span className="text-danger">*</span>
                     </label>
@@ -232,6 +238,7 @@ const Signup = () => {
                             maxLength={15}
                             autoComplete="off"
                             onInput={(e) => formik.setFieldValue("phone", e.target.value)}
+                            id="signup-phone"
                             {...formik.getFieldProps('phone')}
                             className={clsx(
                                 'form-control bg-transparent',
@@ -255,16 +262,17 @@ const Signup = () => {
 
                 <div className="flex flex-col gap-1">
 
-                    <label className="form-label text-gray-900 gap-[2px]">
+                    <label htmlFor="signup-password" className="form-label text-gray-900 gap-[2px]">
                         Senha <span className="text-danger">*</span>
                     </label>
 
-                    <label className="input">
+                    <div className="input">
 
                         <input
                             type={showPassword ? 'text' : 'password'}
                             placeholder=""
                             autoComplete="off"
+                            id="signup-password"
                             {...formik.getFieldProps('password')}
                             className={clsx(
                                 'form-control bg-transparent',
@@ -280,6 +288,7 @@ const Signup = () => {
                             type="button"
                             className="btn btn-icon"
                             onClick={togglePassword}
+                            aria-label={showPassword ? 'Ocultar senha' : 'Mostrar senha'}
                         >
                             <KeenIcon
                                 icon="eye"
@@ -294,7 +303,7 @@ const Signup = () => {
                                 })}
                             />
                         </button>
-                    </label>
+                    </div>
                     {formik.touched.password && formik.errors.password && (
                         <span role="alert" className="text-danger text-xs mt-1">
                             {formik.errors.password}
@@ -304,16 +313,17 @@ const Signup = () => {
 
                 <div className="flex flex-col gap-1">
 
-                    <label className="form-label text-gray-900 gap-[2px]">
+                    <label htmlFor="signup-changepassword" className="form-label text-gray-900 gap-[2px]">
                         Repetição de senha{' '}
                         <span className="text-danger">*</span>
                     </label>
 
-                    <label className="input">
+                    <div className="input">
                         <input
                             type={showConfirmPassword ? 'text' : 'password'}
                             placeholder=""
                             autoComplete="off"
+                            id="signup-changepassword"
                             {...formik.getFieldProps('changepassword')}
                             className={clsx(
                                 'form-control bg-transparent',
@@ -333,6 +343,7 @@ const Signup = () => {
                             type="button"
                             className="btn btn-icon"
                             onClick={toggleConfirmPassword}
+                            aria-label={showConfirmPassword ? 'Ocultar senha' : 'Mostrar senha'}
                         >
                             <KeenIcon
                                 icon="eye"
@@ -347,7 +358,7 @@ const Signup = () => {
                                 })}
                             />
                         </button>
-                    </label>
+                    </div>
 
                     {formik.touched.changepassword &&
                         formik.errors.changepassword && (

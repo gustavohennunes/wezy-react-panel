@@ -35,8 +35,10 @@ const DataRowPicture = ({ row }) => {
                         className="min-w-5 min-h-5"
                     >
                         <button
+                            type="button"
                             onClick={handleOpen}
                             className="min-w-5 min-h-5 p-0 border-none bg-transparent cursor-pointer"
+                            aria-label="Ver imagem"
                         >
                             <KeenIcon
                                 icon="picture"

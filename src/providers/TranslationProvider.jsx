@@ -7,7 +7,7 @@ import '@formatjs/intl-relativetimeformat/locale-data/es'
 import '@formatjs/intl-relativetimeformat/locale-data/fr'
 import '@formatjs/intl-relativetimeformat/locale-data/ja'
 import '@formatjs/intl-relativetimeformat/locale-data/zh'
-import { createContext, useContext, useEffect, useState } from 'react'
+import { createContext, useCallback, useContext, useEffect, useMemo, useState } from 'react'
 import { IntlProvider } from 'react-intl'
 import { I18N_LANGUAGES, I18N_CONFIG_KEY, I18N_DEFAULT_LANGUAGE } from '@/i18n'
 import { getData, setData } from '@/utils'
@@ -51,24 +51,22 @@ const TranslationProvider = ({ children }) => {
     const [currentLanguage, setCurrentLanguage] = useState(
         initialProps.currentLanguage
     )
-    const changeLanguage = (language) => {
+    const changeLanguage = useCallback((language) => {
         setData(I18N_CONFIG_KEY, language)
         setCurrentLanguage(language)
-    }
-    const isRTL = () => {
+    }, [])
+    const isRTL = useCallback(() => {
         return currentLanguage.direction === 'rtl'
-    }
+    }, [currentLanguage.direction])
     useEffect(() => {
         document.documentElement.setAttribute('dir', currentLanguage.direction)
     }, [currentLanguage])
+    const value = useMemo(
+        () => ({ isRTL, currentLanguage, changeLanguage }),
+        [isRTL, currentLanguage, changeLanguage]
+    )
     return (
-        <TranslationsContext.Provider
-            value={{
-                isRTL,
-                currentLanguage,
-                changeLanguage,
-            }}
-        >
+        <TranslationsContext.Provider value={value}>
             <I18NProvider>{children}</I18NProvider>
         </TranslationsContext.Provider>
     )

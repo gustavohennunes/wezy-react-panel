@@ -22,6 +22,9 @@ import { deepMerge, debounce } from '@/lib/helpers'
 import { usePageData } from '@/context/PageDataContext'
 import { updateTablePagination } from '@/utils/urlHelper'
 
+//ARRAY VAZIO FIXO: UM [] NOVO A CADA RENDER FARIA A TABELA RECALCULAR AS LINHAS SEMPRE
+const SEM_DADOS = []
+
 const DataGridContext = createContext(undefined)
 
 export const useDataGrid = () => {
@@ -116,14 +119,15 @@ export const DataGridProvider = (props) => {
 
     const debouncedFetchData = debounce(fetchServerSideData, 100)
 
+    //DADOS LOCAIS (serverSide false) VÃO DIRETO PARA A TABELA, SEM CÓPIA EM STATE: A CÓPIA POR useEffect
+    //FAZIA A TABELA DESENHAR UM FRAME COM AS LINHAS ANTIGAS A CADA MUDANÇA (ex.: FILTRO AO DIGITAR)
+    const dadosLocais = props.data || SEM_DADOS
+    const tableData   = mergedProps.serverSide ? data : dadosLocais
+    const tableTotal  = mergedProps.serverSide ? totalRows : dadosLocais.length
+
     const loadData = () => {
         if (mergedProps.serverSide) {
             debouncedFetchData()
-        } else {
-            setLoading(true) // Show loading bar for local data
-            setData(mergedProps.data || [])
-            setTotalRows(mergedProps.data ? mergedProps.data.length : 0)
-            setLoading(false) // Hide loading bar after data is set
         }
     }
 
@@ -154,7 +158,7 @@ export const DataGridProvider = (props) => {
     }
 
     const table = useReactTable({
-        data,
+        data: tableData,
         columns: mergedProps.columns,
         pageCount: mergedProps.serverSide
             ? Math.ceil(totalRows / pagination.pageSize)
@@ -191,7 +195,7 @@ export const DataGridProvider = (props) => {
             value={{
                 props: mergedProps,
                 table,
-                totalRows,
+                totalRows: tableTotal,
                 loading,
                 setLoading,
                 reload: loadData,

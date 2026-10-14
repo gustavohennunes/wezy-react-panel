@@ -1,43 +1,42 @@
-import React, { useState, useEffect } from 'react'
+import React from 'react'
 import { useDataGrid } from '.'
 import { CustomCheckbox } from '@/components/form/CustomFields'
 
-const DataGridRowSelectAll = ({ setSelectedRows }) => {
+// "SELECIONAR TODOS" DO GRID. AS LINHAS SELECIONÁVEIS SÃO CALCULADAS A CADA RENDER A PARTIR DAS
+// LINHAS ATUAIS DA TABELA — ANTES ERAM GUARDADAS UMA VEZ SÓ (O OBJETO table NÃO MUDA) E IGNORAVAM
+// O "Carregar mais" E O FILTRO AO DIGITAR, PODENDO MARCAR LINHAS QUE NEM ESTAVAM NA TELA.
+// A SELEÇÃO VIVE NO ESTADO DA TABELA; QUEM USA O GRID RECEBE PELO onRowSelectionChange.
+const DataGridRowSelectAll = () => {
     const { table } = useDataGrid()
-    const [selectableRowIds, setSelectableRowIds] = useState([])
-    const [selectedRowIds, setSelectedRowIds] = useState([])
-    const [selectedDataTableIds, setSelectedDataTableIds] = useState([])
 
-    useEffect(() => {
-        const selectableRows = table
-            .getRowModel()
-            .rows.filter((row) => row.original.columns[0].content !== '-')
+    //LINHA COM "-" NA PRIMEIRA COLUNA NÃO TEM CHECKBOX (REGISTRO SEM PERMISSÃO DE EXCLUSÃO)
+    const selectableRows = table
+        .getRowModel()
+        .rows.filter((row) => row.original?.columns?.[0]?.content !== '-')
 
-        setSelectableRowIds(selectableRows.map((row) => row.id))
-    }, [table])
+    const allSelected = selectableRows.length > 0 && selectableRows.every((row) => row.getIsSelected())
 
-    useEffect(() => {
-        setSelectedRows(selectedRowIds)
-    }, [selectedRowIds])
-
+    //UMA ÚNICA ATUALIZAÇÃO DO ESTADO DE SELEÇÃO (EM VEZ DE UM toggleSelected POR LINHA)
     const checkAllRows = (value) => {
-        const updatedSelected = value ? selectableRowIds : []
-
-        setSelectedRowIds(updatedSelected)
-        selectableRowIds.forEach((id) => {
-            table.getRow(id)?.toggleSelected(!!value)
+        table.setRowSelection((selecaoAtual) => {
+            const novaSelecao = { ...selecaoAtual }
+            selectableRows.forEach((row) => {
+                if (value) {
+                    novaSelecao[row.id] = true
+                } else {
+                    delete novaSelecao[row.id]
+                }
+            })
+            return novaSelecao
         })
     }
 
     // MESMO CHECKBOX DO FORMULÁRIO (estilo painel-php), VARIANTE cf-grid
     return (
         <CustomCheckbox
-            checked={
-                selectedRowIds.length === selectableRowIds.length &&
-                selectableRowIds.length > 0
-            }
+            checked={allSelected}
             onChange={(e) => checkAllRows(e.target.checked)}
-            ariaLabel="Select all"
+            ariaLabel="Selecionar todos"
             className="cf-grid"
         />
     )

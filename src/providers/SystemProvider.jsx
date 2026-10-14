@@ -1,4 +1,4 @@
-import { createContext, useContext, useEffect, useState } from 'react'
+import { createContext, useContext, useEffect, useMemo, useState } from 'react'
 import {
     isSystemNotFound,
     subscribeSystemStatus,
@@ -11,7 +11,7 @@ const SystemContext = createContext({ systemNotFound: false })
 const useSystem = () => useContext(SystemContext)
 
 const SystemProvider = ({ children }) => {
-    const [systemNotFound, setSystemNotFound] = useState(isSystemNotFound())
+    const [systemNotFound, setSystemNotFound] = useState(() => isSystemNotFound())
 
     useEffect(() => {
         // Assina o sinal disparado por qualquer parte do app (ex.: interceptors)
@@ -25,12 +25,14 @@ const SystemProvider = ({ children }) => {
         return unsubscribe
     }, [])
 
+    const value = useMemo(() => ({ systemNotFound }), [systemNotFound])
+
     if (systemNotFound) {
         return <SystemNotFoundPage />
     }
 
     return (
-        <SystemContext.Provider value={{ systemNotFound }}>
+        <SystemContext.Provider value={value}>
             {children}
         </SystemContext.Provider>
     )

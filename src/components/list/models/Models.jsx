@@ -1,5 +1,5 @@
     import qs from 'qs'
-    import { useMemo, useState, useEffect } from 'react'
+    import { useMemo, useRef, useState, useEffect } from 'react'
     import { useNavigate } from 'react-router-dom'
     import { DataGrid, KeenIcon, DataGridColumnHeader, DataGridRowSelectAll, DataRowContext } from '@/components'
     import { toast } from 'sonner'
@@ -18,10 +18,6 @@
         const [ confirm, confirmDialog ]            = useConfirm()
         const [ models, setModels ]                 = useState(model || [])
         const [ footer, setFooter ]                 = useState('')
-        //TAMANHO GIGANTE DESDE O PRIMEIRO RENDER: O DataGridProvider CAPTURA O pageSize
-        //NA MONTAGEM, E COM O VALOR ANTIGO (20) A TABELA CORTAVA A EXIBIÇÃO EM 20 LINHAS —
-        //O "Carregar mais" ACUMULAVA REGISTROS QUE NUNCA APARECIAM
-        const [ gridPagination, setGridPagination ] = useState({ size: 1000000 })
         const [ selectedRows, setSelectedRows ]     = useState([])
         const [activeTab, setActiveTab]             = useState('')
         const [ searchInput, setSearchInput ]       = useState(search?.value || '')
@@ -58,9 +54,9 @@
         // MODO "CARREGAR MAIS": em vez de trocar de página, os registros vão se acumulando na
         // MESMA tabela. É o que permite ao drag-and-drop mover um item para uma posição que
         // antes estaria em outra página (a reordenação envia a lista inteira em tela).
-        const [ paginaCarregada, setPaginaCarregada ] = useState(1)
+        //REF: A PÁGINA CARREGADA SÓ É LIDA NO CLIQUE DO "Carregar mais", NÃO APARECE NA TELA
+        const paginaCarregada                         = useRef(1)
         const [ carregandoMais, setCarregandoMais ]   = useState(false)
-        const [ totalRegistros, setTotalRegistros ]   = useState(0)
 
         // ATUALIZA O ESTADO QUANDO O MODELO É ALTERADO
         useEffect(() => {
@@ -73,7 +69,7 @@
 
             //TROCA DE MÓDULO/BUSCA REINICIA O ACUMULADO
             const paginaUrl = parseInt(new URLSearchParams(window.location.search).get('pagina') || '1', 10)
-            setPaginaCarregada(isNaN(paginaUrl) ? 1 : paginaUrl)
+            paginaCarregada.current = isNaN(paginaUrl) ? 1 : paginaUrl
 
         }, [ model ])
 
@@ -87,7 +83,7 @@
             try {
 
                 const url = new URL(window.location.href)
-                url.searchParams.set('pagina', String(paginaCarregada + 1))
+                url.searchParams.set('pagina', String(paginaCarregada.current + 1))
 
                 const response = await api.get(buildApiUrl(url.searchParams.toString()))
                 const novos    = response?.data?.success?.response?.data?.params?.list?.rows || []
@@ -103,7 +99,7 @@
 
                     })
 
-                    setPaginaCarregada((pagina) => pagina + 1)
+                    paginaCarregada.current += 1
 
                 }
 
@@ -124,27 +120,21 @@
 
         }
 
-        // ATUALIZA A PAGINAÇÃO DO GRID
-        useEffect(() => {
+        // PAGINAÇÃO DO GRID — DERIVADA DAS PROPS (SEM STATE + useEffect, QUE CUSTAVA UM RENDER A MAIS)
+        // QUANDO O CARD ESCONDE O "Exibindo de X até Y" ($bloqExibindo), A PONTE NÃO ENVIA
+        // pagination.information — E O RODAPÉ MOSTRAVA "1 - 0 de 0" MESMO COM REGISTROS NA
+        // TELA. NESSE CASO CONSIDERAMOS QUE TUDO QUE FOI CARREGADO ESTÁ NA PÁGINA ATUAL.
+        const totalRegistros = typeof pagination?.information?.total === 'number'
+            ? pagination.information.total
+            : (model?.length || 0)
 
-            const info = pagination?.information
-
-            // QUANDO O CARD ESCONDE O "Exibindo de X até Y" ($bloqExibindo), A PONTE NÃO ENVIA
-            // pagination.information — E O RODAPÉ MOSTRAVA "1 - 0 de 0" MESMO COM REGISTROS NA
-            // TELA. NESSE CASO CONSIDERAMOS QUE TUDO QUE FOI CARREGADO ESTÁ NA PÁGINA ATUAL.
-            const total = typeof info?.total === 'number' ? info.total : (model?.length || 0)
-
-            setTotalRegistros(total)
-
-            //TUDO QUE FOI CARREGADO FICA EM UMA ÚNICA "PÁGINA" — QUEM CONTROLA O
-            //CARREGAMENTO É O BOTÃO "Carregar mais conteúdo" DO RODAPÉ
-            setGridPagination({
-                size: 1000000,
-                rowCount: total,
-                pageCount: 1,
-            })
-
-        }, [pagination, model])
+        //TUDO QUE FOI CARREGADO FICA EM UMA ÚNICA "PÁGINA" (TAMANHO GIGANTE DESDE O PRIMEIRO RENDER:
+        //O DataGridProvider CAPTURA O pageSize NA MONTAGEM) — QUEM CONTROLA O CARREGAMENTO É O BOTÃO
+        //"Carregar mais conteúdo" DO RODAPÉ
+        const gridPagination = useMemo(
+            () => ({ size: 1000000, rowCount: totalRegistros, pageCount: 1 }),
+            [totalRegistros]
+        )
 
         // HANDLER PARA EXCLUIR ITENS SELECIONADOS
         const handleExcluir = async () => {
@@ -301,9 +291,7 @@
                     id: col.component === 'select_all_checkbox' ? 'id' : col?.content?.toLowerCase().replace(/\s/g, '_'),
                     header: ({ column }) => col.component === 'select_all_checkbox' ? (
                         
-                        <DataGridRowSelectAll
-                            setSelectedRows={setSelectedRows}
-                        />
+                        <DataGridRowSelectAll />
 
                     ) : (
 
@@ -456,6 +444,7 @@
                                                     name="FrmBusca"
                                                     id="FrmBusca"
                                                     className="inputBusca"
+                                                    aria-label={search?.placeholder || 'Buscar'}
                                                     placeholder={search?.placeholder}
                                                     value={searchInput}
                                                     onChange={(e) =>
@@ -467,6 +456,7 @@
                                             <button
                                                 type="submit"
                                                 className="btn btn-primary btn-sm ml-1"
+                                                aria-label="Buscar"
                                             >
                                                 <KeenIcon
                                                     icon="magnifier"

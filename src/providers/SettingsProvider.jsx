@@ -1,5 +1,5 @@
 /* eslint-disable no-unused-vars */
-import { createContext, useContext, useState } from 'react'
+import { createContext, useCallback, useContext, useMemo, useState } from 'react'
 import { defaultSettings } from '@/config/settings.config'
 import { getData, setData } from '@/utils'
 const SETTINGS_CONFIGS_KEY = 'settings-configs'
@@ -19,21 +19,23 @@ const LayoutsContext = createContext(initialProps)
 const useSettings = () => useContext(LayoutsContext)
 const SettingsProvider = ({ children }) => {
     const [settings, setSettings] = useState(initialProps.settings)
-    const updateSettings = (newSettings) => {
-        setSettings({
-            ...settings,
+    //FORMA FUNCIONAL: DUAS ATUALIZAÇÕES SEGUIDAS NÃO SE SOBRESCREVEM (ANTES A SEGUNDA PARTIA DO
+    //settings ANTIGO E DESFAZIA A PRIMEIRA)
+    const updateSettings = useCallback((newSettings) => {
+        setSettings((atual) => ({
+            ...atual,
             ...newSettings,
-        })
-    }
-    const storeSettings = (newSettings) => {
+        }))
+    }, [])
+    const storeSettings = useCallback((newSettings) => {
         setData(SETTINGS_CONFIGS_KEY, {
             ...getStoredSettings(),
             ...newSettings,
         })
         updateSettings(newSettings)
-    }
-    const getThemeMode = () => {
-        const { themeMode } = settings
+    }, [updateSettings])
+    const themeMode = settings.themeMode
+    const getThemeMode = useCallback(() => {
         if (themeMode === 'system') {
             return window.matchMedia('(prefers-color-scheme: dark)').matches
                 ? 'dark'
@@ -43,16 +45,13 @@ const SettingsProvider = ({ children }) => {
         } else {
             return 'light'
         }
-    }
+    }, [themeMode])
+    const value = useMemo(
+        () => ({ settings, updateSettings, storeSettings, getThemeMode }),
+        [settings, updateSettings, storeSettings, getThemeMode]
+    )
     return (
-        <LayoutsContext.Provider
-            value={{
-                settings,
-                updateSettings,
-                storeSettings,
-                getThemeMode,
-            }}
-        >
+        <LayoutsContext.Provider value={value}>
             {children}
         </LayoutsContext.Provider>
     )

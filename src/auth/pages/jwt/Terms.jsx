@@ -15,11 +15,13 @@ const Terms = () => {
                 <div className="flex gap-3 mb-2.5 items-center">
                     <img
                         src={PANEL_LOGO}
+                        alt="Logo"
                         className="dark:hidden"
                         style={{ width: '135px' }}
                     />
                     <img
                         src={PANEL_LOGO}
+                        alt="Logo"
                         className="hidden dark:block"
                         style={{
                             filter: 'brightness(100)',

@@ -95,11 +95,13 @@ const Login = () => {
                     <div className="flex gap-3 mb-2.5 items-center">
                         <img
                             src={PANEL_LOGO}
+                            alt="Logo"
                             className="dark:hidden"
                             style={{ width: '135px' }}
                         />
                         <img
                             src={PANEL_LOGO}
+                            alt="Logo"
                             className="hidden dark:block"
                             style={{
                                 filter: 'brightness(100)',
@@ -146,12 +148,13 @@ const Login = () => {
                 )}
 
                 <div className="flex flex-col gap-1">
-                    <label className="form-label text-gray-900 gap-[2px]">
+                    <label htmlFor="login-email" className="form-label text-gray-900 gap-[2px]">
                         E-mail ou login <span className="text-danger">*</span>
                     </label>
 
                     <label className="input">
                         <input
+                            id="login-email"
                             placeholder="Digite seu e-mail ou login"
                             {...formik.getFieldProps('email')}
                             className={clsx('form-control', {
@@ -169,7 +172,7 @@ const Login = () => {
 
                 <div className="flex flex-col gap-1">
                     <div className="flex items-center justify-between gap-1">
-                        <label className="form-label text-gray-900 gap-[2px]">
+                        <label htmlFor="login-senha" className="form-label text-gray-900 gap-[2px]">
                             Senha <span className="text-danger">*</span>
                         </label>
                         <Link
@@ -179,8 +182,11 @@ const Login = () => {
                             Esqueceu sua senha?
                         </Link>
                     </div>
-                    <label className="input">
+                    {/* div E NÃO label: O CONTAINER TEM O INPUT E O BOTÃO DE MOSTRAR SENHA, E UM label SÓ PODE
+                        NOMEAR UM CONTROLE — O NOME DO CAMPO VEM DO label htmlFor ACIMA */}
+                    <div className="input">
                         <input
+                            id="login-senha"
                             type={showPassword ? 'text' : 'password'}
                             placeholder="Digite sua senha"
                             autoComplete="off"
@@ -196,6 +202,7 @@ const Login = () => {
                             type="button"
                             className="btn btn-icon"
                             onClick={togglePassword}
+                            aria-label={showPassword ? 'Ocultar senha' : 'Mostrar senha'}
                         >
                             <KeenIcon
                                 icon="eye"
@@ -210,7 +217,7 @@ const Login = () => {
                                 })}
                             />
                         </button>
-                    </label>
+                    </div>
 
                     {formik.touched.password && formik.errors.password && (
                         <span role="alert" className="text-danger text-xs mt-1">

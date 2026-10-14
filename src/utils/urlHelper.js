@@ -1,6 +1,35 @@
     export const cleanUrl = (url) => {
         return url?.replace(/\/?index\.php/g, '') || ''
     }
+    //PARÂMETROS DA URL DO SPA QUE SEGUEM PARA A API (Set: CONSULTA DIRETA EM VEZ DE PERCORRER A LISTA)
+    const PARAMETROS_PERMITIDOS = new Set([
+        'p',
+        'setor',
+        'qua',
+        'qui',
+        'sex',
+        'slug',
+        'acao',
+        'id',
+        'toggle-status',
+        'busca',
+        'filters',
+        'limit',
+        'pagina',
+        'order-field',
+        'order-direction',
+        'inserir',
+        'alterar',
+        'cliente',
+        'parametro',
+        'parametros',
+        'mes',
+        'ano',
+        'usuario',
+        'start',
+        'end',
+    ])
+
     export const buildApiUrl = (searchParams, defaultSlug = '') => {
         const params = new URLSearchParams(searchParams)
 
@@ -22,37 +51,10 @@
             return false
         }
 
-        const allowedParams = [
-            'p',
-            'setor',
-            'qua',
-            'qui',
-            'sex',
-            'slug',
-            'acao',
-            'id',
-            'toggle-status',
-            'busca',
-            'filters',
-            'limit',
-            'pagina',
-            'order-field',
-            'order-direction',
-            'inserir',
-            'alterar',
-            'cliente',
-            'parametro',
-            'parametros',
-            'mes',
-            'ano',
-            'usuario',
-            'start',
-            'end',
-        ]
 
         // Remove parâmetros não permitidos
         for (const param of [...params.keys()]) {
-            if (!allowedParams.includes(param)) {
+            if (!PARAMETROS_PERMITIDOS.has(param)) {
                 params.delete(param)
             }
         }

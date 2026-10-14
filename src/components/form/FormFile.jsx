@@ -1,6 +1,6 @@
     import React, { useState } from 'react'
 
-    const FormFile = ({ multiple, accept, maxSize, onFilesChange, fieldName, value, fieldClass = '', fieldData = {}, required = false }) => {
+    const FormFile = ({ id, multiple, accept, maxSize, onFilesChange, fieldName, value, fieldClass = '', fieldData = {}, required = false }) => {
         const [selectedFiles, setSelectedFiles] = useState([])
         const [error, setError] = useState(null)
 
@@ -43,6 +43,7 @@
                 )}
 
                 <input
+                    id={id}
                     name={fieldName}
                     className={
                         getFileInputClassName() + `${fieldClass} ${fieldData.class}`

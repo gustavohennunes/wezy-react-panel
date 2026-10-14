@@ -1,5 +1,5 @@
 /* eslint-disable react-refresh/only-export-components */
-import React, { createContext, useState, useContext, useEffect } from 'react'
+import React, { createContext, useState, useContext, useEffect, useMemo } from 'react'
 import { useLocation } from 'react-router-dom'
 const PathnameContext = createContext(undefined)
 const PathnameProvider = ({ children }) => {
@@ -10,13 +10,9 @@ const PathnameProvider = ({ children }) => {
             return pathname
         })
     }, [pathname])
+    const value = useMemo(() => ({ pathname, prevPathname }), [pathname, prevPathname])
     return (
-        <PathnameContext.Provider
-            value={{
-                pathname,
-                prevPathname,
-            }}
-        >
+        <PathnameContext.Provider value={value}>
             {children}
         </PathnameContext.Provider>
     )

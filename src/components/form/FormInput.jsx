@@ -1,4 +1,4 @@
-    import React from 'react'
+    import React, { useId } from 'react'
     import { IMaskInput } from "react-imask";
     import { CurrencyInput } from 'react-currency-mask'
     import { FormFile } from './'
@@ -7,6 +7,9 @@
     const FormInput = ({ type, title, subtitle = '', combinedClass, rowAttr, fieldName, fieldMask, fieldClass = '', fieldData, formState, required = false, handleInputChange }) => {
 
         let inputElement
+
+        //LIGA O <label> DO TÍTULO AO CONTROLE DO CAMPO (LEITOR DE TELA E CLIQUE NO TÍTULO FOCAM O INPUT)
+        const inputId = useId()
 
         if (fieldMask == 'Number'){
             fieldMask = Number;
@@ -37,6 +40,7 @@
                         mask={fieldMask}
                         className={`input w-full ${fieldClass} ${fieldData.class}`}
                         name={fieldName}
+                        id={inputId}
                         value={formState[fieldName] || ''}
                         required={required}
                         onChange={(e) =>
@@ -60,6 +64,7 @@
                                 type={fieldData.type}
                                 className={`input w-full ${fieldClass} ${fieldData.class}`}
                                 name={fieldName}
+                                id={inputId}
                                 required={required}
                                 maxLength={attrMaxLength || 13}
                             />
@@ -77,6 +82,7 @@
                     >
                         <input
                             name={fieldName}
+                            id={inputId}
                             type="password"
                             required={required}
                             onChange={(e) =>
@@ -116,6 +122,7 @@
                     <textarea
                         className={`input w-full min-h-[140px] py-2 leading-relaxed ${fieldClass} ${fieldData.class}`}
                         name={fieldName}
+                        id={inputId}
                         value={formState[fieldName] || ''}
                         required={required}
                         onChange={(e) =>
@@ -144,6 +151,7 @@
 
                 inputElement = (
                     <FormFile
+                        id={inputId}
                         fieldName={fieldName}
                         multiple={true}
                         value={formState[fieldName] || ''}
@@ -157,6 +165,7 @@
 
                 inputElement = (
                     <FormFile
+                        id={inputId}
                         fieldName={fieldName}
                         multiple={true}
                         accept={buildAccept('*')}
@@ -205,7 +214,7 @@
 
                 {title !== false && (
                     <div className="form-label w-full lg:w-56 lg:min-w-56 lg:shrink-0 flex-col h-full justify-center">
-                        <label>
+                        <label htmlFor={inputId}>
                             <b>
                                 {title}
                                 {requiredField && (

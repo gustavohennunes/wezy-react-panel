@@ -26,7 +26,10 @@
         const [ loading, setLoading ]        = useState(false);
         const [ activeTab, setActiveTab ]    = useState('');
         const { callApi }                    = usePageData();
-        const { auth, logout, slug, action } = useAuth();
+        const { auth, logout }               = useAuth();
+        //slug/action DA URL ATUAL (VER Main.jsx)
+        const slug                           = params.get('slug') ?? params.get('pag') ?? '';
+        const action                         = params.get('action') ?? '';
 
         //ATIVA O EDITOR ACE NOS CARDS DE CÓDIGO (ex.: ?pag=modulos) — NO-OP NOS DEMAIS
         useLegacyCodeEditor(data);
@@ -109,8 +112,6 @@
                     }
                 });
 
-                setLoading(false);
-
                 //CASO ESTEJA NA FINALIZAÇÃO DE CADASTRO, DIRECIONA PARA O DASHBOARD
                 if(slug === 'perfil' && action === 'finalizar-cadastro') {
                     window.location.href = '/'
@@ -127,11 +128,14 @@
                     }
                 })
 
-                setLoading(false);
-
                 if (error.status == 401) {
                     logout()
                 }
+
+            } finally {
+
+                //SAI DO ESTADO DE ENVIO EM QUALQUER CAMINHO (SUCESSO, ERRO OU EXCEÇÃO INESPERADA)
+                setLoading(false);
 
             }
 

@@ -291,15 +291,13 @@
                         let combinedClassName = `flex items-start flex-wrap lg:flex-nowrap gap-2.5 lg:gap-4 px-4 ${parsedAttributes.class || ''}`;
                         delete parsedAttributes.class; 
                         
-                        //VERIFICA SE EXISTE UMA KEY COMEÇANDO COM OS CARACTERES 'data-valid-' NO parsedAttributes
-                        if(parsedAttributes && Object.keys(parsedAttributes).length > 0 && Object.keys(parsedAttributes).some(key => key.startsWith('data-valid-'))){
-                                    
-                            const key = Object.keys(parsedAttributes).find(key => key.startsWith('data-valid-')).replace('data-valid-', '');
-                            
-                            if (parsedAttributes['data-valid-' + key] != (validRows[key] ?? '')){
-                                return;
-                            }
-                                
+                        //LINHA CONDICIONAL: TODOS OS data-valid-* PRECISAM CASAR (ex.: "Métodos liberados" EXIGE
+                        //data-valid-ativar-api="ok" E data-valid-limitar-metodos="ok"). ANTES SÓ O PRIMEIRO
+                        //ERA CONFERIDO E A LINHA APARECIA COM APENAS UMA DAS CONDIÇÕES ATIVA.
+                        const condicoesValid = Object.keys(parsedAttributes).filter((attr) => attr.startsWith('data-valid-'))
+
+                        if (condicoesValid.some((attr) => parsedAttributes[attr] != (validRows[attr.replace('data-valid-', '')] ?? ''))) {
+                            return;
                         }
                         
                         if (!fieldData) return null

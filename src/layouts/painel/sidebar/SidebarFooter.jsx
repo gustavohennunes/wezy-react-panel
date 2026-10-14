@@ -47,12 +47,14 @@
                     </Menu>
 
                     <div className="flex items-center gap-1.5">
-                        <div
+                        <button
+                            type="button"
                             onClick={logout}
+                            aria-label="Sair"
                             className="btn btn-icon btn-icon-lg size-8 hover:bg-light hover:text-primary text-gray-600"
                         >
                             <KeenIcon icon="exit-right" />
-                        </div>
+                        </button>
                     </div>
 
                 </div>

@@ -36,11 +36,13 @@
                     <Link to="/?pag=dashboard">
                         <img
                             src={PANEL_LOGO}
+                            alt="Logo"
                             className="dark:hidden"
                             style={{ width: '135px' }}
                         />
                         <img
                             src={PANEL_LOGO}
+                            alt="Logo"
                             className="hidden dark:block"
                             style={{ filter: 'brightness(100)', width: '135px' }}
                         />
@@ -53,6 +55,7 @@
                         <input
                             ref={inputRef}
                             placeholder="Busca"
+                            aria-label="Buscar no menu"
                             type="text"
                             className="min-w-0"
                             value={search}

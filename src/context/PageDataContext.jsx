@@ -1,4 +1,4 @@
-    import { createContext, useContext, useEffect, useState, useCallback, useRef } from 'react'
+    import { createContext, useContext, useEffect, useState, useCallback, useMemo } from 'react'
     import { useSearchParams, useNavigate } from 'react-router-dom'
     import { api } from '@/services/api'
     import { buildApiUrl } from '@/utils/urlHelper'
@@ -15,20 +15,19 @@
         const [loading, setLoading]   = useState(true);
         const [error, setError]       = useState(null);
         const [searchParams]          = useSearchParams();
-        const [lastUrl, setLastUrl]   = useState(null);
         const [redirecting, setRedirecting] = useState(false);
-        const { auth, logout }        = useAuth();
+        const { logout }              = useAuth();
         const { getMenuConfig }       = useMenus();
         const navigate                = useNavigate();
 
         const menuConfig = getMenuConfig('primary');
 
+        //SEM DEDUPLICAÇÃO POR URL: O ANTIGO "if (urlApi === lastUrl) return" NUNCA FUNCIONOU (lastUrl FICAVA
+        //PRESO NO null DO PRIMEIRO RENDER DENTRO DO useCallback) — E OS REFRESHS APÓS EXCLUIR/ALTERAR
+        //DEPENDEM DE PODER CHAMAR A MESMA URL DE NOVO
         const callApi = useCallback(async (urlApi) => {
-            
-            if (urlApi === lastUrl) return
 
             setLoading(true);
-            setLastUrl(urlApi);
 
             try {
                 
@@ -156,8 +155,13 @@
 
         }, [ searchParams, menuConfig ])
 
+        const value = useMemo(
+            () => ({ pageData, loading, error, callApi, redirecting }),
+            [pageData, loading, error, callApi, redirecting]
+        )
+
         return (
-            <PageDataContext.Provider value={{ pageData, loading, error, callApi, redirecting }}>
+            <PageDataContext.Provider value={value}>
                 {children}
             </PageDataContext.Provider>
         )

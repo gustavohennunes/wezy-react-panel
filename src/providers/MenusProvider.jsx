@@ -1,4 +1,4 @@
-    import { createContext, useContext, useState, useEffect } from 'react'
+    import { createContext, useCallback, useContext, useEffect, useMemo, useRef, useState } from 'react'
     import { useAuth } from '../auth/providers/JWTProvider'
     import { getCustomerHost } from '@/utils/customerHost'
     import {
@@ -23,9 +23,16 @@
         
         const { auth, logout } = useAuth()
         const [currentMenuItem, setCurrentMenuItem] = useState(null)
-        const [configs, setConfigs] = useState(new Map())
+        const [configs, setConfigs] = useState(() => new Map())
 
-        const setMenuConfig = (name, config) => {
+        //logout VEM DO AuthProvider E MUDA A CADA RENDER DELE; A REF DEIXA O fetchMenu ESTÁVEL
+        //SEM CHAMAR UM logout ANTIGO
+        const logoutRef = useRef(logout)
+        useEffect(() => {
+            logoutRef.current = logout
+        })
+
+        const setMenuConfig = useCallback((name, config) => {
 
             setConfigs((prevConfigs) => {
                 const newConfigs = new Map(prevConfigs)
@@ -33,17 +40,17 @@
                 return newConfigs
             })
 
-        }
+        }, [])
 
-        const getCurrentMenuItem = () => {
+        const getCurrentMenuItem = useCallback(() => {
             return currentMenuItem
-        }
+        }, [currentMenuItem])
 
-        const getMenuConfig = (name) => {
+        const getMenuConfig = useCallback((name) => {
             return configs.get(name) ?? null
-        }
+        }, [configs])
 
-        const fetchMenu = async () => {
+        const fetchMenu = useCallback(async () => {
 
             try {
 
@@ -64,7 +71,7 @@
                             notifySystemNotFound()
                             return
                         }
-                        logout()
+                        logoutRef.current()
                         console.log(error)
                     })
 
@@ -73,28 +80,26 @@
                     notifySystemNotFound()
                     return
                 }
-                logout()
+                logoutRef.current()
                 console.error('Erro ao buscar menu:', error)
             }
 
-        }
+        }, [setMenuConfig])
 
         useEffect(() => {
             if (auth) {
                 fetchMenu()
             }
-        }, [auth])
+        }, [auth, fetchMenu])
+
+        const value = useMemo(
+            () => ({ configs, fetchMenu, setMenuConfig, getMenuConfig, setCurrentMenuItem, getCurrentMenuItem }),
+            [configs, fetchMenu, setMenuConfig, getMenuConfig, getCurrentMenuItem]
+        )
 
         return (
             <MenuContext.Provider
-                value={{
-                    configs,
-                    fetchMenu,
-                    setMenuConfig,
-                    getMenuConfig,
-                    setCurrentMenuItem,
-                    getCurrentMenuItem,
-                }}
+                value={value}
             >
                 {children}
             </MenuContext.Provider>

@@ -1,12 +1,12 @@
     
-    import { useState, useEffect } from 'react'
+    import { useMemo } from 'react'
     import { Combobox } from './FormCombobox'
 
     const FormSelect = ({ field, fieldData, formState, handleSelectChange, combinedClass, rowAttr = '', required }) => {
 
-        const [options, setOptions] = useState([])
-        
-        useEffect(() => {
+        //OPÇÕES DERIVADAS DAS PROPS (useMemo): ANTES FICAVAM EM STATE PREENCHIDO POR useEffect, E O
+        //CAMPO RENDERIZAVA UMA VEZ VAZIO ANTES DE MOSTRAR AS OPÇÕES
+        const options = useMemo(() => {
 
             if (field.type === 'Qnt') {
 
@@ -32,19 +32,21 @@
 
                 }
 
-                setOptions(generatedOptions)
-
-            } else if (field.type === 'Sel') {
-
-                setOptions(fieldData.options)
-
-            } else if (field.type === 'Man' || field.type === 'Ico') {
-
-                setOptions(fieldData.options || [])
+                return generatedOptions
 
             }
 
-        }, [field, fieldData]);
+            if (field.type === 'Sel') {
+                return fieldData.options || []
+            }
+
+            if (field.type === 'Man' || field.type === 'Ico') {
+                return fieldData.options || []
+            }
+
+            return []
+
+        }, [field.type, fieldData.options]);
         
         return (
             <div className={combinedClass} {...rowAttr}>
@@ -65,6 +67,7 @@
                 </div>
 
                 <Combobox
+                    ariaLabel={fieldData.title || field.title || undefined}
                     options={options}
                     value={formState[fieldData.name || field.name] ?? ''}
                     placeholder={options[0]?.label}

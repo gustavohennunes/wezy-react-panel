@@ -1,4 +1,5 @@
 import clsx from 'clsx'
+import { propsDeBotao } from './keyboard'
 
 const MenuToggle = ({ className, hasItemSub = false, handleToggle, children }) => {
 
@@ -7,7 +8,7 @@ const MenuToggle = ({ className, hasItemSub = false, handleToggle, children }) =
         return (
             <div
                 className={clsx('menu-toggle', className && className)}
-                onClick={handleToggle}
+                {...propsDeBotao(handleToggle)}
             >
                 {children}
             </div>

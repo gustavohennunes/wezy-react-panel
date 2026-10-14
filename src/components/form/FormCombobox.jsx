@@ -1,4 +1,4 @@
-    import { useState } from 'react'
+    import { useId, useState } from 'react'
     import { Check, ChevronDown, X } from 'lucide-react'
     import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover'
     import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem, CommandList } from '@/components/ui/command'
@@ -59,9 +59,11 @@
         creatable = false,
         placeholder = 'Selecione uma opção',
         disabled = false,
+        ariaLabel,
     }) => {
 
         const [open, setOpen]     = useState(false)
+        const listaId             = useId()
         const [search, setSearch] = useState('')
 
         const selecionados = multiple ? (value || []).map(String) : []
@@ -101,6 +103,8 @@
                     <div
                         role="combobox"
                         aria-expanded={open}
+                        aria-controls={listaId}
+                        aria-label={ariaLabel}
                         aria-disabled={disabled}
                         tabIndex={disabled ? -1 : 0}
                         onKeyDown={(e) => {
@@ -176,7 +180,7 @@
 
                         {/* SCROLL FINO DO TEMA (plugins/components/scrollable.js) EM VEZ DO NATIVO; gray-300 PARA O
                             THUMB FICAR VISÍVEL SOBRE O FUNDO DO POPOVER NOS DOIS MODOS */}
-                        <CommandList className="scrollable-y-auto [--tw-scrollbar-thumb-color:var(--tw-gray-300)]">
+                        <CommandList id={listaId} className="scrollable-y-auto [--tw-scrollbar-thumb-color:var(--tw-gray-300)]">
 
                             {!podeCriar && <CommandEmpty>Nenhum resultado</CommandEmpty>}
 

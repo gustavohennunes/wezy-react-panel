@@ -1,4 +1,5 @@
 import clsx from 'clsx'
+import { propsDeBotao } from './keyboard'
 const MenuLabel = ({
     className,
     hasItemSub,
@@ -10,7 +11,7 @@ const MenuLabel = ({
         return (
             <div
                 className={clsx('menu-label', className && className)}
-                onClick={handleToggle}
+                {...propsDeBotao(handleToggle)}
             >
                 {children}
             </div>
@@ -19,7 +20,7 @@ const MenuLabel = ({
         return (
             <div
                 className={clsx('menu-label', className && className)}
-                onClick={handleClick}
+                {...propsDeBotao(handleClick)}
             >
                 {children}
             </div>

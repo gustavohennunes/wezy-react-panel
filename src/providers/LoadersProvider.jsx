@@ -1,6 +1,6 @@
 /* eslint-disable no-unused-vars */
 /* eslint-disable react-refresh/only-export-components */
-import { createContext, useContext, useState } from 'react'
+import { createContext, useContext, useMemo, useState } from 'react'
 import { ProgressBarLoader, ScreenLoader } from '@/components/loaders'
 const initialProps = {
     contentLoader: false,
@@ -16,17 +16,13 @@ const LoadersProvider = ({ children }) => {
     const [contentLoader, setContentLoader] = useState(false)
     const [progressBarLoader, setProgressBarLoader] = useState(false)
     const [screenLoader, setScreenLoader] = useState(false)
+    //VALUE MEMOIZADO: SÓ MUDA QUANDO UM DOS LOADERS MUDA (OS setters DO useState SÃO ESTÁVEIS)
+    const value = useMemo(
+        () => ({ contentLoader, setContentLoader, progressBarLoader, setProgressBarLoader, screenLoader, setScreenLoader }),
+        [contentLoader, progressBarLoader, screenLoader]
+    )
     return (
-        <LoadersContext.Provider
-            value={{
-                contentLoader,
-                setContentLoader,
-                progressBarLoader,
-                setProgressBarLoader,
-                screenLoader,
-                setScreenLoader,
-            }}
-        >
+        <LoadersContext.Provider value={value}>
             {children}
             {progressBarLoader && <ProgressBarLoader />}
             {screenLoader && <ScreenLoader />}

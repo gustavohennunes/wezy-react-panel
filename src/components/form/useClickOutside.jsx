@@ -21,7 +21,8 @@ const useClickOutside = (ref, handler) => {
         }
 
         document.addEventListener('mousedown', validateEventStart)
-        document.addEventListener('touchstart', validateEventStart)
+        //SÓ LÊ O ALVO, NUNCA CHAMA preventDefault — PASSIVO NÃO TRAVA A ROLAGEM NO TOQUE
+        document.addEventListener('touchstart', validateEventStart, { passive: true })
         document.addEventListener('click', listener)
 
         return () => {

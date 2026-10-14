@@ -1,5 +1,5 @@
 /* eslint-disable no-unused-vars */
-import { createContext, useContext, useState } from 'react'
+import { createContext, useContext, useMemo, useState } from 'react'
 import { getData, setData } from '../utils'
 
 const LAYOUTS_CONFIGS_KEY = 'layouts-configs'
@@ -23,38 +23,37 @@ const LayoutContext = createContext(initialProps)
 
 const useLayout = () => useContext(LayoutContext)
 
+//AS FUNÇÕES SÓ LEEM/GRAVAM NO localStorage E NÃO DEPENDEM DE ESTADO — FICAM FORA DO COMPONENTE
+//PARA SEREM ESTÁVEIS ENTRE RENDERS
+const getLayout = (name) => {
+    const storedLayouts = getLayouts()
+    return storedLayouts.get(name)
+}
+
+const hasLayout = (name) => {
+    const storedLayouts = getLayouts()
+    return storedLayouts && storedLayouts.has(name)
+}
+
+const updateLayout = (name, config) => {
+    const storedLayouts = getLayouts()
+    if (storedLayouts.has(name)) {
+        storedLayouts.delete(name)
+    }
+    storedLayouts.set(name, config)
+    setData(LAYOUTS_CONFIGS_KEY, Object.fromEntries(storedLayouts))
+}
+
 const LayoutProvider = ({ children }) => {
-    const getLayout = (name) => {
-        const storedLayouts = getLayouts()
-        return storedLayouts.get(name)
-    }
-
-    const hasLayout = (name) => {
-        const storedLayouts = getLayouts()
-        return storedLayouts && storedLayouts.has(name)
-    }
-
-    const updateLayout = (name, config) => {
-        const storedLayouts = getLayouts()
-        if (storedLayouts.has(name)) {
-            storedLayouts.delete(name)
-        }
-        storedLayouts.set(name, config)
-        setData(LAYOUTS_CONFIGS_KEY, Object.fromEntries(storedLayouts))
-    }
-
     const [currentLayout, setCurrentLayout] = useState()
 
+    const value = useMemo(
+        () => ({ getLayout, hasLayout, updateLayout, currentLayout, setCurrentLayout }),
+        [currentLayout]
+    )
+
     return (
-        <LayoutContext.Provider
-            value={{
-                getLayout,
-                hasLayout,
-                updateLayout,
-                currentLayout,
-                setCurrentLayout,
-            }}
-        >
+        <LayoutContext.Provider value={value}>
             {children}
         </LayoutContext.Provider>
     )

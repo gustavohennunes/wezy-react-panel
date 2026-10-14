@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { useLocation } from 'react-router'
 import { useAuthContext } from '@/auth'
 import { useLoaders } from '@/providers'
@@ -7,19 +7,21 @@ const AppRouting = () => {
     const { setProgressBarLoader } = useLoaders()
     const { verify, setLoading } = useAuthContext()
     const [previousLocation, setPreviousLocation] = useState('')
-    const [firstLoad, setFirstLoad] = useState(true)
+    //REF E NÃO STATE: SÓ OS EFFECTS LEEM, NADA NA TELA DEPENDE DELE
+    const firstLoad = useRef(true)
     const location = useLocation()
     const path = location.pathname.trim()
+    //VERIFICAÇÃO INICIAL UMA VEZ SÓ. ANTES O EFFECT NÃO TINHA LISTA DE DEPENDÊNCIAS E RODAVA A CADA
+    //RENDER ENQUANTO A PRIMEIRA VERIFICAÇÃO NÃO TERMINAVA — VÁRIAS CHAMADAS DE verify() NO BOOT
     useEffect(() => {
-        if (firstLoad) {
-            verify().finally(() => {
-                setLoading(false)
-                setFirstLoad(false)
-            })
-        }
-    })
+        verify().finally(() => {
+            setLoading(false)
+            firstLoad.current = false
+        })
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [])
     useEffect(() => {
-        if (!firstLoad) {
+        if (!firstLoad.current) {
             setProgressBarLoader(true)
             verify()
                 .catch(() => {

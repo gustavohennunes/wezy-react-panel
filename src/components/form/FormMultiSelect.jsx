@@ -44,12 +44,13 @@
 
                 {title !== false && (
                     <div className="form-label w-full lg:w-56 lg:min-w-56 lg:shrink-0 flex-col h-full justify-center">
-                        <label>
+                        {/* span E NÃO label: O CAMPO É UM COMBOBOX (NÃO UM INPUT NATIVO); O NOME CHEGA NELE PELO ariaLabel */}
+                        <span>
                             <b>
                                 {title}
                                 {required && <span className="text-danger"> *</span>}
                             </b>
-                        </label>
+                        </span>
                         {subtitle && <span className="text-[10px]"> {subtitle} </span>}
                     </div>
                 )}
@@ -57,6 +58,7 @@
                 <div className="w-full min-w-0">
 
                     <Combobox
+                        ariaLabel={title || undefined}
                         multiple
                         creatable={isTags}
                         options={options}

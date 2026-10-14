@@ -91,11 +91,13 @@ const ResetPassword = () => {
                     <div className="flex gap-3 mb-2.5 items-center">
                         <img
                             src={PANEL_LOGO}
+                            alt="Logo"
                             className="dark:hidden"
                             style={{ width: '135px' }}
                         />
                         <img
                             src={PANEL_LOGO}
+                            alt="Logo"
                             className="hidden dark:block"
                             style={{
                                 filter: 'brightness(100)',
@@ -117,12 +119,13 @@ const ResetPassword = () => {
                 )}
 
                 <div className="flex flex-col gap-1">
-                    <label className="form-label text-gray-900 gap-[2px]">
+                    <label htmlFor="reset-email" className="form-label text-gray-900 gap-[2px]">
                         E-mail <span className="text-danger">*</span>
                     </label>
 
                     <label className="input">
                         <input
+                            id="reset-email"
                             type="email"
                             placeholder="Insira seu e-mail"
                             autoComplete="off"

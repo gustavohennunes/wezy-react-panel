@@ -6,7 +6,10 @@
     //
     // LIMITAÇÃO CONHECIDA: os links de navegação do HTML funcionam normalmente, mas checkboxes,
     // botão de excluir e tooltips dependem dos handlers do painel.js legado e ficam inertes.
-    const LegacyList = ({ html, columnHeader = [], showHeader = true }) => {
+    //DEFAULT FORA DO COMPONENTE: UM [] NOVO A CADA RENDER INVALIDAVA O useMemo DAS COLUNAS
+    const SEM_COLUNAS = []
+
+    const LegacyList = ({ html, columnHeader = SEM_COLUNAS, showHeader = true }) => {
 
         const columns = useMemo(
             () => (Array.isArray(columnHeader) ? columnHeader : []),

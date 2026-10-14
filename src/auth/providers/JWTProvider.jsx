@@ -1,6 +1,6 @@
     
     import axios from 'axios'
-    import { createContext, useState, useContext, useMemo, useEffect } from 'react'
+    import { createContext, useState, useContext, useMemo } from 'react'
     import * as authHelper from '../_helpers'
     import { api } from '@/services/api'
     import { buildApiUrl } from '@/utils/urlHelper'
@@ -22,30 +22,11 @@
     const AuthProvider = ({ children }) => {
         
         const [ loading, setLoading ]         = useState(true)
-        const [ auth, setAuth ]               = useState(authHelper.getAuthToken())
+        const [ auth, setAuth ]               = useState(() => authHelper.getAuthToken())
         const [ currentUser, setCurrentUser ] = useState()
-        const [ slug, setSlug ]               = useState('')
-        const [ action, setAction ]           = useState('')
         const [ isLogged, setIsLogged ]       = useState(false);
 
         window.api = api;
-
-        useEffect(() => {
-
-            const params = new URLSearchParams(window.location.search)
-
-            let useSlug = params.get('slug') ?? params.get('pag');
-            if(useSlug === ''){
-                useSlug = 'dashboard';
-            }
-
-            if (slug !== useSlug) {
-                setSlug(useSlug);
-            }
-
-            setAction(params.get('action') ?? '');
-
-        }, [ window.location.search ]);
 
         const verify = async () => {
 
@@ -269,8 +250,6 @@
                     newUser,
                     logout,
                     verify,
-                    slug,
-                    action
                 }}
             >
                 {children}

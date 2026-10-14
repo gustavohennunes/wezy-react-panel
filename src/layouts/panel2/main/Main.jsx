@@ -21,7 +21,7 @@ const Main = () => {
 
                 <Navbar />
 
-                <main className="grow" role="content">
+                <main className="grow">
                     {!pathname.includes('/public-profile/') && (
                         <Toolbar>
                             <ToolbarHeading />

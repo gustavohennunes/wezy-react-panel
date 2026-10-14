@@ -41,7 +41,7 @@ const useConfirm = () => {
                     <button type="button" className="btn btn-light" onClick={() => fecha(false)}>
                         {options?.cancelText || 'Cancelar'}
                     </button>
-                    <button type="button" className="btn btn-danger" autoFocus onClick={() => fecha(true)}>
+                    <button type="button" className="btn btn-danger" onClick={() => fecha(true)}>
                         {options?.confirmText || 'Excluir'}
                     </button>
                 </DialogFooter>

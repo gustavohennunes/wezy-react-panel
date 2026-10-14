@@ -1,5 +1,6 @@
 import clsx from 'clsx'
 import { Link } from 'react-router-dom'
+import { propsDeBotao } from './keyboard'
 const MenuLink = ({
     path,
     newTab,
@@ -40,7 +41,7 @@ const MenuLink = ({
             return (
                 <div
                     className={clsx('menu-link', className && className)}
-                    onClick={handleToggle}
+                    {...propsDeBotao(handleToggle)}
                 >
                     {children}
                 </div>
@@ -49,7 +50,7 @@ const MenuLink = ({
             return (
                 <div
                     className={clsx('menu-link', className && className)}
-                    onClick={handleClick}
+                    {...propsDeBotao(handleClick)}
                 >
                     {children}
                 </div>

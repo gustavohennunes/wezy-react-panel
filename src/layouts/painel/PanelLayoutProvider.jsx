@@ -1,4 +1,4 @@
-import { createContext, useContext, useEffect, useState } from 'react'
+import { createContext, useContext, useEffect, useMemo, useState } from 'react'
 import { useLayout } from '@/providers'
 import { deepMerge } from '@/utils'
 import { PanelLayoutConfig } from '.'
@@ -27,13 +27,9 @@ const PanelLayoutProvider = ({ children }) => {
     const { getLayout, setCurrentLayout } = useLayout() // Hook to get and set layout configuration
 
     // Merge the Panel layout configuration with the current layout configuration fetched via getLayout
-    const layoutConfig = deepMerge(
-        PanelLayoutConfig,
-        getLayout(PanelLayoutConfig.name)
-    )
-
     // Set the initial state for layout and mobile sidebar
-    const [layout] = useState(layoutConfig) // Layout configuration is stored in state
+    //O deepMerge (QUE LÊ O localStorage) SÓ RODA NO PRIMEIRO RENDER
+    const [layout] = useState(() => deepMerge(PanelLayoutConfig, getLayout(PanelLayoutConfig.name)))
     const [mobileSidebarOpen, setMobileSidebarOpen] = useState(false) // Manage state for mobile sidebar
 
     // When the layout state changes, set the current layout configuration in the layout provider
@@ -42,15 +38,11 @@ const PanelLayoutProvider = ({ children }) => {
     }, [layout, setCurrentLayout]) // Re-run this effect if layout or setCurrentLayout changes
 
     // Provide the layout state, sticky header state, and sidebar state to children components via context
+    const value = useMemo(() => ({ layout, mobileSidebarOpen, setMobileSidebarOpen }), [layout, mobileSidebarOpen])
+
     return (
         <PanelLayoutContext.Provider
-            value={{
-                layout,
-                // The current layout configuration
-                mobileSidebarOpen,
-                // Whether the mobile sidebar is currently open
-                setMobileSidebarOpen, // Function to toggle the mobile sidebar state
-            }}
+            value={value}
         >
             {children} {/* Render child components that consume this context */}
         </PanelLayoutContext.Provider>

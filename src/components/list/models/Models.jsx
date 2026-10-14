@@ -12,16 +12,6 @@
     import { useConfirm } from '@/components/ui/confirm-dialog'
     import { contemTodasAsPalavras, textoDoHtml } from '@/utils/textSearch'
 
-    //ESPAÇAMENTO VERTICAL DAS LINHAS POR MÓDULO (?pag=). O PADRÃO (md) É COMPACTO
-    const ESPACAMENTO_POR_PAGINA = {
-        clientes: 'xl',
-    }
-
-    const espacamentoDaListagem = () => {
-        const params = new URLSearchParams(window.location.search)
-        return ESPACAMENTO_POR_PAGINA[params.get('pag') ?? params.get('slug')] || 'md'
-    }
-
     const Models = ({ model, columnHeader, btnAdd, search, btnExcluir, pagination, tabs, content }) => {
 
         const { callApi }                           = usePageData()
@@ -641,7 +631,8 @@
                     layout={{
                         card: true,
                         hidePagination: true,
-                        cellSpacing: espacamentoDaListagem(),
+                        //LINHAS ESPAÇADAS EM TODAS AS LISTAGENS (O md PADRÃO DO GRID DEIXAVA OS REGISTROS COLADOS)
+                        cellSpacing: 'xl',
                     }}
                     //RODAPÉ DENTRO DO CARD (mesma posição da paginação que ele substitui).
                     //data-pagination faz herdar o padding do layout de card.

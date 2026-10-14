@@ -15,8 +15,6 @@
     export const FORGOT_PASSWORD_URL = `${CAYMAN_API_URL}/panel/forgot-password`
     // export const RESET_PASSWORD_URL  = `${API_URL}/reset-password`
 
-    const BTOKEN        = import.meta.env.VITE_BTOKEN
-
     const AuthContext = createContext(null)
 
     const AuthProvider = ({ children }) => {
@@ -157,7 +155,8 @@
                         headers: {
                             'Content-Type': 'application/x-www-form-urlencoded',
                             'Customer-Host': getCustomerHost(),
-                            Authorization: `Bearer ${BTOKEN}`,
+                            //SEM Authorization: panel/signup É ENDPOINT PÚBLICO NA API (publicEndpoints do
+                            //Webservice.php). O TOKEN QUE IA AQUI ERA DE ADMINISTRADOR E FICAVA EXPOSTO NO BUNDLE
                         },
                     }
                 )

@@ -23,6 +23,16 @@ const getAuthToken = () => {
     }
 }
 
+//RESPOSTA COMPLETA DO LOGIN (/auth/master) SALVA NO localStorage — O getAuthToken DEVOLVE SÓ O TOKEN
+const getAuth = () => {
+    try {
+        return getData(AUTH_LOCAL_STORAGE_KEY)
+    } catch (error) {
+        console.error('AUTH LOCAL STORAGE ERROR', error)
+        return null
+    }
+}
+
 const setAuth = (auth) => {
     setData(AUTH_LOCAL_STORAGE_KEY, auth)
 }
@@ -56,6 +66,7 @@ export function setupAxios(axios) {
 
 export {
     AUTH_LOCAL_STORAGE_KEY,
+    getAuth,
     getAuthToken,
     removeAuth,
     setAuth,

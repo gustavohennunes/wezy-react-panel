@@ -4,7 +4,8 @@
     import { DataGrid, KeenIcon, DataGridColumnHeader, DataGridRowSelectAll, DataRowContext } from '@/components'
     import { toast } from 'sonner'
     import { Input } from '@/components/ui/input'
-    import { buildApiUrl, buildRemoveItemsUrl, cleanUrl } from '@/utils/urlHelper'
+    import { buildApiUrl, buildRemoveItemsUrl, buildSortListUrl, cleanUrl } from '@/utils/urlHelper'
+    import { arrayMove } from '@dnd-kit/sortable'
     import { api } from '@/services/api'
     import { Tabs } from '@/components/custom/tabs/tabs'
     import { usePageData } from '@/context/PageDataContext'
@@ -12,7 +13,7 @@
     import { useConfirm } from '@/components/ui/confirm-dialog'
     import { contemTodasAsPalavras, textoDoHtml } from '@/utils/textSearch'
 
-    const Models = ({ model, columnHeader, btnAdd, search, btnExcluir, pagination, tabs, content }) => {
+    const Models = ({ model, columnHeader, btnAdd, search, btnExcluir, pagination, tabs, content, sequence = false }) => {
 
         const { callApi }                           = usePageData()
         const [ confirm, confirmDialog ]            = useConfirm()
@@ -111,6 +112,7 @@
                     style: {
                         color: 'white',
                         background: 'var(--tw-danger)',
+                        border: 'none',
                         fontWeight: 'bold'
                     }
                 })
@@ -187,7 +189,8 @@
                     description: <span style={{ 'color': 'white' }}>{response.data?.success?.response?.data?.message}</span>,
                     style: {
                         color: 'white',
-                        background: 'var(--tw-success',
+                        background: 'var(--tw-success)',
+                        border: 'none',
                         fontWeight: 'bold'
                     }
                 });
@@ -199,9 +202,55 @@
                     style: {
                         color: 'white',
                         background: 'var(--tw-danger)',
+                        border: 'none',
                         fontWeight: 'bold'
                     }
                 });
+
+            }
+
+        }
+
+        // REORDENAÇÃO POR ARRASTAR (CARD COM $sequencia = true — A PONTE MANDA params.sequence). A LINHA MUDA DE
+        // LUGAR NA HORA E A ORDEM DE TODAS AS LINHAS EM TELA VAI PARA O acao=sort-list, QUE REDISTRIBUI A
+        // sequencia ENTRE ELAS (MESMO CRITÉRIO DO PAINEL ANTIGO). SE O SERVIDOR RECUSAR, A ORDEM VOLTA.
+        const handleReorder = async (idArrastado, idAlvo) => {
+
+            const anterior = models
+            const de       = anterior.findIndex((linha) => String(linha['row-id']) === String(idArrastado))
+            const para     = anterior.findIndex((linha) => String(linha['row-id']) === String(idAlvo))
+
+            if (de < 0 || para < 0) return
+
+            const nova = arrayMove(anterior, de, para)
+            setModels(nova)
+
+            try {
+
+                const response = await api.post(
+                    buildSortListUrl(),
+                    qs.stringify({ items: nova.map((linha) => linha['row-id']) }),
+                    { headers: { 'Content-Type': 'application/x-www-form-urlencoded' } }
+                )
+
+                const resultado = response.data?.success?.response
+                if (!resultado || resultado.status === false || resultado.data?.status === false) {
+                    throw new Error(resultado?.message || resultado?.data?.message || '')
+                }
+
+            } catch (err) {
+
+                setModels(anterior)
+
+                toast(`❌ Erro`, {
+                    description: <span style={{ 'color': 'white' }}>{err?.response?.data?.error?.message || err?.message || 'Não foi possível alterar a sequência'}</span>,
+                    style: {
+                        color: 'white',
+                        background: 'var(--tw-danger)',
+                        border: 'none',
+                        fontWeight: 'bold'
+                    }
+                })
 
             }
 
@@ -228,6 +277,7 @@
                     style: {
                         color: 'white',
                         background: 'var(--tw-success)',
+                        border: 'none',
                         fontWeight: 'bold'
                     }
                 })
@@ -241,6 +291,7 @@
                     style: {
                         color: 'white',
                         background: 'var(--tw-danger)',
+                        border: 'none',
                         fontWeight: 'bold'
                     }
                 })
@@ -609,6 +660,10 @@
                     onRowSelectionChange={handleRowSelection}
                     pagination={gridPagination}
                     getRowId={(row) => row['row-id']}
+                    //ARRASTAR PARA REORDENAR SÓ NOS CARDS COM $sequencia; DESATIVADO COM O FILTRO AO DIGITAR ATIVO,
+                    //QUE ESCONDE LINHAS E MANDARIA UMA ORDEM INCOMPLETA
+                    onRowReorder={sequence === true ? handleReorder : undefined}
+                    rowReorderDisabled={filtroLocal !== ''}
                     sorting={[
                         {
                             id: 'id',

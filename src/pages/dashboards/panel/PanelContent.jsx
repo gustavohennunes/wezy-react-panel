@@ -47,6 +47,7 @@
                         search={pageData?.params?.search}
                         btnExcluir={pageData?.params?.footer?.delete_button}
                         pagination={pageData?.params?.pagination}
+                        sequence={pageData?.params?.sequence === true}
                     />
                 )
             }

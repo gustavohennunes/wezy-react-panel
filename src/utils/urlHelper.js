@@ -77,6 +77,19 @@
 
     }
 
+    //REORDENAÇÃO POR ARRASTAR: MESMA LISTAGEM COM acao=sort-list (PanelModule::actionSortList)
+    export const buildSortListUrl = () => {
+
+        const params = new URLSearchParams(window.location.search)
+
+        params.set('acao', 'sort-list')
+        params.delete('id')
+        params.delete('excluir')
+
+        return buildApiUrl(params)
+
+    }
+
     export const updateTablePagination = async (params) => {
 
         const url = new URL(window.location.href)

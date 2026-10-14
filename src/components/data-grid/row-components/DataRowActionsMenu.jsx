@@ -63,7 +63,8 @@
                     description: <span style={{ 'color': 'white' }}>{response.data?.success?.response?.data?.message}</span>,
                     style: {
                         color: 'white',
-                        background: 'var(--tw-success',
+                        background: 'var(--tw-success)',
+                        border: 'none',
                         fontWeight: 'bold'
                     }
                 })
@@ -75,6 +76,7 @@
                     style: {
                         color: 'white',
                         background: 'var(--tw-danger)',
+                        border: 'none',
                         fontWeight: 'bold'
                     }
                 })

@@ -96,18 +96,28 @@
 
                 }
 
-                params.delete('acao')
-                params.delete('id')
+                if (acao === 'Inserir') {
 
-                const urlRefresh = buildApiUrl(params)
-                
-                callApi(urlRefresh)
-                
+                    //INSERIR SEM REDIRECT DO CARD: VAI PARA A LISTAGEM PELA URL (O PageDataContext BUSCA OS DADOS)
+                    params.delete('acao')
+                    params.delete('id')
+                    navigate({ search: '?' + params.toString() })
+
+                } else {
+
+                    //PAINEL ANTIGO (framework/formulario.php): DEPOIS DE ALTERAR, VOLTA PARA O MESMO FORMULÁRIO.
+                    //ANTES CARREGAVA A LISTAGEM COM A URL AINDA EM acao=Alterar (TIRAVA DO EDITOR DE MÓDULOS
+                    //A CADA SALVAMENTO E O F5 REABRIA O FORMULÁRIO). PÁGINA SÓ DE FORMULÁRIO (SEM acao) TAMBÉM RECARREGA
+                    callApi(buildApiUrl(params))
+
+                }
+
                 toast(`✅ Sucesso!`, {
                     description: <span style={{'color':'white'}}>{response?.data?.success?.response?.data?.message}</span>,
                     style: {
                         color: 'white',
-                        background: 'var(--tw-success',
+                        background: 'var(--tw-success)',
+                        border: 'none',
                         fontWeight: 'bold'
                     }
                 });
@@ -124,6 +134,7 @@
                     style: {
                         color: 'white',
                         background: 'var(--tw-danger)',
+                        border: 'none',
                         fontWeight: 'bold'
                     }
                 })

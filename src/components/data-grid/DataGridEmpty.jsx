@@ -4,7 +4,8 @@ const DataGridEmpty = () => {
 
     const { table, props } = useDataGrid()
 
-    const totalColumns = table.getAllColumns().length + (props.rowSelection ? 1 : 0)
+    //+1 PARA A COLUNA DA ALÇA DE ARRASTAR (DataGridTable) QUANDO A LISTAGEM É ORDENÁVEL
+    const totalColumns = table.getAllColumns().length + (props.rowSelection ? 1 : 0) + (typeof props.onRowReorder === 'function' ? 1 : 0)
 
     return (
         <tr>

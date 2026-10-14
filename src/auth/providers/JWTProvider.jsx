@@ -209,9 +209,11 @@
 
         //DADOS DO USUÁRIO LOGADO — VÊM DO PRÓPRIO /auth/master (data.usuario),
         //QUE JÁ FICA SALVO NO localStorage. NÃO EXIGE REQUISIÇÃO EXTRA.
+        //DEPOIS DE RECARREGAR A PÁGINA O auth É SÓ O TOKEN (getAuthToken), ENTÃO O usuario
+        //VEM DA RESPOSTA COMPLETA GUARDADA — ANTES O NOME E O LOGIN SUMIAM DO MENU DO USUÁRIO
         const usuarioLogado = useMemo(() => {
 
-            const usuario = auth?.data?.usuario
+            const usuario = auth?.data?.usuario ?? (auth ? authHelper.getAuth()?.data?.usuario : null)
             if (!usuario) return null
 
             return {

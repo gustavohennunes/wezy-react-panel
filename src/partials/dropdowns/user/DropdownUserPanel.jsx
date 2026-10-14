@@ -57,16 +57,24 @@ const DropdownUserPanel = ({ menuItemRef }) => {
 
     const buildMenu = (menuConfig) => {
 
+        //O MENU DO USUÁRIO SÃO OS MÓDULOS adm/conf/manu QUE O USUÁRIO ACESSA (PanelMenus.php). SEM NENHUM,
+        //SÓ SOBRAVAM OS DOIS SEPARADORES COM UMA DIV VAZIA NO MEIO
+        const itens = (menuConfig?.user || []).filter((item) => item.title)
+
+        if (itens.length === 0) {
+            return <MenuSeparator />
+        }
+
         return (
             <Fragment>
                 <MenuSeparator />
                 <div className="flex flex-col">
 
-                    {menuConfig?.user.map((item, index) => {
+                    {itens.map((item, index) => {
 
                         var icon = transformOldIcon(item.icon)
 
-                        return (item.title && (
+                        return (
                             <MenuItem key={index}>
                                 <MenuLink path={item.path}>
                                     <MenuIcon className="menu-icon">
@@ -77,7 +85,7 @@ const DropdownUserPanel = ({ menuItemRef }) => {
                                     </MenuTitle>
                                 </MenuLink>
                             </MenuItem>
-                        ));
+                        );
 
                     })}
 

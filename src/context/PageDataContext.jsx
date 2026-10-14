@@ -57,6 +57,7 @@
                         style: {
                             color: 'white',
                             background: 'var(--tw-danger)',
+                            border: 'none',
                             fontWeight: 'bold'
                         }
                     })
@@ -76,6 +77,7 @@
                     style: {
                         color: 'white',
                         background: 'var(--tw-danger)',
+                        border: 'none',
                         fontWeight: 'bold'
                     }
                 })

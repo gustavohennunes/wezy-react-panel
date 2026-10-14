@@ -1,9 +1,83 @@
 import { DataGridEmpty } from '.'
 import { flexRender } from '@tanstack/react-table'
+import { DndContext, KeyboardSensor, PointerSensor, closestCenter, useSensor, useSensors } from '@dnd-kit/core'
+import { SortableContext, sortableKeyboardCoordinates, useSortable, verticalListSortingStrategy } from '@dnd-kit/sortable'
+import { restrictToParentElement, restrictToVerticalAxis } from '@dnd-kit/modifiers'
+import { CSS } from '@dnd-kit/utilities'
+import { GripVertical } from 'lucide-react'
 import { useDataGrid } from '.'
 import { cn } from '@/lib/utils'
+
+//ARRASTAR SÓ NO EIXO VERTICAL E SEM SAIR DO <tbody>
+const MODIFICADORES = [restrictToVerticalAxis, restrictToParentElement]
+
+const ACESSIBILIDADE = {
+    screenReaderInstructions: {
+        draggable: 'Para reordenar, pressione Espaço ou Enter, use as setas para mover e pressione Espaço ou Enter de novo para soltar. Esc cancela.',
+    },
+}
+
+//ELEMENTOS ONDE O ARRASTAR PELA LINHA NÃO COMEÇA: O CLIQUE NELES TEM QUE CONTINUAR FUNCIONANDO
+//(A PRÓPRIA ALÇA É UM <button> E TEM OS LISTENERS DELA)
+const INTERATIVOS = 'a, button, input, select, textarea, label, [contenteditable], [role="checkbox"], [role="switch"], [data-no-dnd]'
+
+//LINHA ARRASTÁVEL (props.onRowReorder): ARRASTA PELA LINHA INTEIRA COM O MOUSE, MENOS EM CIMA DE LINK, BOTÃO E
+//CAMPO. A ALÇA À ESQUERDA SINALIZA QUE DÁ PARA REORDENAR E É POR ONDE FUNCIONA O TECLADO E O TOQUE (NO CELULAR
+//A LINHA PRECISA CONTINUAR ROLANDO A PÁGINA)
+const LinhaOrdenavel = ({ row, desativado, className, celulaAlca, children }) => {
+
+    const { attributes, listeners, setNodeRef, setActivatorNodeRef, transform, transition, isDragging } =
+        useSortable({ id: row.id, disabled: desativado })
+
+    //SÓ O onPointerDown VAI PARA A LINHA: O onKeyDown NELA PEGARIA O Espaço DE UM CHECKBOX FOCADO E COMEÇARIA O ARRASTE
+    const arrastarPelaLinha = (event) => {
+        if (desativado || event.target.closest(INTERATIVOS)) return
+        listeners?.onPointerDown?.(event)
+    }
+
+    return (
+        <tr
+            ref={setNodeRef}
+            data-state={row.getIsSelected() ? 'selected' : undefined}
+            onPointerDown={arrastarPelaLinha}
+            className={cn(
+                className,
+                !desativado && 'cursor-grab',
+                isDragging && 'relative z-10 bg-light shadow-lg cursor-grabbing'
+            )}
+            style={{ transform: CSS.Translate.toString(transform), transition }}
+        >
+            <td className={celulaAlca}>
+                <button
+                    type="button"
+                    ref={setActivatorNodeRef}
+                    {...attributes}
+                    {...listeners}
+                    disabled={desativado}
+                    aria-label="Arrastar para reordenar"
+                    title={desativado ? 'Limpe o filtro para reordenar' : 'Arrastar para reordenar'}
+                    className={cn(
+                        'flex items-center justify-center size-6 rounded text-gray-500 hover:text-gray-900 hover:bg-gray-100 touch-none',
+                        desativado ? 'cursor-not-allowed opacity-40' : isDragging ? 'cursor-grabbing' : 'cursor-grab'
+                    )}
+                >
+                    <GripVertical className="size-4" />
+                </button>
+            </td>
+            {children}
+        </tr>
+    )
+
+}
+
 const DataGridTable = () => {
     const { table, props } = useDataGrid()
+
+    const sensores = useSensors(
+        //5px ANTES DE COMEÇAR A ARRASTAR: UM CLIQUE SIMPLES NA ALÇA NÃO MOVE NADA
+        useSensor(PointerSensor, { activationConstraint: { distance: 5 } }),
+        useSensor(KeyboardSensor, { coordinateGetter: sortableKeyboardCoordinates })
+    )
 
     const headCellSpacingOptions = {
         xs: '!px-[5px] !py-[6px] text-[13px]',
@@ -30,7 +104,69 @@ const DataGridTable = () => {
 
     const cellBorder = props.layout?.cellBorder ?? false
 
-    return (
+    const ordenavel = typeof props.onRowReorder === 'function'
+    const linhas    = table.getRowModel().rows
+
+    const classeLinha = cn(
+        'border-b hover:bg-muted/30 data-[state=selected]:bg-muted/50',
+        cellBorder && '[&_>:last-child]:border-e-0'
+    )
+
+    const celulas = (row) =>
+        row.getVisibleCells().map((cell) => (
+            <td
+                key={cell.id}
+                style={cell.column.columnDef.meta?.cellStyle}
+                className={cn(
+                    bodyCellSpacing,
+                    cellBorder && 'border-e',
+                    'align-middle [&:has([role=checkbox])]:pe-0 !text-[13px]',
+                    cell.column.columnDef.meta
+                        ?.cellClassName
+                )}
+            >
+                {flexRender(
+                    cell.column.columnDef.cell,
+                    cell.getContext()
+                )}
+            </td>
+        ))
+
+    const aoSoltar = ({ active, over }) => {
+        if (over && active.id !== over.id) {
+            props.onRowReorder(active.id, over.id)
+        }
+    }
+
+    const corpo = linhas.length ? (
+        linhas.map((row) =>
+            ordenavel ? (
+                <LinhaOrdenavel
+                    key={row.id}
+                    row={row}
+                    desativado={Boolean(props.rowReorderDisabled)}
+                    className={classeLinha}
+                    celulaAlca={cn(bodyCellSpacing, cellBorder && 'border-e', 'align-middle w-[34px] !pe-0')}
+                >
+                    {celulas(row)}
+                </LinhaOrdenavel>
+            ) : (
+                <tr
+                    key={row.id}
+                    data-state={
+                        row.getIsSelected() ? 'selected' : undefined
+                    }
+                    className={classeLinha}
+                >
+                    {celulas(row)}
+                </tr>
+            )
+        )
+    ) : (
+        <DataGridEmpty />
+    )
+
+    const tabela = (
         <table
             className={cn(
                 'w-full align-middle text-left rtl:text-right caption-bottom text-sm',
@@ -47,6 +183,11 @@ const DataGridTable = () => {
                             cellBorder && '[&_>:last-child]:border-e-0'
                         )}
                     >
+                        {ordenavel && (
+                            <th className={cn(headCellSpacing, cellBorder && 'border-e', 'h-11 w-[34px]')}>
+                                <span className="sr-only">Ordem</span>
+                            </th>
+                        )}
                         {headerGroup.headers.map((header) => (
                             <th
                                 key={header.id}
@@ -72,43 +213,31 @@ const DataGridTable = () => {
                 ))}
             </thead>
             <tbody className="[&_tr:last-child]:border-0">
-                {table.getRowModel().rows.length ? (
-                    table.getRowModel().rows.map((row) => (
-                        <tr
-                            key={row.id}
-                            data-state={
-                                row.getIsSelected() ? 'selected' : undefined
-                            }
-                            className={cn(
-                                'border-b hover:bg-muted/30 data-[state=selected]:bg-muted/50',
-                                cellBorder && '[&_>:last-child]:border-e-0'
-                            )}
-                        >
-                            {row.getVisibleCells().map((cell) => (
-                                <td
-                                    key={cell.id}
-                                    style={cell.column.columnDef.meta?.cellStyle}
-                                    className={cn(
-                                        bodyCellSpacing,
-                                        cellBorder && 'border-e',
-                                        'align-middle [&:has([role=checkbox])]:pe-0 !text-[13px]',
-                                        cell.column.columnDef.meta
-                                            ?.cellClassName
-                                    )}
-                                >
-                                    {flexRender(
-                                        cell.column.columnDef.cell,
-                                        cell.getContext()
-                                    )}
-                                </td>
-                            ))}
-                        </tr>
-                    ))
+                {ordenavel ? (
+                    <SortableContext items={linhas.map((row) => row.id)} strategy={verticalListSortingStrategy}>
+                        {corpo}
+                    </SortableContext>
                 ) : (
-                    <DataGridEmpty />
+                    corpo
                 )}
             </tbody>
         </table>
+    )
+
+    if (!ordenavel) {
+        return tabela
+    }
+
+    return (
+        <DndContext
+            sensors={sensores}
+            collisionDetection={closestCenter}
+            modifiers={MODIFICADORES}
+            onDragEnd={aoSoltar}
+            accessibility={ACESSIBILIDADE}
+        >
+            {tabela}
+        </DndContext>
     )
 }
 export { DataGridTable }

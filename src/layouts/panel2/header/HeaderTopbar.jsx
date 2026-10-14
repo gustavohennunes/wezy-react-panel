@@ -3,8 +3,6 @@ import { KeenIcon } from '@/components/keenicons'
 import { toAbsoluteUrl } from '@/utils'
 import { Menu, MenuItem, MenuToggle } from '@/components'
 import { DropdownUserPanel } from '@/partials/dropdowns/user'
-import { DropdownNotifications } from '@/partials/dropdowns/notifications'
-import { DropdownChat } from '@/partials/dropdowns/chat'
 import { useLanguage } from '@/i18n'
 const HeaderTopbar = () => {
     const itemChatRef = useRef(null)

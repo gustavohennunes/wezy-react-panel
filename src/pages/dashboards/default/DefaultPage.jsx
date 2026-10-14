@@ -1,6 +1,6 @@
     import { useLayout } from '@/providers'
 
-    import { Demo1LightSidebarPage, Demo2Page, Demo4Page, Demo5Page, PanelPage } from '../'
+    import { PanelPage } from '../'
 
     const DefaultPage = () => {
         

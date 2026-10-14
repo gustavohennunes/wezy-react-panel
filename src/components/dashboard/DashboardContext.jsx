@@ -1,7 +1,7 @@
 
     import { useState, useEffect } from 'react'
-    import { BlockList, ReportSettings } from '@/pages/account/security/privacy-settings'
-    import { EntryCallout, Teams } from '@/pages/dashboards/demo1'
+    import { ReportSettings } from '@/pages/account/security/privacy-settings'
+    import { EntryCallout } from '@/pages/dashboards/demo1'
     import { useAuth } from '@/auth/providers/JWTProvider'
 
     import { ChannelStats } from './ChannelStats'

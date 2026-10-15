@@ -56,21 +56,19 @@
                 </div>
 
                 {percentual !== null && (
+                    //BARRA DO METRONIC (.progress / .progress-bar); h-1.5 E bg-gray-200 MANTÊM A ALTURA E O FUNDO DE ANTES
                     <div
-                        className="h-1.5 rounded-full bg-gray-200 overflow-hidden mb-1.5"
+                        className={clsx(
+                            'progress h-1.5 bg-gray-200 mb-1.5',
+                            nivel === 'critico' ? 'progress-danger' : nivel === 'alerta' ? 'progress-warning' : 'progress-primary'
+                        )}
                         role="progressbar"
                         aria-label="Uso do armazenamento"
                         aria-valuemin={0}
                         aria-valuemax={100}
                         aria-valuenow={percentual}
                     >
-                        <div
-                            className={clsx(
-                                'h-full rounded-full transition-[width]',
-                                nivel === 'critico' ? 'bg-danger' : nivel === 'alerta' ? 'bg-warning' : 'bg-primary'
-                            )}
-                            style={{ width: `${Math.max(percentual, 2)}%` }}
-                        />
+                        <div className="progress-bar transition-[width]" style={{ width: `${Math.max(percentual, 2)}%` }} />
                     </div>
                 )}
 

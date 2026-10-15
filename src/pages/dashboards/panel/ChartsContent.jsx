@@ -223,8 +223,10 @@
                                             style={c.color && !c.badge ? { color: c.color } : undefined}
                                         >
                                             {c.badge ? (
+                                                //BADGE DO METRONIC (badge-pill); border-0, px-2/py-0.5 E leading-3 MANTÊM O TAMANHO DE ANTES,
+                                                //E SEM COR DO CARTÃO FICA SEM FUNDO, COMO ERA
                                                 <span
-                                                    className="inline-block rounded-full px-2 py-0.5 text-2xs font-medium"
+                                                    className={clsx('badge badge-pill border-0 px-2 py-0.5 leading-3', !c.color && 'bg-transparent text-current')}
                                                     style={c.color ? { color: c.color, backgroundColor: c.color + '1A' } : undefined}
                                                 >
                                                     {texto}

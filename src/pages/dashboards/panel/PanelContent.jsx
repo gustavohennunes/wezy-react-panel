@@ -1,4 +1,4 @@
-    import { useMemo } from 'react'
+    import { useEffect, useMemo } from 'react'
     import { usePageData } from '@/context/PageDataContext'
     import { Models } from '@/components/list/models'
     import { FormContext } from '@/components/form/FormContext'
@@ -10,6 +10,7 @@
     import { ChartsContent } from './ChartsContent'
     import { PicturesGallery } from '@/components/pictures/PicturesGallery'
     import { LegacyHtml } from '@/components/legacy/LegacyHtml'
+    import { registrarRecente } from '@/utils/modulosRecentes'
 
     //O echo DO CARTÃO MUITAS VEZES É SÓ <script>/<style> (ex.: 1/modulos): NADA APARECE NA TELA E O mb-5
     //DEIXAVA UM VÃO ACIMA DO CONTEÚDO. OS SCRIPTS CONTINUAM RODANDO — SÓ O ESPAÇAMENTO DEPENDE DISTO
@@ -93,6 +94,13 @@
             return newContent
 
         }, [pageData])
+
+        //"RECENTES" DO DASHBOARD: SÓ MÓDULO QUE CARREGOU (pageData DA API), NÃO QUALQUER URL DIGITADA
+        useEffect(() => {
+            if (!loading && pageData) {
+                registrarRecente(new URLSearchParams(window.location.search).get('pag'))
+            }
+        }, [pageData, loading])
 
         if (loading) {
             return <ScreenLoader />

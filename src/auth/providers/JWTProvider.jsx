@@ -5,7 +5,7 @@
     import * as authHelper from '../_helpers'
     import { api } from '@/services/api'
     import { buildApiUrl } from '@/utils/urlHelper'
-    import { getCustomerHost, setCustomerHost, clearCustomerHost } from '@/utils/customerHost'
+    import { getCustomerHost, setCustomerHost, clearCustomerHost, getFixedCustomerHost } from '@/utils/customerHost'
     import { isSystemNotFoundError, notifySystemNotFound } from '@/utils/systemStatus'
 
     const API_URL = import.meta.env.VITE_APP_API_URL
@@ -145,6 +145,11 @@
          */
         const login = async (login, senha, idPainelCliente = null) => {
 
+            //ENTROU POR ?a=dominio: LOGIN DIRETO NO BANCO DESSE CLIENTE, COMO O index.php LEGADO
+            if (getFixedCustomerHost()) {
+                return loginNoPainel(login, senha)
+            }
+
             try {
 
                 const { data: auth } = await axios.post(
@@ -199,6 +204,57 @@
 
                 throw new Error(
                     response?.data?.message ||
+                        error.message ||
+                        'Não foi possível autenticar. Tente novamente.'
+                )
+
+            }
+
+        }
+
+        /**
+         * Login no painel de um cliente só (panel/login com o Customer-Host do ?a=). Igual ao
+         * painel legado em painel.../?a=dominio: o usuário precisa existir naquele painel
+         * (ex.: "admin"), não no cadastro central.
+         */
+        const loginNoPainel = async (login, senha) => {
+
+            try {
+
+                const { data: resposta } = await axios.post(
+                    `${CAYMAN_API_URL}/panel/login`,
+                    { login, senha },
+                    {
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'Customer-Host': getCustomerHost(),
+                        },
+                    }
+                )
+
+                const dados = resposta?.success?.response?.data
+                if (!dados?.session_token) {
+                    throw new Error('Usuário ou senha inválidos.')
+                }
+
+                if (dados.dominio) {
+                    setCustomerHost(dados.dominio)
+                }
+
+                saveAuth({ status: true, data: dados })
+
+                const { data: user } = await newUser()
+
+                setCurrentUser(user)
+
+            } catch (error) {
+
+                if (isSystemNotFoundError(error)) notifySystemNotFound()
+
+                saveAuth(undefined)
+
+                throw new Error(
+                    error.response?.data?.error?.message ||
                         error.message ||
                         'Não foi possível autenticar. Tente novamente.'
                 )
@@ -315,7 +371,7 @@
 
             saveAuth(undefined)
             setCurrentUser(undefined)
-            // O próximo login pode pertencer a outro painel
+            // O próximo login pode pertencer a outro painel (o domínio fixado pelo ?a= continua, como no legado)
             clearCustomerHost()
         }
 

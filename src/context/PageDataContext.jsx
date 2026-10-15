@@ -4,7 +4,6 @@
     import { buildApiUrl } from '@/utils/urlHelper'
     import { toast } from 'sonner'
     import { useAuth } from '@/auth/providers/JWTProvider'
-    import { useMenus } from '@/providers/MenusProvider'
     import { findLegacyRedirectDeep, applyLegacyRedirect, isExternalUrl } from '@/utils/legacyRedirect'
     import { lerRespostaApi, lerBlob } from '@/utils/apiResponse'
     import { isSystemNotFoundError, notifySystemNotFound } from '@/utils/systemStatus'
@@ -19,10 +18,7 @@
         const [searchParams]          = useSearchParams();
         const [redirecting, setRedirecting] = useState(false);
         const { logout }              = useAuth();
-        const { getMenuConfig }       = useMenus();
         const navigate                = useNavigate();
-
-        const menuConfig = getMenuConfig('primary');
 
         //SEM DEDUPLICAÇÃO POR URL: O ANTIGO "if (urlApi === lastUrl) return" NUNCA FUNCIONOU (lastUrl FICAVA
         //PRESO NO null DO PRIMEIRO RENDER DENTRO DO useCallback) — E OS REFRESHS APÓS EXCLUIR/ALTERAR
@@ -30,6 +26,10 @@
         const callApi = useCallback(async (urlApi) => {
 
             setLoading(true);
+
+            //REDIRECT DO CARTÃO (ex.: ?pag=analytics -> &acao=Dashboard): O LOADER CONTINUA ATÉ A PRÓXIMA URL CARREGAR.
+            //SEM ISSO O finally TIRAVA O LOADER, A TELA ANTERIOR APARECIA POR UM INSTANTE E O LOADER VOLTAVA
+            let redirecionou = false;
 
             try {
                 
@@ -55,6 +55,8 @@
                 //POR ISSO A BUSCA PELO REDIRECT VEM ANTES DE LER A ESTRUTURA success.response.data.
                 const redirectLegado = findLegacyRedirectDeep(response.data);
                 if (redirectLegado && applyLegacyRedirect(redirectLegado, navigate)) {
+
+                    redirecionou = true;
 
                     //SAINDO DO SPA (OUTRO HOST, ex.: acao=Painel) — O NAVEGADOR AINDA LEVA UM TEMPO PARA
                     //TROCAR DE PÁGINA, ENTÃO O LAYOUT CONTINUA ESCONDIDO ATRÁS DO LOADER ATÉ LÁ
@@ -114,59 +116,29 @@
                 }
 
             } finally {
-                setLoading(false)
+                if (!redirecionou) {
+                    setLoading(false)
+                }
             }
 
         }, [])
-
-        //O MENU SÓ IMPORTA SEM MÓDULO NA URL (DESTAQUE). COM ?pag=, O MENU CHEGANDO DEPOIS DO LOGIN (OU RECARREGANDO)
-        //REPETIA O EFFECT E PEDIA O MESMO panel/module DUAS VEZES
-        const menuDestaque = (searchParams.get('pag') || searchParams.get('slug')) ? null : menuConfig
 
         useEffect(() => {
 
             const urlApi = buildApiUrl(searchParams)
 
-            //SEM MÓDULO NA URL: O PAINEL-PHP REDIRECIONA A HOME PARA O MÓDULO DESTAQUE
-            //(index.php:534). O panel/menus DEVOLVE O DESTAQUE EM highlight (QUANDO O USUÁRIO
-            //TEM ACESSO); SEM DESTAQUE, ABRE O PRIMEIRO MÓDULO VISÍVEL DO MENU.
             //LOGIN POR HASH EM ANDAMENTO (JWTProvider): NÃO CARREGA NEM REDIRECIONA, SENÃO A URL PERDE O hash
             if (searchParams.get('hash')) {
                 setLoading(true)
                 return
             }
 
+            //SEM MÓDULO NA URL ('/' OU LOGO APÓS O LOGIN): VAI PARA O DASHBOARD. ANTES ABRIA O MÓDULO DESTAQUE DO MENU
+            //(COMO O index.php:534 LEGADO), E O DESTAQUE PODIA REDIRECIONAR DE NOVO (ex.: analytics -> &acao=Dashboard)
             const hasModuleParam = searchParams.get('pag') || searchParams.get('slug')
             if (!hasModuleParam) {
-
-                //MENU AINDA CARREGANDO — MANTÉM O LOADER
-                if (!menuDestaque) {
-                    setLoading(true)
-                    return
-                }
-
-                const destaque = menuDestaque?.highlight || menuDestaque?.structure?.highlight
-                if (typeof destaque === 'string' && destaque !== '') {
-                    navigate('/?pag=' + encodeURIComponent(destaque), { replace: true })
-                    return
-                }
-
-                const menuMain = menuDestaque?.main || menuDestaque?.structure?.main || []
-
-                const firstItem =
-                    menuMain.find((item) => item?.path && item?.title !== 'Dashboards') ||
-                    menuMain.flatMap((item) => item?.children || []).find((child) => child?.path)
-
-                if (firstItem?.path) {
-                    navigate('/' + firstItem.path, { replace: true })
-                    return
-                }
-
-                //MENU SEM NENHUM MÓDULO COM PATH — CAI NO DASHBOARD PADRÃO
-                setPageData({ layout: 'dashboard' })
-                setLoading(false)
+                navigate('/?pag=dashboard', { replace: true })
                 return
-
             }
 
             if (urlApi === false || urlApi === '/panel/module?slug=dashboard') {
@@ -195,7 +167,7 @@
 
             callApi(urlApi)
 
-        }, [ searchParams, menuDestaque ])
+        }, [ searchParams ])
 
         const value = useMemo(
             () => ({ pageData, loading, error, callApi, redirecting }),

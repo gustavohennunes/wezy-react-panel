@@ -26,12 +26,13 @@ const initialValues = {
     password: '',
 }
 
-const Login = () => {
+// destino: PARA ONDE IR DEPOIS DO LOGIN QUANDO A TELA NÃO VEM DO REDIRECT PARA /auth/login (VER RequireAuth)
+const Login = ({ destino }) => {
     const [loading, setLoading] = useState(false)
     const { login } = useAuthContext()
     const navigate = useNavigate()
     const location = useLocation()
-    const from = location.state?.from?.pathname || '/'
+    const from = destino || location.state?.from?.pathname || '/'
     const [showPassword, setShowPassword] = useState(false)
     // Painéis retornados pela API quando o usuário existe em mais de um (409)
     const [paineis, setPaineis] = useState(null)

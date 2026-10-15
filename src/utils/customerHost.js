@@ -3,6 +3,11 @@ import { notifySystemNotFound } from './systemStatus'
 
 const CUSTOMER_HOST_STORAGE_KEY = 'customer-host'
 
+// DOMÍNIO ESCOLHIDO PELA URL (?a=). COMO O $_SESSION['usandoDominio'] DO LEGADO (controles/primario.php): O LOGIN
+// PASSA A SER DIRETO NO PAINEL DESSE CLIENTE (panel/login) E NÃO NO CADASTRO CENTRAL (/auth/master). FICA SALVO À
+// PARTE PORQUE O customer-host TAMBÉM É GRAVADO PELO LOGIN CENTRAL E É APAGADO NO LOGOUT
+const FIXED_CUSTOMER_HOST_STORAGE_KEY = 'customer-host-fixo'
+
 /**
  * Resolve o Customer-Host que deve ser enviado nas requisições.
  *
@@ -26,11 +31,12 @@ const getCustomerHost = () => {
         // 1. Override explícito via ?a= (salva para as próximas navegações)
         if (override) {
             setData(CUSTOMER_HOST_STORAGE_KEY, override)
+            setData(FIXED_CUSTOMER_HOST_STORAGE_KEY, override)
             return override
         }
 
-        // 2. Override salvo anteriormente
-        const saved = getData(CUSTOMER_HOST_STORAGE_KEY)
+        // 2. Override salvo anteriormente (login ou ?a=)
+        const saved = getData(CUSTOMER_HOST_STORAGE_KEY) || getData(FIXED_CUSTOMER_HOST_STORAGE_KEY)
         if (saved) {
             return saved
         }
@@ -69,7 +75,25 @@ const setCustomerHost = (host) => {
     }
 }
 
-/** Remove o override salvo (útil no logout). */
+/**
+ * Domínio fixado pela URL (?a=), ou null. Com ele o login é feito direto no painel
+ * desse cliente, como no painel legado.
+ */
+const getFixedCustomerHost = () => {
+    try {
+        const override = new URLSearchParams(window.location.search).get('a')
+        if (override) {
+            setData(FIXED_CUSTOMER_HOST_STORAGE_KEY, override)
+            return override
+        }
+        return getData(FIXED_CUSTOMER_HOST_STORAGE_KEY) || null
+    } catch (error) {
+        console.error('CUSTOMER HOST FIXED RESOLVE ERROR', error)
+        return null
+    }
+}
+
+/** Remove o override salvo (útil no logout). O domínio fixado pelo ?a= continua. */
 const clearCustomerHost = () => {
     try {
         localStorage.removeItem(CUSTOMER_HOST_STORAGE_KEY)
@@ -82,5 +106,7 @@ export {
     getCustomerHost,
     setCustomerHost,
     clearCustomerHost,
+    getFixedCustomerHost,
     CUSTOMER_HOST_STORAGE_KEY,
+    FIXED_CUSTOMER_HOST_STORAGE_KEY,
 }

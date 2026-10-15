@@ -3,7 +3,8 @@ import { AuthLayoutProvider } from './AuthLayoutProvider'
 import { toAbsoluteUrl } from '@/utils'
 import useBodyClasses from '@/hooks/useBodyClasses'
 import { Fragment } from 'react'
-const Layout = () => {
+// children: TELA RENDERIZADA SEM ROTA PRÓPRIA (ex.: LOGIN NO /?a=dominio, VER RequireAuth); SEM ELE, A ROTA FILHA
+const Layout = ({ children }) => {
     // Applying body classes to set the background color in dark mode
     useBodyClasses('dark:bg-coal-500')
     return (
@@ -19,14 +20,14 @@ const Layout = () => {
         `}
             </style>
             <div className="flex items-center justify-center grow bg-center bg-no-repeat page-bg">
-                <Outlet />
+                {children ?? <Outlet />}
             </div>
         </Fragment>
     )
 }
-const AuthLayout = () => (
+const AuthLayout = ({ children }) => (
     <AuthLayoutProvider>
-        <Layout />
+        <Layout>{children}</Layout>
     </AuthLayoutProvider>
 )
 export { AuthLayout }

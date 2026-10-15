@@ -1,23 +1,17 @@
-import { useSearchParams } from 'react-router-dom'
 import useBodyClasses from '@/hooks/useBodyClasses'
 import { PanelLayoutProvider, Main } from './'
 import { PageDataProvider, usePageData } from '@/context/PageDataContext'
 import { ScreenLoader } from '@/components/loaders'
 import { LegacySelectEnhancer } from '@/components/form/LegacySelectEnhancer'
 
-//acao QUE ABREM TELA DE FORMULÁRIO. AS DEMAIS (ex.: Painel, Phpmyadmin, InterfaceWezy) COSTUMAM
-//SER LINKS QUE O CARD RESPONDE COM exit(loc(...)) — ATÉ A API RESPONDER, MOSTRA SÓ O LOADER
-//EM TELA CHEIA PARA O USUÁRIO NÃO VER O PAINEL ANTES DO REDIRECT
-const ACOES_DE_TELA = ['Alterar', 'Inserir']
-
+//LOADER EM TELA CHEIA SÓ QUANDO A RESPOSTA JÁ É UM REDIRECT PARA OUTRO HOST (ex.: acao=Painel, ACESSO AO PAINEL DO
+//CLIENTE): O NAVEGADOR AINDA LEVA UM TEMPO PARA SAIR. ANTES QUALQUER acao FORA DE Alterar/Inserir (Dashboard, Fotos...)
+//JÁ TROCAVA O LAYOUT INTEIRO PELO LOADER ENQUANTO CARREGAVA, E A SIDEBAR SUMIA. AGORA ESSAS CARREGAM COM O LOADER DO
+//CONTEÚDO, COMO OS OUTROS LINKS DO MENU
 const PanelBody = () => {
-    const { loading, redirecting } = usePageData()
-    const [searchParams] = useSearchParams()
+    const { redirecting } = usePageData()
 
-    const acao = searchParams.get('acao')
-    const acaoDeRedirect = acao && !ACOES_DE_TELA.includes(acao)
-
-    if (redirecting || (acaoDeRedirect && loading)) {
+    if (redirecting) {
         return <ScreenLoader />
     }
 

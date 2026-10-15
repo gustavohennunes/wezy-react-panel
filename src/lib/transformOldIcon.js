@@ -216,3 +216,15 @@ export const transformOldIcon = (iconString) => {
     return keenIconFromName(mappedIcon)
 
 }
+
+//ÍCONE DO MENU POR PÁGINA, QUANDO O DO SPRITE ANTIGO NÃO COMBINA COM O MÓDULO
+//(ex.: "Usuários" usa o sprite l1 c13, que vira um "check")
+const ICONE_POR_PAGINA = {
+    liberaracesso: { lib: 'keen', icon: 'users', type: 'outline' },
+}
+
+//ÍCONE DE UM ITEM DO panel/menus (SIDEBAR E ACESSO RÁPIDO DO DASHBOARD)
+export const iconeDoMenu = (item) => {
+    const pagina = /[?&]pag=([^&]+)/.exec(item?.path || '')?.[1]
+    return ICONE_POR_PAGINA[pagina] || transformOldIcon(item?.icon || '')
+}

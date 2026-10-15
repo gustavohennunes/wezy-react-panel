@@ -1,10 +1,10 @@
     import qs from 'qs'
     import { useEffect } from 'react'
-    import { KeenIcon } from '@/components'
     import { buildApiUrl, buildRemoveItemsUrl, cleanUrl } from '@/utils/urlHelper'
     import { api } from '@/services/api'
     import { toast } from 'sonner'
     import { transformOldIcon } from '@/lib/transformOldIcon'
+    import { OldIcon } from '@/components/legacy/OldIcon'
     import { usePageData } from '@/context/PageDataContext'
     import { useConfirm } from '@/components/ui/confirm-dialog'
     import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip'
@@ -135,7 +135,7 @@
                                                         <span className={sprite} />
                                                     </span>
                                                 ) : keen?.icon ? (
-                                                    <KeenIcon icon={keen.icon} style={keen.type} />
+                                                    <OldIcon icon={keen} />
                                                 ) : (
                                                     <span className="text-2sm">{item.title}</span>
                                                 )}

@@ -5,6 +5,53 @@
     float: left;
 }
 
+/* TOOLTIP DO BOOTSTRAP 3 USADO PELO HTML LEGADO (ex.: "?" DOS CARDS DO framework/charts.php). O BOOTSTRAP MOSTRA O
+   TOOLTIP COM .in E O POSICIONA COM top/left; O .tooltip DO METRONIC (plugins/components/tooltip.js) FICA EM
+   display:none ATÉ GANHAR .show E NÃO TEM position — POR ISSO O TOOLTIP ERA CRIADO MAS NUNCA APARECIA */
+.tooltip.in {
+    display: block;
+    position: absolute;
+    max-width: 320px;
+    max-width: min(320px, calc(100vw - 30px));
+}
+
+.tooltip.in .tooltip-arrow {
+    display: none;
+}
+
+.tooltip.in .tooltip-inner {
+    text-align: left;
+    white-space: pre-line;
+    word-wrap: break-word;
+}
+
+/* "?" DOS CARDS DO framework/charts.php. NO REACT O $.fn.tooltip É O DO jQuery UI (SEM .Constructor DO BOOTSTRAP),
+   ENTÃO O SCRIPT DO charts.php NÃO LIGA O TOOLTIP E SÓ SOBRA O title NATIVO, QUE DEMORA A APARECER.
+   AQUI O PRÓPRIO title VIRA O BALÃO NO HOVER/FOCO (attr(title)) */
+.legacy-html .chart-description-help[title] {
+    position: relative;
+}
+
+.legacy-html .chart-description-help[title]:hover::after,
+.legacy-html .chart-description-help[title]:focus-visible::after {
+    content: attr(title);
+    position: absolute;
+    bottom: calc(100% + 6px);
+    left: -8px;
+    z-index: 50;
+    width: max-content;
+    max-width: min(320px, calc(100vw - 30px));
+    padding: 0.375rem 0.6rem;
+    border-radius: 0.375rem;
+    background-color: var(--tw-tooltip-background-color, #1b1c22);
+    box-shadow: var(--tw-tooltip-box-shadow);
+    color: #fff;
+    font: 400 12px/1.45 Inter, system-ui, sans-serif;
+    text-align: left;
+    white-space: pre-line;
+    pointer-events: none;
+}
+
 .clearfix::after {
     content: '';
     display: block;

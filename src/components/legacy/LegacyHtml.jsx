@@ -32,6 +32,9 @@
         return interno.startsWith('?') || interno.startsWith('/') ? interno : '/' + interno
     }
 
+    //VER filaScripts NO useEffect ABAIXO
+    let filaScripts = Promise.resolve()
+
     const LegacyHtml = ({ html, className = '', style }) => {
 
         const ref          = useRef(null)
@@ -59,7 +62,10 @@
                 }
             }
 
-            executar()
+            //FILA ÚNICA ENTRE TODOS OS LegacyHtml DA TELA: NO LEGADO É UM DOCUMENTO SÓ E OS SCRIPTS RODAM NA ORDEM.
+            //AQUI O echo DO CARTÃO (output-html, COM O <script src> DO Chart.js) E CADA CAMPO `aut` (COM O new Chart)
+            //SÃO INSTÂNCIAS SEPARADAS — SEM A FILA, O new Chart RODAVA ANTES DE O Chart.js CARREGAR
+            filaScripts = filaScripts.then(executar, executar)
 
             return () => {
                 cancelado = true

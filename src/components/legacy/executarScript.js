@@ -9,6 +9,8 @@
             novo.async = false
             novo.onload = () => resolve()
             novo.onerror = () => resolve()
+            //OS SCRIPTS DE TODOS OS LegacyHtml SÃO UMA FILA SÓ: UM SRC QUE NUNCA RESPONDE NÃO PODE TRAVAR O RESTO
+            setTimeout(resolve, 15000)
         } else {
             novo.textContent = antigo.textContent
         }

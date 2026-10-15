@@ -9,6 +9,7 @@ import { DefaultTooltip, KeenIcon } from '@/components'
 import { useMenus } from '@/providers'
 import { MenuItem, MenuLink, MenuSub, MenuTitle, MenuSeparator, MenuArrow, MenuIcon, } from '@/components/menu'
 import { transformOldIcon } from '@/lib/transformOldIcon'
+import { OldIcon } from '@/components/legacy/OldIcon'
 import { useAuth } from '@/auth/providers/JWTProvider'
 
 const DropdownUserPanel = ({ menuItemRef }) => {
@@ -78,7 +79,7 @@ const DropdownUserPanel = ({ menuItemRef }) => {
                             <MenuItem key={index}>
                                 <MenuLink path={item.path}>
                                     <MenuIcon className="menu-icon">
-                                        <KeenIcon icon={icon.icon} style={icon.type} />
+                                        <OldIcon icon={icon} />
                                     </MenuIcon>
                                     <MenuTitle>
                                         {item.title}

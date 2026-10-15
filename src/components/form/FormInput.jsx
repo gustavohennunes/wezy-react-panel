@@ -3,6 +3,8 @@
     import { CurrencyInput } from 'react-currency-mask'
     import { FormFile } from './'
     import { FormColorPicker } from './FormColorPicker'
+    import { FormIconSelector } from './FormIconSelector'
+    import { isLegacyIconField } from '@/utils/legacyIcons'
     import { LegacyHtml } from '@/components/legacy/LegacyHtml'
 
     //CAMPOS NÃO OCUPAM A LINHA TODA: O CONTEÚDO É CURTO E O INPUT GIGANTE FICAVA VAZIO.
@@ -179,6 +181,14 @@
 
             break
             case 'aut':
+
+                //GRADE DE SPRITES DO CARTÃO DE MÓDULOS VIRA O SELETOR DE KEENICONS (MESMOS HIDDEN FrmIconeX/FrmIconeY)
+                if (isLegacyIconField(fieldData.extra_html)) {
+                    inputElement = (
+                        <FormIconSelector className={fieldData.class} html={fieldData.extra_html} />
+                    )
+                    break
+                }
 
                 inputElement = (
                     <div className={fieldData.class + ' text-[13px] w-full'}>

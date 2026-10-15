@@ -7,7 +7,17 @@
     import { ScreenLoader } from '@/components/loaders'
     import { Plans } from '../../account/billing/plans/blocks/Plans'
     import { Com379Content } from './Com379Content'
+    import { ChartsContent } from './ChartsContent'
     import { LegacyHtml } from '@/components/legacy/LegacyHtml'
+
+    //O echo DO CARTÃO MUITAS VEZES É SÓ <script>/<style> (ex.: 1/modulos): NADA APARECE NA TELA E O mb-5
+    //DEIXAVA UM VÃO ACIMA DO CONTEÚDO. OS SCRIPTS CONTINUAM RODANDO — SÓ O ESPAÇAMENTO DEPENDE DISTO
+    const temConteudoVisivel = (html) =>
+        html
+            .replace(/<script\b[\s\S]*?<\/script>/gi, '')
+            .replace(/<style\b[\s\S]*?<\/style>/gi, '')
+            .replace(/<!--[\s\S]*?-->/g, '')
+            .trim().length > 0
 
     const PanelContent = () => {
         
@@ -25,6 +35,10 @@
 
             if (pageData?.layout === 'com379' && pageData?.params?.com379) {
                 newContent = <Com379Content data={pageData.params.com379} />
+            } else if (Array.isArray(pageData?.params?.charts) && pageData.params.charts.length > 0) {
+                //$chartsConfig DO CARTÃO COMO DADOS (PanelModule::buildChartsData): GRÁFICOS EM COMPONENTES REACT.
+                //O extra-html-content (HTML DO framework/charts.php) TAMBÉM VEM, MAS SÓ É USADO SEM ESTES DADOS
+                newContent = <ChartsContent cards={pageData.params.charts} />
             } else if (extraHtml.length > 0) {
                 //GRÁFICOS, FUNIL E FOTOS (layout html) VÊM COM O HTML DO PAINEL LEGADO, COM SCRIPTS
                 newContent = <LegacyHtml html={extraHtml} />
@@ -64,7 +78,7 @@
 
                 return (
                     <>
-                        <LegacyHtml html={outputHtml} className="legacy-output mb-5" />
+                        <LegacyHtml html={outputHtml} className={temConteudoVisivel(outputHtml) ? 'legacy-output mb-5' : 'legacy-output'} />
                         {formularioVazio ? null : newContent}
                     </>
                 )

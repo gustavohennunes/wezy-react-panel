@@ -302,8 +302,10 @@
 
                                     </Toolbar>
 
-                                    {headerAfterContent && (
-                                        <LegacyHtml html={headerAfterContent} className="w-full mb-5 px-[30px]" />
+                                    {/* px-5 = MESMO RECUO DO .container-fluid (TOOLBAR E CONTEÚDO). SEM mb: O CONTEÚDO JÁ TEM O
+                                        PRÓPRIO RESPIRO NO TOPO E O mb-5 DOBRAVA O ESPAÇO ABAIXO DO CABEÇALHO */}
+                                    {String(headerAfterContent).trim() && (
+                                        <LegacyHtml html={headerAfterContent} className="w-full px-5" />
                                     )}
 
                                     <Outlet />

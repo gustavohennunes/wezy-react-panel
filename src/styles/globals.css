@@ -54,6 +54,48 @@
     padding: 15px;
     border-radius:0.75rem;
 }
+/* CABEÇALHO DE CONTEXTO DOS CARTÕES ($cabecalhoPagina): "<b>Cliente: </b>Nome", "<b>Produto: </b>...".
+   NO PAINEL ANTIGO É UMA CAIXA CINZA COM padding INLINE; AQUI VIRA UM CARD DO TEMA, COM O RÓTULO PEQUENO
+   EM CIMA E O NOME EM DESTAQUE. !important SÓ ONDE O CARTÃO MANDA style INLINE. O CARTÃO NÃO MUDA. */
+.legacy-html > .filtros.pagina-conteudo:has(> b:first-child) {
+    margin-top: 0;
+    padding: 16px 20px !important;
+    background-color: var(--tw-card-background-color);
+    border: 1px solid var(--card-border-color);
+    box-shadow: var(--tw-card-box-shadow);
+    font-size: 15px;
+    font-weight: 600;
+    line-height: 1.4;
+    color: var(--tw-gray-900);
+}
+.legacy-html > .filtros.pagina-conteudo:has(> b:first-child) > b:first-child {
+    display: block;
+    margin-bottom: 2px;
+    font-size: 11px;
+    font-weight: 500;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    color: var(--tw-gray-500);
+}
+/* NOTA CINZA ABAIXO DO NOME (ex.: "Listagem montada a partir de panel_structure.json: 43 módulos" NO 1/modulos) */
+.legacy-html > .filtros.pagina-conteudo:has(> b:first-child) > div[style*="font-size:11px"] {
+    margin-top: 12px !important;
+    padding-top: 12px;
+    border-top: 1px dashed var(--tw-gray-200);
+    font-size: 12px !important;
+    font-weight: 400;
+    line-height: 1.6;
+    color: var(--tw-gray-600) !important;
+}
+.legacy-html > .filtros.pagina-conteudo:has(> b:first-child) > div[style*="font-size:11px"] b {
+    padding: 1px 6px;
+    border-radius: 4px;
+    background-color: var(--tw-gray-100);
+    font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+    font-size: 11px;
+    font-weight: 500;
+    color: var(--tw-gray-800);
+}
 .pagina-conteudo .periodo-busca {
     font-size: 12px;
     height: 13px;

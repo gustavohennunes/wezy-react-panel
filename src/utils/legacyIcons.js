@@ -29,3 +29,7 @@
         document.head.appendChild(link)
 
     }
+
+    //CAMPO `aut` "Icone" DO CARTÃO DE MÓDULOS (getModuleIcons EM 1/modulos-main.php): TRAZ OS HIDDEN
+    //FrmIconeX/FrmIconeY E O REACT TROCA A GRADE DE SPRITES PELO FormIconSelector
+    export const isLegacyIconField = (html) => /id=["']FrmIconeX["']/.test(html || '')

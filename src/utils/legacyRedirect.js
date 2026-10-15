@@ -107,10 +107,11 @@
                 return false
             }
 
-            // OUTRO HOST (ex.: acesso ao painel do cliente por hash) — sai do SPA
+            // OUTRO HOST (ex.: acesso ao painel do cliente por hash) — sai do SPA. replace: É UM REDIRECT, A URL DA
+            // AÇÃO (ex.: ?pag=clientes&acao=Painel) NÃO FICA NO HISTÓRICO PARA O "VOLTAR" REABRIR
             if (destino.origin !== window.location.origin) {
 
-                window.location.href = url
+                window.location.replace(url)
 
                 return true
 
@@ -124,7 +125,7 @@
             // ACESSO DE SUPORTE (?hash=, "Acessar Painel" DO PAINEL DE MÓDULOS): CARREGA A PÁGINA DO ZERO. NA NAVEGAÇÃO
             // INTERNA O PageDataContext ABRIA O MÓDULO DESTAQUE ANTES DO LOGIN LER O hash, E ELE SE PERDIA
             if (destino.searchParams.has('hash')) {
-                window.location.href = url
+                window.location.replace(url)
                 return true
             }
 

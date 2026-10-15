@@ -2,6 +2,7 @@
     import { Link } from 'react-router-dom'
     import clsx from 'clsx'
     import { KeenIcon } from '@/components/keenicons'
+    import { Skeleton } from '@/components/ui/skeleton'
     import { OldIcon } from '@/components/legacy/OldIcon'
     import { useAuth } from '@/auth/providers/JWTProvider'
     import * as authHelper from '@/auth/_helpers'
@@ -95,18 +96,16 @@
                     </div>
                     {percentual !== null && (
                         <>
+                            {/* BARRA DE PROGRESSO DO METRONIC (.progress / .progress-bar), NA COR DO NÍVEL */}
                             <div
-                                className="h-2 overflow-hidden rounded-full bg-gray-200"
+                                className={clsx('progress h-2 bg-gray-200', nivel === 'critico' ? 'progress-danger' : nivel === 'alerta' ? 'progress-warning' : 'progress-primary')}
                                 role="progressbar"
                                 aria-label="Uso do armazenamento"
                                 aria-valuemin={0}
                                 aria-valuemax={100}
                                 aria-valuenow={percentual}
                             >
-                                <div
-                                    className={clsx('h-full rounded-full', nivel === 'critico' ? 'bg-danger' : nivel === 'alerta' ? 'bg-warning' : 'bg-primary')}
-                                    style={{ width: `${Math.max(percentual, 2)}%` }}
-                                />
+                                <div className="progress-bar" style={{ width: `${Math.max(percentual, 2)}%` }} />
                             </div>
                             <span className={clsx('text-2sm', nivel === 'critico' ? 'text-danger' : nivel === 'alerta' ? 'text-warning' : 'text-gray-600')}>
                                 {percentual}% usado{nivel === 'critico' ? ' · quase cheio' : nivel === 'alerta' ? ' · atenção ao espaço' : ''}
@@ -215,7 +214,7 @@
                             {!menu && (
                                 <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-3" aria-hidden="true">
                                     {Array.from({ length: 6 }).map((_, i) => (
-                                        <div key={i} className="h-[58px] animate-pulse rounded-lg bg-gray-100" />
+                                        <Skeleton key={i} className="h-[58px] rounded-lg bg-gray-100" />
                                     ))}
                                 </div>
                             )}

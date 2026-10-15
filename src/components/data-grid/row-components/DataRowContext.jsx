@@ -1,5 +1,6 @@
 import { DataRowToggle, DataRowActionsMenu, DataRowPicture } from '.'
 import { DataGridRowSelect } from '@/components'
+import { LegacyHtml } from '@/components/legacy/LegacyHtml'
 export const DataRowContext = ({ fullRow, row, index, handleToggle }) => {
     if (!row) return
 
@@ -31,6 +32,13 @@ export const DataRowContext = ({ fullRow, row, index, handleToggle }) => {
     }
 
     if (row.content) {
+
+        //SÓ AS CÉLULAS COM <script> OU <form> DO CARTÃO PASSAM PELO LegacyHtml (EXECUTA E ENVIA PARA A API);
+        //AS DEMAIS CONTINUAM COM O innerHTML SIMPLES, MAIS LEVE PARA LISTAGENS GRANDES
+        if (typeof row.content === 'string' && /<(script|form)\b/i.test(row.content)) {
+            return <LegacyHtml html={row.content} />
+        }
+
         return <div dangerouslySetInnerHTML={{ __html: row.content }} />
     }
 

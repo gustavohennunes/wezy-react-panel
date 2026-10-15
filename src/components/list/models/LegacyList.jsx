@@ -1,15 +1,41 @@
-    import { useMemo } from 'react'
+    import { useEffect, useMemo, useRef } from 'react'
+    import { executarScript } from '@/components/legacy/executarScript'
 
     // LISTAGEM MONTADA EM HTML PELO PRÓPRIO CARD ($novoResultadoInicial no painel-php).
     // A ponte entrega esse HTML em params.list.content; como são <tr> crus, não é possível
     // injetá-los no DataGrid (TanStack) — aqui montamos uma tabela própria com o mesmo cabeçalho.
     //
-    // LIMITAÇÃO CONHECIDA: os links de navegação do HTML funcionam normalmente, mas checkboxes,
-    // botão de excluir e tooltips dependem dos handlers do painel.js legado e ficam inertes.
+    // OS <script> DO HTML SÃO EXECUTADOS DEPOIS DE MONTAR A TABELA, E O WRAPPER .legacy-html DEIXA O legacy-runtime.js
+    // (SERVIDO PELA API) APLICAR DATAS E O CONTADOR DOS CHECKBOXES, COMO NO painel.js LEGADO.
     //DEFAULT FORA DO COMPONENTE: UM [] NOVO A CADA RENDER INVALIDAVA O useMemo DAS COLUNAS
     const SEM_COLUNAS = []
 
     const LegacyList = ({ html, columnHeader = SEM_COLUNAS, showHeader = true }) => {
+
+        const corpoRef = useRef(null)
+
+        //SCRIPT VINDO DE innerHTML NÃO RODA: RECRIA NA ORDEM, COMO O LegacyHtml
+        useEffect(() => {
+
+            const corpo = corpoRef.current
+            if (!corpo) return
+
+            let cancelado = false
+
+            const executar = async () => {
+                for (const script of Array.from(corpo.querySelectorAll('script'))) {
+                    if (cancelado) return
+                    await executarScript(script)
+                }
+            }
+
+            executar()
+
+            return () => {
+                cancelado = true
+            }
+
+        }, [html])
 
         const columns = useMemo(
             () => (Array.isArray(columnHeader) ? columnHeader : []),
@@ -21,7 +47,7 @@
         }
 
         return (
-            <div className="grid min-w-full">
+            <div className="grid min-w-full legacy-html">
                 <div className="overflow-x-auto">
                     <table className="table table-auto align-middle text-sm text-gray-700 w-full legacy-list">
 
@@ -46,7 +72,7 @@
 
                         )}
 
-                        <tbody dangerouslySetInnerHTML={{ __html: html }} />
+                        <tbody ref={corpoRef} dangerouslySetInnerHTML={{ __html: html }} />
 
                     </table>
                 </div>

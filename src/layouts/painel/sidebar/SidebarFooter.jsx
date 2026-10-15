@@ -4,15 +4,28 @@
     import { KeenIcon, Menu, MenuItem, MenuToggle } from '@/components'
     import { DropdownUserPanel } from '@/partials/dropdowns/user'
     import { useLanguage } from '@/i18n'
+    import { useMenus } from '@/providers'
 
     const SidebarFooter = forwardRef((props, ref) => {
 
         const { logout } = useAuthContext()
         const itemUserRef = useRef(null)
         const { isRTL } = useLanguage()
+        const { getMenuConfig } = useMenus()
+
+        //USO DE DISCO DO CLIENTE ENVIADO PELO panel/menus (false QUANDO O LEGADO NÃO MOSTRAVA)
+        const uso = getMenuConfig('primary')?.usage
 
         return (
             <div ref={ref} className="flex flex-center flex-col">
+
+                {uso?.used && (
+                    <div className="px-4 mb-3 text-2xs leading-4 text-gray-600">
+                        <span className="font-semibold text-gray-700">Disco utilizado:</span> {uso.used}
+                        <br />
+                        <span className="font-semibold text-gray-700">Plano atual:</span> {uso.plan}
+                    </div>
+                )}
 
                 <div className="flex justify-between shrink-0 ps-4 pe-3.5 mb-3.5">
 

@@ -33,7 +33,9 @@
 
     }
 
-    const LabelComCor = ({ option }) => {
+    //quebra: NA LISTA DO POPOVER O TEXTO QUEBRA LINHA PARA A OPÇÃO SER LIDA INTEIRA;
+    //NO GATILHO (ALTURA FIXA h-10) CONTINUA TRUNCADO COM "…"
+    const LabelComCor = ({ option, quebra = false }) => {
 
         const cor = corDaOpcao(option?.value)
 
@@ -45,7 +47,7 @@
                         style={{ backgroundColor: cor }}
                     />
                 )}
-                <span className="truncate">{option?.label}</span>
+                <span className={quebra ? 'min-w-0 whitespace-normal break-words' : 'truncate'}>{option?.label}</span>
             </span>
         )
 
@@ -194,7 +196,7 @@
                                         onSelect={() => escolhe(option)}
                                     >
                                         <Check className={cn('shrink-0', estaSelecionado(option) ? 'opacity-100' : 'opacity-0')} />
-                                        <LabelComCor option={option} />
+                                        <LabelComCor option={option} quebra />
                                     </CommandItem>
                                 ))}
 
@@ -204,7 +206,7 @@
                                         value="__criar__"
                                         onSelect={() => escolhe({ label: termo, value: termo })}
                                     >
-                                        <span className="truncate">Criar &quot;{termo}&quot;</span>
+                                        <span className="min-w-0 whitespace-normal break-words">Criar &quot;{termo}&quot;</span>
                                     </CommandItem>
                                 )}
 

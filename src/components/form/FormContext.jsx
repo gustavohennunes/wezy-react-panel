@@ -269,7 +269,24 @@
                 )}
 
                 {/* SEM SEÇÕES NÃO HÁ CAMPOS NEM BOTÃO DE ENVIO: O FORM SERIA SÓ HIDDENS */}
-                {sections.length > 0 && (
+                {/* $action = 'false' NO CARTÃO: O LEGADO NÃO CRIA O <form> (O CARTÃO TRAZ O PRÓPRIO NO HTML DOS CAMPOS).
+                    AQUI VIRA UM <div>, SENÃO O <form> DO CARTÃO FICARIA ANINHADO E O ENVIO IRIA PARA O LUGAR ERRADO */}
+                {sections.length > 0 && data?.form?.action === false && (
+                <div>
+                    {sections.map((section, index) => (
+                        <FormSection
+                            key={index}
+                            loading={loading}
+                            data={section}
+                            index={index + 1}
+                            button={index === sections.length - 1}
+                            form={data.form}
+                        />
+                    ))}
+                </div>
+                )}
+
+                {sections.length > 0 && data?.form?.action !== false && (
                 <form
                     encType="application/x-www-form-urlencoded"
                     onSubmit={submitForm}

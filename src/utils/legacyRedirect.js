@@ -121,6 +121,13 @@
                 return false
             }
 
+            // ACESSO DE SUPORTE (?hash=, "Acessar Painel" DO PAINEL DE MÓDULOS): CARREGA A PÁGINA DO ZERO. NA NAVEGAÇÃO
+            // INTERNA O PageDataContext ABRIA O MÓDULO DESTAQUE ANTES DO LOGIN LER O hash, E ELE SE PERDIA
+            if (destino.searchParams.has('hash')) {
+                window.location.href = url
+                return true
+            }
+
             if (navigate) {
                 navigate(destino.pathname + destino.search, { replace: true })
             } else {

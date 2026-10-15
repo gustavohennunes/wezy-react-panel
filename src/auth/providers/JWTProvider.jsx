@@ -1,5 +1,6 @@
     
     import axios from 'axios'
+    import { toast } from 'sonner'
     import { createContext, useState, useContext, useMemo } from 'react'
     import * as authHelper from '../_helpers'
     import { api } from '@/services/api'
@@ -26,7 +27,76 @@
 
         window.api = api;
 
+        //ACESSO DE SUPORTE ABERTO PELO PAINEL MESTRE (?hash=...&a=dominio). O FRONT SÓ REPASSA O HASH:
+        //A API (panel/login-hash) CONFERE VALIDADE, CLIENTE E USO ÚNICO E DEVOLVE O TOKEN DE SESSÃO
+        const loginPorHash = async (hash) => {
+
+            //O HASH NÃO FICA NA URL NEM NO HISTÓRICO
+            const params = new URLSearchParams(window.location.search)
+            params.delete('hash')
+            const query = params.toString()
+            window.history.replaceState(window.history.state, '', window.location.pathname + (query ? '?' + query : ''))
+
+            try {
+
+                const { data: resposta } = await axios.post(
+                    `${CAYMAN_API_URL}/panel/login-hash`,
+                    { hash },
+                    {
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'Customer-Host': getCustomerHost(),
+                        },
+                    }
+                )
+
+                const dados = resposta?.success?.response?.data
+                if (!dados?.session_token) {
+                    throw new Error('Acesso inválido ou expirado.')
+                }
+
+                //O DOMÍNIO DEVOLVIDO PELA API PASSA A SER O Customer-Host (O ?a= DA URL JÁ FOI SALVO, É O MESMO)
+                if (dados.dominio) {
+                    setCustomerHost(dados.dominio)
+                }
+
+                saveAuth({ status: true, data: dados })
+
+                //RECARREGA: O "Acessar Painel" PODE VIR DE DENTRO DO PRÓPRIO SPA (PAINEL DE MÓDULOS NO MESMO ENDEREÇO),
+                //COM MENU E MÓDULO DO OUTRO CLIENTE JÁ CARREGADOS. A URL JÁ ESTÁ SEM O hash
+                window.location.reload()
+
+            } catch (error) {
+
+                if (isSystemNotFoundError(error)) notifySystemNotFound()
+
+                //SEM ISSO CAI NO LOGIN SEM EXPLICAÇÃO (ex.: 403 api_disabled — O PAINEL REACT EXIGE API ATIVA NO CLIENTE)
+                const motivo = error.response?.data?.error?.message || error.message || 'Acesso inválido ou expirado.'
+                toast('❌ Não foi possível acessar o painel', {
+                    description: <span style={{ color: 'white' }}>{motivo}</span>,
+                    duration: 10000,
+                    style: {
+                        color: 'white',
+                        background: 'var(--tw-danger)',
+                        border: 'none',
+                        fontWeight: 'bold'
+                    }
+                })
+
+                saveAuth(undefined)
+                setCurrentUser(undefined)
+
+            }
+
+        }
+
         const verify = async () => {
+
+            const hash = new URLSearchParams(window.location.search).get('hash')
+            if (hash) {
+                await loginPorHash(hash)
+                return
+            }
 
             if (auth) {
                 
@@ -228,6 +298,21 @@
         }, [ auth ])
 
         const logout = () => {
+
+            //INVALIDA O TOKEN NA API (panel/logout) SEM ESPERAR A RESPOSTA — SE JÁ EXPIROU, O 401 É IGNORADO
+            const token = authHelper.getAuthToken()
+            if (token) {
+                axios
+                    .post(`${CAYMAN_API_URL}/panel/logout`, {}, {
+                        headers: {
+                            'Content-Type': 'application/json',
+                            Authorization: `Bearer ${token}`,
+                            'Customer-Host': getCustomerHost(),
+                        },
+                    })
+                    .catch(() => {})
+            }
+
             saveAuth(undefined)
             setCurrentUser(undefined)
             // O próximo login pode pertencer a outro painel

@@ -7,6 +7,7 @@
     import { ScreenLoader } from '@/components/loaders'
     import { Plans } from '../../account/billing/plans/blocks/Plans'
     import { Com379Content } from './Com379Content'
+    import { LegacyHtml } from '@/components/legacy/LegacyHtml'
 
     const PanelContent = () => {
         
@@ -25,7 +26,8 @@
             if (pageData?.layout === 'com379' && pageData?.params?.com379) {
                 newContent = <Com379Content data={pageData.params.com379} />
             } else if (extraHtml.length > 0) {
-                newContent = <div dangerouslySetInnerHTML={{ __html: extraHtml }} />
+                //GRÁFICOS, FUNIL E FOTOS (layout html) VÊM COM O HTML DO PAINEL LEGADO, COM SCRIPTS
+                newContent = <LegacyHtml html={extraHtml} />
             } else if (pageData?.layout === 'dashboard') {
                 newContent = <DashboardContext />
             } else if (pageData?.layout === 'plans') {
@@ -46,10 +48,27 @@
                         tabs={pageData?.params?.buttons?.list}
                         search={pageData?.params?.search}
                         btnExcluir={pageData?.params?.footer?.delete_button}
+                        extraButton={pageData?.params?.footer?.extra_button}
                         pagination={pageData?.params?.pagination}
                         sequence={pageData?.params?.sequence === true}
                     />
                 )
+            }
+
+            //O QUE O CARTÃO IMPRIMIU (echo) VEM ANTES DO CONTEÚDO, COMO NO PAINEL LEGADO
+            const outputHtml = pageData?.['output-html'] || ''
+            if (outputHtml.trim().length > 0) {
+
+                //TELA FEITA SÓ POR echo ($lista = false SEM CAMPOS): NÃO MOSTRA O FORMULÁRIO VAZIO
+                const formularioVazio = pageData?.layout === 'form' && !(pageData?.params?.form?.fields?.length > 0)
+
+                return (
+                    <>
+                        <LegacyHtml html={outputHtml} className="legacy-output mb-5" />
+                        {formularioVazio ? null : newContent}
+                    </>
+                )
+
             }
 
             return newContent

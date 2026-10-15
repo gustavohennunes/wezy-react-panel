@@ -1,33 +1,12 @@
     export const cleanUrl = (url) => {
         return url?.replace(/\/?index\.php/g, '') || ''
     }
-    //PARÂMETROS DA URL DO SPA QUE SEGUEM PARA A API (Set: CONSULTA DIRETA EM VEZ DE PERCORRER A LISTA)
-    const PARAMETROS_PERMITIDOS = new Set([
-        'p',
-        'setor',
-        'qua',
-        'qui',
-        'sex',
-        'slug',
-        'acao',
-        'id',
-        'toggle-status',
-        'busca',
-        'filters',
-        'limit',
-        'pagina',
-        'order-field',
-        'order-direction',
-        'inserir',
-        'alterar',
-        'cliente',
-        'parametro',
-        'parametros',
-        'mes',
-        'ano',
-        'usuario',
-        'start',
-        'end',
+    //PARÂMETROS DA URL DO SPA QUE NÃO SEGUEM PARA A API. TODO O RESTO SEGUE, COMO NO PAINEL LEGADO: OS CARTÕES
+    //LEEM PARÂMETROS PRÓPRIOS (tipo, categoria, status_filtro, cancelarCompra, exportar...) E UMA LISTA FIXA
+    //DE PERMITIDOS FAZIA ESSAS AÇÕES CHEGAREM À API SEM O PARÂMETRO
+    //  a — HOST DO CLIENTE, USADO SÓ PELO FRONT (utils/customerHost.js)
+    const PARAMETROS_DO_FRONT = new Set([
+        'a',
     ])
 
     export const buildApiUrl = (searchParams, defaultSlug = '') => {
@@ -52,9 +31,9 @@
         }
 
 
-        // Remove parâmetros não permitidos
+        // Remove os parâmetros que são só do front
         for (const param of [...params.keys()]) {
-            if (!PARAMETROS_PERMITIDOS.has(param)) {
+            if (PARAMETROS_DO_FRONT.has(param)) {
                 params.delete(param)
             }
         }

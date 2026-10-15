@@ -228,7 +228,7 @@ const Login = () => {
 
                 <button
                     type="submit"
-                    className="btn btn-danger flex justify-center grow mb-2.5"
+                    className="btn btn-danger btn-auth flex justify-center grow mb-2.5"
                     disabled={loading || formik.isSubmitting}
                 >
                     {loading ? 'Carregando...' : 'Entrar'}

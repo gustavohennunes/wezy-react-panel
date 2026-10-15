@@ -71,3 +71,10 @@ select.campo-filtro{
 .clearfix{
     clear: both;
 }
+/* BOTÃO PRINCIPAL DAS TELAS DE AUTH (login, cadastro, recuperar senha): NO CLARO USA
+   O MESMO #052850 DO ScreenLoader; NO DARK CONTINUA O .btn-danger DO TEMA. */
+html:not(.dark) .btn-auth {
+    --tw-danger: #052850;
+    --tw-danger-active: #031b36;
+    --tw-danger-box-shadow: 0px 4px 12px 0px rgba(5, 40, 80, 0.35);
+}

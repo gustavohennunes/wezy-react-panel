@@ -12,6 +12,37 @@
     import { usePageData } from '@/context/PageDataContext'
     import { Alert } from '@/components/alert'
     import { toast } from 'sonner'
+    import { LegacyHtml } from '@/components/legacy/LegacyHtml'
+    import { installLegacyBridge } from '@/utils/legacyBridge'
+
+    //MENSAGENS QUE O CARTÃO DEFINE ($setMsgAlerta, $setMsgFormErro...) OU QUE A PONTE GERA (alterado=ok, inserido=erro...).
+    //A PONTE AS ENVIA EM params.messages.{general|list|form}.{success|error|alert}
+    const VARIANTE_MENSAGEM = { success: 'success', error: 'danger', alert: 'warning' }
+
+    const mensagensDaPagina = (messages) => {
+
+        const lista = []
+
+        if (!messages || typeof messages !== 'object') {
+            return lista
+        }
+
+        ;['general', 'list', 'form'].forEach((grupo) => {
+
+            const itens = messages[grupo]
+            if (!itens || typeof itens !== 'object') return
+
+            Object.entries(itens).forEach(([tipo, texto]) => {
+                if (typeof texto === 'string' && texto.trim() !== '' && VARIANTE_MENSAGEM[tipo]) {
+                    lista.push({ variant: VARIANTE_MENSAGEM[tipo], html: texto })
+                }
+            })
+
+        })
+
+        return lista
+
+    }
 
     //BASE64 DE UM TEXTO UTF-8 (O btoa SOZINHO SÓ ACEITA latin1). EM BLOCOS PARA NÃO ESTOURAR A PILHA
     //COM CSS GRANDE NO String.fromCharCode
@@ -43,6 +74,7 @@
         const [ title, setTitle ]                 = useState('');
         const [ breadcrumbs, setBreadcrumbs ]     = useState('');
         const [ headerContent, setHeaderContent ] = useState('');
+        const [ headerAfterContent, setHeaderAfterContent ] = useState('');
         const [ footerContent, setFooterContent ] = useState('');
         const [ pageCss, setPageCss ]             = useState('');
         const [ pageJs, setPageJs ]               = useState('');
@@ -101,6 +133,12 @@
             } else {
                 setHeaderContent('');
             }
+            //$cabecalhoPagina DO CARTÃO (HTML ANTES DA LISTAGEM — MUITAS VEZES OS FILTROS)
+            if(pageData?.params?.extra_content?.header?.after){
+                setHeaderAfterContent(pageData?.params?.extra_content?.header.after);
+            } else {
+                setHeaderAfterContent('');
+            }
             if (pageData?.params?.extra_content?.footer) {
                 setFooterContent(pageData?.params?.extra_content?.footer);
             } else {
@@ -114,6 +152,13 @@
 
         //menuConfig ENTRA NA LISTA PORQUE O MENU PODE CHEGAR DEPOIS DO MÓDULO
         }, [ pageData, menuConfig, slug, action, titleMetatag ]);
+
+        //JS DOS CARTÕES CHAMA index.php?...&layout=false — REESCRITO PARA A API (VER utils/legacyBridge.js)
+        useEffect(() => {
+            installLegacyBridge();
+        }, []);
+
+        const mensagens = mensagensDaPagina(pageData?.params?.messages);
 
         useEffect(() => {
             
@@ -245,16 +290,26 @@
                                             </Alert>
                                         )}
 
+                                        {mensagens.map((mensagem, i) => (
+                                            <Alert key={`mensagem-${i}`} variant={mensagem.variant} className="mt-4 w-full">
+                                                <span dangerouslySetInnerHTML={{ __html: mensagem.html }} />
+                                            </Alert>
+                                        ))}
+
                                         {headerContent && (
-                                            <div className="w-full" dangerouslySetInnerHTML={{ __html: headerContent }} />
+                                            <LegacyHtml html={headerContent} className="w-full" />
                                         )}
 
                                     </Toolbar>
 
+                                    {headerAfterContent && (
+                                        <LegacyHtml html={headerAfterContent} className="w-full mb-5 px-[30px]" />
+                                    )}
+
                                     <Outlet />
 
                                     {footerContent && (
-                                        <div className="w-full" style={{padding: '10px 30px'}} dangerouslySetInnerHTML={{ __html: footerContent }} />
+                                        <LegacyHtml html={footerContent} className="w-full" style={{padding: '10px 30px'}} />
                                     )}
 
                                 </main>

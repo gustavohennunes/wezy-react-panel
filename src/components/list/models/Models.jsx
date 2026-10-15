@@ -10,10 +10,11 @@
     import { Tabs } from '@/components/custom/tabs/tabs'
     import { usePageData } from '@/context/PageDataContext'
     import { LegacyList } from './LegacyList'
+    import { LegacyHtml } from '@/components/legacy/LegacyHtml'
     import { useConfirm } from '@/components/ui/confirm-dialog'
     import { contemTodasAsPalavras, textoDoHtml } from '@/utils/textSearch'
 
-    const Models = ({ model, columnHeader, btnAdd, search, btnExcluir, pagination, tabs, content, sequence = false }) => {
+    const Models = ({ model, columnHeader, btnAdd, search, btnExcluir, extraButton, pagination, tabs, content, sequence = false }) => {
 
         const { callApi }                           = usePageData()
         const [ confirm, confirmDialog ]            = useConfirm()
@@ -470,6 +471,18 @@
 
                     ) : null}
 
+                    {/* FILTRO Todos/Ativos/Inativos DO CARTÃO ($setBotoesStatus) */}
+                    {tabs?.status && Array.isArray(tabs?.status) ? (
+
+                        <Tabs
+                            activeTab={activeTab}
+                            setActiveTab={setActiveTab}
+                            tabs={tabs?.status}
+                            className="tabs w-f px-6"
+                        />
+
+                    ) : null}
+
                     <div className="bg-transparent">
 
                         {search !== undefined && addBtn !== undefined && (
@@ -711,6 +724,11 @@
                 />
 
                 {footer}
+
+                {/* $addBotaoListagem DO CARTÃO (HTML DO LEGADO, ex.: confirmar(...)) */}
+                {typeof extraButton === 'string' && extraButton.trim() !== '' && (
+                    <LegacyHtml html={extraButton} className="mt-3" />
+                )}
             </div>
         )
     }

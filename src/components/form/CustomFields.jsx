@@ -41,10 +41,13 @@
         </label>
     )
 
-    const CustomRadio = ({ name, value, checked, onChange, label }) => (
+    //className: CLASSE DO ITEM VINDA DA API (ex.: "forms tipo-do-modulo") — OS SCRIPTS LEGADOS
+    //(LegacyCodeEditor → arrumaSelect) LOCALIZAM O RADIO MARCADO POR ELA
+    const CustomRadio = ({ name, value, checked, onChange, label, className }) => (
         <label data-custom-field="radiobutton">
             <input
                 type="radio"
+                className={className}
                 name={name}
                 value={value}
                 checked={checked}

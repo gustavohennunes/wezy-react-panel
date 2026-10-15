@@ -3,6 +3,7 @@
     import { CurrencyInput } from 'react-currency-mask'
     import { FormFile } from './'
     import { FormColorPicker } from './FormColorPicker'
+    import { LegacyHtml } from '@/components/legacy/LegacyHtml'
 
     //CAMPOS NÃO OCUPAM A LINHA TODA: O CONTEÚDO É CURTO E O INPUT GIGANTE FICAVA VAZIO.
     //O TEXTAREA É MAIS LARGO; O EDITOR DE CÓDIGO (ace) CONTINUA 100% PORQUE NASCE NO WRAPPER
@@ -143,11 +144,9 @@
 
                 //A PONTE PODE MANDAR HTML NO VALOR (LINKS DE DOWNLOAD, <br>) — RENDERIZA COMO HTML
                 inputElement = (
-                    <div
+                    <LegacyHtml
                         className={fieldData.class + ' text-[13px]'}
-                        dangerouslySetInnerHTML={{
-                            __html: (fieldData.value || '') + (fieldData.extra_html || ''),
-                        }}
+                        html={(fieldData.value || '') + (fieldData.extra_html || '')}
                     />
                 )
 
@@ -183,12 +182,10 @@
 
                 inputElement = (
                     <div className={fieldData.class + ' text-[13px] w-full'}>
-                        <span
+                        <LegacyHtml
                             style={{ display: 'contents' }}
-                            dangerouslySetInnerHTML={{
-                                __html: fieldData.extra_html,
-                            }}
-                        ></span>
+                            html={fieldData.extra_html}
+                        />
                     </div>
                 )
 

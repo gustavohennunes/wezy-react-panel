@@ -55,7 +55,7 @@
             try {
 
                 await axios
-                    .get('https://painel.wezy.com.br/api/v1/panel/menus', {
+                    .get(`${import.meta.env.VITE_CAYMAN_API_URL}/panel/menus`, {
                         headers: {
                             'Content-Type': 'application/x-www-form-urlencoded',
                             'Customer-Host': getCustomerHost(),

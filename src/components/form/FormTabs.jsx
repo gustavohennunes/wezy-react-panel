@@ -1,6 +1,7 @@
 
     import React from 'react'
     import { Tabs } from '@/components/custom/tabs/tabs'
+    import { cleanUrl } from '@/utils/urlHelper'
 
     export const FormTabs = ({ tabs, activeTab, setActiveTab }) => {
 

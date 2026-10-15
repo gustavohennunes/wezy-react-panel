@@ -6,6 +6,8 @@
     import { useAuth } from '@/auth/providers/JWTProvider'
     import { useMenus } from '@/providers/MenusProvider'
     import { findLegacyRedirectDeep, applyLegacyRedirect, isExternalUrl } from '@/utils/legacyRedirect'
+    import { lerRespostaApi, lerBlob } from '@/utils/apiResponse'
+    import { isSystemNotFoundError, notifySystemNotFound } from '@/utils/systemStatus'
 
     const PageDataContext = createContext()
 
@@ -31,7 +33,22 @@
 
             try {
                 
-                const response = await api.get(urlApi);
+                //Blob: O CARTÃO PODE DEVOLVER UM ARQUIVO (EXPORTAÇÃO, PDF, XML) EM VEZ DO JSON DA PONTE
+                const response = await api.get(urlApi, { responseType: 'blob' });
+
+                const corpo = await lerRespostaApi(response);
+                if (corpo === null) {
+
+                    //ARQUIVO BAIXADO: VOLTA PARA A TELA DE ONDE O LINK FOI CLICADO, COMO O NAVEGADOR FAZIA NO LEGADO
+                    if (window.history.length > 1) {
+                        navigate(-1);
+                    }
+
+                    return;
+
+                }
+
+                response.data = corpo;
 
                 //O CARD PODE ENCERRAR COM exit(loc(...)) — NESSE CASO O PHP DESCARREGA O BUFFER E A
                 //RESPOSTA VEM COMO HTML CRU (<script>window.location="...")</script>), SEM O JSON.
@@ -72,6 +89,14 @@
 
             } catch (err) {
 
+                //COM responseType blob O CORPO DO ERRO TAMBÉM VEM COMO Blob
+                if (err?.response?.data instanceof Blob) {
+                    err.response.data = await lerBlob(err.response.data);
+                    if (isSystemNotFoundError(err)) {
+                        notifySystemNotFound();
+                    }
+                }
+
                 toast(`❌ Erro: `, {
                     description: <span style = {{ 'color': 'white' }}> { err?.response?.data?.error?.message }</span>,
                     style: {
@@ -94,24 +119,39 @@
 
         }, [])
 
+        //O MENU SÓ IMPORTA SEM MÓDULO NA URL (DESTAQUE). COM ?pag=, O MENU CHEGANDO DEPOIS DO LOGIN (OU RECARREGANDO)
+        //REPETIA O EFFECT E PEDIA O MESMO panel/module DUAS VEZES
+        const menuDestaque = (searchParams.get('pag') || searchParams.get('slug')) ? null : menuConfig
+
         useEffect(() => {
 
             const urlApi = buildApiUrl(searchParams)
 
             //SEM MÓDULO NA URL: O PAINEL-PHP REDIRECIONA A HOME PARA O MÓDULO DESTAQUE
-            //(index.php:533). A API panel/menus NÃO expõe o destaque, então abrimos o
-            //primeiro módulo visível do menu assim que ele carrega — mesma tela que o
-            //usuário via ao entrar no painel antigo.
+            //(index.php:534). O panel/menus DEVOLVE O DESTAQUE EM highlight (QUANDO O USUÁRIO
+            //TEM ACESSO); SEM DESTAQUE, ABRE O PRIMEIRO MÓDULO VISÍVEL DO MENU.
+            //LOGIN POR HASH EM ANDAMENTO (JWTProvider): NÃO CARREGA NEM REDIRECIONA, SENÃO A URL PERDE O hash
+            if (searchParams.get('hash')) {
+                setLoading(true)
+                return
+            }
+
             const hasModuleParam = searchParams.get('pag') || searchParams.get('slug')
             if (!hasModuleParam) {
 
                 //MENU AINDA CARREGANDO — MANTÉM O LOADER
-                if (!menuConfig) {
+                if (!menuDestaque) {
                     setLoading(true)
                     return
                 }
 
-                const menuMain = menuConfig?.main || menuConfig?.structure?.main || []
+                const destaque = menuDestaque?.highlight || menuDestaque?.structure?.highlight
+                if (typeof destaque === 'string' && destaque !== '') {
+                    navigate('/?pag=' + encodeURIComponent(destaque), { replace: true })
+                    return
+                }
+
+                const menuMain = menuDestaque?.main || menuDestaque?.structure?.main || []
 
                 const firstItem =
                     menuMain.find((item) => item?.path && item?.title !== 'Dashboards') ||
@@ -155,7 +195,7 @@
 
             callApi(urlApi)
 
-        }, [ searchParams, menuConfig ])
+        }, [ searchParams, menuDestaque ])
 
         const value = useMemo(
             () => ({ pageData, loading, error, callApi, redirecting }),

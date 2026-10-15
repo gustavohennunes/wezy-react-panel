@@ -33,13 +33,14 @@
 
                 }
                 
-                if (field.type === 'Frm' && field.field?.class.indexOf('data-hora') !== -1) {
+                //Dtm (DATA E HORA) CHEGA NO FORMATO DO LEGADO "dd/mm/aaaa - hh:mm"
+                if ((field.type === 'Frm' || field.type === 'Dtm') && (field.field?.class || '').indexOf('data-hora') !== -1) {
                     
                     if(!field.field?.value || field.field?.value === '0000-00-00 00:00:00' || field.field?.value == ''){
                         initialFormState[fieldName] = null
                     } else {
 
-                        const parseDate = field?.field?.value?.split(' ');
+                        const parseDate = field?.field?.value?.replace(' - ', ' ').split(' ');
                         const dateValue = parseDate[0].split('/');
                         const timeValue = parseDate[1].split(':');
                         
@@ -312,6 +313,7 @@
                                 return null
 
                             case 'Frm':
+                            case 'Dtm':
                             case 'Psw':
                             case 'Val':
                             case 'Txt':
@@ -394,6 +396,7 @@
                                                     name={item.name}
                                                     value={item.value}
                                                     checked={formState[item.name] === item.value}
+                                                    className={item.class}
                                                     onChange={(e) =>
                                                         handleRadioChange(fieldName, e.target.value, item.class)
                                                     }

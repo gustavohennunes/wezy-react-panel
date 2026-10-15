@@ -4,6 +4,7 @@
     import { FormSection } from './'
     import { FormTabs } from './'
     import { ScreenLoader } from '@/components/loaders'
+    import { KeenIcon } from '@/components/keenicons'
     import { api } from '@/services/api'
     import { toast } from 'sonner'
     import { buildApiUrl } from '@/utils/urlHelper'
@@ -346,9 +347,16 @@
                 </form>
                 )}
 
-                <button type="button" onClick={() => navigate(-1)}>
-                    Voltar
-                </button>
+                <div className="flex justify-center mt-5">
+                    <button
+                        type="button"
+                        onClick={() => navigate(-1)}
+                        className="btn btn-sm btn-light text-sm gap-1.5"
+                    >
+                        <KeenIcon icon="arrow-left" className="text-base" />
+                        Voltar
+                    </button>
+                </div>
 
             </div>
         )

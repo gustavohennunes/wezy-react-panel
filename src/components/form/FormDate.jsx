@@ -1,4 +1,5 @@
-import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
+import { useState } from 'react';
+    import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
     import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
     import { DateTimePicker } from '@mui/x-date-pickers/DateTimePicker';
     import { DatePicker } from '@mui/x-date-pickers/DatePicker';
@@ -11,6 +12,21 @@ import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
 
     const FormDate = ({ title, idx, fieldName, fieldClass, combinedClass, rowAttr, fieldData, formState, handleDateChange, ampm = false }) => {
         
+        //CALENDÁRIO ABRE AO CLICAR EM QUALQUER PARTE DO CAMPO, NÃO SÓ NO ÍCONE. A DIGITAÇÃO DIRETA CONTINUA FUNCIONANDO
+        const [aberto, setAberto] = useState(false)
+
+        const pickerProps = {
+            open: aberto,
+            onOpen: () => setAberto(true),
+            onClose: () => setAberto(false),
+            slotProps: {
+                textField: {
+                    onClick: () => setAberto(true),
+                    sx: { cursor: 'pointer' },
+                },
+            },
+        }
+
         let requiredField = false
         if ((fieldClass + fieldData.class).indexOf('obg') !== -1) {
             requiredField = true
@@ -70,7 +86,9 @@ import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
         return (
             <div className={combinedClass} {...rowAttr}>
 
-                <label className="form-label flex items-center gap-1 w-full lg:w-56 lg:min-w-56 lg:shrink-0 h-full justify-center">
+                {/* flex-col COMO OS OUTROS CAMPOS: justify-center CENTRALIZA NA VERTICAL. EM LINHA (flex) ELE
+                    CENTRALIZAVA O TÍTULO NA HORIZONTAL, FORA DO ALINHAMENTO À ESQUERDA DO FORMULÁRIO */}
+                <label className="form-label flex flex-col w-full lg:w-56 lg:min-w-56 lg:shrink-0 h-full justify-center">
                     <b>
                         {fieldData.title || title}
                         {requiredField && (
@@ -85,6 +103,7 @@ import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
 
                         <DatePicker 
                             key={`${fieldName}-${idx}`}
+                            {...pickerProps}
                             format='DD/MM/YYYY'                        
                             name={fieldName}
                             value={parseDate(formState[fieldName])}
@@ -99,6 +118,7 @@ import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
 
                         <DateTimePicker
                             key={`${fieldName}-${idx}`}
+                            {...pickerProps}
                             format='DD/MM/YYYY - HH:mm'
                             ampm={false}                            
                             name={fieldName}

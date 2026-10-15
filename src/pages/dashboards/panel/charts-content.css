@@ -7,49 +7,7 @@
     color: var(--tw-gray-700);
 }
 
-.legacy-charts .chart-html label {
-    color: var(--tw-gray-700);
-    font-weight: 500;
-}
-
-.legacy-charts .chart-html input.forms,
-.legacy-charts .chart-html input[type="text"],
-.legacy-charts .chart-html input[type="date"],
-.legacy-charts .chart-html select {
-    height: 2.5rem !important;
-    padding: 0 0.75rem;
-    border: 1px solid var(--tw-gray-300);
-    border-radius: 0.375rem;
-    background-color: var(--tw-light-active);
-    color: var(--tw-gray-700);
-    font-size: 0.8125rem;
-    outline: none;
-    transition: border-color 0.15s ease;
-}
-
-.legacy-charts .chart-html input.forms:focus,
-.legacy-charts .chart-html input[type="text"]:focus,
-.legacy-charts .chart-html select:focus {
-    border-color: var(--tw-primary);
-}
-
-.legacy-charts .chart-html .btt.padrao,
-.legacy-charts .chart-html button[type="submit"] {
-    height: 2.5rem !important;
-    padding: 0 1.25rem !important;
-    border: 0;
-    border-radius: 0.375rem;
-    background-color: var(--tw-primary) !important;
-    color: var(--tw-primary-inverse, #fff) !important;
-    font-size: 0.8125rem;
-    font-weight: 500;
-    cursor: pointer;
-}
-
-.legacy-charts .chart-html .btt.padrao:hover,
-.legacy-charts .chart-html button[type="submit"]:hover {
-    background-color: var(--tw-primary-active) !important;
-}
+/* CAMPOS E BOTÕES (.forms, .btt.padrao) FICAM NO legacy-compat.css, QUE VALE PARA TODO HTML LEGADO */
 
 .legacy-charts .chart-html a {
     color: var(--tw-primary);

@@ -449,7 +449,7 @@
                     href={cleanUrl(btnAdd?.url)}
                     target="_self"
                 >
-                    <i className="ki-filled ki-plus"></i>
+                    <i className="ki-filled ki-plus !text-sm"></i>
                     {btnAdd?.label}
                 </a>
 
@@ -591,7 +591,7 @@
                             disabled={!hasSelection}
                             onClick={handleExcluir}
                         >
-                            <i className="ki-filled ki-trash"></i>
+                            <i className="ki-filled ki-trash !text-sm"></i>
                             Excluir selecionados
                         </button>
 

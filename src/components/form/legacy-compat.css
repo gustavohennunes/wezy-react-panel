@@ -215,3 +215,70 @@ input[name="FrmPagina"] {
     max-height: 70vh;
     overflow: auto;
 }
+
+/* CAMPOS E BOTÕES DO HTML LEGADO (.forms E .btt.padrao VINHAM DO css/style.css DO PAINEL ANTIGO, QUE O REACT NÃO
+   CARREGA — SEM ISTO FICAVAM COMO INPUT/BUTTON CRUS DO NAVEGADOR, ex.: FILTRO DE DATAS DO framework/charts.php).
+   AQUI GANHAM A CARA DOS CAMPOS DO TEMA. !important SÓ ONDE O CARTÃO MANDA style INLINE (height/padding) */
+.legacy-html input.forms,
+.legacy-html select.forms,
+.legacy-html textarea.forms {
+    min-height: 2.5rem;
+    padding: 0 0.75rem;
+    border: 1px solid var(--tw-gray-300);
+    border-radius: 0.375rem;
+    background-color: var(--tw-light-active);
+    color: var(--tw-gray-700);
+    font-size: 0.8125rem;
+    outline: none;
+    transition: border-color 0.15s ease;
+}
+
+.legacy-html textarea.forms {
+    padding: 0.5rem 0.75rem;
+}
+
+.legacy-html input.forms:focus,
+.legacy-html select.forms:focus,
+.legacy-html textarea.forms:focus {
+    border-color: var(--tw-primary);
+}
+
+.legacy-html button.btt.padrao,
+.legacy-html input[type="submit"].btt.padrao {
+    height: 2.5rem !important;
+    padding: 0 1.25rem !important;
+    border: 0;
+    border-radius: 0.375rem;
+    background-color: var(--tw-primary) !important;
+    color: var(--tw-primary-inverse, #fff) !important;
+    font-size: 0.8125rem;
+    font-weight: 500;
+    cursor: pointer;
+}
+
+.legacy-html button.btt.padrao:hover,
+.legacy-html input[type="submit"].btt.padrao:hover {
+    background-color: var(--tw-primary-active) !important;
+}
+
+.legacy-html form label {
+    color: var(--tw-gray-700);
+    font-size: 0.8125rem;
+    font-weight: 500;
+}
+
+/* CARD DO framework/charts.php (FALLBACK QUANDO A API NÃO MANDA params.charts): CORES DO TEMA NO LUGAR DO #FFF/#EEE
+   FIXOS DO <style> DO charts.php — O MODO ESCURO FICAVA COM CARDS BRANCOS */
+.legacy-html .chart-card {
+    background: var(--tw-card-background-color) !important;
+    border-color: var(--card-border-color, var(--tw-gray-200)) !important;
+}
+
+.legacy-html .chart-card-title {
+    color: var(--tw-gray-900) !important;
+    border-bottom-color: var(--tw-gray-200) !important;
+}
+
+.legacy-html .chart-card a {
+    color: var(--tw-primary);
+}

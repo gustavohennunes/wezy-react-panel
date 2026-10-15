@@ -8,6 +8,7 @@
     import { Plans } from '../../account/billing/plans/blocks/Plans'
     import { Com379Content } from './Com379Content'
     import { ChartsContent } from './ChartsContent'
+    import { PicturesGallery } from '@/components/pictures/PicturesGallery'
     import { LegacyHtml } from '@/components/legacy/LegacyHtml'
 
     //O echo DO CARTÃO MUITAS VEZES É SÓ <script>/<style> (ex.: 1/modulos): NADA APARECE NA TELA E O mb-5
@@ -35,6 +36,10 @@
 
             if (pageData?.layout === 'com379' && pageData?.params?.com379) {
                 newContent = <Com379Content data={pageData.params.com379} />
+            } else if (pageData?.params?.photos && Array.isArray(pageData.params.photos.items)) {
+                //GALERIA DO framework/fotos.php COMO DADOS (PanelModule::buildPhotosData): GALERIA EM REACT COM @dnd-kit.
+                //O extra-html-content (HTML DO fotos.php) TAMBÉM VEM, MAS SÓ É USADO SEM ESTES DADOS
+                newContent = <PicturesGallery data={pageData.params.photos} />
             } else if (Array.isArray(pageData?.params?.charts) && pageData.params.charts.length > 0) {
                 //$chartsConfig DO CARTÃO COMO DADOS (PanelModule::buildChartsData): GRÁFICOS EM COMPONENTES REACT.
                 //O extra-html-content (HTML DO framework/charts.php) TAMBÉM VEM, MAS SÓ É USADO SEM ESTES DADOS

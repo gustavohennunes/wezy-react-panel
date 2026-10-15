@@ -24,6 +24,22 @@
     margin: 0;
 }
 
+/* VARIANTE MENOR (ex.: CANTO DAS MINIATURAS DA GALERIA DE FOTOS) */
+[data-custom-field='checkbox'].cf-sm .custom-checkbox .custom-checkbox-icon {
+    width: 26px;
+    height: 26px;
+    margin-right: 0;
+}
+[data-custom-field='checkbox'].cf-sm .custom-checkbox .custom-checkbox-icon > span {
+    width: 16px;
+    height: 16px;
+}
+[data-custom-field='checkbox'].cf-sm .custom-checkbox .custom-checkbox-icon > span svg {
+    width: 9px;
+    margin: 1.5px;
+    margin-top: -1.5px;
+}
+
 /* CHECKBOX */
 
 [data-custom-field='checkbox'] {

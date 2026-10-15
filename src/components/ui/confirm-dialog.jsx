@@ -7,11 +7,15 @@ import { Dialog, DialogBody, DialogContent, DialogDescription, DialogFooter, Dia
 //   ...e renderizar {confirmDialog} no componente.
 const useConfirm = () => {
 
+    //aberto SEPARADO DOS TEXTOS: O DIÁLOGO AINDA ANIMA A SAÍDA DEPOIS DE FECHAR. ZERAR AS OPÇÕES NO FECHAMENTO
+    //TROCAVA O TEXTO PELO PADRÃO ("Tem certeza?") DURANTE A ANIMAÇÃO — AS OPÇÕES SÓ MUDAM NA PRÓXIMA ABERTURA
+    const [aberto, setAberto] = useState(false)
     const [options, setOptions] = useState(null)
     const resolver = useRef(null)
 
     const confirm = useCallback((opts = {}) => {
         setOptions(opts)
+        setAberto(true)
         return new Promise((resolve) => {
             resolver.current = resolve
         })
@@ -20,11 +24,11 @@ const useConfirm = () => {
     const fecha = (resposta) => {
         resolver.current?.(resposta)
         resolver.current = null
-        setOptions(null)
+        setAberto(false)
     }
 
     const confirmDialog = (
-        <Dialog open={options !== null} onOpenChange={(aberto) => !aberto && fecha(false)}>
+        <Dialog open={aberto} onOpenChange={(abrindo) => !abrindo && fecha(false)}>
             <DialogContent className="max-w-md">
 
                 <DialogHeader>

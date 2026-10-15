@@ -302,10 +302,10 @@
 
                                     </Toolbar>
 
-                                    {/* px-5 = MESMO RECUO DO .container-fluid (TOOLBAR E CONTEÚDO). SEM mb: O CONTEÚDO JÁ TEM O
-                                        PRÓPRIO RESPIRO NO TOPO E O mb-5 DOBRAVA O ESPAÇO ABAIXO DO CABEÇALHO */}
+                                    {/* px-5 = MESMO RECUO DO .container-fluid (TOOLBAR E CONTEÚDO). mb-5: A LISTAGEM (ABAS) COMEÇA
+                                        SEM ESPAÇO NO TOPO E O CABEÇALHO FICAVA GRUDADO NELA. SÓ RENDERIZA COM CONTEÚDO */}
                                     {String(headerAfterContent).trim() && (
-                                        <LegacyHtml html={headerAfterContent} className="w-full px-5" />
+                                        <LegacyHtml html={headerAfterContent} className="w-full px-5 mb-5" />
                                     )}
 
                                     <Outlet />

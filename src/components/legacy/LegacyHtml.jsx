@@ -7,6 +7,7 @@
     import { findLegacyRedirectDeep, applyLegacyRedirect } from '@/utils/legacyRedirect'
     import { isLegacyUrl, legacyUrlToApiUrl } from '@/utils/legacyBridge'
     import { executarScript } from './executarScript'
+    import './legacy-fotos.css'
 
     // HTML MONTADO PELO PAINEL LEGADO (echo DO CARTÃO, framework/charts.php, funil.php, fotos.php, $cabecalhoPagina...).
     // DIFERENTE DO dangerouslySetInnerHTML:
@@ -85,6 +86,28 @@
 
                 if (event.defaultPrevented || event.button !== 0 || event.metaKey || event.ctrlKey || event.shiftKey || event.altKey) {
                     return
+                }
+
+                //BOTÃO-DIV DO LEGADO (criaBotao com a classe enviaForm, ex.: "Enviar" do framework/fotos.php): NO painel.js O
+                //CLIQUE ENVIA O FORM CUJO id VEM DA CLASSE "envioXxx" (#envioXxx). requestSubmit DISPARA O submit,
+                //QUE O aoEnviar ABAIXO MANDA PARA A API
+                const botaoEnvio = event.target.closest?.('.enviaForm')
+                if (botaoEnvio && container.contains(botaoEnvio)) {
+
+                    const classeEnvio = Array.from(botaoEnvio.classList).find((classe) => /^envio./.test(classe))
+                    const form = (classeEnvio && container.querySelector(`form#${CSS.escape(classeEnvio)}`)) || botaoEnvio.closest('form')
+
+                    if (form) {
+                        event.preventDefault()
+                        if (typeof form.requestSubmit === 'function') {
+                            form.requestSubmit()
+                        } else {
+                            form.dispatchEvent(new Event('submit', { bubbles: true, cancelable: true }))
+                        }
+                    }
+
+                    return
+
                 }
 
                 const link = event.target.closest?.('a')

@@ -1,0 +1,281 @@
+/* GALERIA DO LEGADO (framework/fotos.php, ?acao=Fotos): O HTML VEM DO PAINEL ANTIGO, QUE ESTILIZAVA TUDO NO
+   css/style.css (NÃO CARREGADO NO REACT). AQUI GANHA UM VISUAL NOVO COM BASE NO ANTIGO: CARD DE ENVIO, GRADE DE
+   MINIATURAS COM CHECKBOX NO CANTO E BARRA DE AÇÕES. SÓ CSS — O HTML E OS SCRIPTS DO LEGADO NÃO MUDAM.
+   !important SÓ ONDE O fotos.php MANDA style/width/height INLINE */
+
+.legacy-html .fotos-container {
+    display: flex;
+    flex-direction: column;
+    gap: 1.25rem;
+}
+
+/* ----- CARD DE ENVIO ----- */
+
+.legacy-html .fotos-container #principal,
+.legacy-html .fotos-container .fotos-lista {
+    padding: 1.25rem;
+    border: 1px solid var(--card-border-color, var(--tw-gray-200));
+    border-radius: 0.75rem;
+    background-color: var(--tw-card-background-color);
+    box-shadow: var(--tw-card-box-shadow);
+}
+
+.legacy-html #envioFoto {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.5rem;
+    font-size: 0.8125rem;
+    font-weight: 500;
+    color: var(--tw-gray-800);
+}
+
+/* OS <br /> DO fotos.php SÓ CRIAVAM ESPAÇO ENTRE OS ITENS — O gap DO FLEX FAZ ISSO */
+.legacy-html #envioFoto br {
+    display: none;
+}
+
+.legacy-html #envioFoto .clearfix {
+    display: none;
+}
+
+.legacy-html #envioFoto input[type="file"] {
+    width: 100%;
+    max-width: 520px;
+    margin: 0 0 0.5rem !important;
+    padding: 0.375rem;
+    border: 1px dashed var(--tw-gray-300);
+    border-radius: 0.5rem;
+    background-color: var(--tw-light-active);
+    color: var(--tw-gray-600);
+    font-size: 0.8125rem;
+    font-weight: 400;
+    cursor: pointer;
+}
+
+.legacy-html #envioFoto input[type="file"]:hover {
+    border-color: var(--tw-primary);
+}
+
+.legacy-html #envioFoto input[type="file"]::file-selector-button {
+    margin-right: 0.75rem;
+    padding: 0.5rem 0.875rem;
+    border: 1px solid var(--tw-gray-300);
+    border-radius: 0.375rem;
+    background-color: var(--tw-light);
+    color: var(--tw-gray-800);
+    font: inherit;
+    font-weight: 500;
+    cursor: pointer;
+}
+
+.legacy-html #envioFoto input[type="text"] {
+    width: 100%;
+    max-width: 420px;
+    height: 2.5rem;
+    padding: 0 0.75rem;
+    border: 1px solid var(--tw-gray-300);
+    border-radius: 0.375rem;
+    background-color: var(--tw-light-active);
+    color: var(--tw-gray-700);
+    font-size: 0.8125rem;
+    font-weight: 400;
+}
+
+/* ----- BOTÕES-DIV DO LEGADO (criaBotao): "Enviar" E "Excluir selecionados" ----- */
+
+.legacy-html .fotos-container .btt,
+.legacy-html .exclusion .btt {
+    display: inline-flex;
+    align-items: center;
+    height: 2.5rem;
+    padding: 0 1.125rem;
+    border-radius: 0.375rem;
+    font-size: 0.8125rem;
+    font-weight: 500;
+    cursor: pointer;
+    user-select: none;
+    transition: background-color 0.15s ease, opacity 0.15s ease;
+}
+
+/* O ÍCONE É UM SPRITE BRANCO DO css/icons.css — NO BOTÃO NOVO SÓ O TEXTO */
+.legacy-html .fotos-container .btt .icones,
+.legacy-html .exclusion .btt .icones {
+    display: none;
+}
+
+.legacy-html .fotos-container .btt.enviaForm {
+    margin-top: 0.25rem;
+    background-color: var(--tw-primary);
+    color: var(--tw-primary-inverse, #fff);
+}
+
+.legacy-html .fotos-container .btt.enviaForm:hover {
+    background-color: var(--tw-primary-active);
+}
+
+/* ----- GRADE DE MINIATURAS ----- */
+
+.legacy-html #listaFotos {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+    gap: 0.75rem;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+}
+
+/* O <div style="clear:both"> DENTRO DO <ul> VIRARIA UMA CÉLULA DA GRADE */
+.legacy-html #listaFotos > div {
+    display: none;
+}
+
+.legacy-html #listaFotos > li {
+    position: relative;
+    aspect-ratio: 4 / 3;
+    overflow: hidden;
+    border-radius: 0.5rem;
+    background-color: var(--tw-gray-100);
+}
+
+/* VAGAS VAZIAS (O fotos.php COMPLETA A GRADE COM <li></li>) */
+.legacy-html #listaFotos > li:not(.sorta) {
+    border: 1px dashed var(--tw-gray-300);
+    background-color: transparent;
+}
+
+.legacy-html #listaFotos > li.sorta {
+    border: 1px solid var(--tw-gray-200);
+    cursor: grab;
+    transition: box-shadow 0.15s ease, border-color 0.15s ease;
+}
+
+.legacy-html #listaFotos > li.sorta:hover {
+    border-color: var(--tw-gray-400);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+}
+
+.legacy-html #listaFotos > li.sorta:has(.check:checked) {
+    border-color: var(--tw-primary);
+    box-shadow: 0 0 0 2px var(--tw-primary);
+}
+
+.legacy-html #listaFotos > li > img {
+    display: block;
+    width: 100% !important;
+    height: 100% !important;
+    object-fit: cover;
+}
+
+.legacy-html #listaFotos .fotos-check {
+    position: absolute;
+    top: 0.5rem;
+    left: 0.5rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 1.625rem;
+    height: 1.625rem;
+    border-radius: 0.375rem;
+    background-color: rgba(255, 255, 255, 0.92);
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);
+}
+
+.legacy-html #listaFotos .fotos-check .check {
+    width: 1rem;
+    height: 1rem;
+    margin: 0;
+    accent-color: var(--tw-primary);
+    cursor: pointer;
+}
+
+/* LINK DA FOTO (QUANDO O CARTÃO USA $link) EM FAIXA NA BASE DA MINIATURA */
+.legacy-html #listaFotos .link {
+    position: absolute;
+    right: 0;
+    bottom: 0;
+    left: 0;
+    overflow: hidden;
+    padding: 0.25rem 0.5rem;
+    background: linear-gradient(transparent, rgba(0, 0, 0, 0.65));
+    color: #fff;
+    font-size: 0.6875rem;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+}
+
+/* LUGAR DA FOTO AO ARRASTAR (jQuery UI sortable, placeholder ui-state-highlight) */
+.legacy-html #listaFotos > li.ui-state-highlight {
+    border: 2px dashed var(--tw-primary);
+    background-color: var(--tw-primary-light);
+}
+
+/* ----- AÇÕES ----- */
+
+.legacy-html .exclusion {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.75rem;
+    margin-top: 1rem;
+}
+
+/* O <div style="clear:both"> DO FIM VIRARIA UM ITEM DO FLEX */
+.legacy-html .exclusion > div:not(.btt) {
+    display: none;
+}
+
+.legacy-html .exclusion .linkExcluir {
+    text-decoration: none;
+}
+
+/* O RUNTIME DO LEGADO DEIXA opacity 0.7 SEM NENHUMA FOTO MARCADA E 1 COM ALGUMA */
+.legacy-html .exclusion .btt.bttExcluir {
+    border: 1px solid var(--tw-danger);
+    background-color: var(--tw-danger-light);
+    color: var(--tw-danger);
+}
+
+.legacy-html .exclusion .btt.bttExcluir:hover {
+    background-color: var(--tw-danger);
+    color: var(--tw-danger-inverse, #fff);
+}
+
+.legacy-html .exclusion .link-fotos {
+    color: var(--tw-primary);
+    font-size: 0.8125rem;
+    font-weight: 500;
+    text-decoration: none;
+}
+
+.legacy-html .exclusion .link-fotos:hover {
+    text-decoration: underline;
+}
+
+/* "Voltar" DO LEGADO (<div align="center"><a class="preto">Voltar</a></div>, ex.: GALERIA E FORMULÁRIOS ANTIGOS):
+   MESMO BOTÃO CLARO DO "Voltar" DOS FORMULÁRIOS REACT */
+.legacy-html div[align="center"] > a.preto {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.375rem;
+    height: 2rem;
+    padding: 0 0.875rem;
+    border: 1px solid var(--tw-gray-200);
+    border-radius: 0.375rem;
+    background-color: var(--tw-light);
+    color: var(--tw-gray-700);
+    font-size: 0.875rem;
+    font-weight: 500;
+    text-decoration: none;
+    transition: background-color 0.15s ease, color 0.15s ease;
+}
+
+.legacy-html div[align="center"] > a.preto::before {
+    content: '←';
+}
+
+.legacy-html div[align="center"] > a.preto:hover {
+    background-color: var(--tw-gray-100);
+    color: var(--tw-gray-900);
+}

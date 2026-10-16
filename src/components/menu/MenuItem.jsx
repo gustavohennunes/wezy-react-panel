@@ -299,6 +299,7 @@ const MenuItemComponent = forwardRef(function MenuItem(props, ref) {
             multipleExpand,
             hasSub,
             location,
+            open,
         }
     })
     useImperativeHandle(
@@ -336,7 +337,7 @@ const MenuItemComponent = forwardRef(function MenuItem(props, ref) {
         }
     }, [accordionShow])
     useEffect(() => {
-        const { highlight: destacar, children: filhos, propToggle: modo, hasSub: temSub, handleHide: esconde, location: local } = atual.current
+        const { highlight: destacar, children: filhos, propToggle: modo, hasSub: temSub, handleHide: esconde, location: local, open: abertoPorProp } = atual.current
         const mudouDePagina = rotaAnterior.current !== rotaAtual
         rotaAnterior.current = rotaAtual
         if (destacar) {
@@ -346,7 +347,8 @@ const MenuItemComponent = forwardRef(function MenuItem(props, ref) {
                 }
                 setHere(true)
             } else {
-                if (modo === 'accordion') {
+                //open = ABERTO DE FORA (ex.: GRUPO COM RESULTADO DA BUSCA DA SIDEBAR): NÃO FECHA SÓ POR NÃO TER O ITEM ATUAL
+                if (modo === 'accordion' && !abertoPorProp) {
                     setShow(false)
                 }
                 setHere(false)

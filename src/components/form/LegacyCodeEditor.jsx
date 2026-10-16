@@ -200,7 +200,9 @@
 
                     //O ace PRIMEIRO (MODO E TEMA SE REGISTRAM NO window.ace), DEPOIS OS DOIS JUNTOS
                     const aceModule = await import('ace-builds/src-noconflict/ace')
-                    await Promise.all([import('ace-builds/src-noconflict/mode-php'), import('ace-builds/src-noconflict/theme-idle_fingers')])
+                    //ext-searchbox: CAIXA DO CTRL+F/CTRL+H. SEM ELA O ACE TENTA BAIXAR ext-searchbox.js PELO basePath (NÃO EXISTE
+                    //NO BUILD) E RECEBE O index.html ("Unexpected token '<'" E "reading 'Search'")
+                    await Promise.all([import('ace-builds/src-noconflict/mode-php'), import('ace-builds/src-noconflict/theme-idle_fingers'), import('ace-builds/src-noconflict/ext-searchbox')])
 
                     if (destroyed) return
 

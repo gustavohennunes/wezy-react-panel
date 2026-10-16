@@ -206,17 +206,10 @@ const Login = ({ destino }) => {
                 </div>
 
                 <div className="flex flex-col gap-1">
-                    <div className="flex items-center justify-between gap-1">
-                        <label htmlFor="login-senha" className="form-label text-gray-900 gap-[2px]">
-                            Senha <span className="text-danger">*</span>
-                        </label>
-                        <Link
-                            to={comCliente('/auth/reset-password')}
-                            className="text-2sm link shrink-0"
-                        >
-                            Esqueceu sua senha?
-                        </Link>
-                    </div>
+                    {/* "Esqueceu sua senha?" ESCONDIDO ATÉ EXISTIR O FLUXO DE RESET NA API (A ROTA /auth/reset-password ESTÁ DESLIGADA) */}
+                    <label htmlFor="login-senha" className="form-label text-gray-900 gap-[2px]">
+                        Senha <span className="text-danger">*</span>
+                    </label>
                     {/* div E NÃO label: O CONTAINER TEM O INPUT E O BOTÃO DE MOSTRAR SENHA, E UM label SÓ PODE
                         NOMEAR UM CONTROLE — O NOME DO CAMPO VEM DO label htmlFor ACIMA */}
                     <div className="input">

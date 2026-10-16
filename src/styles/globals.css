@@ -69,6 +69,21 @@
     background: color-mix(in srgb, var(--tw-primary) 10%, transparent);
 }
 
+/* TRECHO ACHADO PELA BUSCA NA ÁRVORE DO MODO EDIÇÃO. O bg-warning-light SUMIA: NO LIGHT QUASE BRANCO, NO DARK UM CINZA
+   ESCURO NO FUNDO PRETO — AQUI É MARCA-TEXTO DE VERDADE NOS DOIS, COM O TEXTO ESCURO POR CIMA */
+.editor-tree-busca {
+    background: #fde047;
+    color: #1c1917;
+    border-radius: 2px;
+    padding: 0 1px;
+    font-weight: 600;
+}
+
+.dark .editor-tree-busca {
+    background: #facc15;
+    color: #0c0a09;
+}
+
 /* LINKS SIMPLES NAS CÉLULAS DAS LISTAGENS (ex.: SLUG DO projetos-paginas COM O LINK DA PÁGINA NO SITE). O RESET DO
    TAILWIND HERDA COR E TIRA O SUBLINHADO, ENTÃO O <a> PARECIA TEXTO COMUM. LINKS COM CLASSE (BOTÕES) FICAM COMO ESTÃO */
 .celula-html a[href]:not([class]) {

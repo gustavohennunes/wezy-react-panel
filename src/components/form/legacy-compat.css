@@ -145,6 +145,12 @@ form a.padrao.btt-novo-cinza {
     margin: 0;
 }
 
+/* NO ?pag=modulos AS ABAS FICAM NUM <div style="width:calc(100% - 10px)"> (display:block) E O flex ACIMA NÃO TINHA EFEITO:
+   O PAI DAS ABAS VIRA flex EM QUALQUER CARTÃO (O .clearfix DENTRO DELE VIRA UM ITEM VAZIO, SEM LARGURA) */
+form div:has(> a.padrao.btt-novo-cinza) {
+    display: flex;
+}
+
 form a.padrao.btt-novo-cinza:hover,
 form a.padrao.btt-novo-cinza.btt-ativo {
     background: var(--legacy-tab-hover);

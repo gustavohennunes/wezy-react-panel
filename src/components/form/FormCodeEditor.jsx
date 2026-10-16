@@ -102,7 +102,8 @@
 
                     //O ace PRIMEIRO (TEMA E MODO SE REGISTRAM NO window.ace), DEPOIS OS DOIS JUNTOS
                     const aceModule = await import('ace-builds/src-noconflict/ace')
-                    await Promise.all([import('ace-builds/src-noconflict/theme-idle_fingers'), CARREGAR_MODO[modo]()])
+                    //ext-searchbox: CAIXA DO CTRL+F/CTRL+H (SEM ELA O ACE BUSCA ext-searchbox.js PELO basePath E QUEBRA)
+                    await Promise.all([import('ace-builds/src-noconflict/theme-idle_fingers'), import('ace-builds/src-noconflict/ext-searchbox'), CARREGAR_MODO[modo]()])
 
                     if (destruido || !hostRef.current) return
 

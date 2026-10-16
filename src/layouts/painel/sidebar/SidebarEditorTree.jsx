@@ -2,6 +2,7 @@
     import { Link, useLocation } from 'react-router-dom'
     import clsx from 'clsx'
     import { KeenIcon } from '@/components/keenicons'
+    import { DestaqueBusca as Destaque, normalizarBusca as normalizar } from '@/utils/buscaSidebar'
 
     // MODO DE EDIÇÃO DO SITE (?pag=ativar-modulo-edicao, ACESSO DE SUPORTE): A SIDEBAR VIRA A ÁRVORE PÁGINAS > SECTIONS >
     // BACK-ENDS, COMO O class/ProjectStructure.php DO PAINEL ANTIGO. OS DADOS VÊM DO panel/menus (data.editor.pages).
@@ -80,6 +81,54 @@
 
     }
 
+    //FILTRA A ÁRVORE PELA BUSCA, JÁ COM O CAMINHO ABERTO ATÉ O QUE BATEU:
+    //- PÁGINA BATE: ELA ABERTA COM TODAS AS SECTIONS (FECHADAS, SALVO AS QUE TAMBÉM BATEM)
+    //- SECTION BATE: PÁGINA + ELA ABERTA COM TODOS OS BACK-ENDS
+    //- BACK-END BATE (NOME OU TIPO, ex.: "head"): PÁGINA + SECTION ABERTAS, SÓ COM OS BACK-ENDS QUE BATEM
+    //null SEM BUSCA (A ÁRVORE NORMAL)
+    const filtrarArvore = (pages, busca) => {
+
+        const termo = normalizar(busca).trim()
+        if (!termo) return null
+
+        const bate    = (texto) => normalizar(texto).includes(termo)
+        const abertos = new Set()
+
+        const paginas = pages.reduce((lista, page) => {
+
+            const paginaBate = bate(page.name)
+
+            const sections = page.sections.reduce((secoes, section) => {
+
+                const backends = section.backend.filter((backend) => bate(backend.name) || bate(backend.type))
+
+                if (bate(section.name)) {
+                    abertos.add('s' + section.id)
+                    secoes.push(section)
+                } else if (backends.length > 0) {
+                    abertos.add('s' + section.id)
+                    secoes.push({ ...section, backend: backends })
+                } else if (paginaBate) {
+                    secoes.push(section)
+                }
+
+                return secoes
+
+            }, [])
+
+            if (paginaBate || sections.length > 0) {
+                if (sections.length > 0) abertos.add('p' + page.id)
+                lista.push({ ...page, sections })
+            }
+
+            return lista
+
+        }, [])
+
+        return { termo, paginas, abertos }
+
+    }
+
     //SIGLA DO TIPO DE BACK-END ([HEAD], [PARA]...) E DE SECTION CLONADA
     const Sigla = ({ children }) => (
         <span className="shrink-0 rounded bg-gray-100 px-1 py-px font-mono text-[9px] font-semibold leading-4 text-gray-600">
@@ -122,7 +171,7 @@
         </div>
     )
 
-    const SidebarEditorTree = ({ editor }) => {
+    const SidebarEditorTree = ({ editor, search = '' }) => {
 
         const location = useLocation()
         const pages    = useMemo(() => editor?.pages || [], [editor])
@@ -138,9 +187,20 @@
             setAbertos((anterior) => new Set([...anterior, ...abertosDaUrl]))
         }, [abertosDaUrl])
 
+        //COM BUSCA: SÓ O QUE BATEU, COM O PRÓPRIO ABRE/FECHA (RECOMEÇA A CADA LETRA); APAGANDO A BUSCA, VOLTA A ÁRVORE COMO ESTAVA
+        const filtro = useMemo(() => filtrarArvore(pages, search), [pages, search])
+        const [abertosBusca, setAbertosBusca] = useState(null)
+        useEffect(() => {
+            setAbertosBusca(filtro ? new Set(filtro.abertos) : null)
+        }, [filtro])
+
+        const paginasVisiveis = filtro ? filtro.paginas : pages
+        const abertosVisiveis = filtro ? abertosBusca || filtro.abertos : abertos
+        const termo           = filtro?.termo || ''
+
         const alternar = (chave) =>
-            setAbertos((anterior) => {
-                const proximo = new Set(anterior)
+            (filtro ? setAbertosBusca : setAbertos)((anterior) => {
+                const proximo = new Set(anterior || filtro?.abertos)
                 proximo.has(chave) ? proximo.delete(chave) : proximo.add(chave)
                 return proximo
             })
@@ -164,11 +224,15 @@
                     <span className="px-1 text-2sm text-gray-600">Nenhuma página ativa no projeto.</span>
                 )}
 
+                {pages.length > 0 && filtro && paginasVisiveis.length === 0 && (
+                    <span className="px-1 text-2sm text-gray-600">{`Nenhuma página, section ou back-end com "${search.trim()}".`}</span>
+                )}
+
                 <ul className="flex min-w-0 flex-col gap-0.5">
-                    {pages.map((page) => {
+                    {paginasVisiveis.map((page) => {
 
                         const chavePagina = 'p' + page.id
-                        const paginaAberta = abertos.has(chavePagina)
+                        const paginaAberta = abertosVisiveis.has(chavePagina)
 
                         return (
                             <li key={chavePagina} className="min-w-0 overflow-hidden rounded-md">
@@ -185,7 +249,7 @@
                                     titulo={page.name}
                                     icone={<KeenIcon icon="document" className="shrink-0 text-base text-gray-500" />}
                                 >
-                                    <span className="truncate">{page.subpage ? '» ' : ''}{page.name}</span>
+                                    <span className="truncate">{page.subpage ? '» ' : ''}<Destaque texto={page.name} termo={termo} /></span>
                                 </Linha>
 
                                 {paginaAberta && (
@@ -193,7 +257,7 @@
                                         {page.sections.map((section) => {
 
                                             const chaveSection = 's' + section.id
-                                            const sectionAberta = abertos.has(chaveSection)
+                                            const sectionAberta = abertosVisiveis.has(chaveSection)
 
                                             return (
                                                 <li key={chaveSection} className="min-w-0">
@@ -209,7 +273,7 @@
                                                         titulo={section.name}
                                                     >
                                                         {section.clone && <Sigla>CLONE</Sigla>}
-                                                        <span className="truncate">{section.name}</span>
+                                                        <span className="truncate"><Destaque texto={section.name} termo={termo} /></span>
                                                     </Linha>
 
                                                     {sectionAberta && (
@@ -224,7 +288,7 @@
                                                                         titulo={`[${backend.type}] ${backend.name}`}
                                                                     >
                                                                         <Sigla>{backend.type}</Sigla>
-                                                                        <span className="truncate">{backend.name}</span>
+                                                                        <span className="truncate"><Destaque texto={backend.name} termo={termo} /></span>
                                                                     </Linha>
                                                                 </li>
                                                             ))}

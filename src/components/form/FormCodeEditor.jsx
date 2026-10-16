@@ -1,6 +1,7 @@
     import { useEffect, useRef } from 'react'
     import { toast } from 'sonner'
     import { limparGlobal } from '@/utils/limparGlobal'
+    import { recarregarSeVersaoNova } from '@/utils/versaoNova'
 
     // EDITOR DE CÓDIGO (ACE) PARA CAMPOS Txt QUE O index.php LEGADO TRANSFORMAVA EM EDITOR (index.php:573-610:
     // #TxtConteudo, #TxtConteudoFinal E #TxtConteudo_json NAS PÁGINAS DE $modulosHabilitados/$modulosHabilitadosAcao).
@@ -152,6 +153,8 @@
                     }
 
                 } catch (erro) {
+                    //ABA COM BUILD ANTERIOR: O CHUNK DO ace NÃO EXISTE MAIS — RECARREGA COM A VERSÃO NOVA
+                    if (recarregarSeVersaoNova(erro)) return
                     console.error('[FormCodeEditor] Falha ao iniciar o editor:', erro)
                     toast.error('Não foi possível carregar o editor de código.')
                 }
@@ -190,7 +193,7 @@
                 <div
                     ref={hostRef}
                     className="w-full overflow-hidden rounded-md border border-gray-300"
-                    style={{ height: 500, fontSize: 13 }}
+                    style={{ height: 950, fontSize: 13 }}
                 />
                 <input ref={hiddenRef} type="hidden" name={fieldName} defaultValue={valorInicial.current} />
                 {fieldName === 'TxtConteudo' && (

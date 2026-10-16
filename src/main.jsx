@@ -11,6 +11,7 @@ import { App } from './App'
 import { setupAxios } from './auth'
 import { ProvidersWrapper } from './providers'
 import React from 'react'
+import { recarregarSeVersaoNova } from './utils/versaoNova'
 
 setupIonicReact()
 
@@ -20,6 +21,13 @@ setupIonicReact()
  * @see https://github.com/axios/axios#interceptors
  */
 setupAxios(axios)
+
+//import() COM DEPENDÊNCIAS QUE FALHOU (CHUNK DE UM BUILD ANTERIOR JÁ APAGADO): RECARREGA COM A VERSÃO NOVA
+window.addEventListener('vite:preloadError', (event) => {
+    if (recarregarSeVersaoNova(event.payload)) {
+        event.preventDefault()
+    }
+})
 
 const root = ReactDOM.createRoot(document.getElementById('root'))
 

@@ -6,7 +6,9 @@
 // - ORDEM DO ENVIO: assets/ E media/ PRIMEIRO, index.html E .htaccess POR ÚLTIMO — QUEM ABRIR O SITE NO MEIO DO
 //   DEPLOY CONTINUA NO index.html ANTERIOR, QUE APONTA PARA ASSETS QUE AINDA EXISTEM
 // - SÓ SOBE O QUE MUDOU (MESMO NOME E TAMANHO NO SERVIDOR = PULA) E RECONECTA SE O FTP CAIR NO MEIO
-// - NO FIM, APAGA DO SERVIDOR OS assets/ QUE NÃO SÃO DESTE BUILD (HASH ANTIGO)
+// - NO FIM, APAGA DO SERVIDOR OS assets/ QUE NÃO SÃO DESTE BUILD (HASH ANTIGO) E TÊM MAIS DE DIAS_ASSETS_ANTIGOS DIAS.
+//   NÃO APAGA NA HORA: UMA ABA ABERTA COM O BUILD ANTERIOR AINDA CARREGA CHUNKS SOB DEMANDA (ex.: O ace DO EDITOR) E
+//   RECEBIA O index.html NO LUGAR ("Failed to fetch dynamically imported module")
 //
 // --sem-build: SÓ ENVIA O ÚLTIMO BUILD DA PASTA TEMPORÁRIA
 
@@ -154,15 +156,19 @@ try {
         enviados++
     }
 
-    //LIMPA OS assets/ DE BUILDS ANTERIORES
+    //LIMPA OS assets/ DE BUILDS ANTERIORES COM MAIS DE DIAS_ASSETS_ANTIGOS DIAS. SEM DATA NO FTP (modifiedAt), MANTÉM
+    const DIAS_ASSETS_ANTIGOS = 7
+    const limite  = Date.now() - DIAS_ASSETS_ANTIGOS * 24 * 60 * 60 * 1000
     const atuais  = new Set(readdirSync(join(saida, 'assets')))
-    const antigos = (await comRetentativa('listar assets', () => cliente.list(`${remoto}/assets`))).filter((item) => item.isFile && !atuais.has(item.name))
+    const antigos = (await comRetentativa('listar assets', () => cliente.list(`${remoto}/assets`))).filter((item) =>
+        item.isFile && !atuais.has(item.name) && item.modifiedAt instanceof Date && item.modifiedAt.getTime() < limite
+    )
 
     for (const item of antigos) {
         await comRetentativa(`remover assets/${item.name}`, () => cliente.remove(`${remoto}/assets/${item.name}`))
     }
 
-    console.log(`Deploy concluído: ${enviados} enviados, ${iguais} já iguais no servidor, ${antigos.length} assets antigos removidos.`)
+    console.log(`Deploy concluído: ${enviados} enviados, ${iguais} já iguais no servidor, ${antigos.length} assets com mais de ${DIAS_ASSETS_ANTIGOS} dias removidos.`)
 
 } catch (erro) {
 

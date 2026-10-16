@@ -4,6 +4,7 @@
     import qs from 'qs'
     import { injectLegacyIconsCss } from '@/utils/legacyIcons'
     import { limparGlobal } from '@/utils/limparGlobal'
+    import { recarregarSeVersaoNova } from '@/utils/versaoNova'
     import './legacy-compat.css'
 
     //REESCREVE LINKS LEGADOS (index.php?pag=...) PARA AS ROTAS DO SPA
@@ -210,7 +211,7 @@
                     //depende de medições de layout que falham durante a montagem do React)
                     const host = document.createElement('div')
                     host.style.width    = '100%'
-                    host.style.height   = '600px'
+                    host.style.height   = '950px'
                     host.style.fontSize = '13px'
 
                     textarea.style.display = 'none'
@@ -244,6 +245,8 @@
                     window.editor = editor
 
                 } catch (err) {
+                    //ABA COM BUILD ANTERIOR: O CHUNK DO ace NÃO EXISTE MAIS — RECARREGA COM A VERSÃO NOVA
+                    if (recarregarSeVersaoNova(err)) return
                     console.error('[LegacyCodeEditor] Falha ao iniciar o editor ACE:', err)
                     toast.error('Não foi possível carregar o editor de código. Veja o console.')
                 }

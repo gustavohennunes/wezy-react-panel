@@ -3,6 +3,9 @@
     RewriteEngine On
     RewriteBase /
     RewriteRule ^index\.html$ - [L]
+    # ARQUIVO INEXISTENTE EM assets/ (BUILD ANTIGO JÁ APAGADO) É 404, NÃO O index.html — HTML NO LUGAR DE JS QUEBRA O
+    # import() COM "Expected a JavaScript module script but the server responded with text/html"
+    RewriteRule ^assets/ - [L]
     RewriteCond %{REQUEST_FILENAME} !-f
     RewriteCond %{REQUEST_FILENAME} !-d
     RewriteRule . /index.html [L]

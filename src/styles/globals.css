@@ -55,6 +55,20 @@
     border-radius:0.75rem;
 }
 
+/* ÁRVORE DO MODO DE EDIÇÃO (SidebarEditorTree): O bg-primary-light QUASE NÃO APARECIA. atual = A TELA ABERTA (TOM DE
+   PRIMARY BEM VISÍVEL); grupo = PARENTES DESTACADOS JUNTO, COMO NO LEGADO (MESMO TOM, MAIS FRACO — FUNCIONA NO CLARO E NO ESCURO) */
+.editor-tree-atual {
+    background: color-mix(in srgb, var(--tw-primary) 22%, transparent);
+    color: var(--tw-primary);
+    box-shadow: inset 3px 0 0 var(--tw-primary);
+}
+.editor-tree-atual.editor-tree-atual-sem-barra {
+    box-shadow: none;
+}
+.editor-tree-grupo {
+    background: color-mix(in srgb, var(--tw-primary) 10%, transparent);
+}
+
 /* LINKS SIMPLES NAS CÉLULAS DAS LISTAGENS (ex.: SLUG DO projetos-paginas COM O LINK DA PÁGINA NO SITE). O RESET DO
    TAILWIND HERDA COR E TIRA O SUBLINHADO, ENTÃO O <a> PARECIA TEXTO COMUM. LINKS COM CLASSE (BOTÕES) FICAM COMO ESTÃO */
 .celula-html a[href]:not([class]) {

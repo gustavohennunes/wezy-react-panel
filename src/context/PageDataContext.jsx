@@ -8,6 +8,7 @@
     import { findLegacyRedirectDeep, applyLegacyRedirect, isExternalUrl } from '@/utils/legacyRedirect'
     import { lerRespostaApi, lerBlob } from '@/utils/apiResponse'
     import { isSystemNotFoundError, notifySystemNotFound } from '@/utils/systemStatus'
+    import { paginaInicial } from '@/utils/startPage'
     import { getAuthToken } from '@/auth/_helpers'
 
     const PageDataContext = createContext()
@@ -149,11 +150,12 @@
                 return
             }
 
-            //SEM MÓDULO NA URL ('/' OU LOGO APÓS O LOGIN): VAI PARA O DASHBOARD. ANTES ABRIA O MÓDULO DESTAQUE DO MENU
-            //(COMO O index.php:534 LEGADO), E O DESTAQUE PODIA REDIRECIONAR DE NOVO (ex.: analytics -> &acao=Dashboard)
+            //SEM MÓDULO NA URL ('/' OU LOGO APÓS O LOGIN): VAI PARA A PÁGINA INICIAL DO CLIENTE (DASHBOARD OU A DO .env
+            //VITE_START_PAGES — VER utils/startPage). ANTES ABRIA O MÓDULO DESTAQUE DO MENU (COMO O index.php:534 LEGADO),
+            //E O DESTAQUE PODIA REDIRECIONAR DE NOVO (ex.: analytics -> &acao=Dashboard)
             const hasModuleParam = searchParams.get('pag') || searchParams.get('slug')
             if (!hasModuleParam) {
-                navigate('/?pag=dashboard', { replace: true })
+                navigate(paginaInicial(), { replace: true })
                 return
             }
 

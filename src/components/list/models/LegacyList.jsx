@@ -1,5 +1,11 @@
-    import { useEffect, useMemo, useRef } from 'react'
+    import { useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react'
+    import { createPortal } from 'react-dom'
+    import { useNavigate } from 'react-router-dom'
+    import { DataRowActionsMenu } from '@/components/data-grid/row-components/DataRowActionsMenu'
     import { executarScript } from '@/components/legacy/executarScript'
+    import { injectLegacyIconsCss } from '@/utils/legacyIcons'
+    import { isLegacyUrl } from '@/utils/legacyBridge'
+    import { cleanUrl } from '@/utils/urlHelper'
 
     // LISTAGEM MONTADA EM HTML PELO PRÓPRIO CARD ($novoResultadoInicial no painel-php).
     // A ponte entrega esse HTML em params.list.content; como são <tr> crus, não é possível
@@ -13,6 +19,72 @@
     const LegacyList = ({ html, columnHeader = SEM_COLUNAS, showHeader = true }) => {
 
         const corpoRef = useRef(null)
+        const navigate = useNavigate()
+
+        //ÍCONES DO SPRITE DO LEGADO NAS AÇÕES (<div class="icones"><div class="figura-black l4 c1">, ex.: "Alterar" DO
+        //projetos-paginas-sections-backend): TAMANHO E RECORTE VÊM DO /css/icons.css DO PAINEL ANTIGO, QUE ESTA LISTAGEM
+        //NÃO CARREGAVA — O ÍCONE FICAVA SEM CSS E O LINK SUMIA. SÓ CARREGA UMA VEZ
+        useEffect(() => {
+            if (/figura-|class=["'][^"']*\bicones\b/.test(html || '')) {
+                injectLegacyIconsCss()
+            }
+        }, [html])
+
+        //CÉLULAS DE AÇÕES DO LEGADO (<a class="bttPS" data-original-title="Alterar"><div class="icones"><div class="figura-black
+        //l4 c1">): VIRAM O MESMO MENU DE AÇÕES DAS LISTAGENS NORMAIS (?pag=modulos) — ÍCONE CENTRALIZADO, TOOLTIP COM O TÍTULO E
+        //EXCLUSÃO COM CONFIRMAÇÃO PELA API. createPortal: O MENU FICA NA ÁRVORE DO REACT (ROUTER, PageData) MESMO DENTRO DO
+        //HTML DO CARTÃO. SÓ CONVERTE CÉLULA QUE TEM APENAS ESSES LINKS (SEM TEXTO NEM CAMPOS) — O RESTO FICA COMO VEIO
+        const [celulasDeAcoes, setCelulasDeAcoes] = useState([])
+        useLayoutEffect(() => {
+
+            const corpo = corpoRef.current
+            if (!corpo) {
+                setCelulasDeAcoes([])
+                return
+            }
+
+            const encontradas = []
+
+            corpo.querySelectorAll('td').forEach((td) => {
+
+                const links = Array.from(td.querySelectorAll('a[href]')).filter((link) => link.querySelector('.icones, [class*="figura-"]'))
+                if (links.length === 0) return
+
+                const copia = td.cloneNode(true)
+                copia.querySelectorAll('a[href]').forEach((link) => link.remove())
+                if (copia.textContent.trim() !== '' || copia.querySelector('input, select, textarea, button, img')) return
+
+                const itens = links.map((link) => ({
+                    url: link.getAttribute('href') || '',
+                    title: link.getAttribute('data-original-title') || link.getAttribute('title') || link.textContent.trim(),
+                    icon: link.querySelector('[class*="figura-"]')?.className || '',
+                    target: link.getAttribute('target') || '',
+                }))
+
+                td.innerHTML = ''
+                const host = document.createElement('div')
+                host.className = 'flex justify-center'
+                td.appendChild(host)
+
+                encontradas.push({ host, row: { content: itens } })
+
+            })
+
+            setCelulasDeAcoes(encontradas)
+
+        }, [html])
+
+        //LINK ?pag=... DA LISTAGEM NAVEGA PELO ROUTER (SEM RECARREGAR O PAINEL INTEIRO)
+        const aoClicar = (event) => {
+            if (event.defaultPrevented || event.button !== 0 || event.metaKey || event.ctrlKey || event.shiftKey || event.altKey) return
+            const link = event.target.closest?.('a[href]')
+            if (!link || (link.target && link.target !== '_self')) return
+            const href = link.getAttribute('href') || ''
+            if (!isLegacyUrl(href)) return
+            event.preventDefault()
+            const destino = cleanUrl(href)
+            navigate(destino.startsWith('?') || destino.startsWith('/') ? destino : '/' + destino)
+        }
 
         //SCRIPT VINDO DE innerHTML NÃO RODA: RECRIA NA ORDEM, COMO O LegacyHtml
         useEffect(() => {
@@ -72,7 +144,9 @@
 
                         )}
 
-                        <tbody ref={corpoRef} dangerouslySetInnerHTML={{ __html: html }} />
+                        <tbody ref={corpoRef} onClick={aoClicar} dangerouslySetInnerHTML={{ __html: html }} />
+
+                        {celulasDeAcoes.map((celula, indice) => createPortal(<DataRowActionsMenu row={celula.row} />, celula.host, `acoes-${indice}`))}
 
                     </table>
                 </div>

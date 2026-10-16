@@ -124,13 +124,23 @@ form a.padrao.btt-expandir {
     padding: 0 30px;
 }
 
+/* BOTÃO "Expandir" (NÃO AS ABAS, QUE TAMBÉM TÊM .btt-expandir): O form a.padrao ZERA O margin-bottom COM !important E
+   ELE FICAVA COLADO NAS ABAS/EDITOR */
+form a.padrao.btt-expandir:not(.btt-novo-cinza) {
+    margin-bottom: 10px !important;
+}
+
 /* ABAS (Principal / Ajax / Funções / CSS / JS / Instalador) */
 form a.padrao.btt-novo-cinza {
     background: var(--legacy-tab-bg);
     color: var(--legacy-tab-text) !important;
     border-radius: 0;
     border-left: 1px solid var(--legacy-tab-border);
-    width: 16.666666%;
+    /* AS ABAS FICAM NUM <div style="display:flex"> DO CARTÃO: DIVIDEM A LARGURA IGUALMENTE (4 ABAS = 25% CADA, 6 = 16,6%)
+       — ANTES ERA width FIXA DE 16,6% E, COM MENOS ABAS, SOBRAVA ESPAÇO VAZIO */
+    flex: 1 1 0;
+    min-width: 0;
+    width: auto;
     padding: 0;
     margin: 0;
 }

@@ -1,4 +1,4 @@
-    import React, { useId } from 'react'
+    import React, { useId, useMemo } from 'react'
     import { IMaskInput } from "react-imask";
     import { CurrencyInput } from 'react-currency-mask'
     import { FormFile } from './'
@@ -21,7 +21,9 @@
         //LIGA O <label> DO TÍTULO AO CONTROLE DO CAMPO (LEITOR DE TELA E CLIQUE NO TÍTULO FOCAM O INPUT)
         const inputId = useId()
 
-        const inputMask = resolveFormMask(fieldMask, fieldName)
+        //MÁSCARA COM REFERÊNCIA ESTÁVEL: O resolveFormMask DEVOLVE UM ARRAY NOVO A CADA RENDER (TELEFONE FIXO/CELULAR) E O
+        //IMaskInput RECONFIGURAVA A MÁSCARA EM TODO RENDER DO FORMULÁRIO
+        const inputMask = useMemo(() => resolveFormMask(fieldMask, fieldName), [fieldMask, fieldName])
 
         //FORMATOS PERMITIDOS ENVIADOS PELA PONTE (panel/module) VIRAM O accept DO INPUT
         const buildAccept = (fallback) => {
@@ -51,9 +53,12 @@
                         id={inputId}
                         value={formState[fieldName] || ''}
                         required={required}
-                        onChange={(e) =>
-                            handleInputChange(fieldName, e.target.value)
-                        }
+                        //COM MÁSCARA O VALOR VEM DO onAccept (RECOMENDADO PELO react-imask): A MÁSCARA REESCREVE O TEXTO SOZINHA
+                        //(TROCA FIXO/CELULAR, COLAR, AUTOPREENCHIMENTO) E O onChange PODIA NÃO ACOMPANHAR — O ESTADO FICAVA COM O
+                        //VALOR ANTIGO E, NO PRÓXIMO RENDER DO FORMULÁRIO, O CAMPO VOLTAVA/SE APAGAVA (TELEFONE/WHATSAPP). SEM
+                        //MÁSCARA O IMask NÃO É CRIADO E O onAccept NÃO DISPARA: AÍ CONTINUA O onChange
+                        onAccept={inputMask ? (valor) => handleInputChange(fieldName, valor) : undefined}
+                        onChange={inputMask ? undefined : (e) => handleInputChange(fieldName, e.target.value)}
                         //CAMPO DE CEP: ENTER BUSCA O ENDEREÇO EM VEZ DE ENVIAR O FORMULÁRIO (COMO NO LEGADO)
                         onKeyDown={buscaCep ? (e) => {
                             if (e.key === 'Enter') {

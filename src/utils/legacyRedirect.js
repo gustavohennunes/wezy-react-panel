@@ -62,6 +62,13 @@
 
         if (typeof data === 'object') {
 
+            //loc() DO PHP NO PAINEL REACT (includes/config.php COM WEZY_PANEL_API_CARD): EM VEZ DO <script>, A API RESPONDE
+            //{ success: { type: 'redirect', response: { data: { redirect } } } } — REDIRECT EXPLÍCITO, SEM PROCURAR TEXTO
+            const redirectApi = data?.success?.type === 'redirect' ? data.success.response?.data?.redirect : null
+            if (typeof redirectApi === 'string' && redirectApi !== '') {
+                return redirectApi
+            }
+
             for (const key of Object.keys(data)) {
 
                 const found = findLegacyRedirectDeep(data[key], depth + 1)

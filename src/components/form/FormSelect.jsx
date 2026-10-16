@@ -1,5 +1,5 @@
     
-    import { useMemo } from 'react'
+    import { useMemo, useRef } from 'react'
     import { Combobox } from './FormCombobox'
 
     const FormSelect = ({ field, fieldData, formState, handleSelectChange, combinedClass, rowAttr = '', required }) => {
@@ -47,6 +47,20 @@
             return []
 
         }, [field.type, fieldData.options]);
+
+        const nomeCampo = fieldData.name || field.name
+
+        //O <select> LEGADO TINHA id = NOME DO CAMPO (ex.: #Selid_email) E O <script> DO CARTÃO (output-html) FAZ
+        //$('#Selid_email').change(...) — ex.: emails-disparos RECARREGA COM &parametros= DO TEMPLATE ESCOLHIDO. O COMBOBOX
+        //NÃO É UM <select>, ENTÃO O HIDDEN LEVA O id E RECEBE UM change NATIVO (O jQuery ESCUTA) QUANDO O USUÁRIO ESCOLHE.
+        //SÓ NA ESCOLHA DO USUÁRIO: NO PREENCHIMENTO INICIAL O HANDLER DO CARTÃO RECARREGARIA A PÁGINA EM LOOP
+        const hiddenRef = useRef(null)
+        const avisarScriptsDoCartao = (valor) => {
+            const hidden = hiddenRef.current
+            if (!hidden) return
+            hidden.value = valor
+            hidden.dispatchEvent(new Event('change', { bubbles: true }))
+        }
         
         return (
             <div className={combinedClass} {...rowAttr}>
@@ -71,20 +85,24 @@
                     <Combobox
                         ariaLabel={fieldData.title || field.title || undefined}
                         options={options}
-                        value={formState[fieldData.name || field.name] ?? ''}
+                        value={formState[nomeCampo] ?? ''}
                         placeholder={options[0]?.label}
                         onChange={(value) => {
+                            const vazio = value === '' || value === null || value === undefined
                             //OPÇÃO SEM VALOR ("Selecione uma opção") VAI COMO '-1', QUE O handleSelectChange GRAVA VAZIO
-                            handleSelectChange(fieldData.name || field.name, value === '' || value === null || value === undefined ? '-1' : String(value))
+                            handleSelectChange(nomeCampo, vazio ? '-1' : String(value))
+                            avisarScriptsDoCartao(vazio ? '' : String(value))
                         }}
                     />
 
                 </div>
 
                 <input
+                    ref={hiddenRef}
                     type="hidden"
-                    name={fieldData.name || field.name}
-                    value={formState[fieldData.name || field.name] || ''}
+                    id={nomeCampo}
+                    name={nomeCampo}
+                    value={formState[nomeCampo] || ''}
                 />
 
             </div>

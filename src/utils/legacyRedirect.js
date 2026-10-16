@@ -6,11 +6,14 @@
     //
     // Os padrões exigem ATRIBUIÇÃO seguida de string literal, então usos de leitura
     // (ex.: if (window.location.href.includes('x')) ou == ) não disparam falso positivo.
+    // (?!\s*\+): STRING QUE É SÓ O COMEÇO DE UMA CONCATENAÇÃO NÃO É REDIRECT — É O HANDLER DE UM SCRIPT DO CARTÃO
+    // (ex.: emails-disparos: window.location = '/?pag=...&parametros=' + $(this).val(); NO change DO SELECT). SEM ISSO
+    // A TELA COM &parametros=59 "REDIRECIONAVA" PARA &parametros= AO CARREGAR
     const REDIRECT_PATTERNS = [
-        /window\.location(?:\.href)?\s*=\s*["']([^"']+)["']/i,
+        /window\.location(?:\.href)?\s*=\s*["']([^"']+)["'](?!\s*\+)/i,
         /window\.location\.(?:replace|assign)\s*\(\s*["']([^"']+)["']\s*\)/i,
-        /window\.top\.location(?:\.href)?\s*=\s*["']([^"']+)["']/i,
-        /location\.href\s*=\s*["']([^"']+)["']/i,
+        /window\.top\.location(?:\.href)?\s*=\s*["']([^"']+)["'](?!\s*\+)/i,
+        /location\.href\s*=\s*["']([^"']+)["'](?!\s*\+)/i,
     ]
 
     // PROCURA O REDIRECT EM UMA STRING

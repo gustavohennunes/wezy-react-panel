@@ -16,6 +16,17 @@
     import { useLegacyModoCriacao } from './LegacyModoCriacao'
     import { findLegacyRedirectDeep, applyLegacyRedirect } from '@/utils/legacyRedirect'
 
+    //$('#envioConteudo').submit() DO JS DOS CARTÕES (ex.: "Enviar e-mail" DO emails-disparos): O jQuery CHAMA O
+    //form.submit() NATIVO, QUE NÃO DISPARA O EVENTO submit — PULAVA O onSubmit DO REACT E POSTAVA A PÁGINA CRUA NO
+    //ENDEREÇO DO PAINEL REACT. NESTE <form> O submit() DISPARA UM EVENTO submit, QUE O onSubmit DO REACT RECEBE (E MANDA
+    //PARA A API). EVENTO E NÃO requestSubmit(): O form.submit() DO LEGADO NÃO PASSAVA PELA VALIDAÇÃO DO NAVEGADOR, E UM
+    //CAMPO required ESCONDIDO (LINHA CONDICIONAL) CANCELAVA O ENVIO SEM AVISO
+    const prepararEnvioLegado = (form) => {
+        if (form) {
+            form.submit = () => form.dispatchEvent(new Event('submit', { bubbles: true, cancelable: true }))
+        }
+    }
+
     const FormContext = ({ data }) => {
 
         const navigate = useNavigate();
@@ -24,7 +35,6 @@
 
         const acao = params.get('acao');
 
-        const [ sections, setSections ]      = useState([]);
         const [ formTabs, setFormTabs ]      = useState('');
         const [ loading, setLoading ]        = useState(false);
         const [ activeTab, setActiveTab ]    = useState('');
@@ -238,7 +248,10 @@
 
         }
 
-        useEffect(() => {
+        //SEÇÕES DERIVADAS NO RENDER (useMemo) E NÃO NUM useEffect + setSections: COM O EFFECT, O PRIMEIRO RENDER SAÍA SEM
+        //CAMPOS E O <script> DO CARTÃO (output-html, RODA LOGO APÓS ESSE RENDER) LIGAVA $('#Selid_email').change,
+        //$('.btt-enviar-email').click... EM ELEMENTOS QUE AINDA NÃO EXISTIAM — FUNCIONAVA OU NÃO CONFORME A CORRIDA
+        const sections = useMemo(() => {
 
             const fields = Array.isArray(data?.form?.fields) ? data.form.fields : []
 
@@ -293,12 +306,14 @@
                 groupedSections.push(currentSection)
             }
 
-            setSections(groupedSections)
+            return groupedSections
 
+        }, [ data ]);
+
+        useEffect(() => {
             if (data?.buttons?.form) {
                 parseTabs(data.buttons.form)
             }
-
         }, [ data ]);
 
         //O LOADER VALE APENAS ENQUANTO A PONTE NÃO RESPONDEU. UM FORMULÁRIO SEM CAMPOS
@@ -344,6 +359,9 @@
 
                 {sections.length > 0 && data?.form?.action !== false && (
                 <form
+                    //id DO <form> DO LEGADO (framework/formulario.php): O JS DOS CARTÕES ENVIA COM $('#envioConteudo').submit()
+                    id="envioConteudo"
+                    ref={prepararEnvioLegado}
                     encType="application/x-www-form-urlencoded"
                     onSubmit={submitForm}
                 >

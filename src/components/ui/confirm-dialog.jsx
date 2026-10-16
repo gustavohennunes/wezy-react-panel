@@ -5,6 +5,7 @@ import { Dialog, DialogBody, DialogContent, DialogDescription, DialogFooter, Dia
 //   const [confirm, confirmDialog] = useConfirm()
 //   if (!(await confirm({ title: 'Excluir?' }))) return
 //   ...e renderizar {confirmDialog} no componente.
+// OPÇÕES: title, description, confirmText, cancelText, confirmClass (PADRÃO btn-danger) E hideCancel (AVISO SÓ COM "OK")
 const useConfirm = () => {
 
     //aberto SEPARADO DOS TEXTOS: O DIÁLOGO AINDA ANIMA A SAÍDA DEPOIS DE FECHAR. ZERAR AS OPÇÕES NO FECHAMENTO
@@ -36,16 +37,18 @@ const useConfirm = () => {
                 </DialogHeader>
 
                 <DialogBody>
-                    <DialogDescription className="text-2sm text-gray-700">
+                    <DialogDescription className="text-2sm text-gray-700 whitespace-pre-line">
                         {options?.description || 'Essa ação não pode ser desfeita.'}
                     </DialogDescription>
                 </DialogBody>
 
                 <DialogFooter className="flex justify-end gap-2.5">
-                    <button type="button" className="btn btn-light" onClick={() => fecha(false)}>
-                        {options?.cancelText || 'Cancelar'}
-                    </button>
-                    <button type="button" className="btn btn-danger" onClick={() => fecha(true)}>
+                    {!options?.hideCancel && (
+                        <button type="button" className="btn btn-light" onClick={() => fecha(false)}>
+                            {options?.cancelText || 'Cancelar'}
+                        </button>
+                    )}
+                    <button type="button" className={'btn ' + (options?.confirmClass || 'btn-danger')} onClick={() => fecha(true)}>
                         {options?.confirmText || 'Excluir'}
                     </button>
                 </DialogFooter>

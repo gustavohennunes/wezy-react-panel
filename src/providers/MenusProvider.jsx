@@ -1,6 +1,7 @@
     import { createContext, useCallback, useContext, useEffect, useMemo, useRef, useState } from 'react'
     import { useAuth } from '../auth/providers/JWTProvider'
     import { getCustomerHost } from '@/utils/customerHost'
+    import { getAuthToken } from '@/auth/_helpers'
     import {
         isSystemNotFoundError,
         notifySystemNotFound,
@@ -52,6 +53,13 @@
 
         const fetchMenu = useCallback(async () => {
 
+            //ERRO DE UMA REQUISIÇÃO FEITA COM UM TOKEN QUE JÁ FOI TROCADO (OUTRO LOGIN/PAINEL NO MEIO) NÃO DESLOGA:
+            //O logout() INVALIDARIA NA API O TOKEN NOVO
+            const tokenUsado = getAuthToken()
+            const deslogarSeMesmoToken = () => {
+                if (getAuthToken() === tokenUsado) logoutRef.current()
+            }
+
             try {
 
                 await axios
@@ -71,7 +79,7 @@
                             notifySystemNotFound()
                             return
                         }
-                        logoutRef.current()
+                        deslogarSeMesmoToken()
                         console.log(error)
                     })
 
@@ -80,7 +88,7 @@
                     notifySystemNotFound()
                     return
                 }
-                logoutRef.current()
+                deslogarSeMesmoToken()
                 console.error('Erro ao buscar menu:', error)
             }
 

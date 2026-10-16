@@ -221,7 +221,11 @@ input[name="FrmPagina"] {
    AQUI GANHAM A CARA DOS CAMPOS DO TEMA. !important SÓ ONDE O CARTÃO MANDA style INLINE (height/padding) */
 .legacy-html input.forms,
 .legacy-html select.forms,
-.legacy-html textarea.forms {
+.legacy-html textarea.forms,
+/* INPUT SEM CLASSE DENTRO DE CAMPO aut (ex.: retornaFormulario DO emails-disparos: <input type="text" id="ManualFrm...">).
+   NO LEGADO O style.css DAVA BORDA A TODO input; AQUI O RESET DO TAILWIND DEIXAVA SEM BORDA E SEM FUNDO — INVISÍVEL */
+.legacy-html :is(input:not([type]), input[type="text"], input[type="tel"], input[type="email"], input[type="number"], input[type="url"], input[type="password"]):not([class]),
+.legacy-html textarea:not([class]) {
     min-height: 2.5rem;
     padding: 0 0.75rem;
     border: 1px solid var(--tw-gray-300);
@@ -233,14 +237,53 @@ input[name="FrmPagina"] {
     transition: border-color 0.15s ease;
 }
 
-.legacy-html textarea.forms {
+.legacy-html textarea.forms,
+.legacy-html textarea:not([class]) {
     padding: 0.5rem 0.75rem;
+}
+
+/* MESMA LARGURA DOS CAMPOS DO FORMULÁRIO REACT (max-w-[420px]) */
+.legacy-html :is(input:not([type]), input[type="text"], input[type="tel"], input[type="email"], input[type="number"], input[type="url"], input[type="password"]):not([class]),
+.legacy-html textarea:not([class]) {
+    width: 100%;
+    max-width: 420px;
 }
 
 .legacy-html input.forms:focus,
 .legacy-html select.forms:focus,
-.legacy-html textarea.forms:focus {
+.legacy-html textarea.forms:focus,
+.legacy-html input:not([class]):focus,
+.legacy-html textarea:not([class]):focus {
     border-color: var(--tw-primary);
+}
+
+/* BOTÃO VERDE DE AÇÃO DO LEGADO (css/style.css .btt-verde + painel.css #formulario .btt-acao), ex.: "Enviar e-mail" DO
+   emails-disparos. O CARTÃO MANDA style="color:#FFF; border:0px" E O FUNDO VINHA DO CSS ANTIGO — SEM ELE, TEXTO BRANCO NO
+   BRANCO. AQUI COM A COR DE SUCESSO DO TEMA */
+.legacy-html :is(input[type="button"], input[type="submit"], button, a).btt-verde {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 160px;
+    height: 2.5rem;
+    padding: 0 1.25rem;
+    border: 0;
+    border-radius: 0.375rem;
+    background-color: var(--tw-success);
+    color: var(--tw-success-inverse, #fff) !important;
+    font-size: 0.8125rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition: background-color 0.15s ease;
+}
+
+.legacy-html :is(input[type="button"], input[type="submit"], button, a).btt-verde:hover {
+    background-color: var(--tw-success-active);
+}
+
+.legacy-html :is(input[type="button"], input[type="submit"], button, a).btt-verde:focus-visible {
+    outline: 2px solid var(--tw-success);
+    outline-offset: 2px;
 }
 
 .legacy-html button.btt.padrao,

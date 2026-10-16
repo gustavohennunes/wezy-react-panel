@@ -7,6 +7,7 @@
     import { FormCodeEditor, temEditorDeCodigo } from './FormCodeEditor'
     import { isLegacyIconField } from '@/utils/legacyIcons'
     import { LegacyHtml } from '@/components/legacy/LegacyHtml'
+    import { resolveFormMask } from '@/utils/formMask'
 
     //CAMPOS NÃO OCUPAM A LINHA TODA: O CONTEÚDO É CURTO E O INPUT GIGANTE FICAVA VAZIO.
     //O TEXTAREA É MAIS LARGO; O EDITOR DE CÓDIGO (ace) CONTINUA 100% PORQUE NASCE NO WRAPPER
@@ -20,9 +21,7 @@
         //LIGA O <label> DO TÍTULO AO CONTROLE DO CAMPO (LEITOR DE TELA E CLIQUE NO TÍTULO FOCAM O INPUT)
         const inputId = useId()
 
-        if (fieldMask == 'Number'){
-            fieldMask = Number;
-        }
+        const inputMask = resolveFormMask(fieldMask, fieldName)
 
         //FORMATOS PERMITIDOS ENVIADOS PELA PONTE (panel/module) VIRAM O accept DO INPUT
         const buildAccept = (fallback) => {
@@ -46,7 +45,7 @@
 
                 inputElement = (
                     <IMaskInput
-                        mask={fieldMask}
+                        mask={inputMask}
                         className={`input w-full ${LARGURA_CAMPO} ${fieldClass} ${fieldData.class}`}
                         name={fieldName}
                         id={inputId}

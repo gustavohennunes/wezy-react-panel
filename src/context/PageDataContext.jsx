@@ -8,6 +8,7 @@
     import { findLegacyRedirectDeep, applyLegacyRedirect, isExternalUrl } from '@/utils/legacyRedirect'
     import { lerRespostaApi, lerBlob } from '@/utils/apiResponse'
     import { isSystemNotFoundError, notifySystemNotFound } from '@/utils/systemStatus'
+    import { getAuthToken } from '@/auth/_helpers'
 
     const PageDataContext = createContext()
 
@@ -38,6 +39,9 @@
             //REDIRECT DO CARTÃO (ex.: ?pag=analytics -> &acao=Dashboard): O LOADER CONTINUA ATÉ A PRÓXIMA URL CARREGAR.
             //SEM ISSO O finally TIRAVA O LOADER, A TELA ANTERIOR APARECIA POR UM INSTANTE E O LOADER VOLTAVA
             let redirecionou = false;
+
+            //401 DE UM TOKEN QUE JÁ FOI TROCADO (OUTRO LOGIN/PAINEL NO MEIO) NÃO DESLOGA — VER fetchMenu
+            const tokenUsado = getAuthToken();
 
             try {
                 
@@ -123,7 +127,7 @@
                 
                 setError(err)
 
-                if (err.status == 401) {
+                if (err.status == 401 && getAuthToken() === tokenUsado) {
                     logout()
                 }
 

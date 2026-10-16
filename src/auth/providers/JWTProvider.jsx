@@ -21,7 +21,15 @@
     const AuthProvider = ({ children }) => {
         
         const [ loading, setLoading ]         = useState(true)
-        const [ auth, setAuth ]               = useState(() => authHelper.getAuthToken())
+        //?hash= (ACESSO AO PAINEL DE OUTRO CLIENTE): O TOKEN SALVO É DE OUTRO PAINEL. ESQUECE ANTES DE TUDO — SENÃO O MENU
+        //JÁ PEDIA panel/menus COM ELE NO Customer-Host NOVO, TOMAVA 401 E O logout() DERRUBAVA A SESSÃO NOVA DO HASH
+        const [ auth, setAuth ]               = useState(() => {
+            if (new URLSearchParams(window.location.search).has('hash')) {
+                authHelper.removeAuth()
+                return null
+            }
+            return authHelper.getAuthToken()
+        })
         const [ currentUser, setCurrentUser ] = useState()
         const [ isLogged, setIsLogged ]       = useState(false);
 

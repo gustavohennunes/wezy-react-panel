@@ -2,6 +2,10 @@
     import { KeenIcon } from '@/components/keenicons'
     import { useConfirm } from '@/components/ui/confirm-dialog'
 
+    //CAMPOS COM "Remover" PENDENTE. FICA FORA DO COMPONENTE PORQUE A LINHA PODE SUMIR ANTES DE SALVAR (ex.: DESMARCAR
+    //"Usar logotipo customizado" ESCONDE O CAMPO DO LOGO E DESMONTA ESTE INPUT) — O FormContext MANDA O del NO SUBMIT
+    export const arquivosRemovidos = new Set()
+
     const FormFile = ({ id, multiple, accept, maxSize, onFilesChange, fieldName, value, fieldClass = '', fieldData = {}, required = false }) => {
         const [selectedFiles, setSelectedFiles] = useState([])
         const [error, setError] = useState(null)
@@ -18,7 +22,10 @@
                 confirmText: 'Remover',
                 cancelText: 'Cancelar',
             })
-            if (confirmou) setRemovido(true)
+            if (confirmou) {
+                setRemovido(true)
+                arquivosRemovidos.add(fieldName)
+            }
         }
 
         const handleFileChange = (event) => {
@@ -33,7 +40,10 @@
             setSelectedFiles(files)
             setError(null)
             //ARQUIVO NOVO ESCOLHIDO: O UPLOAD SUBSTITUI O ANTIGO, NÃO PRECISA MAIS DO del
-            if (files.length > 0) setRemovido(false)
+            if (files.length > 0) {
+                setRemovido(false)
+                arquivosRemovidos.delete(fieldName)
+            }
             if (onFilesChange) {
                 onFilesChange(files)
             }
@@ -71,13 +81,12 @@
                 {value && removido && (
                     <div className="mb-2 flex items-center gap-2 text-2sm text-gray-600">
                         <span>Arquivo será removido ao salvar.</span>
-                        <button type="button" onClick={() => setRemovido(false)} className="btn btn-link btn-sm">
+                        <button type="button" onClick={() => { setRemovido(false); arquivosRemovidos.delete(fieldName) }} className="btn btn-link btn-sm">
                             Desfazer
                         </button>
                     </div>
                 )}
 
-                {removido && <input type="hidden" name={'del' + fieldName} value="ok" />}
 
                 <input
                     id={id}

@@ -3,6 +3,7 @@
     import qs from 'qs'
     import { FormSection } from './'
     import { chaveValid } from './FormSection'
+    import { arquivosRemovidos } from './FormFile'
     import { temEditorDeCodigo, instalarEditorGlobal } from './FormCodeEditor'
     import { FormTabs } from './'
     import { ScreenLoader } from '@/components/loaders'
@@ -98,6 +99,11 @@
         useLegacyCodeEditor(data);
         useLegacyModoCriacao(data);
 
+        //"Remover" PENDENTE DE OUTRO FORMULÁRIO (SAIU SEM SALVAR) NÃO PODE VALER AQUI
+        useEffect(() => {
+            arquivosRemovidos.clear()
+        }, [])
+
         async function submitForm(e) {
 
             e.preventDefault();
@@ -105,6 +111,14 @@
             let response = '';
             const form = e.target;
             const formData = new FormData(form);
+
+            //"Remover" DO FormFile: del<campo>=ok E O CAMPO DE ARQUIVO VAZIO (O fotoInsert SÓ OLHA OS CAMPOS QUE CHEGAM EM
+            //$_FILES). VEM DAQUI E NÃO DO INPUT PORQUE A LINHA PODE TER SIDO ESCONDIDA (data-valid-*) ANTES DE SALVAR
+            arquivosRemovidos.forEach((campo) => {
+                formData.set('del' + campo, 'ok')
+                if (!formData.has(campo)) formData.append(campo, new Blob([]), '')
+            })
+            arquivosRemovidos.clear()
             const formDataObject = {};
             
             formData.forEach((value, key) => {

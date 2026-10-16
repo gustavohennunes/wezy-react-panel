@@ -3,6 +3,7 @@ import { PANEL_LOGO } from '@/config/branding'
 import { useFormik } from 'formik'
 import { useState } from 'react'
 import { Link } from 'react-router-dom'
+import { getFixedCustomerHost, loginDoCliente } from '@/utils/customerHost'
 import * as Yup from 'yup'
 import { useNavigate } from 'react-router-dom'
 import { useAuthContext } from '@/auth/useAuthContext'
@@ -58,6 +59,10 @@ const ResetPassword = () => {
                 const params = new URLSearchParams()
 
                 params.append('email', values.email)
+
+                //O CLIENTE DO ?a= SEGUE PARA A PRÓXIMA TELA (VER comCliente)
+                const cliente = getFixedCustomerHost()
+                if (cliente) params.append('a', cliente)
 
                 navigate({
                     pathname: '/auth/reset-password/check-email',
@@ -163,7 +168,7 @@ const ResetPassword = () => {
                     </button>
 
                     <Link
-                        to="/auth/login"
+                        to={loginDoCliente()}
                         className="flex items-center align-start text-sm gap-2 text-gray-700 hover:text-primary"
                     >
                         <KeenIcon icon="black-left" />

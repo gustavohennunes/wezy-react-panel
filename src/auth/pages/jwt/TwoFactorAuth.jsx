@@ -1,5 +1,6 @@
 import { useState } from 'react'
 import { Link } from 'react-router-dom'
+import { loginDoCliente } from '@/utils/customerHost'
 import { toAbsoluteUrl } from '@/utils'
 import { KeenIcon } from '@/components'
 const TwoFactorAuth = () => {
@@ -70,7 +71,7 @@ const TwoFactorAuth = () => {
                 </button>
 
                 <Link
-                    to="/auth/login"
+                    to={loginDoCliente()}
                     className="flex items-center justify-center text-sm gap-2 text-gray-700 hover:text-primary"
                 >
                     <KeenIcon icon="black-left" />

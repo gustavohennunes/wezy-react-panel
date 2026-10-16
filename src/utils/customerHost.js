@@ -142,7 +142,29 @@ const clearCustomerHostWithoutParam = () => {
     clearCustomerHost()
 }
 
+/**
+ * Caminho de tela de autenticação com o ?a= do cliente fixo (quando houver). Os links entre login, cadastro e
+ * recuperação de senha precisam levar o cliente junto: a tela de login sem ?a= volta para o login central e apaga o
+ * cliente salvo (clearCustomerHostWithoutParam).
+ */
+const comCliente = (caminho) => {
+    const cliente = getFixedCustomerHost()
+    if (!cliente) return caminho
+    const [rota, query = ''] = String(caminho).split('?')
+    const params = new URLSearchParams(query)
+    params.set('a', cliente)
+    return rota + '?' + params.toString()
+}
+
+/** Volta para o login: o do cliente (/?a=cliente, a tela de login na própria URL) ou o central (/auth/login). */
+const loginDoCliente = () => {
+    const cliente = getFixedCustomerHost()
+    return cliente ? '/?a=' + encodeURIComponent(cliente) : '/auth/login'
+}
+
 export {
+    comCliente,
+    loginDoCliente,
     clearCustomerHostWithoutParam,
     getCustomerHost,
     setCustomerHost,

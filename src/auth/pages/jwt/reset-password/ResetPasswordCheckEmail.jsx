@@ -1,4 +1,5 @@
 import { Link } from 'react-router-dom'
+import { comCliente } from '@/utils/customerHost'
 import { toAbsoluteUrl } from '@/utils'
 import { useLayout } from '@/providers'
 import { useEffect, useState } from 'react'
@@ -43,7 +44,7 @@ const ResetPasswordCheckEmail = () => {
                     <Link
                         to={
                             currentLayout?.name === 'auth-branded'
-                                ? '/auth/reset-password/changed'
+                                ? comCliente('/auth/reset-password/changed')
                                 : '/auth/classic/reset-password/changed'
                         }
                         className="btn btn-primary flex justify-center"
@@ -59,7 +60,7 @@ const ResetPasswordCheckEmail = () => {
                     <Link
                         to={
                             currentLayout?.name === 'auth-branded'
-                                ? '/auth/reset-password/enter-email'
+                                ? comCliente('/auth/reset-password/enter-email')
                                 : '/auth/classic/reset-password/enter-email'
                         }
                         className="text-xs font-medium link"

@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react'
-import { clearCustomerHostWithoutParam } from '@/utils/customerHost'
+import axios from 'axios'
+import { clearCustomerHostWithoutParam, comCliente, getCustomerHost, getFixedCustomerHost } from '@/utils/customerHost'
 import { PANEL_LOGO } from '@/config/branding'
 import { Link, useLocation, useNavigate } from 'react-router-dom'
 import clsx from 'clsx'
@@ -44,6 +45,32 @@ const Login = ({ destino }) => {
     useEffect(() => {
         clearCustomerHostWithoutParam()
     }, [location.search])
+
+    //"Cadastre-se!" SÓ NO PAINEL DE UM CLIENTE (?a= OU DOMÍNIO DO CLIENTE) COM "Habilitar cadastro de usuários" LIGADO
+    //(panel/login-config). NO LOGIN CENTRAL NÃO EXISTE CLIENTE PARA CADASTRAR. O ?a= VAI JUNTO NO LINK: SEM ELE A VOLTA
+    //PARA O LOGIN ESQUECERIA O CLIENTE
+    const clienteFixo = getFixedCustomerHost()
+    const [cadastroLiberado, setCadastroLiberado] = useState(false)
+    useEffect(() => {
+        if (!clienteFixo) {
+            setCadastroLiberado(false)
+            return
+        }
+        let ativo = true
+        axios
+            .get(`${import.meta.env.VITE_CAYMAN_API_URL}/panel/login-config`, {
+                headers: { 'Customer-Host': getCustomerHost() },
+            })
+            .then(({ data }) => {
+                if (ativo) setCadastroLiberado(data?.success?.response?.data?.cadastro === true)
+            })
+            .catch(() => {
+                if (ativo) setCadastroLiberado(false)
+            })
+        return () => {
+            ativo = false
+        }
+    }, [clienteFixo])
 
     const formik = useFormik({
         initialValues,
@@ -184,7 +211,7 @@ const Login = ({ destino }) => {
                             Senha <span className="text-danger">*</span>
                         </label>
                         <Link
-                            to="/auth/reset-password"
+                            to={comCliente('/auth/reset-password')}
                             className="text-2sm link shrink-0"
                         >
                             Esqueceu sua senha?
@@ -242,14 +269,16 @@ const Login = ({ destino }) => {
                     {loading ? 'Carregando...' : 'Entrar'}
                 </button>
 
-                <div className="flex items-center justify-start font-medium">
-                    <span className="text-2sm text-gray-600 me-1.5">
-                        Não tem uma conta?
-                    </span>
-                    <Link to="/auth/signup" className="text-2sm link">
-                        Cadastre-se!
-                    </Link>
-                </div>
+                {cadastroLiberado && (
+                    <div className="flex items-center justify-start font-medium">
+                        <span className="text-2sm text-gray-600 me-1.5">
+                            Não tem uma conta?
+                        </span>
+                        <Link to={comCliente('/auth/signup')} className="text-2sm link">
+                            Cadastre-se!
+                        </Link>
+                    </div>
+                )}
             </form>
         </div>
     )

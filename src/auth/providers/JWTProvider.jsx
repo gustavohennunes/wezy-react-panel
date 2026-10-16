@@ -271,19 +271,19 @@
 
         }
 
-        const register = async (name, email, phone, password, password_confirmation, terms) => {
+        //CADASTRO NO PAINEL DO CLIENTE (panel/signup, LIBERADO PELO "Habilitar cadastro de usuários" DO CLIENTE)
+        const register = async (name, login, email, password, password_confirmation) => {
 
             try {
 
                 const { data: auth } = await axios.post(
                     CAYMAN_REGISTER_URL,
                     {
-                        login: email,
+                        nome: name,
+                        login,
+                        email,
                         senha: password,
                         'confirmacao-senha': password_confirmation,
-                        nome: name,
-                        telefone: phone,
-                        termos: terms,
                     },
                     {
                         headers: {

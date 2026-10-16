@@ -1,4 +1,5 @@
 import { Link } from 'react-router-dom'
+import { comCliente } from '@/utils/customerHost'
 import { PANEL_LOGO } from '@/config/branding'
 import { KeenIcon } from '@/components'
 
@@ -40,7 +41,7 @@ const Terms = () => {
                 <div className="flex items-start justify-start gap-1">
                     
                     <Link
-                        to="/auth/signup"
+                        to={comCliente('/auth/signup')}
                         className="text-xs font-medium link flex gap-2 items-center"
                     >
                         <KeenIcon icon="black-left" /> 

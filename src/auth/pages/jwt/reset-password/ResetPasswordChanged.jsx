@@ -1,4 +1,5 @@
 import { Link } from 'react-router-dom'
+import { loginDoCliente } from '@/utils/customerHost'
 import { toAbsoluteUrl } from '@/utils'
 import { useLayout } from '@/providers'
 const ResetPasswordChanged = () => {
@@ -32,7 +33,7 @@ const ResetPasswordChanged = () => {
                     <Link
                         to={
                             currentLayout?.name === 'auth-branded'
-                                ? '/auth/login'
+                                ? loginDoCliente()
                                 : '/auth/classic/login'
                         }
                         className="btn btn-primary"

@@ -1,0 +1,16 @@
+# SPA (React Router): ARQUIVO OU PASTA QUE EXISTE É SERVIDO; O RESTO (ex.: /auth/login) CAI NO index.html
+<IfModule mod_rewrite.c>
+    RewriteEngine On
+    RewriteBase /
+    RewriteRule ^index\.html$ - [L]
+    RewriteCond %{REQUEST_FILENAME} !-f
+    RewriteCond %{REQUEST_FILENAME} !-d
+    RewriteRule . /index.html [L]
+</IfModule>
+
+# index.html SEM CACHE (APONTA PARA OS ASSETS COM HASH DO BUILD ATUAL); ASSETS COM HASH PODEM FICAR EM CACHE
+<IfModule mod_headers.c>
+    <FilesMatch "index\.html$">
+        Header set Cache-Control "no-cache, no-store, must-revalidate"
+    </FilesMatch>
+</IfModule>

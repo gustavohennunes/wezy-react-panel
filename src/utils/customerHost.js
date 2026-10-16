@@ -8,17 +8,34 @@ const CUSTOMER_HOST_STORAGE_KEY = 'customer-host'
 // PARTE PORQUE O customer-host TAMBÉM É GRAVADO PELO LOGIN CENTRAL E É APAGADO NO LOGOUT
 const FIXED_CUSTOMER_HOST_STORAGE_KEY = 'customer-host-fixo'
 
+// ENDEREÇOS DA PLATAFORMA (LOGIN CENTRAL). QUALQUER OUTRO É O PAINEL DE UM CLIENTE (ex.: painel.dudaimoveis.com.br
+// APONTANDO PARA O app.wezy.com.br): O CLIENTE SAI DO PRÓPRIO ENDEREÇO E O LOGIN É DIRETO NO BANCO DELE, COMO O
+// controles/primario.php FAZ COM O X-Forwarded-Host. LISTA NO .env (VITE_PLATFORM_HOSTS, SEPARADA POR VÍRGULA)
+const PLATFORM_HOSTS = String(
+    import.meta.env.VITE_PLATFORM_HOSTS ||
+        'app.wezy.com.br,painel.wezy.com.br,localhost,127.0.0.1'
+)
+    .split(',')
+    .map((host) => host.trim().toLowerCase())
+    .filter(Boolean)
+
+/** Host do cliente pelo endereço da página (sem o "painel."), ou null num endereço da plataforma. */
+const hostDoEndereco = () => {
+    const hostname = String(window.location.hostname || '').toLowerCase()
+    if (hostname === '' || PLATFORM_HOSTS.includes(hostname)) return null
+    return hostname.replace(/^painel\./, '').replace(/^www\./, '') || null
+}
+
 /**
  * Resolve o Customer-Host que deve ser enviado nas requisições.
  *
  * Regras (em ordem de prioridade):
  * 1. Se a URL tiver ?a=<host>, esse valor é salvo e passa a ser usado.
  *    Ex.: painel.manentti.com.br/?a=carbonebrasil.com  ->  carbonebrasil.com
- * 2. Caso já exista um valor salvo anteriormente (via ?a=), ele é reutilizado.
- * 3. Caso o domínio comece com "painel.", usa o restante do domínio.
- *    Ex.: painel.manentti.com.br  ->  manentti.com.br
- * 4. Caso contrário, usa o domínio completo.
- *    Ex.: mdj.qualquerdominio.com.br  ->  mdj.qualquerdominio.com.br
+ * 2. Endereço de cliente (fora de VITE_PLATFORM_HOSTS): o próprio domínio, sem "painel.".
+ *    Ex.: painel.dudaimoveis.com.br  ->  dudaimoveis.com.br
+ * 3. Caso já exista um valor salvo anteriormente (login ou ?a=), ele é reutilizado.
+ * 4. Endereço da plataforma sem nada salvo: o domínio (sem "painel.", se tiver).
  *
  * Se nenhum caso resolver um host válido (ex.: domínio vazio), retorna null e
  * dispara o sinal de "sistema não encontrado", bloqueando o app.
@@ -35,20 +52,28 @@ const getCustomerHost = () => {
             return override
         }
 
-        // 2. Override salvo anteriormente (login ou ?a=)
-        const saved = getData(CUSTOMER_HOST_STORAGE_KEY) || getData(FIXED_CUSTOMER_HOST_STORAGE_KEY)
+        // 2. Endereço do próprio cliente
+        const doEndereco = hostDoEndereco()
+        if (doEndereco) {
+            return doEndereco
+        }
+
+        // 3. Override salvo anteriormente (login ou ?a=)
+        const saved =
+            getData(CUSTOMER_HOST_STORAGE_KEY) ||
+            getData(FIXED_CUSTOMER_HOST_STORAGE_KEY)
         if (saved) {
             return saved
         }
 
-        // 3. Domínio com prefixo "painel." -> usa o restante
+        // 4. Domínio com prefixo "painel." -> usa o restante
         const hostname = window.location.hostname
 
         if (hostname.startsWith('painel.')) {
             const rest = hostname.replace(/^painel\./, '')
             if (rest) return rest
         } else if (hostname) {
-            // 4. Domínio completo
+            // Domínio completo
             return hostname
         }
 
@@ -76,8 +101,8 @@ const setCustomerHost = (host) => {
 }
 
 /**
- * Domínio fixado pela URL (?a=), ou null. Com ele o login é feito direto no painel
- * desse cliente, como no painel legado.
+ * Domínio fixado pela URL (?a=) ou pelo endereço do cliente (painel.cliente.com.br), ou null.
+ * Com ele o login é feito direto no painel desse cliente, como no painel legado.
  */
 const getFixedCustomerHost = () => {
     try {
@@ -86,7 +111,9 @@ const getFixedCustomerHost = () => {
             setData(FIXED_CUSTOMER_HOST_STORAGE_KEY, override)
             return override
         }
-        return getData(FIXED_CUSTOMER_HOST_STORAGE_KEY) || null
+        return (
+            hostDoEndereco() || getData(FIXED_CUSTOMER_HOST_STORAGE_KEY) || null
+        )
     } catch (error) {
         console.error('CUSTOMER HOST FIXED RESOLVE ERROR', error)
         return null

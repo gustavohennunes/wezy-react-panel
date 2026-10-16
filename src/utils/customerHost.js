@@ -133,7 +133,17 @@ const clearCustomerHost = () => {
     }
 }
 
+/**
+ * Tela de login SEM ?a= na URL (ex.: entrou por /?a=dominio, não logou e depois abriu /auth/login ou /): o cliente
+ * salvo pelo ?a= não vale mais e o login volta a ser o central. Com ?a= na URL (login na própria tela do ?a=) mantém.
+ */
+const clearCustomerHostWithoutParam = () => {
+    if (new URLSearchParams(window.location.search).get('a')) return
+    clearCustomerHost()
+}
+
 export {
+    clearCustomerHostWithoutParam,
     getCustomerHost,
     setCustomerHost,
     clearCustomerHost,

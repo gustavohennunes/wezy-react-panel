@@ -15,9 +15,12 @@
 
         useEffect(() => {
 
+            //MODO TAGS: A PONTE MANDA COMO OPÇÕES SÓ OS VALORES JÁ SALVOS NO REGISTRO (PanelModule, Mul SEM TABELA) —
+            //TODOS PODEM SAIR PELO X DA LISTA; AO SALVAR, SAEM DO REGISTRO
             const initial = (fieldData.options || []).map((option) => ({
                 ...option,
                 selected: option.selected === true || option.selected === 'selected',
+                removable: isTags,
             }))
 
             setOptions(initial)
@@ -27,16 +30,23 @@
 
         const handleChange = (values) => {
 
-            //TAG CRIADA PELO USUÁRIO ENTRA NA LISTA DE OPÇÕES PARA CONTINUAR APARECENDO NA BUSCA
+            //TAG CRIADA PELO USUÁRIO ENTRA NA LISTA DE OPÇÕES PARA CONTINUAR APARECENDO NA BUSCA (COM O X, COMO AS SALVAS)
             if (isTags) {
                 setOptions((prev) => {
                     const novas = values.filter((value) => !prev.some((option) => String(option.value) === value))
-                    return novas.length ? [...prev, ...novas.map((value) => ({ label: value, value }))] : prev
+                    return novas.length ? [...prev, ...novas.map((value) => ({ label: value, value, removable: true }))] : prev
                 })
             }
 
             setSelected(values)
 
+        }
+
+        //X NA LISTA: A TAG SAI DAS OPÇÕES E DA SELEÇÃO (O HIDDEN DELA SOME E NÃO VAI NO ENVIO)
+        const removeOpcao = (option) => {
+            const valor = String(option.value)
+            setOptions((prev) => prev.filter((item) => String(item.value) !== valor))
+            setSelected((prev) => prev.filter((item) => item !== valor))
         }
 
         return (
@@ -65,6 +75,7 @@
                         options={options}
                         value={selected}
                         onChange={handleChange}
+                        onRemoveOption={removeOpcao}
                         placeholder={isTags ? 'Digite para adicionar' : options.length ? 'Selecione' : 'Nenhuma opção disponível'}
                     />
 

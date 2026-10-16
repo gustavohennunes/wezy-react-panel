@@ -13,8 +13,12 @@
 
     const criadoPeloReact = (el) => Object.keys(el).some((key) => key.startsWith('__reactFiber$'))
 
-    const lerOpcoes = (select) =>
-        Array.from(select.options).map((option) => ({ label: option.text, value: option.value }))
+    //select-tag (TAGS LIVRES): AS OPÇÕES SÃO OS VALORES DO PRÓPRIO REGISTRO (SALVOS OU CRIADOS AGORA), NÃO UMA LISTA FIXA
+    //DO CARTÃO — TODAS GANHAM O X NA LISTA
+    const lerOpcoes = (select) => {
+        const tags = select.classList.contains('select-tag')
+        return Array.from(select.options).map((option) => ({ label: option.text, value: option.value, removable: tags }))
+    }
 
     const LegacySelectCombobox = ({ select }) => {
 
@@ -48,6 +52,17 @@
             }
         }
 
+        //X NA LISTA: A TAG SAI DO <select> ORIGINAL (E DA SELEÇÃO); O CARTÃO RECEBE O change COMO NO select2
+        const removeOpcao = (option) => {
+            if (!creatable) return
+            const alvo = Array.from(select.options).find((item) => item.value === String(option.value))
+            if (!alvo) return
+            alvo.remove()
+            select.dispatchEvent(new Event('input', { bubbles: true }))
+            select.dispatchEvent(new Event('change', { bubbles: true }))
+            atualiza()
+        }
+
         const onChange = (novo) => {
 
             if (multiple) {
@@ -77,6 +92,7 @@
                 onChange={onChange}
                 multiple={multiple}
                 creatable={creatable}
+                onRemoveOption={removeOpcao}
                 disabled={select.disabled}
                 placeholder={options[0]?.label || 'Selecione uma opção'}
             />

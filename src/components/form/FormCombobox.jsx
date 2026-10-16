@@ -2,6 +2,7 @@
     import { Check, ChevronDown, X } from 'lucide-react'
     import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover'
     import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem, CommandList } from '@/components/ui/command'
+    import { useConfirm } from '@/components/ui/confirm-dialog'
     import { cn } from '@/lib/utils'
     import { normalizaTexto, contemTodasAsPalavras } from '@/utils/textSearch'
 
@@ -9,6 +10,7 @@
     // - BUSCA POR PALAVRAS: "cli ativo" ACHA OPÇÕES QUE TENHAM AS DUAS, EM QUALQUER ORDEM (customMatcher)
     // - QUADRADINHO DE COR QUANDO O value É #hex, var(...) OU color-* (formatColor)
     // - multiple: VALORES VIRAM BADGES; creatable: PERMITE CRIAR VALORES NOVOS (select-tag / tags:true)
+    // - onRemoveOption: OPÇÃO COM removable: true GANHA UM X NA LISTA (TAG ERRADA, SALVA OU CRIADA AGORA, SAI SEM RECARREGAR)
 
     const normaliza = normalizaTexto
 
@@ -62,11 +64,27 @@
         placeholder = 'Selecione uma opção',
         disabled = false,
         ariaLabel,
+        onRemoveOption,
     }) => {
 
         const [open, setOpen]     = useState(false)
         const listaId             = useId()
         const [search, setSearch] = useState('')
+        const [confirm, confirmDialog] = useConfirm()
+
+        //X DA LISTA: CONFIRMA ANTES (O X DO CHIP NO CAMPO SÓ DESMARCA, SEM PERGUNTAR). FECHA A LISTA PRIMEIRO PARA O
+        //MODAL NÃO DISPUTAR FOCO COM O POPOVER
+        const confirmaRemocao = async (option) => {
+            setOpen(false)
+            setSearch('')
+            const confirmou = await confirm({
+                title: 'Remover opção?',
+                description: `"${option.label}" sai da lista e da seleção. Ao salvar o formulário, sai também do registro.`,
+                confirmText: 'Remover',
+                cancelText: 'Cancelar',
+            })
+            if (confirmou) onRemoveOption(option)
+        }
 
         const selecionados = multiple ? (value || []).map(String) : []
         const atual        = multiple ? null : options.find((option) => String(option.value) === String(value ?? ''))
@@ -99,6 +117,7 @@
             options.find((option) => String(option.value) === valor) || { label: valor, value: valor }
 
         return (
+            <>
             <Popover open={open} onOpenChange={(aberto) => { setOpen(aberto); if (!aberto) setSearch('') }}>
 
                 <PopoverTrigger asChild disabled={disabled}>
@@ -197,6 +216,19 @@
                                     >
                                         <Check className={cn('shrink-0', estaSelecionado(option) ? 'opacity-100' : 'opacity-0')} />
                                         <LabelComCor option={option} quebra />
+                                        {option.removable && onRemoveOption && (
+                                            <button
+                                                type="button"
+                                                aria-label={`Remover "${option.label}"`}
+                                                title="Remover"
+                                                className="ms-auto flex size-5 shrink-0 items-center justify-center rounded text-gray-500 hover:bg-gray-200 hover:text-danger"
+                                                //O cmdk SELECIONA O ITEM NO pointerdown/click: O X NÃO PODE MARCAR A OPÇÃO
+                                                onPointerDown={(e) => { e.preventDefault(); e.stopPropagation() }}
+                                                onClick={(e) => { e.preventDefault(); e.stopPropagation(); confirmaRemocao(option) }}
+                                            >
+                                                <X className="size-3.5" />
+                                            </button>
+                                        )}
                                     </CommandItem>
                                 ))}
 
@@ -219,6 +251,8 @@
                 </PopoverContent>
 
             </Popover>
+            {confirmDialog}
+            </>
         )
 
     }

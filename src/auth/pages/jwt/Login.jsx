@@ -1,4 +1,5 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
+import { clearCustomerHostWithoutParam } from '@/utils/customerHost'
 import { PANEL_LOGO } from '@/config/branding'
 import { Link, useLocation, useNavigate } from 'react-router-dom'
 import clsx from 'clsx'
@@ -37,6 +38,12 @@ const Login = ({ destino }) => {
     // Painéis retornados pela API quando o usuário existe em mais de um (409)
     const [paineis, setPaineis] = useState(null)
     const { currentLayout } = useLayout()
+
+    //DESLOGADO EM /auth/login (OU / -> /auth/login) SEM ?a=: ESQUECE O customer-host / customer-host-fixo DE UM ?a=
+    //ANTERIOR — SENÃO O LOGIN IA DIRETO PARA AQUELE CLIENTE (panel/login) EM VEZ DO CENTRAL
+    useEffect(() => {
+        clearCustomerHostWithoutParam()
+    }, [location.search])
 
     const formik = useFormik({
         initialValues,

@@ -68,6 +68,28 @@
     text-decoration-color: currentColor;
 }
 
+/* AVISO AMARELO DOS CARTÕES (.alert-amarelo, ex.: "Horas incompletas" DO historico-cronograma). O CSS DO CARTÃO DAVA
+   FONTE GRANDE, LINHAS COLADAS E MARGEM/LARGURA FIXAS; AQUI FICA COMO OS AVISOS DO TEMA (CORES DO warning, CLARO E ESCURO) */
+.legacy-html .alert-amarelo {
+    width: auto;
+    margin: 0;
+    padding: 1rem 1.25rem;
+    border: 1px solid var(--tw-warning-clarity);
+    border-radius: 0.75rem;
+    background: var(--tw-warning-light);
+    color: var(--tw-gray-800);
+    font-size: 0.8125rem;
+    line-height: 1.85;
+}
+
+.legacy-html .alert-amarelo > b:first-child {
+    display: inline-block;
+    margin-bottom: 0.25rem;
+    font-size: 0.875rem;
+    font-weight: 600;
+    color: var(--tw-gray-900);
+}
+
 /* Ações de cadastro renderizadas pelo HTML legado, como "Cadastrar redes". */
 .legacy-html a.btt-inserir.padrao.btt-add {
     display: inline-flex;

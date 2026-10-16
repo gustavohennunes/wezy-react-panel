@@ -549,7 +549,7 @@ module.exports = {
                         gap: '0.275rem',
                         fontSize: theme('fontSize.xs')[0],
                         fontWeight: '500',
-                        iconFontSize: '0.500rem',
+                        iconFontSize: '0.8rem', //ERA 0.500rem: ÍCONE DOS BOTÕES btn-sm FICAVA MINÚSCULO (ex.: LIXEIRA DO "Remover" DO FormFile)
                         onlyIconFontSize: '1.125rem',
                         tabsGap: '0.188rem',
                     },

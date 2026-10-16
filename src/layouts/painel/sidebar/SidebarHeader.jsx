@@ -1,6 +1,6 @@
     /* eslint-disable no-unused-vars */
     import React, { forwardRef, useEffect, useRef, useState } from 'react'
-    import { PANEL_LOGO } from '@/config/branding'
+    import { PanelLogo } from '@/layouts/painel/PanelLogo'
     import { KeenIcon } from '@/components'
     import { Link } from 'react-router-dom'
 
@@ -34,18 +34,7 @@
             <div ref={ref}>
                 <div className="flex gap-3 mb-5 items-center px-6 mt-8">
                     <Link to="/?pag=dashboard">
-                        <img
-                            src={PANEL_LOGO}
-                            alt="Logo"
-                            className="dark:hidden"
-                            style={{ width: '135px' }}
-                        />
-                        <img
-                            src={PANEL_LOGO}
-                            alt="Logo"
-                            className="hidden dark:block"
-                            style={{ filter: 'brightness(100)', width: '135px' }}
-                        />
+                        <PanelLogo />
                     </Link>
                 </div>
 

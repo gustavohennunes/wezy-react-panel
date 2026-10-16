@@ -1,5 +1,6 @@
     import { useEffect, useMemo } from 'react'
     import { usePageData } from '@/context/PageDataContext'
+    import { abasDaListagemNoTopo } from '@/utils/listTabs'
     import { Models } from '@/components/list/models'
     import { FormContext } from '@/components/form/FormContext'
     import { DashboardContext } from '@/components/dashboard/DashboardContext'
@@ -65,7 +66,8 @@
                         columnHeader={pageData?.params?.list?.header}
                         content={pageData?.params?.list?.content}
                         btnAdd={pageData?.params?.add_button}
-                        tabs={pageData?.params?.buttons?.list}
+                        //ABAS QUE O Main JÁ MOSTRA NO TOPO (ACIMA DO $cabecalhoPagina) SAEM DO CARD
+                        tabs={abasDaListagemNoTopo(pageData) ? { ...pageData.params.buttons.list, before: false } : pageData?.params?.buttons?.list}
                         search={pageData?.params?.search}
                         btnExcluir={pageData?.params?.footer?.delete_button}
                         extraButton={pageData?.params?.footer?.extra_button}

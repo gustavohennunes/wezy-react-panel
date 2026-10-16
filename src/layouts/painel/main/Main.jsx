@@ -14,6 +14,8 @@
     import { toast } from 'sonner'
     import { LegacyHtml } from '@/components/legacy/LegacyHtml'
     import { installLegacyBridge } from '@/utils/legacyBridge'
+    import { Tabs } from '@/components/custom/tabs/tabs'
+    import { abasDaListagemNoTopo } from '@/utils/listTabs'
 
     //MENSAGENS QUE O CARTÃO DEFINE ($setMsgAlerta, $setMsgFormErro...) OU QUE A PONTE GERA (alterado=ok, inserido=erro...).
     //A PONTE AS ENVIA EM params.messages.{general|list|form}.{success|error|alert}
@@ -304,6 +306,13 @@
 
                                     {/* px-5 = MESMO RECUO DO .container-fluid (TOOLBAR E CONTEÚDO). mb-5: A LISTAGEM (ABAS) COMEÇA
                                         SEM ESPAÇO NO TOPO E O CABEÇALHO FICAVA GRUDADO NELA. SÓ RENDERIZA COM CONTEÚDO */}
+                                    {/* ABAS DA LISTAGEM ACIMA DO $cabecalhoPagina (VER utils/listTabs) */}
+                                    {abasDaListagemNoTopo(pageData) && (
+                                        <div className="w-full px-5">
+                                            <Tabs tabs={abasDaListagemNoTopo(pageData)} />
+                                        </div>
+                                    )}
+
                                     {String(headerAfterContent).trim() && (
                                         <LegacyHtml html={headerAfterContent} className="w-full px-5 mb-5" />
                                     )}

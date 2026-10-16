@@ -3,6 +3,7 @@
     import { toast } from 'sonner'
     import qs from 'qs'
     import { injectLegacyIconsCss } from '@/utils/legacyIcons'
+    import { limparGlobal } from '@/utils/limparGlobal'
     import './legacy-compat.css'
 
     //REESCREVE LINKS LEGADOS (index.php?pag=...) PARA AS ROTAS DO SPA
@@ -196,9 +197,9 @@
 
                     console.info('[LegacyCodeEditor] iniciando — bytes da área principal:', valorInicial.length)
 
+                    //O ace PRIMEIRO (MODO E TEMA SE REGISTRAM NO window.ace), DEPOIS OS DOIS JUNTOS
                     const aceModule = await import('ace-builds/src-noconflict/ace')
-                    await import('ace-builds/src-noconflict/mode-php')
-                    await import('ace-builds/src-noconflict/theme-idle_fingers')
+                    await Promise.all([import('ace-builds/src-noconflict/mode-php'), import('ace-builds/src-noconflict/theme-idle_fingers')])
 
                     if (destroyed) return
 
@@ -335,14 +336,10 @@
                     container?.remove()
                 }
 
-                delete window.setConteudoEditor
-                delete window.juntaConteudos
-                delete window.abreEditor
-                delete window.fechaEditor
-                delete window.codigoInicial
-                delete window.codigoInicialSemComentarios
-                delete window.salvarModulo
-                if (window.editor === editor) delete window.editor
+                //VER limparGlobal: delete DIRETO QUEBRAVA QUANDO O <script> DO CARTÃO DECLARAVA A MESMA FUNÇÃO NO GLOBAL
+                ;['setConteudoEditor', 'juntaConteudos', 'abreEditor', 'fechaEditor', 'codigoInicial', 'codigoInicialSemComentarios', 'salvarModulo']
+                    .forEach((nome) => limparGlobal(nome))
+                if (editor) limparGlobal('editor', editor)
 
             }
 

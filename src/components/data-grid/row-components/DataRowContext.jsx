@@ -39,7 +39,7 @@ export const DataRowContext = ({ fullRow, row, index, handleToggle }) => {
             return <LegacyHtml html={row.content} />
         }
 
-        return <div dangerouslySetInnerHTML={{ __html: row.content }} />
+        return <div className="celula-html" dangerouslySetInnerHTML={{ __html: row.content }} />
     }
 
     return row.content || '-'

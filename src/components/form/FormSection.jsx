@@ -4,15 +4,18 @@
     import { FormInput, FormSelect, FormMultiSelect, FormDate } from './'
     import { CustomCheckbox, CustomRadio } from './CustomFields'
 
-    const FormSection = ({ data, index, button, form, loading }) => {
+    //CHAVE DO CONTROLADOR DE LINHAS CONDICIONAIS: CLASSE "valid valid-xxx" -> "xxx"
+    export const chaveValid = (className) => /(?:^|\s)valid-([^\s]+)/.exec(className || '')?.[1] || null
+
+    //validRows/setValidRows/controladores VÊM DO FormContext: SÃO DO FORMULÁRIO INTEIRO, COMO NO painel.js LEGADO
+    //(ajustaValidFromTr) — O CONTROLADOR (ex.: "Copiar Section") PODE ESTAR EM OUTRA SEÇÃO DAS LINHAS QUE ELE MOSTRA
+    const FormSection = ({ data, index, button, form, loading, validRows = {}, setValidRows = () => {}, controladores = new Set() }) => {
 
         const [formState, setFormState] = useState({})
-        const [validRows, setValidRows] = useState({})
-        
+
         useEffect(() => {
-        
+
             const initialFormState = {}
-            const initialValidRows = {}
             
             data.fields.forEach((field) => {
 
@@ -85,13 +88,6 @@
                             
                             initialFormState[item.name].push(item.value);
                             
-                            if (item.class.includes('valid valid-')) {
-        
-                                const key = item.class.split('valid valid-')[1];
-        
-                                initialValidRows[key] = item.value;
-        
-                            }
 
                         }
 
@@ -108,13 +104,6 @@
                             
                             initialFormState[item.name] = item.value || 0;
                             
-                            if (item.class.includes('valid valid-')) {
-        
-                                const key = item.class.split('valid valid-')[1];
-        
-                                initialValidRows[key] = item.value;
-        
-                            }
 
                         }
 
@@ -130,7 +119,6 @@
             })
             
             setFormState(initialFormState);
-            setValidRows(initialValidRows);
                 
         }, [ data ]);
 
@@ -240,6 +228,13 @@
                 value = ''
             }
 
+            //SELECT CONTROLADOR DE LINHAS (classe valid valid-xxx)
+            const campoSelect = data.fields.find((f) => (f.field?.name || f.name) === name)
+            const keySelect = chaveValid(campoSelect?.field?.class)
+            if (keySelect) {
+                setValidRows((prev) => ({ ...prev, [keySelect]: value }));
+            }
+
             setFormState((prev) => ({
                 ...prev,
                 [name]: value,
@@ -258,13 +253,9 @@
 
         const handleRadioChange = (name, value, className) => {
             
-            if(className.includes('valid valid-')){
-                
-                const key = className.split('valid valid-')[1];
-                const newItem = { [key]: value };
-
-                setValidRows((prev) => ({ ...prev, ...newItem }));
-
+            const key = chaveValid(className)
+            if (key) {
+                setValidRows((prev) => ({ ...prev, [key]: value }));
             }
             
             setFormState((prev) => ({
@@ -276,24 +267,10 @@
 
         const handleCheckBoxChange = (fieldName, value, checked, className) => {
 
-            if (className.includes('valid valid-')) {
-
-                const key = className.split('valid valid-')[1];
-                if (validRows[key]) {
-
-                    const newValidRows = { ...validRows };
-                    delete newValidRows[key];
-
-                    setValidRows(newValidRows);
-
-                } else {
-
-                    const newItem = { [key]: value };
-
-                    setValidRows((prev) => ({ ...prev, ...newItem }));
-
-                }
-
+            //CHECKBOX CONTROLADOR: MARCADO VALE O value, DESMARCADO VALE '' (painel.js)
+            const key = chaveValid(className)
+            if (key) {
+                setValidRows((prev) => ({ ...prev, [key]: checked ? value : '' }));
             }
             
             setFormState((prev) => {
@@ -384,7 +361,16 @@
                         //ERA CONFERIDO E A LINHA APARECIA COM APENAS UMA DAS CONDIÇÕES ATIVA.
                         const condicoesValid = Object.keys(parsedAttributes).filter((attr) => attr.startsWith('data-valid-'))
 
-                        if (condicoesValid.some((attr) => parsedAttributes[attr] != (validRows[attr.replace('data-valid-', '')] ?? ''))) {
+                        //COMO O ajustaValidFromTr DO painel.js: "1|2" ACEITA QUALQUER UM DOS VALORES, E CONDIÇÃO SEM CAMPO
+                        //CONTROLADOR NO FORMULÁRIO NÃO ESCONDE A LINHA
+                        const condicaoFalha = (attr) => {
+                            const chave = attr.replace('data-valid-', '')
+                            if (!controladores.has(chave)) return false
+                            const permitidos = String(parsedAttributes[attr] ?? '').split('|')
+                            return !permitidos.includes(String(validRows[chave] ?? ''))
+                        }
+
+                        if (condicoesValid.some(condicaoFalha)) {
                             return;
                         }
                         

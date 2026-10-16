@@ -14,3 +14,16 @@
         Header set Cache-Control "no-cache, no-store, must-revalidate"
     </FilesMatch>
 </IfModule>
+
+# COMPRESSÃO: O SERVIDOR MANDAVA OS ASSETS CRUS (index ~3 MB, ace ~470 KB, mode-php ~500 KB) — O EDITOR DE CÓDIGO
+# LEVAVA SEGUNDOS PARA CARREGAR
+<IfModule mod_deflate.c>
+    AddOutputFilterByType DEFLATE text/html text/css text/plain text/xml application/javascript text/javascript application/json image/svg+xml application/xml font/ttf application/x-font-ttf
+</IfModule>
+
+# ASSETS COM HASH NO NOME (assets/index-AbC123.js) NUNCA MUDAM: CACHE DE 1 ANO. O index.html CONTINUA SEM CACHE (ACIMA)
+<IfModule mod_headers.c>
+    <FilesMatch "-[A-Za-z0-9_-]{8}\.(js|css|ttf|woff|woff2|svg|png|jpg|webp)$">
+        Header set Cache-Control "public, max-age=31536000, immutable"
+    </FilesMatch>
+</IfModule>

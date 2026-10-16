@@ -282,3 +282,35 @@ input[name="FrmPagina"] {
 .legacy-html .chart-card a {
     color: var(--tw-primary);
 }
+
+/* "Adicionar @media Tablet | Adicionar @media Mobile" (aba CSS das sections, campo aut com href="Javascript:addMedia...")
+   AS FUNÇÕES FICAM NO FormCodeEditor; AQUI OS LINKS GANHAM CARA DE BOTÃO PEQUENO, COMO NO PAINEL ANTIGO */
+.legacy-html a[href^="javascript:addMedia" i] {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.375rem;
+    height: 1.875rem;
+    margin: 0.125rem 0;
+    padding: 0 0.75rem;
+    border: 1px dashed var(--tw-primary);
+    border-radius: 0.375rem;
+    background-color: var(--tw-primary-light);
+    color: var(--tw-primary);
+    font-size: 0.75rem;
+    font-weight: 500;
+    text-decoration: none;
+    cursor: pointer;
+    transition: background-color 0.15s ease, color 0.15s ease, border-color 0.15s ease;
+}
+.legacy-html a[href^="javascript:addMedia" i]::before {
+    content: '+';
+    font-size: 0.9375rem;
+    font-weight: 600;
+    line-height: 1;
+}
+.legacy-html a[href^="javascript:addMedia" i]:hover,
+.legacy-html a[href^="javascript:addMedia" i]:focus-visible {
+    border-style: solid;
+    background-color: var(--tw-primary);
+    color: var(--tw-primary-inverse, #fff);
+}

@@ -1,7 +1,9 @@
-    import { useState, useEffect } from 'react'
+    import { useState, useEffect, useLayoutEffect, useMemo } from 'react'
     import { useNavigate } from 'react-router-dom'
     import qs from 'qs'
     import { FormSection } from './'
+    import { chaveValid } from './FormSection'
+    import { temEditorDeCodigo, instalarEditorGlobal } from './FormCodeEditor'
     import { FormTabs } from './'
     import { ScreenLoader } from '@/components/loaders'
     import { KeenIcon } from '@/components/keenicons'
@@ -26,6 +28,56 @@
         const [ formTabs, setFormTabs ]      = useState('');
         const [ loading, setLoading ]        = useState(false);
         const [ activeTab, setActiveTab ]    = useState('');
+        //LINHAS CONDICIONAIS (data-valid-xxx) DO FORMULÁRIO INTEIRO — VER FormSection
+        const [ validRows, setValidRows ]    = useState({});
+
+        //CAMPOS QUE CONTROLAM LINHAS (classe "valid valid-xxx") E O VALOR INICIAL DE CADA UM
+        const { controladores, validIniciais } = useMemo(() => {
+
+            const chaves  = new Set()
+            const valores = {}
+
+            ;(Array.isArray(data?.form?.fields) ? data.form.fields : []).forEach((field) => {
+
+                if (field.type === 'Rdo' || field.type === 'Ckb') {
+
+                    ;(Array.isArray(field.field) ? field.field : []).forEach((item) => {
+                        const chave = chaveValid(item?.class)
+                        if (!chave) return
+                        chaves.add(chave)
+                        if (!(chave in valores)) valores[chave] = ''
+                        if (item.checked && item.value) valores[chave] = String(item.value)
+                    })
+
+                } else if (field.field && !Array.isArray(field.field)) {
+
+                    const chave = chaveValid(field.field.class)
+                    if (!chave) return
+                    chaves.add(chave)
+                    const marcada = Array.isArray(field.field.options)
+                        ? field.field.options.find((o) => o.selected === true || o.selected === 'selected')
+                        : null
+                    valores[chave] = String(field.field.value || marcada?.value || '')
+
+                }
+
+            })
+
+            return { controladores: chaves, validIniciais: valores }
+
+        }, [data]);
+
+        useEffect(() => {
+            setValidRows(validIniciais)
+        }, [validIniciais]);
+
+        //window.editor PROVISÓRIO ANTES DO <script> DO CARTÃO RODAR (VER instalarEditorGlobal NO FormCodeEditor)
+        useLayoutEffect(() => {
+            const campos = Array.isArray(data?.form?.fields) ? data.form.fields : []
+            if (campos.some((field) => temEditorDeCodigo(field.field?.name || field.name))) {
+                return instalarEditorGlobal()
+            }
+        }, [data]);
         const { callApi }                    = usePageData();
         const { auth, logout }               = useAuth();
         //slug/action DA URL ATUAL (VER Main.jsx)
@@ -282,6 +334,9 @@
                             index={index + 1}
                             button={index === sections.length - 1}
                             form={data.form}
+                            validRows={validRows}
+                            setValidRows={setValidRows}
+                            controladores={controladores}
                         />
                     ))}
                 </div>
@@ -341,6 +396,9 @@
                             index={index + 1}
                             button={index === sections.length - 1}
                             form={data.form}
+                            validRows={validRows}
+                            setValidRows={setValidRows}
+                            controladores={controladores}
                         />
                     ))}
 

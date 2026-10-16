@@ -4,6 +4,7 @@
     import { FormFile } from './'
     import { FormColorPicker } from './FormColorPicker'
     import { FormIconSelector } from './FormIconSelector'
+    import { FormCodeEditor, temEditorDeCodigo } from './FormCodeEditor'
     import { isLegacyIconField } from '@/utils/legacyIcons'
     import { LegacyHtml } from '@/components/legacy/LegacyHtml'
 
@@ -150,6 +151,18 @@
 
             break
             case 'Txt':
+
+                //CAMPOS QUE O index.php LEGADO VIRAVA EDITOR DE CÓDIGO (ex.: CSS/JS DAS SECTIONS)
+                if (temEditorDeCodigo(fieldName)) {
+                    inputElement = (
+                        <FormCodeEditor
+                            fieldName={fieldName}
+                            value={formState[fieldName] || ''}
+                            onChange={(texto) => handleInputChange(fieldName, texto)}
+                        />
+                    )
+                    break
+                }
 
                 inputElement = (
                     <textarea

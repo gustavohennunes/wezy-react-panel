@@ -5,6 +5,7 @@
     import { useMenus } from '@/providers'
     import { iconeDoMenu } from '@/lib/transformOldIcon'
     import { OldIcon } from '@/components/legacy/OldIcon'
+    import { SidebarEditorTree } from './SidebarEditorTree'
     import { useEffect } from 'react'
 
     const iconeDoItem = iconeDoMenu
@@ -192,6 +193,11 @@
         const { getMenuConfig } = useMenus()
 
         const menuConfig = getMenuConfig('primary')
+
+        //MODO DE EDIÇÃO DO SITE (ACESSO DE SUPORTE): A ÁRVORE DO PROJETO NO LUGAR DO MENU, COMO O retornaMenu LEGADO
+        if (menuConfig?.editor) {
+            return <SidebarEditorTree editor={menuConfig.editor} />
+        }
 
         return (
             <Menu

@@ -1,9 +1,10 @@
-    import { createContext, useContext, useEffect, useState, useCallback, useMemo } from 'react'
+    import { createContext, useContext, useEffect, useState, useCallback, useMemo, useRef } from 'react'
     import { useSearchParams, useNavigate } from 'react-router-dom'
     import { api } from '@/services/api'
     import { buildApiUrl } from '@/utils/urlHelper'
     import { toast } from 'sonner'
     import { useAuth } from '@/auth/providers/JWTProvider'
+    import { useMenus } from '@/providers/MenusProvider'
     import { findLegacyRedirectDeep, applyLegacyRedirect, isExternalUrl } from '@/utils/legacyRedirect'
     import { lerRespostaApi, lerBlob } from '@/utils/apiResponse'
     import { isSystemNotFoundError, notifySystemNotFound } from '@/utils/systemStatus'
@@ -20,6 +21,13 @@
         const { logout }              = useAuth();
         const navigate                = useNavigate();
 
+        //MODO DE EDIÇÃO DO SITE: A SIDEBAR MOSTRA A ÁRVORE DO PROJETO (panel/menus). O MENU É RECARREGADO AO LIGAR/DESLIGAR
+        //O MODO (?pag=ativar-modulo-edicao) E, COM ELE LIGADO, NAS TELAS DO PROJETO — PÁGINA/SECTION/BACK-END NOVOS
+        //APARECEM NA ÁRVORE, COMO NO LEGADO (QUE MONTAVA O MENU A CADA CARREGAMENTO)
+        const { fetchMenu, getMenuConfig } = useMenus();
+        const menusRef = useRef({ fetchMenu, editor: false });
+        menusRef.current = { fetchMenu, editor: Boolean(getMenuConfig('primary')?.editor) };
+
         //SEM DEDUPLICAÇÃO POR URL: O ANTIGO "if (urlApi === lastUrl) return" NUNCA FUNCIONOU (lastUrl FICAVA
         //PRESO NO null DO PRIMEIRO RENDER DENTRO DO useCallback) — E OS REFRESHS APÓS EXCLUIR/ALTERAR
         //DEPENDEM DE PODER CHAMAR A MESMA URL DE NOVO
@@ -35,6 +43,10 @@
                 
                 //Blob: O CARTÃO PODE DEVOLVER UM ARQUIVO (EXPORTAÇÃO, PDF, XML) EM VEZ DO JSON DA PONTE
                 const response = await api.get(urlApi, { responseType: 'blob' });
+
+                if (/[?&]slug=ativar-modulo-edicao(&|$)/.test(urlApi) || (menusRef.current.editor && /[?&]slug=projetos-paginas/.test(urlApi))) {
+                    menusRef.current.fetchMenu();
+                }
 
                 const corpo = await lerRespostaApi(response);
                 if (corpo === null) {

@@ -54,6 +54,61 @@
     padding: 15px;
     border-radius:0.75rem;
 }
+
+/* LINKS SIMPLES NAS CÉLULAS DAS LISTAGENS (ex.: SLUG DO projetos-paginas COM O LINK DA PÁGINA NO SITE). O RESET DO
+   TAILWIND HERDA COR E TIRA O SUBLINHADO, ENTÃO O <a> PARECIA TEXTO COMUM. LINKS COM CLASSE (BOTÕES) FICAM COMO ESTÃO */
+.celula-html a[href]:not([class]) {
+    color: var(--tw-primary);
+    text-decoration: underline;
+    text-decoration-color: transparent;
+    text-underline-offset: 3px;
+    transition: text-decoration-color 0.15s;
+}
+.celula-html a[href]:not([class]):hover {
+    text-decoration-color: currentColor;
+}
+
+/* Ações de cadastro renderizadas pelo HTML legado, como "Cadastrar redes". */
+.legacy-html a.btt-inserir.padrao.btt-add {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    float: none;
+    min-height: 40px;
+    height: auto;
+    max-width: 100%;
+    padding: 10px 16px;
+    border: 1px solid transparent;
+    border-radius: 6px;
+    background-color: var(--tw-primary);
+    color: var(--tw-primary-inverse, #fff) !important;
+    font-size: 13px;
+    font-weight: 600;
+    line-height: 18px;
+    text-align: center;
+    text-decoration: none;
+    cursor: pointer;
+    transition: background-color 150ms ease;
+}
+
+.legacy-html a.btt-inserir.padrao.btt-add::before {
+    content: '+';
+    flex-shrink: 0;
+    font-size: 20px;
+    font-weight: 400;
+    line-height: 18px;
+}
+
+.legacy-html a.btt-inserir.padrao.btt-add:hover {
+    background-color: var(--tw-primary-active);
+}
+
+.legacy-html a.btt-inserir.padrao.btt-add:focus-visible {
+    outline: 2px solid var(--tw-primary);
+    outline-offset: 3px;
+}
+
 /* CABEÇALHO DE CONTEXTO DOS CARTÕES ($cabecalhoPagina): "<b>Cliente: </b>Nome", "<b>Produto: </b>...".
    NO PAINEL ANTIGO É UMA CAIXA CINZA COM padding INLINE; AQUI VIRA UM CARD DO TEMA, COM O RÓTULO PEQUENO
    EM CIMA E O NOME EM DESTAQUE. !important SÓ ONDE O CARTÃO MANDA style INLINE. O CARTÃO NÃO MUDA. */

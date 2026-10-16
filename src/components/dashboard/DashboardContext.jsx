@@ -199,7 +199,7 @@
                                 {total > 0 && <span className="ms-2 text-sm font-normal text-gray-500 tabular-nums">{total}</span>}
                             </h3>
                             <label className="input input-sm w-full sm:w-56">
-                                <KeenIcon icon="magnifier" className="text-base" />
+                                <KeenIcon icon="magnifier" className="!text-sm" />
                                 <input
                                     type="search"
                                     placeholder="Buscar módulo"

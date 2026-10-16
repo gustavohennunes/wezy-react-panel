@@ -5,7 +5,7 @@ const CUSTOMER_HOST_STORAGE_KEY = 'customer-host'
 
 // DOMÍNIO ESCOLHIDO PELA URL (?a=). COMO O $_SESSION['usandoDominio'] DO LEGADO (controles/primario.php): O LOGIN
 // PASSA A SER DIRETO NO PAINEL DESSE CLIENTE (panel/login) E NÃO NO CADASTRO CENTRAL (/auth/master). FICA SALVO À
-// PARTE PORQUE O customer-host TAMBÉM É GRAVADO PELO LOGIN CENTRAL E É APAGADO NO LOGOUT
+// PARTE PORQUE O customer-host TAMBÉM É GRAVADO PELO LOGIN CENTRAL. OS DOIS SÃO APAGADOS NO LOGOUT
 const FIXED_CUSTOMER_HOST_STORAGE_KEY = 'customer-host-fixo'
 
 // ENDEREÇOS DA PLATAFORMA (LOGIN CENTRAL). QUALQUER OUTRO É O PAINEL DE UM CLIENTE (ex.: painel.dudaimoveis.com.br
@@ -120,10 +120,14 @@ const getFixedCustomerHost = () => {
     }
 }
 
-/** Remove o override salvo (útil no logout). O domínio fixado pelo ?a= continua. */
+/**
+ * Logout: esquece o cliente salvo, tanto o do login quanto o do ?a=. O próximo login volta a ser o central — a não
+ * ser que a URL ainda tenha ?a= ou que o endereço seja o do próprio cliente (painel.cliente.com.br).
+ */
 const clearCustomerHost = () => {
     try {
         localStorage.removeItem(CUSTOMER_HOST_STORAGE_KEY)
+        localStorage.removeItem(FIXED_CUSTOMER_HOST_STORAGE_KEY)
     } catch (error) {
         console.error('CUSTOMER HOST CLEAR ERROR', error)
     }

@@ -12,7 +12,7 @@
     const LARGURA_CAMPO = 'max-w-[420px]'
     const LARGURA_TEXTO = 'max-w-[700px]'
 
-    const FormInput = ({ type, title, subtitle = '', combinedClass, rowAttr, fieldName, fieldMask, fieldClass = '', fieldData, formState, required = false, handleInputChange }) => {
+    const FormInput = ({ type, title, subtitle = '', combinedClass, rowAttr, fieldName, fieldMask, fieldClass = '', fieldData, formState, required = false, handleInputChange, buscaCep = null }) => {
 
         let inputElement
 
@@ -54,8 +54,33 @@
                         onChange={(e) =>
                             handleInputChange(fieldName, e.target.value)
                         }
+                        //CAMPO DE CEP: ENTER BUSCA O ENDEREÇO EM VEZ DE ENVIAR O FORMULÁRIO (COMO NO LEGADO)
+                        onKeyDown={buscaCep ? (e) => {
+                            if (e.key === 'Enter') {
+                                e.preventDefault()
+                                buscaCep.buscar()
+                            }
+                        } : undefined}
                     />
                 );
+
+                //data-buscar-cep="cep": BOTÃO "Buscar endereço" AO LADO (VER buscarCep NO FormSection)
+                if (buscaCep) {
+                    inputElement = (
+                        <div className={`flex w-full ${LARGURA_CAMPO} gap-2`}>
+                            <div className="min-w-0 flex-1 [&>.input]:max-w-none">{inputElement}</div>
+                            <button
+                                type="button"
+                                className="btn btn-primary shrink-0 gap-1.5"
+                                onClick={buscaCep.buscar}
+                                disabled={buscaCep.buscando}
+                            >
+                                <i className="ki-filled ki-geolocation text-base" />
+                                {buscaCep.buscando ? 'Buscando...' : 'Buscar endereço'}
+                            </button>
+                        </div>
+                    )
+                }
 
             break
             case 'Val':

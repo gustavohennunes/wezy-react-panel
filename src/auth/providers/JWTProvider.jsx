@@ -371,7 +371,7 @@
 
             saveAuth(undefined)
             setCurrentUser(undefined)
-            // O próximo login pode pertencer a outro painel (o domínio fixado pelo ?a= continua, como no legado)
+            // O próximo login pode pertencer a outro painel: esquece o cliente salvo (inclusive o do ?a=)
             clearCustomerHost()
         }
 

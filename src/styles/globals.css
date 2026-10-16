@@ -101,6 +101,91 @@
     height: 13px;
     line-height: 12px;
 }
+
+/* BARRA DE FILTROS DO LEGADO (<div class="filtros pagina-conteudo"><form class="busca-painel-left">, ex.: ?pag=cadastro-prospects):
+   NO PAINEL ANTIGO OS .left FLUTUAVAM LADO A LADO PELO css/style.css, QUE O REACT NÃO CARREGA. AQUI VIRA UM CARD COM
+   OS CAMPOS EM LINHA (QUEBRANDO EM TELAS MENORES) E O BOTÃO DE BUSCA NO FIM. OS SELECTS JÁ VIRAM O COMBOBOX DO TEMA */
+.legacy-html .filtros.pagina-conteudo:has(> form.busca-painel-left) {
+    margin-bottom: 1.25rem;
+    padding: 16px 20px !important;
+    background-color: var(--tw-card-background-color);
+    border: 1px solid var(--card-border-color, var(--tw-gray-200));
+    border-radius: 0.75rem;
+    box-shadow: var(--tw-card-box-shadow);
+}
+.legacy-html .filtros.pagina-conteudo > .clearfix {
+    display: none;
+}
+.legacy-html form.busca-painel-left {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: flex-end;
+    gap: 12px 16px;
+}
+.legacy-html form.busca-painel-left > .clearfix,
+.legacy-html form.busca-painel-left .left > .clearfix {
+    display: none;
+}
+.legacy-html form.busca-painel-left > .left {
+    float: none;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    flex: 1 1 150px;
+    min-width: 150px;
+    max-width: 220px;
+}
+.legacy-html form.busca-painel-left .periodo-busca {
+    height: auto;
+    font-size: 0.8125rem;
+    font-weight: 500;
+    line-height: 1.25rem;
+    color: var(--tw-gray-800);
+}
+/* CAMPOS DE TEXTO/DATA SOLTOS NO FILTRO (O SELECT JÁ VIRA O .legacy-combobox) */
+.legacy-html form.busca-painel-left .left > input:not([type="hidden"]):not([type="submit"]) {
+    height: 2.5rem;
+    width: 100%;
+    padding: 0 0.75rem;
+    border: 1px solid var(--tw-gray-300);
+    border-radius: 0.375rem;
+    background-color: var(--tw-light-active);
+    color: var(--tw-gray-700);
+    font-size: 0.8125rem;
+    font-weight: 500;
+}
+/* ÚLTIMA COLUNA: SÓ O BOTÃO DE BUSCA (O margin-top:20px INLINE ALINHAVA COM OS CAMPOS NO LEGADO) */
+.legacy-html form.busca-painel-left > .left:has(.send-filtro) {
+    flex: 0 0 auto;
+    min-width: 0;
+}
+.legacy-html form.busca-painel-left .btt.send-filtro {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 2.5rem;
+    height: 2.5rem;
+    margin-top: 0 !important;
+    border-radius: 0.375rem;
+    background-color: var(--tw-primary);
+    cursor: pointer;
+    transition: background-color 0.15s ease;
+}
+.legacy-html form.busca-painel-left .btt.send-filtro:hover {
+    background-color: var(--tw-primary-active);
+}
+/* O ÍCONE ERA UM SPRITE BRANCO DO css/icons.css (NÃO CARREGADO): LUPA DESENHADA AQUI */
+.legacy-html form.busca-painel-left .btt.send-filtro > * {
+    display: none;
+}
+.legacy-html form.busca-painel-left .btt.send-filtro::before {
+    content: '';
+    width: 16px;
+    height: 16px;
+    background-color: var(--tw-primary-inverse, #fff);
+    -webkit-mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='2.25' stroke-linecap='round' stroke-linejoin='round'%3E%3Ccircle cx='11' cy='11' r='7'/%3E%3Cpath d='m20 20-3.5-3.5'/%3E%3C/svg%3E") center / contain no-repeat;
+    mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='2.25' stroke-linecap='round' stroke-linejoin='round'%3E%3Ccircle cx='11' cy='11' r='7'/%3E%3Cpath d='m20 20-3.5-3.5'/%3E%3C/svg%3E") center / contain no-repeat;
+}
 .pagina-conteudo .filter-field .periodo-busca {
     margin-bottom:5px;
 }

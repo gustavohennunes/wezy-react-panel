@@ -3,6 +3,7 @@
     import { toast } from 'sonner'
     import { FormInput, FormSelect, FormMultiSelect, FormDate } from './'
     import { CustomCheckbox, CustomRadio } from './CustomFields'
+    import { BotaoExcluirRegistro } from './BotaoExcluirRegistro'
 
     //CHAVE DO CONTROLADOR DE LINHAS CONDICIONAIS: CLASSE "valid valid-xxx" -> "xxx"
     export const chaveValid = (className) => /(?:^|\s)valid-([^\s]+)/.exec(className || '')?.[1] || null
@@ -684,7 +685,7 @@
 
                             <div className="hidden lg:block lg:w-56 lg:min-w-56 lg:shrink-0"></div>
 
-                            <div className="w-full lg:flex-1">
+                            <div className="w-full lg:flex-1 flex flex-wrap items-center gap-2.5">
                                 <button type="submit" className="btn btn-success" disabled={loading ? true : false}>
                                     {loading ? (
                                         <>
@@ -696,6 +697,8 @@
                                         </>
                                     )}
                                 </button>
+                                {/* $botaoExcluirForm DO CARTÃO (VER BotaoExcluirRegistro) */}
+                                {form.delete_button === true && <BotaoExcluirRegistro />}
                             </div>
 
                         </div>

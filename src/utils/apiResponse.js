@@ -4,7 +4,7 @@
 
     const TIPOS_DE_TEXTO = ['application/json', 'text/html', 'text/plain', 'text/javascript']
 
-    const ehTexto = (contentType) => TIPOS_DE_TEXTO.some((tipo) => contentType.includes(tipo))
+    const tipoDeTexto = (contentType) => TIPOS_DE_TEXTO.some((tipo) => contentType.includes(tipo))
 
     const nomeDoArquivo = (contentDisposition, contentType) => {
 
@@ -66,9 +66,9 @@
         const contentDisposition = String(response?.headers?.['content-disposition'] || '')
         const corpo              = response?.data
 
-        const ehArquivo = /attachment|filename/i.test(contentDisposition) || (contentType !== '' && !ehTexto(contentType))
+        const respostaDeArquivo = /attachment|filename/i.test(contentDisposition) || (contentType !== '' && !tipoDeTexto(contentType))
 
-        if (ehArquivo && corpo instanceof Blob) {
+        if (respostaDeArquivo && corpo instanceof Blob) {
             baixar(corpo, nomeDoArquivo(contentDisposition, contentType))
             return null
         }

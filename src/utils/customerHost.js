@@ -13,7 +13,7 @@ const FIXED_CUSTOMER_HOST_STORAGE_KEY = 'customer-host-fixo'
 // controles/primario.php FAZ COM O X-Forwarded-Host. LISTA NO .env (VITE_PLATFORM_HOSTS, SEPARADA POR VÍRGULA)
 const PLATFORM_HOSTS = String(
     import.meta.env.VITE_PLATFORM_HOSTS ||
-        'app.wezy.com.br,painel.wezy.com.br,localhost,127.0.0.1'
+        'app.wezy.com.br,sub.app.wezy.com.br,painel.wezy.com.br,localhost,127.0.0.1'
 )
     .split(',')
     .map((host) => host.trim().toLowerCase())

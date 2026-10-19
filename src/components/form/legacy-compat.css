@@ -235,7 +235,7 @@ input[name="FrmPagina"] {
 /* CAMPOS E BOTÕES DO HTML LEGADO (.forms E .btt.padrao VINHAM DO css/style.css DO PAINEL ANTIGO, QUE O REACT NÃO
    CARREGA — SEM ISTO FICAVAM COMO INPUT/BUTTON CRUS DO NAVEGADOR, ex.: FILTRO DE DATAS DO framework/charts.php).
    AQUI GANHAM A CARA DOS CAMPOS DO TEMA. !important SÓ ONDE O CARTÃO MANDA style INLINE (height/padding) */
-.legacy-html input.forms,
+.legacy-html input.forms:not([type="checkbox"], [type="radio"]),
 .legacy-html select.forms,
 .legacy-html textarea.forms,
 /* INPUT SEM CLASSE DENTRO DE CAMPO aut (ex.: retornaFormulario DO emails-disparos: <input type="text" id="ManualFrm...">).
@@ -247,7 +247,8 @@ input[name="FrmPagina"] {
     border: 1px solid var(--tw-gray-300);
     border-radius: 0.375rem;
     background-color: var(--tw-light-active);
-    color: var(--tw-gray-700);
+    /* gray-900: NO ESCURO O gray-700 SE MISTURAVA COM O FUNDO (ex.: {{imageToThumbs/230/190}} DO BACK-END DAS SECTIONS) */
+    color: var(--tw-gray-900);
     font-size: 0.8125rem;
     outline: none;
     transition: border-color 0.15s ease;
@@ -258,14 +259,23 @@ input[name="FrmPagina"] {
     padding: 0.5rem 0.75rem;
 }
 
-/* MESMA LARGURA DOS CAMPOS DO FORMULÁRIO REACT (max-w-[420px]) */
-.legacy-html :is(input:not([type]), input[type="text"], input[type="tel"], input[type="email"], input[type="number"], input[type="url"], input[type="password"]):not([class]),
-.legacy-html textarea:not([class]) {
+/* CAMPOS DE TEXTO DO HTML LEGADO OCUPAM A COLUNA: TEXTAREA ATÉ 700px E INPUT 25% MENOR, 525px (OS MESMOS DO FormInput).
+   ANTES OS .forms FICAVAM NO TAMANHO NATIVO DO NAVEGADOR (~200px, ex.: Src/Alt text/Largura DO BACK-END DAS SECTIONS) */
+.legacy-html :is(input:not([type]), input[type="text"], input[type="tel"], input[type="email"], input[type="number"], input[type="url"], input[type="password"]):is(:not([class]), .forms) {
     width: 100%;
-    max-width: 420px;
+    max-width: 525px;
+}
+.legacy-html textarea:is(:not([class]), .forms) {
+    width: 100%;
+    max-width: 700px;
+}
+/* SELECT 10% MAIOR QUE O INPUT (578px, O MESMO DO FormSelect) */
+.legacy-html select.forms {
+    width: 100%;
+    max-width: 578px;
 }
 
-.legacy-html input.forms:focus,
+.legacy-html input.forms:not([type="checkbox"], [type="radio"]):focus,
 .legacy-html select.forms:focus,
 .legacy-html textarea.forms:focus,
 .legacy-html input:not([class]):focus,

@@ -11,6 +11,7 @@ import { toAbsoluteUrl } from '@/utils'
 import { useAuthContext } from '@/auth'
 import { useLayout } from '@/providers'
 import { Alert } from '@/components'
+import { lerVoltaAposLogin, limparVoltaAposLogin } from '@/auth/voltaAposLogin'
 
 const loginSchema = Yup.object().shape({
     email: Yup.string()
@@ -34,7 +35,10 @@ const Login = ({ destino }) => {
     const { login } = useAuthContext()
     const navigate = useNavigate()
     const location = useLocation()
-    const from = destino || location.state?.from?.pathname || '/'
+    //VOLTA PARA A TELA QUE PEDIU O LOGIN COM A QUERY (?pag=...&acao=...). ANTES SÓ O pathname: NESTE PAINEL ELE É SEMPRE "/",
+    //ENTÃO A SESSÃO EXPIRADA SEMPRE CAÍA NA TELA INICIAL
+    const origem = location.state?.from
+    const from = destino || (origem ? `${origem.pathname || '/'}${origem.search || ''}${origem.hash || ''}` : '') || lerVoltaAposLogin() || '/'
     const [showPassword, setShowPassword] = useState(false)
     // Painéis retornados pela API quando o usuário existe em mais de um (409)
     const [paineis, setPaineis] = useState(null)
@@ -93,6 +97,7 @@ const Login = ({ destino }) => {
 
             await login(values.email, values.password, idPainelCliente)
 
+            limparVoltaAposLogin()
             navigate(from, {
                 replace: true,
             })

@@ -97,7 +97,7 @@
                     )}
                 </div>
 
-                <div className="w-full lg:flex-1 min-w-0 max-w-[420px]">
+                <div className="w-full lg:flex-1 min-w-0 max-w-[578px]">
 
                     <Combobox
                         ariaLabel={fieldData.title || field.title || undefined}

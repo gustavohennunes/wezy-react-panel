@@ -7,19 +7,22 @@
     import { FormCodeEditor, temEditorDeCodigo } from './FormCodeEditor'
     import { isLegacyIconField } from '@/utils/legacyIcons'
     import { LegacyHtml } from '@/components/legacy/LegacyHtml'
-    import { resolveFormMask } from '@/utils/formMask'
+    import { resolveFormMask, formatarSite } from '@/utils/formMask'
 
     //CAMPOS NÃO OCUPAM A LINHA TODA: O CONTEÚDO É CURTO E O INPUT GIGANTE FICAVA VAZIO.
     //O TEXTAREA É MAIS LARGO; O EDITOR DE CÓDIGO (ace) CONTINUA 100% PORQUE NASCE NO WRAPPER
-    const LARGURA_CAMPO = 'max-w-[420px]'
+    const LARGURA_CAMPO = 'max-w-[525px]'
     const LARGURA_TEXTO = 'max-w-[700px]'
 
     const FormInput = ({ type, title, subtitle = '', combinedClass, rowAttr, fieldName, fieldMask, fieldClass = '', fieldData, formState, required = false, handleInputChange, buscaCep = null }) => {
 
         let inputElement
 
-        //LIGA O <label> DO TÍTULO AO CONTROLE DO CAMPO (LEITOR DE TELA E CLIQUE NO TÍTULO FOCAM O INPUT)
-        const inputId = useId()
+        //LIGA O <label> DO TÍTULO AO CONTROLE DO CAMPO (LEITOR DE TELA E CLIQUE NO TÍTULO FOCAM O INPUT). O id É O DO LEGADO
+        //(A PONTE MANDA id = NOME DO CAMPO): O JS DOS CARTÕES USA $('#FrmEmails_cliente').val(...) ETC. COM O id DO useId
+        //(":r5:") ESSES SELETORES NÃO ACHAVAM NADA (ex.: emails-disparos NÃO PREENCHIA O E-MAIL AO ESCOLHER O DESTINATÁRIO)
+        const idGerado = useId()
+        const inputId  = fieldData?.id || idGerado
 
         //MÁSCARA COM REFERÊNCIA ESTÁVEL: O resolveFormMask DEVOLVE UM ARRAY NOVO A CADA RENDER (TELEFONE FIXO/CELULAR) E O
         //IMaskInput RECONFIGURAVA A MÁSCARA EM TODO RENDER DO FORMULÁRIO
@@ -58,7 +61,7 @@
                         //VALOR ANTIGO E, NO PRÓXIMO RENDER DO FORMULÁRIO, O CAMPO VOLTAVA/SE APAGAVA (TELEFONE/WHATSAPP). SEM
                         //MÁSCARA O IMask NÃO É CRIADO E O onAccept NÃO DISPARA: AÍ CONTINUA O onChange
                         onAccept={inputMask ? (valor) => handleInputChange(fieldName, valor) : undefined}
-                        onChange={inputMask ? undefined : (e) => handleInputChange(fieldName, e.target.value)}
+                        onChange={inputMask ? undefined : (e) => handleInputChange(fieldName, fieldMask === 'Site' ? formatarSite(e.target.value) : e.target.value)}
                         //CAMPO DE CEP: ENTER BUSCA O ENDEREÇO EM VEZ DE ENVIAR O FORMULÁRIO (COMO NO LEGADO)
                         onKeyDown={buscaCep ? (e) => {
                             if (e.key === 'Enter') {

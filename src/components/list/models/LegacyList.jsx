@@ -16,7 +16,7 @@
     //DEFAULT FORA DO COMPONENTE: UM [] NOVO A CADA RENDER INVALIDAVA O useMemo DAS COLUNAS
     const SEM_COLUNAS = []
 
-    const LegacyList = ({ html, columnHeader = SEM_COLUNAS, showHeader = true }) => {
+    const LegacyList = ({ html, columnHeader = SEM_COLUNAS, showHeader = true, onRemoveItems }) => {
 
         const corpoRef = useRef(null)
         const navigate = useNavigate()
@@ -66,7 +66,7 @@
                 host.className = 'flex justify-center'
                 td.appendChild(host)
 
-                encontradas.push({ host, row: { content: itens } })
+                encontradas.push({ host, element: td.closest('tr'), row: { content: itens } })
 
             })
 
@@ -146,7 +146,7 @@
 
                         <tbody ref={corpoRef} onClick={aoClicar} dangerouslySetInnerHTML={{ __html: html }} />
 
-                        {celulasDeAcoes.map((celula, indice) => createPortal(<DataRowActionsMenu row={celula.row} />, celula.host, `acoes-${indice}`))}
+                        {celulasDeAcoes.map((celula, indice) => createPortal(<DataRowActionsMenu row={celula.row} onRemoveItems={(ids) => onRemoveItems(ids, celula.element)} />, celula.host, `acoes-${indice}`))}
 
                     </table>
                 </div>

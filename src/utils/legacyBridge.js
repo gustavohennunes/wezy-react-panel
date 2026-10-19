@@ -163,6 +163,45 @@
 
         }
 
+        // $(campo).val(valor) DO JS DOS CARTÕES EM CAMPO CONTROLADO PELO REACT: O jQuery TROCA SÓ O DOM, O ESTADO DO
+        // FORMULÁRIO CONTINUA COM O VALOR ANTIGO E O PRÓXIMO RENDER DESFAZ A TROCA (ex.: O E-MAIL QUE O emails-disparos
+        // PREENCHE AO ESCOLHER O DESTINATÁRIO). AQUI A TROCA VIRA UM EVENTO DE DIGITAÇÃO QUE O onChange DO REACT RECEBE
+        if (jq && jq.fn && typeof jq.fn.val === 'function' && !jq.fn.val.ponteReact) {
+
+            const valOriginal = jq.fn.val
+
+            const controladoPeloReact = (el) =>
+                Object.keys(el).some((chave) => chave.startsWith('__reactProps$') && typeof el[chave]?.onChange === 'function')
+
+            const valComReact = function (...args) {
+
+                if (args.length === 0) {
+                    return valOriginal.apply(this, args)
+                }
+
+                const anteriores = this.toArray().map((el) => el.value)
+                const resultado  = valOriginal.apply(this, args)
+
+                this.each((indice, el) => {
+
+                    const campoDeFormulario = el instanceof HTMLInputElement || el instanceof HTMLTextAreaElement || el instanceof HTMLSelectElement
+                    if (!campoDeFormulario || el.type === 'hidden' || el.value === anteriores[indice] || !controladoPeloReact(el)) return
+
+                    //O REACT SÓ DISPARA onChange SE O VALOR "RASTREADO" FOR DIFERENTE DO DOM: VOLTA O RASTREADO PARA O ANTERIOR
+                    el._valueTracker?.setValue(anteriores[indice])
+                    el.dispatchEvent(new Event(el instanceof HTMLSelectElement ? 'change' : 'input', { bubbles: true }))
+
+                })
+
+                return resultado
+
+            }
+
+            valComReact.ponteReact = true
+            jq.fn.val = valComReact
+
+        }
+
         // XMLHttpRequest DIRETO (SEM jQuery). O jQuery TAMBÉM USA XHR, MAS A URL DELE JÁ CHEGA REESCRITA PELO
         // ajaxPrefilter — AÍ NÃO É MAIS "LEGADA" E PASSA DIRETO POR AQUI
         if (typeof window.XMLHttpRequest === 'function') {

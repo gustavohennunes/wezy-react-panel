@@ -6,12 +6,12 @@
 
     const ERRO_DE_CHUNK = /Failed to fetch dynamically imported module|Importing a module script failed|error loading dynamically imported module|Expected a JavaScript/i
 
-    export const ehChunkAusente = (erro) => ERRO_DE_CHUNK.test(String(erro?.message || erro || ''))
+    export const chunkAusente = (erro) => ERRO_DE_CHUNK.test(String(erro?.message || erro || ''))
 
     // true QUANDO VAI RECARREGAR (QUEM CHAMOU NÃO PRECISA MOSTRAR ERRO)
     export const recarregarSeVersaoNova = (erro) => {
 
-        if (!ehChunkAusente(erro)) return false
+        if (!chunkAusente(erro)) return false
 
         let ultima = 0
         try {

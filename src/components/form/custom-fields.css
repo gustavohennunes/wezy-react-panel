@@ -160,3 +160,61 @@
     border-radius: 50px;
     margin: 3px;
 }
+
+/* CHECKBOX E RADIO CRUS DO HTML LEGADO (CAMPOS aut, ex.: OS custom-field[...] DO BACK-END DAS SECTIONS): VINHAM COM O
+   VISUAL NATIVO DO NAVEGADOR. AQUI GANHAM O MESMO DESENHO DOS CustomCheckbox/CustomRadio ACIMA (CAIXA 18px, AZUL DA MARCA
+   MARCADO, HALO NO HOVER), SEM MUDAR O HTML — O JS DOS CARTÕES CONTINUA LENDO O PRÓPRIO INPUT */
+.legacy-html input[type='checkbox']:not([data-custom-field] *),
+.legacy-html input[type='radio']:not([data-custom-field] *) {
+    -webkit-appearance: none;
+    appearance: none;
+    flex-shrink: 0;
+    width: 18px;
+    height: 18px;
+    min-width: 0;
+    min-height: 0;
+    padding: 0;
+    margin: 0 10px 0 0;
+    border: 2px solid var(--cf-box-border);
+    background: var(--cf-box-bg) center / 10px no-repeat;
+    vertical-align: middle;
+    cursor: pointer;
+    transition: background-color 0.2s, border-color 0.2s, box-shadow 0.2s;
+}
+.legacy-html input[type='checkbox']:not([data-custom-field] *) {
+    border-radius: 3px;
+}
+.legacy-html input[type='radio']:not([data-custom-field] *) {
+    border-radius: 50%;
+}
+.legacy-html input[type='checkbox']:not([data-custom-field] *):hover,
+.legacy-html input[type='radio']:not([data-custom-field] *):hover,
+.legacy-html input[type='checkbox']:not([data-custom-field] *):focus-visible,
+.legacy-html input[type='radio']:not([data-custom-field] *):focus-visible {
+    outline: none;
+    box-shadow: 0 0 0 7px var(--cf-hover);
+}
+.legacy-html input[type='checkbox']:not([data-custom-field] *):checked {
+    border-color: #0075a7;
+    background-color: #0075a7;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 405 405'%3E%3Cpath fill='%23fff' d='M393.401,124.425L179.603,338.208c-15.832,15.835-41.514,15.835-57.361,0L11.878,227.836c-15.838-15.835-15.838-41.52,0-57.358c15.841-15.841,41.521-15.841,57.355-0.006l81.698,81.699L336.037,67.064c15.841-15.841,41.523-15.829,57.358,0C409.23,82.902,409.23,108.578,393.401,124.425z'/%3E%3C/svg%3E");
+}
+.legacy-html input[type='radio']:not([data-custom-field] *):checked {
+    border-color: #0075a7;
+    background: radial-gradient(circle, #fff 0 4px, #0075a7 4.5px);
+}
+.legacy-html input[type='checkbox']:not([data-custom-field] *):disabled,
+.legacy-html input[type='radio']:not([data-custom-field] *):disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+/* O <label> EM VOLTA: INPUT E TEXTO ALINHADOS, LINHA COM ALTURA PARA O HALO, TEXTO NA COR DOS CAMPOS DO REACT */
+.legacy-html label:has(> input[type='checkbox']:not([data-custom-field] *)),
+.legacy-html label:has(> input[type='radio']:not([data-custom-field] *)) {
+    display: inline-flex;
+    align-items: center;
+    min-height: 32px;
+    font-size: 13px;
+    color: var(--tw-gray-900);
+    cursor: pointer;
+}

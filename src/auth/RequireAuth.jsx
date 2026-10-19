@@ -3,6 +3,7 @@ import { ScreenLoader } from '@/components/loaders'
 import { AuthLayout } from '@/layouts/auth'
 import { Login } from './pages/jwt'
 import { useAuthContext } from './useAuthContext'
+import { guardarVoltaAposLogin } from './voltaAposLogin'
 const RequireAuth = () => {
     const { auth, loading } = useAuthContext()
     const location = useLocation()
@@ -21,6 +22,9 @@ const RequireAuth = () => {
             </AuthLayout>
         )
     }
+    //SESSÃO EXPIRADA (OU ABRIU UMA TELA SEM ESTAR LOGADO): DEPOIS DO LOGIN VOLTA PARA ESTA TELA, COMO NO PAINEL LEGADO.
+    //O state SOME NUM F5 DO /auth/login; O sessionStorage SEGURA (VER Login.jsx)
+    guardarVoltaAposLogin(location.pathname + location.search + location.hash)
     return (
         <Navigate
             to="/auth/login"

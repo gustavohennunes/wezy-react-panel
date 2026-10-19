@@ -69,7 +69,16 @@
 
                 {value && !removido && (
                     <div className="mb-2 flex items-center gap-2">
-                        <img src={value} alt="Imagem" className="w-10 h-10 object-cover rounded-lg" />
+                        {/* MINIATURA COM PRÉVIA AMPLIADA NO HOVER (COMO O verFoto DAS LISTAGENS E O BANCO DE IMAGENS DO LEGADO).
+                            object-contain: LOGO LARGO (ex.: 190x43) NÃO É CORTADO. O CLIQUE ABRE A IMAGEM EM OUTRA ABA */}
+                        <div className="group relative shrink-0">
+                            <a href={value} target="_blank" rel="noopener noreferrer" title="Abrir imagem em nova aba" className="block">
+                                <img src={value} alt="Imagem atual" className="size-10 rounded-lg border border-gray-200 bg-gray-100 object-contain" />
+                            </a>
+                            <div className="pointer-events-none invisible absolute left-12 top-1/2 z-50 -translate-y-1/2 rounded-lg border border-gray-200 bg-[var(--tw-card-background-color,var(--tw-light))] p-2 opacity-0 shadow-lg transition-opacity duration-150 group-hover:visible group-hover:opacity-100">
+                                <img src={value} alt="" className="block max-h-[240px] max-w-[320px] min-w-16 bg-gray-100 object-contain" />
+                            </div>
+                        </div>
                         {/* SEM CONDIÇÃO DE multiple: A API MANDA multiple ATÉ EM CAMPO DE UM ARQUIVO SÓ (ex.: LOGOTIPO DO CLIENTE) */}
                         <button type="button" onClick={removerArquivo} className="btn btn-sm btn-light text-danger gap-1">
                             <KeenIcon icon="trash" />

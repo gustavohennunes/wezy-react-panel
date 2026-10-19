@@ -39,6 +39,32 @@
         }
     }
 
+    //CONTROLADORES DE LINHA CONDICIONAL QUE VÊM CRUS NO HTML DE UM CAMPO aut (ex.: CUSTOM FIELDS DO BACK-END DAS SECTIONS:
+    //<input type="radio" class="forms obg valid valid-forma-apresentacao-0">, E AS LINHAS COM data-valid-forma-apresentacao-0="4").
+    //SEM ISSO O FormSection NÃO CONHECIA A CHAVE E MOSTRAVA TODAS AS LINHAS DE UMA VEZ. DEVOLVE [{ chave, valor inicial }]
+    const controladoresDoHtml = (html) => {
+
+        if (!html.includes('valid-') || typeof DOMParser === 'undefined') return []
+
+        const documento = new DOMParser().parseFromString(html, 'text/html')
+
+        return Array.from(documento.querySelectorAll('input, select, textarea')).reduce((lista, campo) => {
+
+            const chave = chaveValid(campo.getAttribute('class'))
+            if (!chave) return lista
+
+            let valor = campo.value || ''
+            if (campo.type === 'radio' || campo.type === 'checkbox') {
+                valor = campo.checked ? campo.value : ''
+            }
+
+            lista.push({ chave, valor: String(valor) })
+            return lista
+
+        }, [])
+
+    }
+
     //ABA DE CATEGORIA: CARTÃO QUE DIVIDE O FORMULÁRIO EM ABAS NA MESMA TELA (ex.: projetos-css-padrao, "Cores | Tipografias |
     //Botões | CSS | JS | Outros"). O LINK DA ABA É Javascript:openCategory('colors') E CADA LINHA TEM data-category="colors";
     //NO LEGADO O openCategory ESCONDIA AS <tr> DAS OUTRAS. AQUI A ABA TROCA O ESTADO E O FormSection ESCONDE
@@ -79,6 +105,13 @@
                         if (item.checked && item.value) valores[chave] = String(item.value)
                     })
 
+                } else if (field.type === 'aut' && typeof field.field?.extra_html === 'string') {
+
+                    controladoresDoHtml(field.field.extra_html).forEach(({ chave, valor }) => {
+                        chaves.add(chave)
+                        if (!(chave in valores) || valor !== '') valores[chave] = valor
+                    })
+
                 } else if (field.field && !Array.isArray(field.field)) {
 
                     const chave = chaveValid(field.field.class)
@@ -100,6 +133,37 @@
         useEffect(() => {
             setValidRows(validIniciais)
         }, [validIniciais]);
+
+        //CONTROLADOR CRU DENTRO DE CAMPO aut (VER controladoresDoHtml): O CLIQUE NO RADIO/CHECKBOX DO HTML LEGADO ATUALIZA AS
+        //LINHAS CONDICIONAIS, COMO O ajustaValidFromTr DO painel.js FAZIA PARA QUALQUER .valid DA PÁGINA
+        useEffect(() => {
+
+            const aoMudar = (event) => {
+
+                const campo = event.target
+                if (!(campo instanceof Element) || !campo.closest('.legacy-html')) return
+
+                const chave = chaveValid(campo.getAttribute('class'))
+                if (!chave || !controladores.has(chave)) return
+
+                let valor
+                if (campo.type === 'radio') {
+                    if (!campo.checked) return
+                    valor = campo.value
+                } else if (campo.type === 'checkbox') {
+                    valor = campo.checked ? campo.value : ''
+                } else {
+                    valor = campo.value
+                }
+
+                setValidRows((anterior) => (anterior[chave] === String(valor) ? anterior : { ...anterior, [chave]: String(valor) }))
+
+            }
+
+            document.addEventListener('change', aoMudar)
+            return () => document.removeEventListener('change', aoMudar)
+
+        }, [controladores]);
 
         //window.editor PROVISÓRIO ANTES DO <script> DO CARTÃO RODAR (VER instalarEditorGlobal NO FormCodeEditor)
         useLayoutEffect(() => {
@@ -287,9 +351,14 @@
 
                 } else if (tabUrl) {
 
+                    //target="_blank" DO setButtonsModule (BOTÃO DECLARADO COMO array('Nome', true) NO CARTÃO, ex.: "Acessar
+                    //Painel" DO menuModulos) — ANTES SE PERDIA AQUI E O BOTÃO ABRIA NA MESMA ABA
+                    const tabTarget = /\btarget=["']([^"']+)["']/i.exec(tab)?.[1]
+
                     tabsObject.before.push({
                         content: tabName,
                         url: tabUrl,
+                        ...(tabTarget ? { target: tabTarget } : {}),
                     })
 
                 }
@@ -460,6 +529,14 @@
                                 name="Id"
                                 id="Id"
                                 value={data.form?.hidden_fields?.id}
+                            />
+                            {/* name="id" (MINÚSCULO) É O DO framework/formulario.php LEGADO: CARTÕES COM forms() PRÓPRIO LEEM
+                                $_POST['id'] (ex.: textos-e-imagens VOLTA PARA &id=$_POST['id'] — SEM ELE A URL FICAVA "&id=") */}
+                            <input
+                                type="hidden"
+                                name="id"
+                                id="id"
+                                value={data.form?.hidden_fields?.id ?? ''}
                             />
                         </>
                     )}

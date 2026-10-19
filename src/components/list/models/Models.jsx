@@ -1,5 +1,5 @@
     import qs from 'qs'
-    import { useMemo, useRef, useState, useEffect } from 'react'
+    import { useMemo, useRef, useState, useEffect, useCallback } from 'react'
     import { useNavigate } from 'react-router-dom'
     import { DataGrid, KeenIcon, DataGridColumnHeader, DataGridRowSelectAll, DataRowContext } from '@/components'
     import { toast } from 'sonner'
@@ -8,7 +8,6 @@
     import { arrayMove } from '@dnd-kit/sortable'
     import { api } from '@/services/api'
     import { Tabs } from '@/components/custom/tabs/tabs'
-    import { usePageData } from '@/context/PageDataContext'
     import { LegacyList } from './LegacyList'
     import { LegacyHtml } from '@/components/legacy/LegacyHtml'
     import { useConfirm } from '@/components/ui/confirm-dialog'
@@ -17,7 +16,6 @@
 
     const Models = ({ model, columnHeader, btnAdd, search, btnExcluir, extraButton, pagination, tabs, content, sequence = false }) => {
 
-        const { callApi }                           = usePageData()
         const [ confirm, confirmDialog ]            = useConfirm()
         const [ models, setModels ]                 = useState(model || [])
         const [ footer, setFooter ]                 = useState('')
@@ -25,6 +23,14 @@
         const [activeTab, setActiveTab]             = useState('')
         const [ searchInput, setSearchInput ]       = useState(search?.value || '')
         const navigate                              = useNavigate()
+        const selectionTable = useRef(null)
+        const deletionBusy = useRef(false)
+        const scope = useMemo(() => ({ model, content }), [model, content])
+        const currentScope = useRef(scope)
+        currentScope.current = scope
+        const [removals, setRemovals] = useState({ scope, ids: new Set() })
+        const removedIds = useMemo(() => removals.scope === scope ? removals.ids : new Set(), [removals, scope])
+        const visibleModels = useMemo(() => models.filter((row) => !removedIds.has(String(row['row-id']))), [models, removedIds])
 
         //A BUSCA DO SERVIDOR MUDOU (NOVA RESPOSTA DA PONTE) — O CAMPO ACOMPANHA
         useEffect(() => {
@@ -50,8 +56,8 @@
         }, [models])
 
         const data = useMemo(
-            () => (filtroLocal === '' ? models : models.filter((linha) => contemTodasAsPalavras(textoDasLinhas.get(linha), filtroLocal))),
-            [models, filtroLocal, textoDasLinhas]
+            () => (filtroLocal === '' ? visibleModels : visibleModels.filter((linha) => contemTodasAsPalavras(textoDasLinhas.get(linha), filtroLocal))),
+            [visibleModels, filtroLocal, textoDasLinhas]
         )
 
         // MODO "CARREGAR MAIS": em vez de trocar de página, os registros vão se acumulando na
@@ -161,9 +167,9 @@
         // QUANDO O CARD ESCONDE O "Exibindo de X até Y" ($bloqExibindo), A PONTE NÃO ENVIA
         // pagination.information — E O RODAPÉ MOSTRAVA "1 - 0 de 0" MESMO COM REGISTROS NA
         // TELA. NESSE CASO CONSIDERAMOS QUE TUDO QUE FOI CARREGADO ESTÁ NA PÁGINA ATUAL.
-        const totalRegistros = typeof pagination?.information?.total === 'number'
+        const totalRegistros = Math.max(0, (typeof pagination?.information?.total === 'number'
             ? pagination.information.total
-            : (model?.length || 0)
+            : (model?.length || 0)) - removedIds.size)
 
         //TUDO QUE FOI CARREGADO FICA EM UMA ÚNICA "PÁGINA" (TAMANHO GIGANTE DESDE O PRIMEIRO RENDER:
         //O DataGridProvider CAPTURA O pageSize NA MONTAGEM) — QUEM CONTROLA O CARREGAMENTO É O BOTÃO
@@ -173,84 +179,67 @@
             [totalRegistros]
         )
 
-        // HANDLER PARA EXCLUIR ITENS SELECIONADOS
-        const handleExcluir = async () => {
-
-            const quantidade = selectedRows.length
-            const confirmado = await confirm({
-                title: quantidade === 1 ? 'Excluir item?' : `Excluir ${quantidade} itens?`,
-                description: quantidade === 1
-                    ? 'Tem certeza que deseja excluir o item selecionado? Essa ação não pode ser desfeita.'
-                    : `Tem certeza que deseja excluir os ${quantidade} itens selecionados? Essa ação não pode ser desfeita.`,
-            })
-
-            if (!confirmado) return
-
+        // REMOVE DA TELA APÓS CONFIRMAR E ENVIA POR AJAX, SEM RECARREGAR O MÓDULO.
+        const removeItems = useCallback(async (items, legacyRow = null) => {
+            const ids = [...new Set(items.map(String))]
+            if (ids.length === 0 || deletionBusy.current || currentScope.current !== scope) return
+            deletionBusy.current = true
             try {
-
-                const data = {
-                    items: selectedRows,
-                }
-
-                const response = await api.post(
-                    buildRemoveItemsUrl(),
-                    qs.stringify(data),
-                    {
-                        headers: {
-                            'Content-Type': 'application/x-www-form-urlencoded',
-                        },
+                const url = buildRemoveItemsUrl()
+                const confirmado = await confirm({
+                    title: ids.length === 1 ? 'Excluir item?' : `Excluir ${ids.length} itens?`,
+                    description: ids.length === 1
+                        ? 'Tem certeza que deseja excluir este item? Essa ação não pode ser desfeita.'
+                        : `Tem certeza que deseja excluir os ${ids.length} itens selecionados? Essa ação não pode ser desfeita.`,
+                })
+                if (!confirmado || currentScope.current !== scope) return
+                const previousHidden = legacyRow?.hidden
+                if (legacyRow) legacyRow.hidden = true
+                else setRemovals((prev) => ({
+                    scope,
+                    ids: new Set([...(prev.scope === scope ? prev.ids : []), ...ids]),
+                }))
+                selectionTable.current?.setRowSelection((selection) => Object.fromEntries(
+                    Object.entries(selection).filter(([id]) => !ids.includes(String(id)))
+                ))
+                setSelectedRows((prev) => prev.filter((id) => !ids.includes(String(id))))
+                try {
+                    const response = await api.post(url, qs.stringify({ items: ids }), {
+                        headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+                    })
+                    const resultado = response.data?.success?.response
+                    if (!resultado || resultado.status === false || resultado.data?.status === false) {
+                        throw new Error(resultado?.message || resultado?.data?.message || 'Não foi possível excluir os itens')
                     }
-                )
-
-                //SEM success O CARD NÃO EXCLUIU (ex.: RESPONDEU COM <script>window.location=...?erro=...);
-                //status false É RECUSA DO PRÓPRIO BACKEND (ex.: SEM PERMISSÃO) E TRAZ A MENSAGEM
-                const resultado = response.data?.success?.response
-                if (!resultado || resultado.status === false || resultado.data?.status === false) {
-                    throw new Error(resultado?.message || resultado?.data?.message || '')
+                    toast('✅ Sucesso!', {
+                        description: resultado.data?.message || resultado.message || 'Exclusão concluída com sucesso!',
+                        style: { color: 'white', background: 'var(--tw-success)', border: 'none', fontWeight: 'bold' },
+                    })
+                } catch (err) {
+                    if (legacyRow) legacyRow.hidden = previousHidden
+                    else setRemovals((prev) => prev.scope !== scope ? prev : ({
+                        scope,
+                        ids: new Set([...prev.ids].filter((id) => !ids.includes(id))),
+                    }))
+                    toast('❌ Erro', {
+                        description: err?.response?.data?.error?.message || err?.message || 'Não foi possível excluir os itens',
+                        style: { color: 'white', background: 'var(--tw-danger)', border: 'none', fontWeight: 'bold' },
+                    })
                 }
-
-                const urlRefresh = buildApiUrl(
-                    new URLSearchParams(window.location.search)
-                )
-
-                if (urlRefresh === false) {
-                    return
-                }
-
-                callApi(urlRefresh)
-
-                toast(`✅ Sucesso!`, {
-                    description: <span style={{ 'color': 'white' }}>{response.data?.success?.response?.data?.message}</span>,
-                    style: {
-                        color: 'white',
-                        background: 'var(--tw-success)',
-                        border: 'none',
-                        fontWeight: 'bold'
-                    }
-                });
-
-            } catch (err) {
-
-                toast(`❌ Erro`, {
-                    description: <span style={{ 'color': 'white' }}>{err?.message || 'Não foi possível excluir o item selecionado'}</span>,
-                    style: {
-                        color: 'white',
-                        background: 'var(--tw-danger)',
-                        border: 'none',
-                        fontWeight: 'bold'
-                    }
-                });
-
+            } finally {
+                deletionBusy.current = false
             }
+        }, [confirm, scope])
 
-        }
+        const handleExcluir = useCallback(() => removeItems(selectedRows), [removeItems, selectedRows])
 
         // REORDENAÇÃO POR ARRASTAR (CARD COM $sequencia = true — A PONTE MANDA params.sequence). A LINHA MUDA DE
         // LUGAR NA HORA E A ORDEM DE TODAS AS LINHAS EM TELA VAI PARA O acao=sort-list, QUE REDISTRIBUI A
         // sequencia ENTRE ELAS (MESMO CRITÉRIO DO PAINEL ANTIGO). SE O SERVIDOR RECUSAR, A ORDEM VOLTA.
         const handleReorder = async (idArrastado, idAlvo) => {
 
-            const anterior = models
+            if (deletionBusy.current) return
+            const anterior = visibleModels
             const de       = anterior.findIndex((linha) => String(linha['row-id']) === String(idArrastado))
             const para     = anterior.findIndex((linha) => String(linha['row-id']) === String(idAlvo))
 
@@ -400,6 +389,7 @@
                                 //PASSA A FUNÇÃO DIRETO: uma closure aqui descartaria os argumentos
                                 //que o DataRowContext envia (id, índice e a própria célula com o action)
                                 handleToggle={handleToggle}
+                                onRemoveItems={removeItems}
                             />
                         )
 
@@ -427,7 +417,8 @@
             })
         }
 
-        const handleRowSelection = (state) => {
+        const handleRowSelection = (state, table) => {
+            selectionTable.current = table
 
             const selectedRowIds = Object.keys(state).filter((key) => {
                 return state[key]
@@ -620,6 +611,7 @@
                     <div className="flex items-center gap-3 mt-3">
 
                         <button
+                            type="button"
                             className={`btn btn-sm btn-danger transition-opacity ${hasSelection ? '' : 'opacity-40 cursor-not-allowed'}`}
                             disabled={!hasSelection}
                             onClick={handleExcluir}
@@ -643,9 +635,9 @@
                 setFooter('')
             }
 
-        }, [btnExcluir, selectedRows])
+        }, [btnExcluir, selectedRows, handleExcluir])
 
-        const column = useMemo(() => (columnHeader ? createColumns(columnHeader) : []), [columnHeader]);
+        const column = useMemo(() => (columnHeader ? createColumns(columnHeader) : []), [columnHeader, removeItems]);
 
         // HTML DA LISTAGEM MONTADO PELO PRÓPRIO CARD ($novoResultadoInicial) — CHEGA EM
         // list.content, ÀS VEZES ANINHADO EM ARRAYS, ENTÃO ACHATAMOS ANTES DE RENDERIZAR
@@ -671,12 +663,13 @@
 
             return (
                 <div>
+                    {confirmDialog}
                     <div className="card card-grid min-w-full">
 
                         {renderToolbar()}
 
                         <div className="card-body">
-                            <LegacyList html={legacyHtml} columnHeader={columnHeader} />
+                            <LegacyList html={legacyHtml} columnHeader={columnHeader} onRemoveItems={removeItems} />
                         </div>
 
                     </div>
@@ -696,6 +689,7 @@
                         html={legacyHtml}
                         columnHeader={columnHeader}
                         showHeader={false}
+                        onRemoveItems={removeItems}
                     />
                 )}
 
@@ -729,11 +723,11 @@
                     //RODAPÉ DENTRO DO CARD (mesma posição da paginação que ele substitui).
                     //data-pagination faz herdar o padding do layout de card.
                     footer={
-                        models.length > 0 ? (
+                        visibleModels.length > 0 ? (
 
                             <div data-pagination className="flex flex-col items-center gap-2">
 
-                                {totalRegistros > models.length && (
+                                {totalRegistros > visibleModels.length && (
                                     <button
                                         type="button"
                                         className="btn btn-light btn-sm"
@@ -746,7 +740,7 @@
 
                                 {totalRegistros > 0 && (
                                     <span className="text-2sm text-gray-600">
-                                        Mostrando {models.length} de {totalRegistros} {totalRegistros === 1 ? 'resultado' : 'resultados'}
+                                        Mostrando {visibleModels.length} de {totalRegistros} {totalRegistros === 1 ? 'resultado' : 'resultados'}
                                     </span>
                                 )}
 

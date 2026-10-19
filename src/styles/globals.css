@@ -25,6 +25,14 @@
     --form-control-text: #fff;
 }
 
+/* O CARD DO BACKEND FORÇA #F5F5F5 !important NO HOVER DE .item-finalizado.
+   NO DARK, MANTÉM O CONTRASTE DO TEXTO E DO SPRITE BRANCO DAS AÇÕES. */
+.dark .legacy-list > tbody > tr.item-finalizado:is(:hover, :focus-within),
+.dark .legacy-list > tbody > tr.item-finalizado:is(:hover, :focus-within) > td {
+    background-color: var(--tw-gray-200) !important;
+    color: var(--tw-gray-900);
+}
+
 .MuiPickersSectionList-root{
     padding:10px 0px !important;
 }
@@ -744,4 +752,69 @@ body .ui-datepicker .ui-datepicker-buttonpane button {
     font-size: 0.75rem;
     font-weight: 500;
     opacity: 1;
+}
+
+/* INPUT DE ARQUIVO (FormFile E HTML LEGADO): MÃOZINHA NO CAMPO INTEIRO E NO BOTÃO "Escolher arquivo" */
+input[type='file']:not(:disabled),
+input[type='file']:not(:disabled)::file-selector-button {
+    cursor: pointer;
+}
+
+/* TinyMCE (legacy-runtime.js DA API, CAMPOS .camp*): MESMA CARA DOS INPUTS DO FORMULÁRIO (plugins/components/input.js) —
+   FUNDO --tw-light-active, BORDA gray-300, CANTO 0.375rem, BORDA primary COM FOCO. VALE NOS DOIS TEMAS; O FUNDO E O TEXTO
+   DE DENTRO DO IFRAME VÊM DO content_style DO EDITOR (VER aparenciaEditor NO legacy-runtime.js). !important PORQUE A PELE
+   DO TinyMCE É CARREGADA DEPOIS DESTE CSS */
+body .tox.tox-tinymce {
+    border: 1px solid var(--tw-gray-300) !important;
+    border-radius: 0.375rem !important;
+    background-color: var(--tw-light-active) !important;
+    transition: border-color 0.15s ease;
+}
+body .tox.tox-tinymce:hover {
+    border-color: var(--tw-gray-400) !important;
+}
+body .tox.tox-tinymce:focus-within {
+    border-color: var(--tw-primary) !important;
+    box-shadow: var(--tw-input-focus-box-shadow);
+}
+body .tox.tox-tinymce .tox-editor-container,
+body .tox.tox-tinymce .tox-editor-header,
+body .tox.tox-tinymce .tox-toolbar-overlord,
+body .tox.tox-tinymce .tox-toolbar,
+body .tox.tox-tinymce .tox-toolbar__primary,
+body .tox.tox-tinymce .tox-toolbar__overflow,
+body .tox.tox-tinymce .tox-edit-area,
+body .tox.tox-tinymce .tox-edit-area__iframe,
+body .tox.tox-tinymce .tox-statusbar {
+    background-color: var(--tw-light-active) !important;
+    background-image: none !important;
+}
+body .tox.tox-tinymce .tox-editor-header {
+    padding: 0 !important;
+    border-bottom: 1px solid var(--tw-gray-300) !important;
+    box-shadow: none !important;
+}
+body .tox.tox-tinymce .tox-statusbar {
+    border-top: 1px solid var(--tw-gray-300) !important;
+    color: var(--tw-gray-500) !important;
+}
+body .tox.tox-tinymce .tox-statusbar a,
+body .tox.tox-tinymce .tox-statusbar__path-item,
+body .tox.tox-tinymce .tox-statusbar__wordcount {
+    color: var(--tw-gray-500) !important;
+}
+/* O CONTORNO AZUL DE FOCO DO PRÓPRIO TinyMCE DUPLICAVA A BORDA DE FOCO ACIMA */
+body .tox.tox-tinymce .tox-edit-area::before {
+    display: none !important;
+}
+body .tox.tox-tinymce .tox-tbtn {
+    color: var(--form-control-text) !important;
+}
+body .tox.tox-tinymce .tox-tbtn svg {
+    fill: var(--form-control-text) !important;
+}
+body .tox.tox-tinymce .tox-tbtn:hover,
+body .tox.tox-tinymce .tox-tbtn--enabled,
+body .tox.tox-tinymce .tox-tbtn--enabled:hover {
+    background-color: var(--tw-gray-200) !important;
 }

@@ -7,7 +7,7 @@ import { isLegacyUrl } from '@/utils/legacyBridge'
 import { cleanUrl } from '@/utils/urlHelper'
 
 //CÉLULA COM HTML DO CARTÃO (ex.: COLUNA "Ações" MONTADA NO arrumaConteudo, COMO NO projetos-paginas-sections-backend)
-const CelulaHtml = ({ html }) => {
+const CelulaHtml = ({ html, onRemoveItems }) => {
 
     const navigate = useNavigate()
 
@@ -24,6 +24,13 @@ const CelulaHtml = ({ html }) => {
         const link = event.target.closest?.('a[href]')
         if (!link || (link.target && link.target !== '_self')) return
         const href = link.getAttribute('href') || ''
+        const params = new URL(href, window.location.href).searchParams
+        if (params.has('excluir')) {
+            event.preventDefault()
+            event.stopPropagation()
+            onRemoveItems?.([params.get('excluir')])
+            return
+        }
         if (!isLegacyUrl(href)) return
         event.preventDefault()
         const destino = cleanUrl(href)
@@ -34,7 +41,7 @@ const CelulaHtml = ({ html }) => {
 
 }
 
-export const DataRowContext = ({ fullRow, row, index, handleToggle }) => {
+export const DataRowContext = ({ fullRow, row, index, handleToggle, onRemoveItems }) => {
     if (!row) return
 
     if (row.component === 'checkbox_delete') {
@@ -45,7 +52,7 @@ export const DataRowContext = ({ fullRow, row, index, handleToggle }) => {
         Array.isArray(row.content)
     ) {
         // MENU AÇÕES
-        return <DataRowActionsMenu row={row} />
+        return <DataRowActionsMenu row={row} onRemoveItems={onRemoveItems} />
     } else if (row.component === 'photo_preview') {
         return <DataRowPicture row={row} />
     } else if (row.component === 'toggle') {
@@ -72,7 +79,7 @@ export const DataRowContext = ({ fullRow, row, index, handleToggle }) => {
             return <LegacyHtml html={row.content} />
         }
 
-        return <CelulaHtml html={row.content} />
+        return <CelulaHtml html={row.content} onRemoveItems={onRemoveItems} />
     }
 
     return row.content || '-'

@@ -1,89 +1,16 @@
-    import qs from 'qs'
     import { useEffect } from 'react'
-    import { buildApiUrl, buildRemoveItemsUrl, cleanUrl } from '@/utils/urlHelper'
-    import { api } from '@/services/api'
-    import { toast } from 'sonner'
+    import { cleanUrl } from '@/utils/urlHelper'
     import { transformOldIcon } from '@/lib/transformOldIcon'
     import { OldIcon } from '@/components/legacy/OldIcon'
-    import { usePageData } from '@/context/PageDataContext'
-    import { useConfirm } from '@/components/ui/confirm-dialog'
     import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip'
     import { injectLegacyIconsCss } from '@/utils/legacyIcons'
 
-    const DataRowActionsMenu = ({ row }) => {
-
-        const { callApi } = usePageData()
-        const [confirm, confirmDialog] = useConfirm()
+    const DataRowActionsMenu = ({ row, onRemoveItems }) => {
 
         //OS ÍCONES DAS AÇÕES VÊM DO SPRITE DO PAINEL ANTIGO (css/icons.css)
         useEffect(() => {
             injectLegacyIconsCss()
         }, [])
-
-        const removeRow = async (itemId) => {
-
-            const confirmado = await confirm({
-                title: 'Excluir item?',
-                description: 'Tem certeza que deseja excluir este item? Essa ação não pode ser desfeita.',
-            })
-
-            if (!confirmado) return
-
-            let response = ''
-            const data = {
-                items: [itemId],
-            }
-
-            try {
-
-                response = await api.post(
-                    buildRemoveItemsUrl(),
-                    qs.stringify(data),
-                    {
-                        headers: {
-                            'Content-Type': 'application/x-www-form-urlencoded',
-                        },
-                    }
-                )
-
-                //SEM success O CARD NÃO EXCLUIU (ex.: RESPONDEU COM <script>window.location=...?erro=...);
-                //status false É RECUSA DO PRÓPRIO BACKEND (ex.: SEM PERMISSÃO) E TRAZ A MENSAGEM
-                const resultado = response.data?.success?.response
-                if (!resultado || resultado.status === false || resultado.data?.status === false) {
-                    throw new Error(resultado?.message || resultado?.data?.message || '')
-                }
-
-                const urlRefresh = buildApiUrl(
-                    new URLSearchParams(window.location.search)
-                )
-
-                callApi(urlRefresh)
-
-                toast(`✅ Sucesso`, {
-                    description: <span style={{ 'color': 'white' }}>{response.data?.success?.response?.data?.message}</span>,
-                    style: {
-                        color: 'white',
-                        background: 'var(--tw-success)',
-                        border: 'none',
-                        fontWeight: 'bold'
-                    }
-                })
-
-            } catch (err) {
-
-                toast(`❌ Erro`, {
-                    description: <span style={{ 'color': 'white' }}>{err?.message || 'Não foi possível remover este item'}</span>,
-                    style: {
-                        color: 'white',
-                        background: 'var(--tw-danger)',
-                        border: 'none',
-                        fontWeight: 'bold'
-                    }
-                })
-
-            }
-
-        }
 
         //ÍCONE DO SPRITE DO PAINEL ANTIGO: A PONTE MANDA "figura-black l4 c1" (ÀS VEZES SÓ "l1 c14")
         const spriteDoIcone = (icon) => {
@@ -94,12 +21,13 @@
 
         const onClickAcao = (e, item) => {
 
-            const params = new URLSearchParams(item.url || '')
+            const params = new URL(item.url || '', window.location.href).searchParams
 
             //EXCLUIR É POR API (COM CONFIRMAÇÃO); OS DEMAIS SEGUEM O LINK NORMALMENTE
             if (params.has('excluir')) {
                 e.preventDefault()
-                removeRow(params.get('excluir'))
+                e.stopPropagation()
+                onRemoveItems?.([params.get('excluir')])
             }
 
         }
@@ -107,7 +35,6 @@
         // AÇÕES LADO A LADO COMO NO PAINEL ANTIGO (Versões, Alterar, Excluir...), COM TOOLTIP NO TÍTULO
         return (
             <>
-                {confirmDialog}
 
                 <TooltipProvider delayDuration={200}>
                     <div className="inline-flex items-center justify-center gap-2.5">

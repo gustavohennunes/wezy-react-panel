@@ -310,7 +310,10 @@
         const temCabecalho = temNumero || Boolean(String(data.title ?? '').trim()) || Boolean(data.subTitle)
 
         return (
-            <div className={`card mb-3${oculta ? ' !hidden' : ''}`}>
+            //SEÇÃO SEM NENHUMA LINHA VISÍVEL (ex.: "CAMPOS DA PÁGINA (home)" DO textos-e-imagens, SÓ TÍTULO; OU TODAS AS LINHAS
+            //ESCONDIDAS POR data-valid-*): O card-body VAZIO SOME (empty:hidden) E O CABEÇALHO FICA SEM A BORDA DE BAIXO E
+            //ARREDONDADO EMBAIXO, EM VEZ DE UMA FAIXA COM PADDING E NADA DENTRO
+            <div className={`card mb-3 [&:has(>.card-body:empty)>.card-header]:border-b-0 [&:has(>.card-body:empty)>.card-header]:rounded-b-[8px]${oculta ? ' !hidden' : ''}`}>
 
                 {temCabecalho && (
                 <div className="card-header !min-h-[46px] !py-2.5 bg-[color:var(--form-header-bg)] rounded-t-[8px]" id="general_settings">
@@ -326,7 +329,7 @@
 
                         <div className="flex flex-col gap-px">
 
-                            <h3 className="text-[13px] font-semibold leading-tight text-gray-900">
+                            <h3 className="text-[13px] font-semibold leading-tight uppercase tracking-wide text-gray-900">
                                 {data.title}
                             </h3>
 
@@ -346,7 +349,7 @@
                 {/* CADA CAMPO GANHA UMA LINHA SEPARADORA ACIMA (EXCETO O PRIMEIRO).
                     O padding lateral SAI do container e vai para cada linha, senão a borda
                     ficaria recuada nas laterais em vez de atravessar o card inteiro. */}
-                <div className="card-body !px-0 grid gap-4 [&>*+*]:border-t [&>*+*]:border-[color:var(--form-divider)] [&>*+*]:pt-4">
+                <div className="card-body !px-0 grid gap-4 empty:hidden [&>*+*]:border-t [&>*+*]:border-[color:var(--form-divider)] [&>*+*]:pt-4">
 
                     {data?.fields.map((field, idx) => {
                         
@@ -663,7 +666,7 @@
                                                 {String(numero).padStart(2, '0')}
                                             </span>
                                         )}
-                                        <h3 className="text-[13px] font-semibold leading-tight text-gray-900">{titulo}</h3>
+                                        <h3 className="text-[13px] font-semibold leading-tight uppercase tracking-wide text-gray-900">{titulo}</h3>
                                     </div>
                                 )
 

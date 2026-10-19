@@ -219,6 +219,7 @@
                         id={inputId}
                         fieldName={fieldName}
                         multiple={true}
+                        value={formState[fieldName] || ''}
                         accept={buildAccept('*')}
                         maxSize={5 * 1024 * 1024}
                     />

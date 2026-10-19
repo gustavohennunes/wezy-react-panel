@@ -6,6 +6,18 @@
     //"Usar logotipo customizado" ESCONDE O CAMPO DO LOGO E DESMONTA ESTE INPUT) — O FormContext MANDA O del NO SUBMIT
     export const arquivosRemovidos = new Set()
 
+    const extensoesDeImagem = ['jpg', 'jpeg', 'png', 'gif', 'webp', 'svg', 'bmp', 'avif', 'ico']
+
+    //NOME DO ARQUIVO SALVO (ÚLTIMO PEDAÇO DA URL, SEM QUERY), COMO O conteudo-arq DO retornaFile NO PAINEL ANTIGO
+    const nomeDoArquivo = (url) => {
+        const ultimo = String(url).split(/[?#]/)[0].split('/').filter(Boolean).pop() || String(url)
+        try {
+            return decodeURIComponent(ultimo)
+        } catch {
+            return ultimo
+        }
+    }
+
     const FormFile = ({ id, multiple, accept, maxSize, onFilesChange, fieldName, value, fieldClass = '', fieldData = {}, required = false }) => {
         const [selectedFiles, setSelectedFiles] = useState([])
         const [error, setError] = useState(null)
@@ -64,21 +76,41 @@
 
         }
 
+        const nome = value ? nomeDoArquivo(value) : ''
+        const mostraMiniatura = extensoesDeImagem.includes(nome.split('.').pop().toLowerCase())
+
         return (
             <div className="w-full">
 
                 {value && !removido && (
                     <div className="mb-2 flex items-center gap-2">
-                        {/* MINIATURA COM PRÉVIA AMPLIADA NO HOVER (COMO O verFoto DAS LISTAGENS E O BANCO DE IMAGENS DO LEGADO).
-                            object-contain: LOGO LARGO (ex.: 190x43) NÃO É CORTADO. O CLIQUE ABRE A IMAGEM EM OUTRA ABA */}
-                        <div className="group relative shrink-0">
-                            <a href={value} target="_blank" rel="noopener noreferrer" title="Abrir imagem em nova aba" className="block">
-                                <img src={value} alt="Imagem atual" className="size-10 rounded-lg border border-gray-200 bg-gray-100 object-contain" />
-                            </a>
-                            <div className="pointer-events-none invisible absolute left-12 top-1/2 z-50 -translate-y-1/2 rounded-lg border border-gray-200 bg-[var(--tw-card-background-color,var(--tw-light))] p-2 opacity-0 shadow-lg transition-opacity duration-150 group-hover:visible group-hover:opacity-100">
-                                <img src={value} alt="" className="block max-h-[240px] max-w-[320px] min-w-16 bg-gray-100 object-contain" />
+                        {mostraMiniatura ? (
+                            //MINIATURA COM PRÉVIA AMPLIADA NO HOVER (COMO O verFoto DAS LISTAGENS E O BANCO DE IMAGENS DO LEGADO).
+                            //object-contain: LOGO LARGO (ex.: 190x43) NÃO É CORTADO. O CLIQUE ABRE A IMAGEM EM OUTRA ABA
+                            <div className="group relative shrink-0">
+                                <a href={value} target="_blank" rel="noopener noreferrer" title="Abrir imagem em nova aba" className="block">
+                                    <img src={value} alt="Imagem atual" className="size-10 rounded-lg border border-gray-200 bg-gray-100 object-contain" />
+                                </a>
+                                <div className="pointer-events-none invisible absolute left-12 top-1/2 z-50 -translate-y-1/2 rounded-lg border border-gray-200 bg-[var(--tw-card-background-color,var(--tw-light))] p-2 opacity-0 shadow-lg transition-opacity duration-150 group-hover:visible group-hover:opacity-100">
+                                    <img src={value} alt="" className="block max-h-[240px] max-w-[320px] min-w-16 bg-gray-100 object-contain" />
+                                </div>
                             </div>
-                        </div>
+                        ) : (
+                            //PDF, DOC, CSV... (CAMPO Arq): SEM MINIATURA, SÓ O ÍCONE DE DOCUMENTO
+                            <a href={value} target="_blank" rel="noopener noreferrer" title="Abrir arquivo em nova aba" className="flex size-10 shrink-0 items-center justify-center rounded-lg border border-gray-200 bg-gray-100 text-gray-600">
+                                <KeenIcon icon="document" className="text-lg" />
+                            </a>
+                        )}
+                        {/* NOME DO ARQUIVO SALVO: COR E SUBLINHADO NO HOVER PARA MOSTRAR QUE É CLICÁVEL */}
+                        <a
+                            href={value}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            title={value}
+                            className="min-w-0 max-w-xs truncate text-2sm font-medium text-primary underline-offset-[3px] hover:text-primary-active hover:underline"
+                        >
+                            {nome}
+                        </a>
                         {/* SEM CONDIÇÃO DE multiple: A API MANDA multiple ATÉ EM CAMPO DE UM ARQUIVO SÓ (ex.: LOGOTIPO DO CLIENTE) */}
                         <button type="button" onClick={removerArquivo} className="btn btn-sm btn-light text-danger gap-1">
                             <KeenIcon icon="trash" />

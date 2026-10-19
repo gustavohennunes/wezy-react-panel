@@ -33,6 +33,18 @@
     color: var(--tw-gray-900);
 }
 
+/* O MESMO CARD PINTA .item-em-aberto DE ROSA CLARO (#f3e7e7 / #e8dada NO HOVER) COM !important. NO DARK O FUNDO
+   CLARO SOMAVA COM O TEXTO CINZA E O LÁPIS BRANCO DAS AÇÕES E A LINHA "BRILHAVA"; AQUI VIRA O VERMELHO ESCURO DO TEMA */
+.dark .legacy-list > tbody > tr.item-em-aberto,
+.dark .legacy-list > tbody > tr.item-em-aberto > td {
+    background-color: var(--tw-danger-light) !important;
+}
+.dark .legacy-list > tbody > tr.item-em-aberto:is(:hover, :focus-within),
+.dark .legacy-list > tbody > tr.item-em-aberto:is(:hover, :focus-within) > td {
+    background-color: color-mix(in srgb, var(--tw-danger) 22%, var(--tw-gray-100)) !important;
+    color: var(--tw-gray-900);
+}
+
 .MuiPickersSectionList-root{
     padding:10px 0px !important;
 }

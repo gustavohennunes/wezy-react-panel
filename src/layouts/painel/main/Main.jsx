@@ -17,6 +17,8 @@
     import { Tabs } from '@/components/custom/tabs/tabs'
     import { abasDaListagemNoTopo } from '@/utils/listTabs'
     import { useRestauraRolagem } from './useRestauraRolagem'
+    import { utf8ParaBase64 } from '@/utils/base64'
+    import { FiltrosCabecalho } from '@/components/list/FiltrosCabecalho'
 
     //MENSAGENS QUE O CARTÃO DEFINE ($setMsgAlerta, $setMsgFormErro...) OU QUE A PONTE GERA (alterado=ok, inserido=erro...).
     //A PONTE AS ENVIA EM params.messages.{general|list|form}.{success|error|alert}
@@ -45,17 +47,6 @@
 
         return lista
 
-    }
-
-    //BASE64 DE UM TEXTO UTF-8 (O btoa SOZINHO SÓ ACEITA latin1). EM BLOCOS PARA NÃO ESTOURAR A PILHA
-    //COM CSS GRANDE NO String.fromCharCode
-    const utf8ParaBase64 = (texto) => {
-        const bytes = new TextEncoder().encode(texto)
-        let binario = ''
-        for (let i = 0; i < bytes.length; i += 0x8000) {
-            binario += String.fromCharCode.apply(null, bytes.subarray(i, i + 0x8000))
-        }
-        return btoa(binario)
     }
 
     const Main = () => {
@@ -315,6 +306,13 @@
                                     {abasDaListagemNoTopo(pageData) && (
                                         <div className="w-full px-5">
                                             <Tabs tabs={abasDaListagemNoTopo(pageData)} />
+                                        </div>
+                                    )}
+
+                                    {/* FILTROS EM ARRAY DO CARTÃO ($formCabecalho — VER class/HeaderFilters.php NA API) */}
+                                    {pageData?.params?.extra_content?.header_form?.fields?.length > 0 && (
+                                        <div className="w-full px-5 mb-5">
+                                            <FiltrosCabecalho formulario={pageData.params.extra_content.header_form} />
                                         </div>
                                     )}
 

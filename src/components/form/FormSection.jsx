@@ -308,9 +308,13 @@
         const temNumero       = data.number || data.number === 0
         const numeroFormatado = temNumero ? String(data.number).padStart(2, '0') : ''
 
+        //SEÇÃO SEM TÍTULO NEM NÚMERO (ex.: CARTÃO SÓ COM CAMPOS aut, COMO O relatorio-vendas): SEM A FAIXA DO CABEÇALHO VAZIA
+        const temCabecalho = temNumero || Boolean(String(data.title ?? '').trim()) || Boolean(data.subTitle)
+
         return (
             <div className="card mb-3">
 
+                {temCabecalho && (
                 <div className="card-header !min-h-[46px] !py-2.5 bg-[color:var(--form-header-bg)] rounded-t-[8px]" id="general_settings">
 
                     <div className="flex items-center gap-2.5">
@@ -339,6 +343,7 @@
                     </div>
 
                 </div>
+                )}
 
                 {/* CADA CAMPO GANHA UMA LINHA SEPARADORA ACIMA (EXCETO O PRIMEIRO).
                     O padding lateral SAI do container e vai para cada linha, senão a borda

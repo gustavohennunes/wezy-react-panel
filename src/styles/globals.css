@@ -378,3 +378,205 @@ html:not(.dark) .btn-auth {
     --tw-danger-active: #031b36;
     --tw-danger-box-shadow: 0px 4px 12px 0px rgba(5, 40, 80, 0.35);
 }
+
+/* RELATÓRIO DE VENDAS (?pag=relatorio-vendas, CLIENTE 360) NO PAINEL REACT. O CARTÃO MANDA ESTE HTML SÓ PELA API
+   (relatorioVendasApi / filtroRelatorioVendasApi); O PAINEL ANTIGO SEGUE COM O DELE. CORES PELAS VARIÁVEIS DO TEMA:
+   O CLARO E O ESCURO SAEM DAQUI SEM COR FIXA */
+.legacy-html .rv-filtro {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: flex-end;
+    gap: 12px;
+}
+.legacy-html .rv-filtro-campo {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    font-size: 0.8125rem;
+    font-weight: 500;
+    color: var(--tw-gray-800);
+}
+.legacy-html .rv-filtro-campo input {
+    width: 150px;
+    height: 2.5rem;
+    padding: 0 0.75rem;
+    border: 1px solid var(--tw-gray-300);
+    border-radius: 0.375rem;
+    background-color: var(--tw-light-active);
+    color: var(--tw-gray-800);
+    font-size: 0.8125rem;
+    font-weight: 500;
+    outline: none;
+}
+.legacy-html .rv-filtro-campo input:focus {
+    border-color: var(--tw-primary);
+}
+.legacy-html .rv-filtro-botao {
+    height: 2.5rem;
+    padding: 0 1.25rem;
+    border-radius: 0.375rem;
+    background-color: var(--tw-primary);
+    color: var(--tw-primary-inverse, #fff);
+    font-size: 0.8125rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background-color 0.15s ease;
+}
+.legacy-html .rv-filtro-botao:hover {
+    background-color: var(--tw-primary-active);
+}
+
+.legacy-html .rv-relatorio {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    width: 100%;
+    font-size: 0.8125rem;
+}
+.legacy-html .rv-mes {
+    /* COR DO STATUS DO MÊS: --rv-cor (TEXTO/BARRA) E --rv-fundo (FAIXA DO CABEÇALHO) */
+    --rv-cor: var(--tw-primary);
+    --rv-fundo: var(--tw-primary-light);
+    overflow: hidden;
+    border: 1px solid var(--tw-gray-200);
+    border-radius: 0.5rem;
+    background-color: var(--tw-card-background-color, var(--tw-light));
+}
+.legacy-html .rv-mes--perdida { --rv-cor: var(--tw-danger);  --rv-fundo: var(--tw-danger-light); }
+.legacy-html .rv-mes--batida  { --rv-cor: var(--tw-success); --rv-fundo: var(--tw-success-light); }
+.legacy-html .rv-mes--super   { --rv-cor: var(--tw-warning); --rv-fundo: var(--tw-warning-light); }
+.legacy-html .rv-periodo      { --rv-cor: var(--tw-gray-800); --rv-fundo: var(--tw-gray-100); }
+
+.legacy-html .rv-mes-cabecalho {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 6px 16px;
+    padding: 12px 16px;
+    background-color: var(--rv-fundo);
+    border-left: 3px solid var(--rv-cor);
+}
+.legacy-html .rv-mes-nome {
+    color: var(--rv-cor);
+    font-size: 0.875rem;
+    font-weight: 700;
+}
+.legacy-html .rv-mes-status {
+    color: var(--tw-gray-700);
+    font-weight: 500;
+}
+.legacy-html .rv-mes-meta {
+    margin-left: auto;
+    color: var(--tw-gray-800);
+    font-weight: 600;
+}
+
+.legacy-html .rv-tabela-rolagem {
+    overflow-x: auto;
+}
+.legacy-html .rv-tabela {
+    width: 100%;
+    border-collapse: collapse;
+}
+.legacy-html .rv-tabela th {
+    padding: 10px 16px;
+    border-bottom: 1px solid var(--tw-gray-200);
+    color: var(--tw-gray-600);
+    font-size: 0.75rem;
+    font-weight: 600;
+    text-align: left;
+    white-space: nowrap;
+}
+.legacy-html .rv-tabela td {
+    padding: 10px 16px;
+    border-bottom: 1px solid var(--tw-gray-200);
+    color: var(--tw-gray-800);
+}
+.legacy-html .rv-tabela tbody tr:last-child td {
+    border-bottom: 0;
+}
+.legacy-html .rv-tabela tbody tr:hover td {
+    background-color: var(--tw-gray-100);
+}
+.legacy-html .rv-tabela a {
+    color: var(--tw-gray-900);
+    font-weight: 500;
+}
+.legacy-html .rv-tabela a:hover {
+    color: var(--tw-primary);
+}
+.legacy-html .rv-tabela .rv-centro {
+    text-align: center;
+    white-space: nowrap;
+}
+.legacy-html .rv-tabela .rv-nome {
+    white-space: nowrap;
+}
+.legacy-html .rv-tabela .rv-valor {
+    text-align: right;
+    white-space: nowrap;
+    font-variant-numeric: tabular-nums;
+}
+.legacy-html .rv-tabela .rv-vazio {
+    padding: 28px 16px;
+    color: var(--tw-gray-600);
+    text-align: center;
+}
+
+.legacy-html .rv-mes-rodape {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 16px 32px;
+    padding: 14px 16px;
+    border-top: 1px solid var(--tw-gray-200);
+    background-color: var(--tw-gray-100);
+}
+.legacy-html .rv-numeros {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px 28px;
+}
+.legacy-html .rv-numeros > div,
+.legacy-html .rv-progresso-topo {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+}
+.legacy-html .rv-numeros span,
+.legacy-html .rv-progresso-topo span {
+    color: var(--tw-gray-600);
+    font-size: 0.75rem;
+}
+.legacy-html .rv-numeros b,
+.legacy-html .rv-progresso-topo b {
+    color: var(--tw-gray-900);
+    font-size: 0.9375rem;
+    font-weight: 700;
+}
+.legacy-html .rv-progresso {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    flex: 1 1 260px;
+    max-width: 420px;
+    margin-left: auto;
+}
+.legacy-html .rv-barra {
+    height: 8px;
+    overflow: hidden;
+    border-radius: 999px;
+    background-color: var(--tw-gray-200);
+}
+.legacy-html .rv-barra > div {
+    height: 100%;
+    border-radius: 999px;
+    background-color: var(--tw-primary);
+}
+.legacy-html .rv-barra--perdida > div { background-color: var(--tw-danger); }
+.legacy-html .rv-barra--batida > div  { background-color: var(--tw-success); }
+.legacy-html .rv-barra--super > div   { background-color: var(--tw-warning); }
+.legacy-html .rv-sobra {
+    color: var(--tw-gray-700);
+    font-size: 0.75rem;
+    font-weight: 500;
+}

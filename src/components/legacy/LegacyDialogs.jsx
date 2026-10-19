@@ -3,6 +3,7 @@
     import { useConfirm } from '@/components/ui/confirm-dialog'
     import { applyLegacyRedirect } from '@/utils/legacyRedirect'
     import { limparGlobal } from '@/utils/limparGlobal'
+    import { avisoErro, avisoSucesso } from '@/utils/avisos'
 
     // CONFIRMAÇÕES E AVISOS QUE O JS DOS CARTÕES CHAMA (painel.js / SweetAlert v1 DO PAINEL ANTIGO), ABERTOS NO DIALOG DO
     // REACT. O legacy-runtime.js DA API TAMBÉM DEFINE confirmar/confirmFunction COM O confirm() DO NAVEGADOR, MAS SÓ
@@ -70,14 +71,27 @@
                 })
             }
 
+            //criaMsg(msg, tipo) DO painel.js: A FAIXA VERDE/VERMELHA DO LEGADO VIRA TOAST (tipo 1 = SUCESSO, 2 = ERRO).
+            //EX.: Ctrl+S DAS ABAS CSS/JS DE SECTION RESPONDE { type, message } E CHAMA criaMsg — SEM ELA NADA APARECIA
+            const criaMsg = (mensagem, tipo) => {
+                const texto = semTags(mensagem)
+                if (String(tipo) === '1') {
+                    avisoSucesso(texto || 'Salvo com sucesso.')
+                } else {
+                    avisoErro(texto || 'Não foi possível concluir.')
+                }
+            }
+
             window.swal            = swal
             window.confirmar       = confirmar
             window.confirmFunction = confirmFunction
+            window.criaMsg         = criaMsg
 
             return () => {
                 limparGlobal('swal', swal)
                 limparGlobal('confirmar', confirmar)
                 limparGlobal('confirmFunction', confirmFunction)
+                limparGlobal('criaMsg', criaMsg)
             }
 
         }, [])

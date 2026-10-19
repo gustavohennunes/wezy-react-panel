@@ -178,7 +178,15 @@
             window.fechaEditor                  = fechaEditor
             window.codigoInicial                = () => usarCodigoInicial('.usar-codigo-inicial')
             window.codigoInicialSemComentarios  = () => usarCodigoInicial('.usar-codigo-inicial-sem-comentario')
-            window.salvarModulo                 = salvarModulo
+            //O salvarModulo/Ctrl+S DAQUI GRAVA EM modules/save (CARTÃO modulos). OUTROS CARTÕES COM #TxtConteudo (ex.: ABA Geral
+            //DA SECTION) TÊM O PRÓPRIO SALVAMENTO — ANTES ESTE Ctrl+S TAMBÉM DISPARAVA LÁ E TENTAVA SALVAR O id DA SECTION COMO
+            //MÓDULO ("O modulo atual nao foi encontrado para criar a copia de recuperacao")
+            const noCartaoModulos = new URLSearchParams(window.location.search).get('pag') === 'modulos'
+            if (noCartaoModulos) {
+                window.salvarModulo = salvarModulo
+                //SÓ TIRA SE AINDA FOR A DAQUI: NOS OUTROS CARTÕES O salvarModulo É DO PRÓPRIO CARTÃO
+                cleanups.push(() => limparGlobal('salvarModulo', salvarModulo))
+            }
 
             //AJUSTES NO HTML LEGADO DO CARD: sprite de ícones + links index.php → SPA + select cru
             injectLegacyIconsCss()
@@ -262,9 +270,9 @@
                 cleanups.push(() => form.removeEventListener('submit', juntaConteudos))
             }
 
-            //CTRL+S / CMD+S
+            //CTRL+S / CMD+S (SÓ NO CARTÃO modulos — VER noCartaoModulos)
             const onKeyDown = (e) => {
-                if ((e.ctrlKey || e.metaKey) && String(e.key).toLowerCase() === 's') {
+                if (noCartaoModulos && (e.ctrlKey || e.metaKey) && String(e.key).toLowerCase() === 's') {
                     e.preventDefault()
                     salvarModulo()
                 }
@@ -342,7 +350,7 @@
                 }
 
                 //VER limparGlobal: delete DIRETO QUEBRAVA QUANDO O <script> DO CARTÃO DECLARAVA A MESMA FUNÇÃO NO GLOBAL
-                ;['setConteudoEditor', 'juntaConteudos', 'abreEditor', 'fechaEditor', 'codigoInicial', 'codigoInicialSemComentarios', 'salvarModulo']
+                ;['setConteudoEditor', 'juntaConteudos', 'abreEditor', 'fechaEditor', 'codigoInicial', 'codigoInicialSemComentarios']
                     .forEach((nome) => limparGlobal(nome))
                 if (editor) limparGlobal('editor', editor)
 

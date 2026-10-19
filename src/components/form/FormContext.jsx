@@ -4,12 +4,23 @@
     import { FormSection } from './'
     import { chaveValid } from './FormSection'
     import { arquivosRemovidos } from './FormFile'
+
+    //Ctrl+S: O JS DOS CARTÕES (ex.: ABA Geral DA SECTION) FAZ $("form").submit() NO ATALHO. NO PAINEL REACT O ATALHO SÓ SALVA,
+    //SEM REDIRECT NEM RECARREGAR O FORMULÁRIO — ISSO FICA PARA O BOTÃO "Salvar". GUARDA A HORA DO ÚLTIMO Ctrl+S PARA O
+    //submitForm SABER DE ONDE VEIO O ENVIO
+    let ultimoAtalhoSalvar = 0
+    if (typeof document !== 'undefined') {
+        document.addEventListener('keydown', (e) => {
+            if ((e.ctrlKey || e.metaKey) && String(e.key).toLowerCase() === 's') ultimoAtalhoSalvar = Date.now()
+        }, true)
+    }
     import { temEditorDeCodigo, instalarEditorGlobal } from './FormCodeEditor'
     import { FormTabs } from './'
     import { ScreenLoader } from '@/components/loaders'
     import { KeenIcon } from '@/components/keenicons'
     import { api } from '@/services/api'
     import { toast } from 'sonner'
+    import { avisoSucesso } from '@/utils/avisos'
     import { buildApiUrl } from '@/utils/urlHelper'
     import { usePageData } from '@/context/PageDataContext'
     import { useAuth } from '@/auth/providers/JWTProvider'
@@ -152,6 +163,13 @@
                         }
                     }
                 );
+
+                //SALVO PELO Ctrl+S (VER ultimoAtalhoSalvar): FICA NA TELA, SÓ AVISA
+                if (acao === 'Alterar' && Date.now() - ultimoAtalhoSalvar < 2000) {
+                    avisoSucesso(response?.data?.success?.response?.data?.message || 'Registro alterado com sucesso')
+                    setLoading(false)
+                    return
+                }
 
                 //REDIRECT EMITIDO PELO CARD COMO <script>window.location="..."</script>.
                 //VARRE A RESPOSTA BRUTA: COM exit(loc(...)) O PHP DEVOLVE HTML CRU, SEM O JSON.

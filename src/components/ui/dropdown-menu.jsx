@@ -4,7 +4,10 @@ import * as React from 'react'
 import * as DropdownMenuPrimitive from '@radix-ui/react-dropdown-menu'
 import { Check, ChevronRight, Circle } from 'lucide-react'
 import { cn } from '@/lib/utils'
-const DropdownMenu = DropdownMenuPrimitive.Root
+//modal={false} POR PADRÃO: O MODO MODAL DO RADIX TRAVA O SCROLL DA PÁGINA (INCLUSIVE O DA SIDEBAR) E O pointer-events DO
+//body ENQUANTO O MENU ESTÁ ABERTO — COM OUTRO DROPDOWN/POPOVER ABERTO JUNTO A TRAVA PODIA FICAR PRESA. O Popover JÁ É
+//NÃO-MODAL; QUEM PRECISAR DO MODAL PASSA modal={true}
+const DropdownMenu = ({ modal = false, ...props }) => <DropdownMenuPrimitive.Root modal={modal} {...props} />
 const DropdownMenuTrigger = DropdownMenuPrimitive.Trigger
 const DropdownMenuGroup = DropdownMenuPrimitive.Group
 const DropdownMenuPortal = DropdownMenuPrimitive.Portal

@@ -10,6 +10,7 @@
     import { isSystemNotFoundError, notifySystemNotFound } from '@/utils/systemStatus'
     import { paginaInicial } from '@/utils/startPage'
     import { getAuthToken } from '@/auth/_helpers'
+    import { avisoErro } from '@/utils/avisos'
 
     const PageDataContext = createContext()
 
@@ -147,6 +148,17 @@
             //LOGIN POR HASH EM ANDAMENTO (JWTProvider): NÃO CARREGA NEM REDIRECIONA, SENÃO A URL PERDE O hash
             if (searchParams.get('hash')) {
                 setLoading(true)
+                return
+            }
+
+            //&erro=permissao: OS CARTÕES LEGADOS MANDAM PARA CÁ QUEM NÃO TEM ACESSO (ex.: loc('?pag=clientes&erro=permissao')).
+            //AVISA E TIRA O PARÂMETRO DA URL — COM ELE O ?pag=dashboard NÃO CAÍA NO DASHBOARD DO REACT E MOSTRAVA
+            //"Este módulo não devolveu campos para exibir"
+            if (searchParams.get('erro') === 'permissao') {
+                avisoErro('Você não tem acesso a esta página.')
+                const semErro = new URLSearchParams(searchParams)
+                semErro.delete('erro')
+                navigate({ search: semErro.toString() ? '?' + semErro.toString() : '' }, { replace: true })
                 return
             }
 

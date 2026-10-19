@@ -91,7 +91,10 @@
                 //BOTÃO-DIV DO LEGADO (criaBotao com a classe enviaForm, ex.: "Enviar" do framework/fotos.php): NO painel.js O
                 //CLIQUE ENVIA O FORM CUJO id VEM DA CLASSE "envioXxx" (#envioXxx). requestSubmit DISPARA O submit,
                 //QUE O aoEnviar ABAIXO MANDA PARA A API
-                const botaoEnvio = event.target.closest?.('.enviaForm')
+                //.send-filtro: BOTÃO-DIV DA LUPA DOS FILTROS (ex.: cadastro-prospects DO CLIENTE 360). O CARTÃO LIGA O CLIQUE NO
+                //$(function(){...}) DO SEU <script>, QUE RODA ANTES DESTE HTML (extra_content.header.after) EXISTIR — O CLIQUE
+                //NÃO FAZIA NADA. AQUI ENVIA O FORM DELE (#conteudoFiltro), COMO O $('#conteudoFiltro').submit() DO CARTÃO
+                const botaoEnvio = event.target.closest?.('.enviaForm, .send-filtro')
                 if (botaoEnvio && container.contains(botaoEnvio)) {
 
                     const classeEnvio = Array.from(botaoEnvio.classList).find((classe) => /^envio./.test(classe))

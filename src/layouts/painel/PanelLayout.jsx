@@ -5,6 +5,7 @@ import { ScreenLoader } from '@/components/loaders'
 import { LegacySelectEnhancer } from '@/components/form/LegacySelectEnhancer'
 import { EmailObrigatorio } from './EmailObrigatorio'
 import { LegacyDialogs } from '@/components/legacy/LegacyDialogs'
+import { DestravaScroll } from './DestravaScroll'
 
 //LOADER EM TELA CHEIA SÓ QUANDO A RESPOSTA JÁ É UM REDIRECT PARA OUTRO HOST (ex.: acao=Painel, ACESSO AO PAINEL DO
 //CLIENTE): O NAVEGADOR AINDA LEVA UM TEMPO PARA SAIR. ANTES QUALQUER acao FORA DE Alterar/Inserir (Dashboard, Fotos...)
@@ -23,6 +24,7 @@ const PanelBody = () => {
             <LegacySelectEnhancer />
             <EmailObrigatorio />
             <LegacyDialogs />
+            <DestravaScroll />
         </PanelLayoutProvider>
     )
 }

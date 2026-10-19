@@ -33,6 +33,7 @@ const DataRowPicture = ({ row }) => {
                         }
                         placement={'right'}
                         className="min-w-5 min-h-5"
+                        tooltipClassName="!bg-white !p-1.5 !shadow-[0_2px_10px_rgba(0,0,0,0.15)]"
                     >
                         <button
                             type="button"

@@ -16,6 +16,7 @@
     import { installLegacyBridge } from '@/utils/legacyBridge'
     import { Tabs } from '@/components/custom/tabs/tabs'
     import { abasDaListagemNoTopo } from '@/utils/listTabs'
+    import { useRestauraRolagem } from './useRestauraRolagem'
 
     //MENSAGENS QUE O CARTÃO DEFINE ($setMsgAlerta, $setMsgFormErro...) OU QUE A PONTE GERA (alterado=ok, inserido=erro...).
     //A PONTE AS ENVIA EM params.messages.{general|list|form}.{success|error|alert}
@@ -64,13 +65,17 @@
         const { getMenuConfig } = useMenus();
         const menuConfig        = getMenuConfig('primary');
         const menuItem          = useMenuCurrentItem(pathname, menuConfig);
-        const { pageData }      = usePageData();
+        const { pageData, loading } = usePageData();
         //slug/action SAEM DA URL ATUAL DO ROUTER (ANTES VINHAM DO AuthProvider, QUE FICA FORA DO
         //ROUTER E MANTINHA O VALOR ANTIGO DEPOIS DE UMA NAVEGAÇÃO SEM RELOAD)
         const urlParams         = new URLSearchParams(search);
         const slug              = urlParams.get('slug') ?? urlParams.get('pag') ?? '';
         const action            = urlParams.get('action') ?? '';
         const containerRef      = useRef(null);
+        //<div> QUE ROLA O CONTEÚDO NO DESKTOP: A POSIÇÃO VOLTA APÓS F5 / ABA RECARREGADA (VER useRestauraRolagem)
+        const rolagemRef        = useRef(null);
+
+        useRestauraRolagem(rolagemRef, loading, pageData);
 
         const [ pageMessage, setPageMessage ]     = useState('');
         const [ title, setTitle ]                 = useState('');
@@ -270,7 +275,7 @@
 
                         <div className="flex flex-col grow items-stretch rounded-xl bg-[--tw-content-bg] dark:bg-[--tw-content-bg-dark] border border-gray-300 dark:border-gray-200 lg:ms-[--tw-sidebar-width] mt-0 lg:mt-[15px] m-[15px]">
 
-                            <div className="flex flex-col grow lg:scrollable-y-auto lg:[scrollbar-width:auto] lg:light:[--tw-scrollbar-thumb-color:var(--tw-content-scrollbar-color)] pt-5">
+                            <div ref={rolagemRef} className="flex flex-col grow lg:scrollable-y-auto lg:[scrollbar-width:auto] lg:light:[--tw-scrollbar-thumb-color:var(--tw-content-scrollbar-color)] pt-5">
 
                                 <main className="grow">
 

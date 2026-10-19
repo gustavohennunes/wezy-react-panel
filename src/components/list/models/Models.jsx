@@ -13,6 +13,7 @@
     import { LegacyHtml } from '@/components/legacy/LegacyHtml'
     import { useConfirm } from '@/components/ui/confirm-dialog'
     import { contemTodasAsPalavras, textoDoHtml } from '@/utils/textSearch'
+    import { devePaginaSerRestaurada, lerPaginasCarregadas, gravarPaginasCarregadas, inicioCarregamentoExtra, fimCarregamentoExtra } from '@/utils/restauraPagina'
 
     const Models = ({ model, columnHeader, btnAdd, search, btnExcluir, extraButton, pagination, tabs, content, sequence = false }) => {
 
@@ -74,12 +75,37 @@
             const paginaUrl = parseInt(new URLSearchParams(window.location.search).get('pagina') || '1', 10)
             paginaCarregada.current = isNaN(paginaUrl) ? 1 : paginaUrl
 
+            //F5 / ABA RECARREGADA PELO NAVEGADOR: REABRE AS PÁGINAS DO "Carregar mais conteúdo" QUE ESTAVAM NA TELA, PARA A
+            //ROLAGEM (Main.jsx) CONSEGUIR VOLTAR AO MESMO PONTO. FORA DISSO, A LISTAGEM RECOMEÇA E O CONTADOR TAMBÉM
+            if (!devePaginaSerRestaurada()) {
+                gravarPaginasCarregadas(paginaCarregada.current)
+                return
+            }
+
+            const paginasAntes = lerPaginasCarregadas()
+            if (paginasAntes <= paginaCarregada.current) return
+
+            let cancelado = false
+
+            inicioCarregamentoExtra()
+
+            ;(async () => {
+                while (!cancelado && paginaCarregada.current < paginasAntes) {
+                    if (!(await carregarMais())) break
+                }
+            })().finally(fimCarregamentoExtra)
+
+            return () => {
+                cancelado = true
+            }
+
+        // eslint-disable-next-line react-hooks/exhaustive-deps
         }, [ model ])
 
         // BUSCA A PRÓXIMA PÁGINA E CONCATENA NO QUE JÁ ESTÁ NA TELA
         const carregarMais = async () => {
 
-            if (carregandoMais) return
+            if (carregandoMais) return false
 
             setCarregandoMais(true)
 
@@ -103,8 +129,13 @@
                     })
 
                     paginaCarregada.current += 1
+                    gravarPaginasCarregadas(paginaCarregada.current)
+
+                    return true
 
                 }
+
+                return false
 
             } catch (err) {
 
@@ -117,6 +148,8 @@
                         fontWeight: 'bold'
                     }
                 })
+
+                return false
 
             } finally {
                 setCarregandoMais(false)

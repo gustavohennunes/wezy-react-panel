@@ -37,10 +37,21 @@
             setSearchInput(search?.value || '')
         }, [search?.value])
 
-        //FILTRO AO DIGITAR: ATUA SÓ NAS LINHAS JÁ CARREGADAS, SEM CHAMAR A API. ENQUANTO O TEXTO FOR
-        //IGUAL AO ?busca= JÁ APLICADO, NÃO FILTRA — O SERVIDOR PODE TER ACHADO O TERMO EM CAMPOS QUE
-        //NÃO APARECEM NA TABELA, E ESSAS LINHAS SUMIRIAM
-        const filtroLocal = searchInput.trim() !== (search?.value || '').trim() ? searchInput.trim() : ''
+        // PAGINAÇÃO DO GRID — DERIVADA DAS PROPS (SEM STATE + useEffect, QUE CUSTAVA UM RENDER A MAIS)
+        // QUANDO O CARD ESCONDE O "Exibindo de X até Y" ($bloqExibindo), A PONTE NÃO ENVIA
+        // pagination.information — E O RODAPÉ MOSTRAVA "1 - 0 de 0" MESMO COM REGISTROS NA
+        // TELA. NESSE CASO CONSIDERAMOS QUE TUDO QUE FOI CARREGADO ESTÁ NA PÁGINA ATUAL.
+        const totalRegistros = Math.max(0, (typeof pagination?.information?.total === 'number'
+            ? pagination.information.total
+            : (model?.length || 0)) - removedIds.size)
+
+        //FILTRO AO DIGITAR: ATUA SÓ NAS LINHAS JÁ CARREGADAS, SEM CHAMAR A API — POR ISSO SÓ LIGA QUANDO TODOS OS
+        //REGISTROS JÁ ESTÃO NA TELA. COM MAIS RESULTADOS NO SERVIDOR (ex.: "Mostrando 100 de 48340" DOS PROSPECTS DO
+        //360) ELE ESCONDIA O QUE NÃO TINHA CARREGADO, E A BUSCA SÓ VALE NO ENTER/LUPA (?busca= NO SERVIDOR).
+        //ENQUANTO O TEXTO FOR IGUAL AO ?busca= JÁ APLICADO, NÃO FILTRA — O SERVIDOR PODE TER ACHADO O TERMO EM CAMPOS
+        //QUE NÃO APARECEM NA TABELA, E ESSAS LINHAS SUMIRIAM
+        const todosCarregados = totalRegistros <= visibleModels.length
+        const filtroLocal = todosCarregados && searchInput.trim() !== (search?.value || '').trim() ? searchInput.trim() : ''
 
         const textoDasLinhas = useMemo(() => {
             const textos = new Map()
@@ -162,14 +173,6 @@
             }
 
         }
-
-        // PAGINAÇÃO DO GRID — DERIVADA DAS PROPS (SEM STATE + useEffect, QUE CUSTAVA UM RENDER A MAIS)
-        // QUANDO O CARD ESCONDE O "Exibindo de X até Y" ($bloqExibindo), A PONTE NÃO ENVIA
-        // pagination.information — E O RODAPÉ MOSTRAVA "1 - 0 de 0" MESMO COM REGISTROS NA
-        // TELA. NESSE CASO CONSIDERAMOS QUE TUDO QUE FOI CARREGADO ESTÁ NA PÁGINA ATUAL.
-        const totalRegistros = Math.max(0, (typeof pagination?.information?.total === 'number'
-            ? pagination.information.total
-            : (model?.length || 0)) - removedIds.size)
 
         //TUDO QUE FOI CARREGADO FICA EM UMA ÚNICA "PÁGINA" (TAMANHO GIGANTE DESDE O PRIMEIRO RENDER:
         //O DataGridProvider CAPTURA O pageSize NA MONTAGEM) — QUEM CONTROLA O CARREGAMENTO É O BOTÃO

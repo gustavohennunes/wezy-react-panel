@@ -132,8 +132,17 @@
 
             }
 
-            //CTRL+S — MESMO ENDPOINT DO PAINEL ANTIGO (modules/save com request-token do card)
+            //CTRL+S — MESMO ENDPOINT DO PAINEL ANTIGO (modules/save com request-token do card).
+            //UM Ctrl+S CHEGA AQUI POR DOIS CAMINHOS: O keydown DESTE HOOK E O document.onkeydown DO PRÓPRIO CARTÃO (QUE
+            //CHAMA window.salvarModulo, ESTA MESMA FUNÇÃO) — SALVAVA 2x E GRAVAVA 2 VERSÕES. COM UM ENVIO EM ANDAMENTO OU
+            //ACABADO DE COMEÇAR, A SEGUNDA CHAMADA É IGNORADA
+            let salvando = false
+            let ultimoEnvio = 0
             const salvarModulo = async () => {
+
+                if (salvando || Date.now() - ultimoEnvio < 800) return
+                salvando = true
+                ultimoEnvio = Date.now()
 
                 juntaConteudos()
 
@@ -167,6 +176,8 @@
 
                 } catch (err) {
                     toast.error('Não foi possível salvar este módulo. Tente novamente.')
+                } finally {
+                    salvando = false
                 }
 
             }

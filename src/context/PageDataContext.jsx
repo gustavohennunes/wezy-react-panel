@@ -141,9 +141,19 @@
 
         }, [])
 
+        //TELA ANTERIOR (QUERY STRING) PARA O ?pag=ativar-modulo-edicao VOLTAR A ELA (ex.: A SECTION ABERTA) EM VEZ DE CAIR NA
+        //LISTA DE PÁGINAS. NO PAINEL ANTIGO O CARTÃO USA O REFERER; AQUI A URL JÁ MUDOU QUANDO A API É CHAMADA, ENTÃO VAI EM &voltar=
+        const buscaAnteriorRef = useRef('')
+
         useEffect(() => {
 
-            const urlApi = buildApiUrl(searchParams)
+            let urlApi = buildApiUrl(searchParams)
+
+            const buscaAnterior = buscaAnteriorRef.current
+            buscaAnteriorRef.current = searchParams.toString()
+            if (urlApi && searchParams.get('pag') === 'ativar-modulo-edicao' && !searchParams.get('voltar') && buscaAnterior) {
+                urlApi += '&voltar=' + encodeURIComponent('?' + buscaAnterior)
+            }
 
             //LOGIN POR HASH EM ANDAMENTO (JWTProvider): NÃO CARREGA NEM REDIRECIONA, SENÃO A URL PERDE O hash
             if (searchParams.get('hash')) {

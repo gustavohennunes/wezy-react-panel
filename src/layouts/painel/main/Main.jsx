@@ -319,7 +319,9 @@
                                     )}
 
                                     {String(headerAfterContent).trim() && (
-                                        <LegacyHtml html={headerAfterContent} className="w-full px-5 mb-5" />
+                                        //flow-root: float DO CARTÃO (ex.: FILTROS ANTIGOS COM float:left/right) FICA DENTRO DO CABEÇALHO,
+                                        //SEM VAZAR E ESPREMER A LISTAGEM AO LADO
+                                        <LegacyHtml html={headerAfterContent} className="w-full px-5 mb-5 flow-root" />
                                     )}
 
                                     <Outlet />

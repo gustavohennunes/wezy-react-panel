@@ -7,6 +7,7 @@ import {
     DialogHeader,
     DialogTitle,
     DialogDescription,
+    DialogClose,
 } from '@/components/ui/dialog'
 const DataRowPicture = ({ row }) => {
     const [open, setOpen] = useState(false)
@@ -54,12 +55,20 @@ const DataRowPicture = ({ row }) => {
                                 <DialogTitle></DialogTitle>
                                 <DialogDescription></DialogDescription>
                             </DialogHeader>
-                            <DialogBody className="m-auto">
+                            <DialogBody className="relative m-auto">
                                 <img
                                     className="min-w-16 min-h-16 m-auto"
                                     src={row.content.large_thumb}
                                     alt="Preview"
                                 />
+                                {/* O X PADRÃO DO DialogContent FICA ESCONDIDO ([&>button]:hidden) PORQUE SUMIA EM CIMA DA IMAGEM.
+                                    ESTE FICA SOBRE O CANTO DA IMAGEM, COM FUNDO PRÓPRIO, VISÍVEL EM QUALQUER FOTO */}
+                                <DialogClose
+                                    className="absolute top-2 end-2 flex size-8 items-center justify-center rounded-full bg-black/60 text-white transition-colors hover:bg-black/80 focus:outline-none"
+                                    aria-label="Fechar"
+                                >
+                                    <KeenIcon icon="cross" className="text-base" />
+                                </DialogClose>
                             </DialogBody>
                         </DialogContent>
                     </Dialog>

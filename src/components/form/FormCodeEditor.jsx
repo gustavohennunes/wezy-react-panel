@@ -12,7 +12,11 @@
     //PÁGINAS E CAMPOS COM EDITOR NO LEGADO
     const PAGINAS_COM_ACAO = ['modulos', 'modulos-versoes', 'planos-itens', 'componentes', 'projetos-paginas-sections', 'actions-pages', 'formulario-webhooks', 'commerce-custom-css', 'paginas-avulsas', 'planos-comerciais']
     const PAGINAS_SEMPRE   = ['projetos-paginas-sections-js', 'projetos-paginas-sections-css', 'projetos-css-padrao', 'actions-pages', 'configuracoes-core', 'projeto-404']
-    const CAMPOS           = ['TxtConteudo', 'TxtConteudoFinal', 'TxtConteudo_json']
+    const CAMPOS           = ['TxtConteudo', 'TxtConteudoFinal', 'TxtConteudo_json', 'TxtConteudo_js']
+
+    //HIDDEN QUE O prePost DO CARTÃO LÊ (O JS DO CARTÃO COPIAVA O EDITOR PARA ELE ANTES DO ENVIO). TxtConteudo_js: JS DO
+    //PROJETO NA FOLHA DE ESTILO (projetos-css-padrao, $post['HdnConteudo_js'])
+    const HIDDEN_DO_CARTAO = { TxtConteudo: 'HdnConteudo', TxtConteudo_js: 'HdnConteudo_js' }
 
     //IMPORT FIXO POR LINGUAGEM: O VITE NÃO RESOLVE import() COM VARIÁVEL EM PACOTE DO node_modules
     const CARREGAR_MODO = {
@@ -32,6 +36,7 @@
     //LINGUAGEM PELA PÁGINA (O JS DE CADA CARTÃO TROCAVA O MODO DO ACE)
     const modoDoEditor = (fieldName) => {
         if (fieldName === 'TxtConteudo_json') return 'json'
+        if (fieldName === 'TxtConteudo_js') return 'javascript'
         const params = new URLSearchParams(window.location.search)
         const pag    = params.get('pag') || params.get('slug') || ''
         if (/-js$/.test(pag)) return 'javascript'
@@ -92,7 +97,8 @@
 
         useEffect(() => {
 
-            let destruido = false
+            let destruido  = false
+            let observador = null
 
             ;(async () => {
 
@@ -127,6 +133,12 @@
                     editorRef.current = editor
                     if (fieldName === 'TxtConteudo') editorReal = editor
                     setTimeout(() => !destruido && editor.resize(true), 300)
+
+                    //EDITOR QUE NASCE ESCONDIDO (ABA DE CATEGORIA FECHADA) FICA SEM TAMANHO: AO APARECER, REMEDE
+                    if (typeof ResizeObserver !== 'undefined') {
+                        observador = new ResizeObserver(() => !destruido && editor.resize(true))
+                        observador.observe(hostRef.current)
+                    }
 
                     //"Adicionar @media Tablet | Mobile" DO CARTÃO (aut COM href="Javascript:addMediaTablet();" E OS HIDDENS
                     //#mediaTablet/#mediaMobile EM BASE64). AS FUNÇÕES VINHAM NO <script> DO CARTÃO, QUE A API NÃO MANDA:
@@ -164,6 +176,7 @@
 
             return () => {
                 destruido = true
+                observador?.disconnect()
                 if (fieldName === 'TxtConteudo') {
                     limparGlobal('addMediaTablet')
                     limparGlobal('addMediaMobile')
@@ -197,8 +210,8 @@
                     style={{ height: 950, fontSize: 13 }}
                 />
                 <input ref={hiddenRef} type="hidden" name={fieldName} defaultValue={valorInicial.current} />
-                {fieldName === 'TxtConteudo' && (
-                    <input ref={hdnRef} type="hidden" name="HdnConteudo" defaultValue={valorInicial.current} />
+                {HIDDEN_DO_CARTAO[fieldName] && (
+                    <input ref={hdnRef} type="hidden" name={HIDDEN_DO_CARTAO[fieldName]} defaultValue={valorInicial.current} />
                 )}
             </div>
         )

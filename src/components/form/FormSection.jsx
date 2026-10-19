@@ -9,7 +9,9 @@
 
     //validRows/setValidRows/controladores VÊM DO FormContext: SÃO DO FORMULÁRIO INTEIRO, COMO NO painel.js LEGADO
     //(ajustaValidFromTr) — O CONTROLADOR (ex.: "Copiar Section") PODE ESTAR EM OUTRA SEÇÃO DAS LINHAS QUE ELE MOSTRA
-    const FormSection = ({ data, index, button, form, loading, validRows = {}, setValidRows = () => {}, controladores = new Set() }) => {
+    //categoriaAtiva: ABA DE CATEGORIA DO FormContext (Javascript:openCategory('x') DO CARTÃO projetos-css-padrao). LINHA COM
+    //data-category DE OUTRA ABA FICA ESCONDIDA (NO DOM, PARA O VALOR IR NO ENVIO, COMO O .hide() DO LEGADO); "url" APARECE EM TODAS
+    const FormSection = ({ data, index, button, form, loading, validRows = {}, setValidRows = () => {}, controladores = new Set(), oculta = false, categoriaAtiva = null }) => {
 
         const [formState, setFormState] = useState({})
 
@@ -286,19 +288,15 @@
 
         };
 
+        //ATRIBUTOS DA LINHA (row_attr). ANTES SEPARAVA POR ESPAÇO E QUEBRAVA VALOR COM ESPAÇO: data-style="Primária Hover"
+        //VIRAVA data-style="Primária" (O "Abrir parâmetros" DA FOLHA DE ESTILO NÃO ACHAVA AS LINHAS DO ESTILO)
         const parseAttributes = (attrString) => {
 
             const attributes = {};
-            const attrArray = attrString.split(' ');
 
-            attrArray.forEach(attr => {
-
-                const [key, value] = attr.split('=');
-                if (key && value) {
-                    attributes[key] = value.replace(/['"]/g, '');
-                }
-
-            });
+            for (const [, key, aspasDuplas, aspasSimples, semAspas] of String(attrString || '').matchAll(/([\w:.-]+)\s*=\s*(?:"([^"]*)"|'([^']*)'|([^\s"'>]+))/g)) {
+                attributes[key] = aspasDuplas ?? aspasSimples ?? semAspas ?? '';
+            }
 
             return attributes;
 
@@ -312,7 +310,7 @@
         const temCabecalho = temNumero || Boolean(String(data.title ?? '').trim()) || Boolean(data.subTitle)
 
         return (
-            <div className="card mb-3">
+            <div className={`card mb-3${oculta ? ' !hidden' : ''}`}>
 
                 {temCabecalho && (
                 <div className="card-header !min-h-[46px] !py-2.5 bg-[color:var(--form-header-bg)] rounded-t-[8px]" id="general_settings">
@@ -360,6 +358,11 @@
                         //px-4 = mesmo recuo que o .card-body tinha (custom.components.card.px)
                         let combinedClassName = `flex items-start flex-wrap lg:flex-nowrap gap-2.5 lg:gap-4 px-4 ${parsedAttributes.class || ''}`;
                         delete parsedAttributes.class; 
+
+                        const categoriaLinha = parsedAttributes['data-category']
+                        if (categoriaAtiva && categoriaLinha && categoriaLinha !== 'url' && categoriaLinha !== categoriaAtiva) {
+                            combinedClassName += ' !hidden'
+                        }
                         
                         //LINHA CONDICIONAL: TODOS OS data-valid-* PRECISAM CASAR (ex.: "Métodos liberados" EXIGE
                         //data-valid-ativar-api="ok" E data-valid-limitar-metodos="ok"). ANTES SÓ O PRIMEIRO

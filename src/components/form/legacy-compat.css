@@ -373,3 +373,20 @@ input[name="FrmPagina"] {
     background-color: var(--tw-primary);
     color: var(--tw-primary-inverse, #fff);
 }
+
+/* "Abrir parâmetros" DA FOLHA DE ESTILO (projetos-css-padrao): O toggleParameters DO CARTÃO FAZ $('[data-style="x"]').toggle(),
+   E O jQuery MOSTRA COM display:block — A LINHA DO FORMULÁRIO É flex (RÓTULO AO LADO DO CAMPO) */
+form [data-style][style*="display: block"] {
+    display: flex !important;
+}
+
+/* PARÂMETROS ABERTOS DE UM ESTILO (MESMO CARTÃO): O <style> DO CARTÃO PINTA [data-style] DE #EEE FIXO (CLARO NO MODO ESCURO)
+   E O FUNDO SÓ COBRIA O pt-4 DE CIMA DA LINHA — O CAMPO FICAVA COLADO NA BORDA DE BAIXO E SOBRAVA UMA FAIXA BRANCA (gap-4)
+   ATÉ A PRÓXIMA. AQUI: FUNDO DO TEMA, MESMO RESPIRO EMBAIXO, A FAIXA ENTRA NO gap (margin negativa) E UMA BARRA À
+   ESQUERDA AGRUPA AS LINHAS DO MESMO ESTILO */
+form [data-style] {
+    background: var(--tw-gray-100);
+    padding-bottom: 1rem;
+    margin-bottom: -1rem;
+    box-shadow: inset 3px 0 0 var(--tw-primary);
+}

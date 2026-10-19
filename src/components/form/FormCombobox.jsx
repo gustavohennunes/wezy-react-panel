@@ -37,16 +37,19 @@
 
     //quebra: NA LISTA DO POPOVER O TEXTO QUEBRA LINHA PARA A OPÇÃO SER LIDA INTEIRA;
     //NO GATILHO (ALTURA FIXA h-10) CONTINUA TRUNCADO COM "…"
-    const LabelComCor = ({ option, quebra = false }) => {
+    //corExtra: COR QUE O value NÃO DIZ SOZINHO (ex.: ESTILO DE COR DA FOLHA DE ESTILO, VER FormSelect). DEVOLVE
+    //{ cor, opacidade } OU null
+    const LabelComCor = ({ option, quebra = false, corExtra }) => {
 
-        const cor = corDaOpcao(option?.value)
+        const extra = corDaOpcao(option?.value) ? null : corExtra?.(option)
+        const cor   = corDaOpcao(option?.value) || extra?.cor
 
         return (
             <span className="flex items-center gap-2.5 min-w-0">
                 {cor && (
                     <span
-                        className="inline-block size-[15px] shrink-0 border border-[#ccc]"
-                        style={{ backgroundColor: cor }}
+                        className="inline-block size-[15px] shrink-0 rounded-[3px] border border-[#ccc]"
+                        style={{ backgroundColor: cor, opacity: extra?.opacidade ?? 1 }}
                     />
                 )}
                 <span className={quebra ? 'min-w-0 whitespace-normal break-words' : 'truncate'}>{option?.label}</span>
@@ -65,6 +68,7 @@
         disabled = false,
         ariaLabel,
         onRemoveOption,
+        corExtra,
     }) => {
 
         const [open, setOpen]     = useState(false)
@@ -152,7 +156,7 @@
 
                                 {selecionados.map((valor) => (
                                     <span key={valor} className="badge flex items-center gap-1.5 max-w-full px-2 py-1 text-2sm font-medium !text-[var(--form-control-text)] !bg-gray-200 !border-gray-300">
-                                        <LabelComCor option={labelDoValor(valor)} />
+                                        <LabelComCor option={labelDoValor(valor)} corExtra={corExtra} />
                                         <button
                                             type="button"
                                             aria-label="Remover"
@@ -172,7 +176,7 @@
                         ) : (
 
                             <span className={cn('flex-1 min-w-0', !atual && 'text-gray-500 font-normal')}>
-                                {atual ? <LabelComCor option={atual} /> : placeholder}
+                                {atual ? <LabelComCor option={atual} corExtra={corExtra} /> : placeholder}
                             </span>
 
                         )}
@@ -215,7 +219,7 @@
                                         onSelect={() => escolhe(option)}
                                     >
                                         <Check className={cn('shrink-0', estaSelecionado(option) ? 'opacity-100' : 'opacity-0')} />
-                                        <LabelComCor option={option} quebra />
+                                        <LabelComCor option={option} quebra corExtra={corExtra} />
                                         {option.removable && onRemoveOption && (
                                             <button
                                                 type="button"

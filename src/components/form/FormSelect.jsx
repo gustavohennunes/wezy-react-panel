@@ -2,6 +2,23 @@
     import { useMemo, useRef } from 'react'
     import { Combobox } from './FormCombobox'
 
+    //FOLHA DE ESTILO (projetos-css-padrao): OS SELECTS DE COR ("Background", "Background hover"...) LISTAM OS ESTILOS DE COR
+    //PELO ÍNDICE ("3:526" = "[COR-2]"). A COR DO ESTILO É O CAMPO CorColor_<índice>_color DO MESMO FORMULÁRIO E A OPACIDADE O
+    //FrmColor_<índice>_opacity — LIDOS NA HORA, ENTÃO A AMOSTRA JÁ MOSTRA O QUE FOI MEXIDO E AINDA NÃO SALVO
+    const corDoEstiloDaFolha = (option) => {
+
+        const indice = String(option?.value ?? '')
+        if (indice === '' || typeof document === 'undefined') return null
+
+        const cor = document.querySelector(`input[name="CorColor_${CSS.escape(indice)}_color"]`)?.value
+        if (!cor) return null
+
+        const opacidade = parseFloat(String(document.querySelector(`input[name="FrmColor_${CSS.escape(indice)}_opacity"]`)?.value ?? '').replace(',', '.'))
+
+        return { cor, opacidade: Number.isFinite(opacidade) ? Math.min(1, Math.max(0, opacidade)) : 1 }
+
+    }
+
     const FormSelect = ({ field, fieldData, formState, handleSelectChange, combinedClass, rowAttr = '', required }) => {
 
         //OPÇÕES DERIVADAS DAS PROPS (useMemo): ANTES FICAVAM EM STATE PREENCHIDO POR useEffect, E O
@@ -87,6 +104,7 @@
                         options={options}
                         value={formState[nomeCampo] ?? ''}
                         placeholder={options[0]?.label}
+                        corExtra={corDoEstiloDaFolha}
                         onChange={(value) => {
                             const vazio = value === '' || value === null || value === undefined
                             //OPÇÃO SEM VALOR ("Selecione uma opção") VAI COMO '-1', QUE O handleSelectChange GRAVA VAZIO

@@ -39,6 +39,20 @@ const Tabs = ({ activeTab, setActiveTab, className, tabs }) => {
 
                 const isInvalidUrl = !tab.url || tab.url === 'javascript:;'
 
+                //ABA QUE TROCA CONTEÚDO NA MESMA TELA (ex.: ABAS DE CATEGORIA DO FormContext): BOTÃO, ATIVA PELO tab.ativa
+                if (tab.onClick) {
+                    return (
+                        <button
+                            key={i}
+                            type="button"
+                            className={`tab shrink-0 whitespace-nowrap${tab.ativa ? ' active' : ''}`}
+                            onClick={tab.onClick}
+                        >
+                            {tab.content}
+                        </button>
+                    )
+                }
+
                 return isInvalidUrl ? (
                     <button
                         key={i}

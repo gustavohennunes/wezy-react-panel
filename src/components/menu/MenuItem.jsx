@@ -22,7 +22,7 @@ import {
     MenuToggle,
     useMenu,
 } from './'
-import { useLocation } from 'react-router-dom'
+import { useMenuLocation } from './MenuModulo'
 import { getMenuLinkPath, hasMenuActiveChild, moduloDaUrl } from './utils'
 const MenuItemComponent = forwardRef(function MenuItem(props, ref) {
     const {
@@ -61,7 +61,7 @@ const MenuItemComponent = forwardRef(function MenuItem(props, ref) {
     const hideTimeoutRef = useRef(null)
     //PÁGINA ATUAL = PATHNAME + MÓDULO (?pag=). SÓ O PATHNAME NÃO SERVE: NESTE PAINEL ELE É SEMPRE "/"
     //E OS EFFECTS DE ABRIR/FECHAR O MENU NUNCA DISPARAVAM AO NAVEGAR
-    const location = useLocation()
+    const location = useMenuLocation()
     const rotaAtual = location.pathname + '|' + moduloDaUrl(location.search)
     const rotaAnterior = useRef(rotaAtual)
     const { match } = useMatchPath(path)

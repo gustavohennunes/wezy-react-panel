@@ -39,6 +39,12 @@
         }
     }
 
+    //ABA DE CATEGORIA: CARTÃO QUE DIVIDE O FORMULÁRIO EM ABAS NA MESMA TELA (ex.: projetos-css-padrao, "Cores | Tipografias |
+    //Botões | CSS | JS | Outros"). O LINK DA ABA É Javascript:openCategory('colors') E CADA LINHA TEM data-category="colors";
+    //NO LEGADO O openCategory ESCONDIA AS <tr> DAS OUTRAS. AQUI A ABA TROCA O ESTADO E O FormSection ESCONDE
+    const categoriaDaAba = (url) =>
+        /^\s*javascript:\s*openCategory\(\s*(?:'|"|&#0?39;|&quot;)([\w-]+)/i.exec(url || '')?.[1] || null
+
     const FormContext = ({ data }) => {
 
         const navigate = useNavigate();
@@ -50,6 +56,8 @@
         const [ formTabs, setFormTabs ]      = useState('');
         const [ loading, setLoading ]        = useState(false);
         const [ activeTab, setActiveTab ]    = useState('');
+        //ABA DE CATEGORIA ATIVA (VER categoriaDaAba) — null = FORMULÁRIO SEM ESSE TIPO DE ABA
+        const [ categoriaAtiva, setCategoriaAtiva ] = useState(null);
         //LINHAS CONDICIONAIS (data-valid-xxx) DO FORMULÁRIO INTEIRO — VER FormSection
         const [ validRows, setValidRows ]    = useState({});
 
@@ -257,6 +265,7 @@
                 before: [],
                 after: [],
             }
+            const categorias = []
             
             tabsArray.forEach((tab) => {
                                     
@@ -265,7 +274,18 @@
                 let tabName = tab.split('href="')[1];
                     tabName = tabName ? tabName.split('>')[1] : '';
 
-                if (tabUrl) {
+                const categoria = categoriaDaAba(tabUrl)
+
+                if (categoria) {
+
+                    categorias.push(categoria)
+                    tabsObject.before.push({
+                        content: tabName,
+                        categoria: categoria,
+                        onClick: () => setCategoriaAtiva(categoria),
+                    })
+
+                } else if (tabUrl) {
 
                     tabsObject.before.push({
                         content: tabName,
@@ -277,6 +297,9 @@
             })
             
             setFormTabs(tabsObject)
+
+            //ABRE NA PRIMEIRA ABA (O CARTÃO CHAMAVA openCategory('colors') AO CARREGAR); APÓS SALVAR CONTINUA NA MESMA
+            setCategoriaAtiva((atual) => (categorias.length === 0 ? null : categorias.includes(atual) ? atual : categorias[0]))
 
         }
 
@@ -295,8 +318,9 @@
                 //Cab COM ATRIBUTO CONDICIONAL (ex.: data-modo-abertura="2" NO CARD DE CLIENTES) NÃO ABRE CARD
                 //NOVO: NO PAINEL ANTIGO ELE ERA UMA <tr> DA MESMA TABELA, ESCONDIDA SOZINHA PELO JS DO CARD
                 //SEM LEVAR OS CAMPOS SEGUINTES. AQUI VIRA UMA LINHA DE TÍTULO DENTRO DA SEÇÃO ATUAL.
+                //data-category NÃO CONTA: É A ABA DA SEÇÃO (VER categoriaDaAba), E CADA Cab DELA É UM CARD PRÓPRIO
                 const cabCondicional = field.type === 'Cab' && currentSection &&
-                    /\bdata-(?!type=)[\w-]+=/.test(field.row_attr || '')
+                    /\bdata-(?!type=|category=)[\w-]+=/.test(field.row_attr || '')
 
                 if (field.type === 'Cab' && !cabCondicional) {
 
@@ -317,6 +341,7 @@
                         title: title,
                         subTitle: subTitle,
                         number: field.field.value.number,
+                        categoria: /\bdata-category=["']?([\w-]+)/.exec(field.row_attr || '')?.[1] || null,
                         fields: [],
                     }
 
@@ -348,6 +373,13 @@
             }
         }, [ data ]);
 
+        //SEÇÃO DE OUTRA ABA DE CATEGORIA: CONTINUA NO DOM (ESCONDIDA) PARA OS CAMPOS IREM NO ENVIO. O BOTÃO DE SALVAR VAI NA
+        //ÚLTIMA SEÇÃO VISÍVEL (NO LEGADO O openCategory SEMPRE MOSTRAVA A ÚLTIMA LINHA, A DO BOTÃO)
+        const secaoForaDaCategoria = (secao) =>
+            Boolean(categoriaAtiva && secao.categoria && secao.categoria !== 'url' && secao.categoria !== categoriaAtiva)
+
+        const ultimaSecaoVisivel = sections.reduce((ultima, secao, indice) => (secaoForaDaCategoria(secao) ? ultima : indice), sections.length - 1)
+
         //O LOADER VALE APENAS ENQUANTO A PONTE NÃO RESPONDEU. UM FORMULÁRIO SEM CAMPOS
         //É UM RESULTADO VÁLIDO (CARD COM $lista = false E $array VAZIO, QUE NO PAINEL-PHP
         //MONTA A TELA POR echo) — ANTES ISSO PRENDIA A PÁGINA NO ScreenLoader PARA SEMPRE.
@@ -358,7 +390,13 @@
         return (
             <div className="grid gap-1 mx-auto">
 
-                {formTabs && <FormTabs tabs={formTabs} activeTab={activeTab} setActiveTab={setActiveTab} />}
+                {formTabs && (
+                    <FormTabs
+                        tabs={categoriaAtiva ? { ...formTabs, before: formTabs.before.map((aba) => (aba.categoria ? { ...aba, ativa: aba.categoria === categoriaAtiva } : aba)) } : formTabs}
+                        activeTab={activeTab}
+                        setActiveTab={setActiveTab}
+                    />
+                )}
 
                 {sections.length === 0 && (
                     <div className="card">
@@ -379,11 +417,13 @@
                             loading={loading}
                             data={section}
                             index={index + 1}
-                            button={index === sections.length - 1}
+                            button={index === ultimaSecaoVisivel}
                             form={data.form}
                             validRows={validRows}
                             setValidRows={setValidRows}
                             controladores={controladores}
+                            oculta={secaoForaDaCategoria(section)}
+                            categoriaAtiva={categoriaAtiva}
                         />
                     ))}
                 </div>
@@ -444,11 +484,13 @@
                             loading={loading}
                             data={section}
                             index={index + 1}
-                            button={index === sections.length - 1}
+                            button={index === ultimaSecaoVisivel}
                             form={data.form}
                             validRows={validRows}
                             setValidRows={setValidRows}
                             controladores={controladores}
+                            oculta={secaoForaDaCategoria(section)}
+                            categoriaAtiva={categoriaAtiva}
                         />
                     ))}
 

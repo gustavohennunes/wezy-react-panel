@@ -2,6 +2,10 @@
     import clsx from 'clsx'
     import { KeenIcon } from '@/components/keenicons'
     import { Menu, MenuArrow, MenuIcon, MenuItem, MenuLink, MenuSub, MenuTitle } from '@/components/menu'
+    import { MenuModuloProvider } from '@/components/menu/MenuModulo'
+    import { moduloDaUrl } from '@/components/menu/utils'
+    import { usePageData } from '@/context/PageDataContext'
+    import { useLocation } from 'react-router-dom'
     import { useMenus } from '@/providers'
     import { iconeDoMenu } from '@/lib/transformOldIcon'
     import { OldIcon } from '@/components/legacy/OldIcon'
@@ -35,6 +39,29 @@
             return lista
 
         }, [])
+
+    //MÓDULO DE UM LINK DO MENU OU DO BREADCRUMB ("?pag=x", "index.php?pag=x&amp;cliente=")
+    const moduloDoLink = (href) => {
+        const inicio = (href || '').indexOf('?')
+        return inicio < 0 ? '' : moduloDaUrl(href.slice(inicio).replace(/&amp;/g, '&'))
+    }
+
+    //O MÓDULO TEM LINK EM ALGUM NÍVEL DO MENU?
+    const menuTemModulo = (items, modulo) =>
+        (items || []).some((item) => moduloDoLink(item?.path) === modulo || menuTemModulo(item?.children, modulo))
+
+    //TELA FORA DO MENU (ex.: CSS/JS/BACK-END DE CABEÇALHO, ?pag=projetos-paginas-sections-css): O ITEM A DESTACAR É O
+    //MÓDULO MAIS PRÓXIMO NO BREADCRUMB QUE ESTÁ NO MENU ("Cabeçalho/Rodapé" = ?pag=projeto-header-footer), E O GRUPO DELE
+    //("Restrito") FICA ABERTO. TELA QUE ESTÁ NO MENU = '' (SEGUE A URL, COMO SEMPRE)
+    const moduloDoMenu = (items, moduloAtual, breadcrumbs) => {
+
+        if (!items || !moduloAtual || menuTemModulo(items, moduloAtual) || typeof breadcrumbs !== 'string') return ''
+
+        const modulos = Array.from(breadcrumbs.matchAll(/href=["']([^"']*)["']/gi), ([, href]) => moduloDoLink(href))
+
+        return modulos.reverse().find((modulo) => modulo && modulo !== moduloAtual && menuTemModulo(items, modulo)) || ''
+
+    }
 
     const SidebarMenuPrimary = ({ search = '' }) => {
 
@@ -225,6 +252,14 @@
             [menuConfig, termo]
         )
 
+        const location     = useLocation()
+        const { pageData } = usePageData() || {}
+        const breadcrumbs  = pageData?.params?.breadcrumbs
+        const moduloMenu   = useMemo(
+            () => moduloDoMenu(menuConfig?.main, moduloDaUrl(location.search), breadcrumbs),
+            [menuConfig, location.search, breadcrumbs]
+        )
+
         //MODO DE EDIÇÃO DO SITE (ACESSO DE SUPORTE): A ÁRVORE DO PROJETO NO LUGAR DO MENU, COMO O retornaMenu LEGADO
         if (menuConfig?.editor) {
             return <SidebarEditorTree editor={menuConfig.editor} search={search} />
@@ -232,16 +267,18 @@
 
         //COM BUSCA, VÁRIOS GRUPOS ABERTOS AO MESMO TEMPO (SEM ISSO O ACCORDION FECHA OS OUTROS)
         return (
-            <Menu
-                highlight={true}
-                multipleExpand={!!termo}
-                className="flex flex-col w-full gap-1.5 px-3.5"
-            >
-                {menuFiltrado && menuFiltrado.main.length === 0 && (
-                    <span className="px-2.5 text-2sm text-gray-600">{`Nenhum menu com "${search.trim()}".`}</span>
-                )}
-                {menuConfig && buildMenu(menuFiltrado || menuConfig)}
-            </Menu>
+            <MenuModuloProvider value={moduloMenu}>
+                <Menu
+                    highlight={true}
+                    multipleExpand={!!termo}
+                    className="flex flex-col w-full gap-1.5 px-3.5"
+                >
+                    {menuFiltrado && menuFiltrado.main.length === 0 && (
+                        <span className="px-2.5 text-2sm text-gray-600">{`Nenhum menu com "${search.trim()}".`}</span>
+                    )}
+                    {menuConfig && buildMenu(menuFiltrado || menuConfig)}
+                </Menu>
+            </MenuModuloProvider>
         )
     }
 

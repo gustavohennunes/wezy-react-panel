@@ -217,8 +217,17 @@
                                         value={`${index}-${option.value}`}
                                         keywords={[String(option.label ?? '')]}
                                         onSelect={() => escolhe(option)}
+                                        //OPÇÃO ESCOLHIDA: SÓ O CHECK QUASE NÃO APARECIA (PRINCIPALMENTE NO ESCURO). GANHA FUNDO E TEXTO
+                                        //PRIMARY (E NEGRITO), MESMO COM O MOUSE/TECLADO SOBRE ELA (data-selected DO cmdk).
+                                        //HOVER DAS OUTRAS: NO CLARO O PADRÃO DO TEMA; NO ESCURO SEM FUNDO, SÓ O TEXTO EM AZUL
+                                        className={cn(
+                                            'cursor-pointer',
+                                            estaSelecionado(option)
+                                                ? 'bg-primary-light text-primary font-semibold data-[selected=true]:bg-primary-light data-[selected=true]:text-primary'
+                                                : 'dark:data-[selected=true]:bg-transparent dark:data-[selected=true]:text-primary'
+                                        )}
                                     >
-                                        <Check className={cn('shrink-0', estaSelecionado(option) ? 'opacity-100' : 'opacity-0')} />
+                                        <Check className={cn('shrink-0', estaSelecionado(option) ? 'opacity-100 text-primary' : 'opacity-0')} />
                                         <LabelComCor option={option} quebra corExtra={corExtra} />
                                         {option.removable && onRemoveOption && (
                                             <button
@@ -240,6 +249,7 @@
                                     <CommandItem
                                         forceMount
                                         value="__criar__"
+                                        className="cursor-pointer"
                                         onSelect={() => escolhe({ label: termo, value: termo })}
                                     >
                                         <span className="min-w-0 whitespace-normal break-words">Criar &quot;{termo}&quot;</span>

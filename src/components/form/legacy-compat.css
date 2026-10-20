@@ -166,6 +166,34 @@ form a.padrao.btt-novo-cinza.btt-ativo {
     z-index: 9999;
 }
 
+/* CAMPO DO CTRL+F DO ACE: O ESTILO DE INPUT DO .legacy-html (h-10, PADDING GRANDE) VAZAVA PARA ELE. AQUI VOLTA PARA A
+   ALTURA DOS BOTÕES < > All (line-height 1.9 DO FORM + BORDAS), SEMPRE BRANCO (SEM DARK MODE) E COM ESPAÇO ANTES DAS SETAS */
+.ace_search .ace_search_form,
+.ace_search .ace_replace_form {
+    display: flex;
+    align-items: center;
+}
+.ace_search .ace_search_field {
+    box-sizing: border-box;
+    height: calc(1.9em + 2px);
+    min-height: 0;
+    margin-right: 0.375rem;
+    padding: 0 0.5rem;
+    border: 1px solid #cbcbcb;
+    border-radius: 0.25rem;
+    background-color: #fff;
+    color: #000;
+    font-size: inherit;
+}
+/* SEM O ANEL DE FOCO DO .legacy-html — O FORM DO ACE TEM overflow:hidden E CORTAVA A SOMBRA */
+.ace_search .ace_search_field:focus {
+    box-shadow: none;
+}
+.ace_search .ace_search_field + .ace_searchbtn {
+    border-left: 1px solid #cbcbcb;
+    border-radius: 3px 0 0 3px;
+}
+
 /* SELECT CRU DOS CARDS (ex.: #SelSetor) GANHA APARÊNCIA DE CAMPO */
 form select.legacy-select {
     width: 100%;

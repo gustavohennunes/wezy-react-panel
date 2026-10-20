@@ -236,6 +236,12 @@
     line-height: 1.4;
     color: var(--tw-gray-900);
 }
+/* NO ESCURO: DESTAQUE AZUL (BORDA TRACEJADA PRIMARY E FUNDO primary-light) IGUAL AO QUADRO "MODO DE EDIÇÃO DO SITE" DA
+   SIDEBAR (SidebarEditorTree) — O CARD DO CONTEXTO (Section/Página, Cliente...) SE MISTURAVA COM O FUNDO */
+.dark .legacy-html > .filtros.pagina-conteudo:has(> b:first-child) {
+    background-color: var(--tw-primary-light);
+    border: 1px dashed var(--tw-primary);
+}
 .legacy-html > .filtros.pagina-conteudo:has(> b:first-child) > b:first-child {
     display: block;
     margin-bottom: 2px;

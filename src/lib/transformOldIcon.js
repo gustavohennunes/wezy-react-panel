@@ -196,7 +196,8 @@ export const OLD_ICON_OPTIONS = (() => {
 
 export const transformOldIcon = (iconString) => {
 
-    iconString = iconString.replace(/figura-(black|white)\s*/i, '')
+    //AÇÃO SEM ÍCONE (undefined/null) CAI NO ÍCONE PADRÃO EM VEZ DE QUEBRAR A TELA
+    iconString = String(iconString ?? '').replace(/figura-(black|white)\s*/i, '')
 
     const colMatch = iconString.match(/c(\d+)/i)
     const rowMatch = iconString.match(/l(\d+)/i)

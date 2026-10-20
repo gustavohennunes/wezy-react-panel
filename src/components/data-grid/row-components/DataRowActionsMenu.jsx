@@ -19,6 +19,22 @@
             return linha && coluna ? `figura-black l${linha[1]} c${coluna[1]}` : null
         }
 
+        //AÇÃO MONTADA PELO CARTÃO EM HTML (verifyEdit() DEVOLVENDO O PRÓPRIO <a>, ex.: "Visualizar" DO planos-comerciais-atividades
+        //DO 360): A PONTE MANDA { content: html }, SEM url/icon/title, E O transformOldIcon(undefined) DERRUBAVA A TELA. TIRA DO
+        //HTML O LINK, O ALVO, O TÍTULO DO TOOLTIP E O ÍCONE DO SPRITE (figura-black lX cY)
+        const acaoDoHtml = (item) => {
+            if (typeof item?.content !== 'string' || item.url !== undefined) return item
+            const html  = new DOMParser().parseFromString(item.content, 'text/html')
+            const link  = html.querySelector('a')
+            const icone = html.querySelector('[class*="figura-"]')
+            return {
+                url: link?.getAttribute('href') || '',
+                target: link?.getAttribute('target') || '',
+                title: link?.getAttribute('data-original-title') || link?.getAttribute('title') || link?.textContent?.trim() || '',
+                icon: icone?.getAttribute('class') || '',
+            }
+        }
+
         const onClickAcao = (e, item) => {
 
             const params = new URL(item.url || '', window.location.href).searchParams
@@ -41,7 +57,7 @@
 
                         {Array.isArray(row.content) && row.content.length > 0 ? (
 
-                            row.content.map((item, index) => {
+                            row.content.map(acaoDoHtml).map((item, index) => {
 
                                 const sprite = spriteDoIcone(item.icon)
                                 const keen   = sprite ? null : transformOldIcon(item.icon)

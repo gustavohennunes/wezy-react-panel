@@ -109,9 +109,11 @@
         }
 
         return (
+            //min-w-0 NOS ITENS DO GRID: CONTEÚDO LARGO (ex.: COLUNAS DO FUNIL) ALARGAVA A PÁGINA INTEIRA, E O CABEÇALHO E OS
+            //FILTROS ESTICAVAM JUNTO. ASSIM SÓ O PRÓPRIO CONTEÚDO ROLA NA HORIZONTAL (VER .geral NO globals.css)
             <div className="grid gap-5 lg:gap-7.5">
-                <div className="grid gap-5 lg:gap-7.5 items-stretch">
-                    <div className="lg:col-span-2">{content}</div>
+                <div className="grid gap-5 lg:gap-7.5 items-stretch min-w-0">
+                    <div className="lg:col-span-2 min-w-0">{content}</div>
                 </div>
             </div>
         )

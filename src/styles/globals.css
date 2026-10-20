@@ -836,3 +836,87 @@ body .tox.tox-tinymce .tox-tbtn--enabled,
 body .tox.tox-tinymce .tox-tbtn--enabled:hover {
     background-color: var(--tw-gray-200) !important;
 }
+
+/* FUNIL (framework/funil.php): AS COLUNAS ROLAM NA HORIZONTAL DENTRO DO PRÓPRIO BLOCO, COMO O #conteudo DO PAINEL ANTIGO.
+   ANTES A PÁGINA TODA FICAVA COM A LARGURA DAS COLUNAS (~3000px) E O CABEÇALHO/AVATARES IAM PARA A DIREITA */
+.legacy-html .geral {
+    /* width 0 + min-width 100%: O BLOCO NÃO EMPURRA A LARGURA DOS PAIS (CONTRIBUI 0 NO TAMANHO INTRÍNSECO) E OCUPA A LARGURA
+       DISPONÍVEL; O QUE PASSAR DISSO ROLA AQUI DENTRO */
+    width: 0;
+    min-width: 100%;
+    overflow-x: auto;
+}
+
+/* COLUNAS DO FUNIL NO TEMA (CLARO E ESCURO). O FUNDO CINZA ATRÁS DAS COLUNAS (DO PAINEL ANTIGO) SAI: CADA COLUNA VIRA UM CARD.
+   A LISTA DE CARTÕES ROLA DENTRO DA COLUNA (ALTURA DA TELA), SEM PRECISAR DESCER A PÁGINA INTEIRA */
+.legacy-html .geral {
+    gap: 12px;
+    padding: 0 0 8px;
+    background: transparent;
+}
+.legacy-html .geral .list {
+    margin: 0 !important;
+    padding: 0 0 12px !important;
+    background-color: var(--tw-card-background-color);
+    border: 1px solid var(--card-border-color);
+    border-radius: 0.75rem;
+    box-shadow: var(--tw-card-box-shadow);
+    float: none;
+}
+.legacy-html .geral .list .titulo {
+    padding: 14px 16px 12px;
+    border-bottom: 1px solid var(--tw-gray-200);
+    margin-bottom: 10px;
+    color: var(--tw-gray-900);
+    font-size: 13px;
+}
+.legacy-html .geral .list .titulo b {
+    font-weight: 600;
+}
+.legacy-html .geral .list .titulo .qnt-itens {
+    top: 14px;
+    right: 16px;
+    color: var(--tw-gray-600);
+    font-weight: 600;
+}
+.legacy-html .geral .list-itens {
+    max-height: calc(100vh - 340px);
+    min-height: 120px;
+    overflow-y: auto;
+    padding: 0 6px;
+}
+.legacy-html .geral .list-itens li {
+    margin: 0 0 8px;
+    width: 100%;
+    padding: 10px 12px;
+    border: 1px solid var(--tw-gray-200);
+    border-radius: 0.5rem;
+    background-color: var(--tw-gray-100);
+    color: var(--tw-gray-800);
+    font-size: 14px;
+    line-height: 1.45;
+    transition: border-color 0.15s ease;
+}
+.legacy-html .geral .list-itens li:hover {
+    border-color: var(--tw-gray-400);
+}
+.legacy-html .geral .list-itens li.ui-sortable-helper {
+    box-shadow: var(--tw-dropdown-box-shadow, 0 8px 24px rgba(0, 0, 0, 0.15));
+}
+.legacy-html .geral .list .funil-limite {
+    color: var(--tw-gray-600);
+}
+.legacy-html .geral .list .funil-carregar-mais {
+    background: var(--tw-primary);
+    font-weight: 500;
+}
+.legacy-html .geral .list .funil-carregar-mais:hover:not(:disabled) {
+    background: var(--tw-primary-active);
+}
+/* NO ESCURO: OS CARTÕES DESTACADOS PELO CARTÃO (ATIVIDADE ATRASADA #ebdbda / DO DIA #f1ebde, NO style) FICAVAM CLAROS DEMAIS */
+.dark .legacy-html .geral .list-itens li[style*="#ebdbda"] {
+    background: color-mix(in srgb, var(--tw-danger) 18%, var(--tw-gray-100)) !important;
+}
+.dark .legacy-html .geral .list-itens li[style*="#f1ebde"] {
+    background: color-mix(in srgb, var(--tw-warning) 18%, var(--tw-gray-100)) !important;
+}

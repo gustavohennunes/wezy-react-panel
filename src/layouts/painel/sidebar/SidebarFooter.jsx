@@ -2,38 +2,18 @@
     import clsx from 'clsx'
     import { toAbsoluteUrl } from '@/utils'
     import { useAuthContext } from '@/auth'
-    import { useAuth } from '@/auth/providers/JWTProvider'
-    import { KeenIcon, Menu, MenuItem, MenuToggle } from '@/components'
+    import { KeenIcon, Menu, MenuItem, MenuSub, MenuToggle } from '@/components'
     import { DropdownUserPanel } from '@/partials/dropdowns/user'
     import { useLanguage } from '@/i18n'
     import { useMenus } from '@/providers'
+    import { lerUsoDeDisco, tamanhoLegivel } from '@/utils/usoDeDisco'
+    import { BarraDeUso } from '@/components/ui/barra-de-uso'
 
     const AVATAR_PADRAO = '/media/avatars/gray/6.png'
 
-    const UNIDADES = { B: 1, KB: 1024, MB: 1024 ** 2, GB: 1024 ** 3, TB: 1024 ** 4 }
-
-    //"1.3GB" / "500 MB" / "1,3 GB" → BYTES (null QUANDO NÃO DÁ PARA LER: AÍ SÓ O TEXTO APARECE, SEM A BARRA)
-    const emBytes = (texto) => {
-        const partes = /([\d.,]+)\s*(B|KB|MB|GB|TB)\b/i.exec(String(texto ?? ''))
-        if (!partes) return null
-        const numero = parseFloat(partes[1].replace(',', '.'))
-        return Number.isFinite(numero) ? numero * UNIDADES[partes[2].toUpperCase()] : null
-    }
-
-    //"1.3GB" → "1,3 GB"
-    const legivel = (texto) =>
-        String(texto ?? '')
-            .replace(/(\d)\.(\d)/, '$1,$2')
-            .replace(/(\d)\s*(B|KB|MB|GB|TB)\b/i, '$1 $2')
-
     const UsoDeDisco = ({ uso }) => {
 
-        const usado     = emBytes(uso.used)
-        const plano     = emBytes(uso.plan)
-        const percentual = usado !== null && plano ? Math.min(100, Math.round((usado * 100) / plano)) : null
-
-        //AMARELO A PARTIR DE 75% E VERMELHO A PARTIR DE 90%: O AVISO VAI TAMBÉM NO TEXTO, NÃO SÓ NA COR
-        const nivel = percentual === null ? 'normal' : percentual >= 90 ? 'critico' : percentual >= 75 ? 'alerta' : 'normal'
+        const { percentual, nivel, barra, texto } = lerUsoDeDisco(uso)
 
         return (
             <div className="rounded-lg border border-gray-200 bg-light px-3 py-2.5">
@@ -44,36 +24,17 @@
                         Armazenamento
                     </span>
                     {percentual !== null && (
-                        <span
-                            className={clsx(
-                                'text-2xs font-semibold tabular-nums',
-                                nivel === 'critico' ? 'text-danger' : nivel === 'alerta' ? 'text-warning' : 'text-gray-600'
-                            )}
-                        >
+                        <span className={clsx('text-2xs font-semibold tabular-nums', texto)}>
                             {percentual}%
                         </span>
                     )}
                 </div>
 
-                {percentual !== null && (
-                    //BARRA DO METRONIC (.progress / .progress-bar); h-1.5 E bg-gray-200 MANTÊM A ALTURA E O FUNDO DE ANTES
-                    <div
-                        className={clsx(
-                            'progress h-1.5 bg-gray-200 mb-1.5',
-                            nivel === 'critico' ? 'progress-danger' : nivel === 'alerta' ? 'progress-warning' : 'progress-primary'
-                        )}
-                        role="progressbar"
-                        aria-label="Uso do armazenamento"
-                        aria-valuemin={0}
-                        aria-valuemax={100}
-                        aria-valuenow={percentual}
-                    >
-                        <div className="progress-bar transition-[width]" style={{ width: `${Math.max(percentual, 2)}%` }} />
-                    </div>
-                )}
+                {/* h-1.5 E bg-gray-200 MANTÊM A ALTURA E O FUNDO DE ANTES */}
+                {percentual !== null && <BarraDeUso percentual={percentual} classeDaBarra={barra} className="h-1.5 mb-1.5" />}
 
                 <div className="text-2xs text-gray-600 tabular-nums">
-                    <span className="font-medium text-gray-800">{legivel(uso.used)}</span> de {legivel(uso.plan)}
+                    <span className="font-medium text-gray-800">{tamanhoLegivel(uso.used)}</span> de {tamanhoLegivel(uso.plan)}
                     {nivel === 'critico' && <span className="text-danger"> · quase cheio</span>}
                 </div>
 
@@ -84,8 +45,7 @@
 
     const SidebarFooter = forwardRef((props, ref) => {
 
-        const { logout } = useAuthContext()
-        const { usuarioLogado } = useAuth()
+        const { logout, usuarioLogado } = useAuthContext()
         const itemUserRef = useRef(null)
         const { isRTL } = useLanguage()
         const { getMenuConfig } = useMenus()
@@ -140,9 +100,9 @@
                                 </span>
                                 <KeenIcon icon="dots-vertical" className="text-base text-gray-500 shrink-0" />
                             </MenuToggle>
-                            {DropdownUserPanel({
-                                menuItemRef: itemUserRef,
-                            })}
+                            <MenuSub className="menu-default light:border-gray-300 w-[250px]" rootClassName="p-0">
+                                <DropdownUserPanel />
+                            </MenuSub>
                         </MenuItem>
                     </Menu>
 
@@ -163,5 +123,7 @@
         )
 
     })
+
+    SidebarFooter.displayName = 'SidebarFooter'
 
     export { SidebarFooter }

@@ -59,4 +59,6 @@
         )
     })
 
+    SidebarHeader.displayName = 'SidebarHeader'
+
     export { SidebarHeader }

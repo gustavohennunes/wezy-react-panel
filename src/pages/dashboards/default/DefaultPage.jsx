@@ -6,11 +6,8 @@
         
         const { currentLayout } = useLayout()
 
-        if (currentLayout?.name === 'panel-layout') {
-            return <PanelPage />
-        } else if (currentLayout?.name === 'panel2-layout') {
-            return <PanelPage />
-        }
+        //O PanelLayout REGISTRA O LAYOUT NUM EFFECT: ATÉ LÁ NÃO HÁ O QUE MOSTRAR
+        return currentLayout?.name === 'panel-layout' ? <PanelPage /> : null
 
     }
 

@@ -1,4 +1,4 @@
-import { createContext, useContext, useEffect, useState } from 'react'
+import { createContext, useContext, useEffect, useMemo, useState } from 'react'
 import { deepMerge } from '@/utils'
 import { useLayout } from '@/providers'
 import { authLayoutConfig } from './AuthLayoutConfig'
@@ -31,15 +31,13 @@ const AuthLayoutProvider = ({ children }) => {
     // Effect hook to set the current layout whenever the layout state changes
     useEffect(() => {
         setCurrentLayout(layout)
-    })
+    }, [layout, setCurrentLayout])
+
+    const value = useMemo(() => ({ layout }), [layout])
 
     // Providing the layout context to all child components wrapped by AuthLayoutProvider
     return (
-        <LayoutContext.Provider
-            value={{
-                layout,
-            }}
-        >
+        <LayoutContext.Provider value={value}>
             {children}
         </LayoutContext.Provider>
     )

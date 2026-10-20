@@ -1,8 +1,9 @@
-    import { useEffect, useMemo, useState } from 'react'
+    import { useMemo, useState } from 'react'
     import { Link, useLocation } from 'react-router-dom'
     import clsx from 'clsx'
     import { KeenIcon } from '@/components/keenicons'
-    import { DestaqueBusca as Destaque, normalizarBusca as normalizar } from '@/utils/buscaSidebar'
+    import { DestaqueBusca as Destaque } from './DestaqueBusca'
+    import { normalizarBusca as normalizar } from '@/utils/normalizarBusca'
 
     // MODO DE EDIÇÃO DO SITE (?pag=ativar-modulo-edicao, ACESSO DE SUPORTE): A SIDEBAR VIRA A ÁRVORE PÁGINAS > SECTIONS >
     // BACK-ENDS, COMO O class/ProjectStructure.php DO PAINEL ANTIGO. OS DADOS VÊM DO panel/menus (data.editor.pages).
@@ -183,16 +184,20 @@
 
         //CLIQUE NA SETA ABRE/FECHA; AO TROCAR DE TELA, O CAMINHO DA TELA ATUAL ABRE DE NOVO (COMO O LEGADO)
         const [abertos, setAbertos] = useState(abertosDaUrl)
-        useEffect(() => {
+        const [abertosDaUrlAnterior, setAbertosDaUrlAnterior] = useState(abertosDaUrl)
+        if (abertosDaUrl !== abertosDaUrlAnterior) {
+            setAbertosDaUrlAnterior(abertosDaUrl)
             setAbertos((anterior) => new Set([...anterior, ...abertosDaUrl]))
-        }, [abertosDaUrl])
+        }
 
         //COM BUSCA: SÓ O QUE BATEU, COM O PRÓPRIO ABRE/FECHA (RECOMEÇA A CADA LETRA); APAGANDO A BUSCA, VOLTA A ÁRVORE COMO ESTAVA
         const filtro = useMemo(() => filtrarArvore(pages, search), [pages, search])
-        const [abertosBusca, setAbertosBusca] = useState(null)
-        useEffect(() => {
+        const [abertosBusca, setAbertosBusca] = useState(() => (filtro ? new Set(filtro.abertos) : null))
+        const [filtroAnterior, setFiltroAnterior] = useState(filtro)
+        if (filtro !== filtroAnterior) {
+            setFiltroAnterior(filtro)
             setAbertosBusca(filtro ? new Set(filtro.abertos) : null)
-        }, [filtro])
+        }
 
         const paginasVisiveis = filtro ? filtro.paginas : pages
         const abertosVisiveis = filtro ? abertosBusca || filtro.abertos : abertos

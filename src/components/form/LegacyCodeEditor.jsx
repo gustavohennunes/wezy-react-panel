@@ -174,7 +174,7 @@
                         toast.error('Não foi possível salvar este módulo. Tente novamente.')
                     }
 
-                } catch (err) {
+                } catch {
                     toast.error('Não foi possível salvar este módulo. Tente novamente.')
                 } finally {
                     salvando = false
@@ -254,12 +254,13 @@
                     editor.resize(true)
 
                     //REMEDIÇÃO APÓS FONTES/CSS ASSENTAREM
-                    setTimeout(() => {
+                    const remedicao = setTimeout(() => {
                         if (!destroyed && editor) {
                             editor.resize(true)
                             editor.renderer.updateFull(true)
                         }
                     }, 400)
+                    cleanups.push(() => clearTimeout(remedicao))
 
                     console.info('[LegacyCodeEditor] ACE pronto — linhas:', editor.getSession().getLength())
 

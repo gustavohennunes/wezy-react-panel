@@ -16,4 +16,5 @@ const ModalBackdrop = forwardRef(({ className, ownerState, ...props }, ref) => {
         />
     )
 })
+ModalBackdrop.displayName = 'ModalBackdrop'
 export { ModalBackdrop }

@@ -1,0 +1,3 @@
+    //CAMPOS COM "Remover" PENDENTE. FICA FORA DO COMPONENTE PORQUE A LINHA PODE SUMIR ANTES DE SALVAR (ex.: DESMARCAR
+    //"Usar logotipo customizado" ESCONDE O CAMPO DO LOGO E DESMONTA O INPUT) — O ENVIO DO FORMULÁRIO MANDA O del NO SUBMIT
+    export const arquivosRemovidos = new Set()

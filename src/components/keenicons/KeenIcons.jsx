@@ -1,4 +1,4 @@
-import React, { forwardRef } from 'react'
+import { forwardRef } from 'react'
 import clsx from 'clsx'
 import { useSettings } from '@/providers'
 // KeenIcon using forwardRef to pass the ref and spread props
@@ -19,3 +19,4 @@ export const KeenIcon = forwardRef(
         )
     }
 )
+KeenIcon.displayName = 'KeenIcon'

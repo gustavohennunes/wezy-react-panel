@@ -13,4 +13,5 @@ const ModalContent = forwardRef(
         )
     }
 )
+ModalContent.displayName = 'ModalContent'
 export { ModalContent }

@@ -1,7 +1,6 @@
     import { KeenIcon } from '@/components'
     import { PanelLogo } from '@/layouts/painel/PanelLogo'
     import { Container } from '@/components/container'
-    import { toAbsoluteUrl } from '@/utils'
     import { Link } from 'react-router-dom'
     import { usePanelLayout } from '../'
 

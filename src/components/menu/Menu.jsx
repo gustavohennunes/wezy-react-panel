@@ -5,7 +5,9 @@ import {
     createContext,
     isValidElement,
     memo,
+    useCallback,
     useContext,
+    useMemo,
     useState,
 } from 'react'
 import { MenuItem } from './'
@@ -15,10 +17,8 @@ const initalProps = {
     highlight: false,
     multipleExpand: false,
     dropdownTimeout: 0,
-    setOpenAccordion: (parentId, id) => { },
-    isOpenAccordion: (parentId, id) => {
-        return false
-    },
+    setOpenAccordion: () => { },
+    isOpenAccordion: () => false,
 }
 
 // Create a Menu Context
@@ -38,16 +38,29 @@ const MenuComponent = ({
     const [openAccordions, setOpenAccordions] = useState({})
 
     // Function to handle the accordion toggle
-    const setOpenAccordion = (parentId, id) => {
+    const setOpenAccordion = useCallback((parentId, id) => {
         setOpenAccordions((prevState) => ({
             ...prevState,
             [parentId]: prevState[parentId] === id ? null : id, // Toggle the current item and collapse others at the same level
         }))
-    }
+    }, [])
 
-    const isOpenAccordion = (parentId, id) => {
-        return openAccordions[parentId] === id
-    }
+    const isOpenAccordion = useCallback(
+        (parentId, id) => openAccordions[parentId] === id,
+        [openAccordions]
+    )
+
+    const value = useMemo(
+        () => ({
+            disabled,
+            highlight,
+            dropdownTimeout,
+            multipleExpand,
+            setOpenAccordion,
+            isOpenAccordion,
+        }),
+        [disabled, highlight, dropdownTimeout, multipleExpand, setOpenAccordion, isOpenAccordion]
+    )
 
     const modifiedChildren = Children.map(children, (child, index) => {
         if (isValidElement(child)) {
@@ -67,16 +80,7 @@ const MenuComponent = ({
     })
 
     return (
-        <MenuContext.Provider
-            value={{
-                disabled,
-                highlight,
-                dropdownTimeout,
-                multipleExpand,
-                setOpenAccordion,
-                isOpenAccordion,
-            }}
-        >
+        <MenuContext.Provider value={value}>
             <div className={clsx('menu', className && className)}>
                 {modifiedChildren}
             </div>

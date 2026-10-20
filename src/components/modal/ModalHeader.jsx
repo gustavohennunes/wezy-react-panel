@@ -7,4 +7,5 @@ const ModalHeader = forwardRef(({ className, children }, ref) => {
         </div>
     )
 })
+ModalHeader.displayName = 'ModalHeader'
 export { ModalHeader }

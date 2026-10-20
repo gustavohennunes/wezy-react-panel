@@ -4,8 +4,7 @@
     import { DataRowActionsMenu } from '@/components/data-grid/row-components/DataRowActionsMenu'
     import { executarScript } from '@/components/legacy/executarScript'
     import { injectLegacyIconsCss } from '@/utils/legacyIcons'
-    import { isLegacyUrl } from '@/utils/legacyBridge'
-    import { cleanUrl } from '@/utils/urlHelper'
+    import { tratarCliqueEmLinkDoLegado } from '@/components/legacy/cliqueEmLinkDoLegado'
 
     // LISTAGEM MONTADA EM HTML PELO PRÓPRIO CARD ($novoResultadoInicial no painel-php).
     // A ponte entrega esse HTML em params.list.content; como são <tr> crus, não é possível
@@ -74,17 +73,8 @@
 
         }, [html])
 
-        //LINK ?pag=... DA LISTAGEM NAVEGA PELO ROUTER (SEM RECARREGAR O PAINEL INTEIRO)
-        const aoClicar = (event) => {
-            if (event.defaultPrevented || event.button !== 0 || event.metaKey || event.ctrlKey || event.shiftKey || event.altKey) return
-            const link = event.target.closest?.('a[href]')
-            if (!link || (link.target && link.target !== '_self')) return
-            const href = link.getAttribute('href') || ''
-            if (!isLegacyUrl(href)) return
-            event.preventDefault()
-            const destino = cleanUrl(href)
-            navigate(destino.startsWith('?') || destino.startsWith('/') ? destino : '/' + destino)
-        }
+        //LINK ?pag=... DA LISTAGEM NAVEGA PELO ROUTER (VER tratarCliqueEmLinkDoLegado)
+        const aoClicar = (event) => tratarCliqueEmLinkDoLegado(event, navigate)
 
         //SCRIPT VINDO DE innerHTML NÃO RODA: RECRIA NA ORDEM, COMO O LegacyHtml
         useEffect(() => {

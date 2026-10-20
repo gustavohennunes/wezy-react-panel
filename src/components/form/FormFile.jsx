@@ -1,10 +1,8 @@
-    import React, { useState } from 'react'
+    import { useState } from 'react'
     import { KeenIcon } from '@/components/keenicons'
     import { useConfirm } from '@/components/ui/confirm-dialog'
 
-    //CAMPOS COM "Remover" PENDENTE. FICA FORA DO COMPONENTE PORQUE A LINHA PODE SUMIR ANTES DE SALVAR (ex.: DESMARCAR
-    //"Usar logotipo customizado" ESCONDE O CAMPO DO LOGO E DESMONTA ESTE INPUT) — O FormContext MANDA O del NO SUBMIT
-    export const arquivosRemovidos = new Set()
+    import { arquivosRemovidos } from './arquivosRemovidos'
 
     const extensoesDeImagem = ['jpg', 'jpeg', 'png', 'gif', 'webp', 'svg', 'bmp', 'avif', 'ico']
 
@@ -18,7 +16,8 @@
         }
     }
 
-    const FormFile = ({ id, multiple, accept, maxSize, onFilesChange, fieldName, value, fieldClass = '', fieldData = {}, required = false }) => {
+    //rotulo: TÍTULO DA LINHA (O <label htmlFor> FICA NO FormInput)
+    const FormFile = ({ id, multiple, accept, maxSize, onFilesChange, fieldName, value, fieldClass = '', fieldData = {}, required = false, rotulo = 'Arquivo' }) => {
         const [selectedFiles, setSelectedFiles] = useState([])
         const [error, setError] = useState(null)
 
@@ -131,6 +130,7 @@
 
                 <input
                     id={id}
+                    aria-label={rotulo}
                     name={fieldName}
                     className={
                         getFileInputClassName() + `${fieldClass} ${fieldData.class}`

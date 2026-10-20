@@ -4,6 +4,7 @@
     import { KeenIcon } from '@/components/keenicons'
     import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip'
     import { LegacyHtml } from '@/components/legacy/LegacyHtml'
+    import { comChaves } from '@/utils/chavesUnicas'
     import { useSettings } from '@/providers'
     import './charts-content.css'
 
@@ -156,8 +157,8 @@
 
     const Numeros = ({ card }) => (
         <div className="grid grid-cols-2 sm:grid-cols-3 xl:grid-cols-[repeat(auto-fit,minmax(150px,1fr))] gap-3">
-            {(card.items || []).map((item, i) => (
-                <div key={i} className="rounded-lg border border-gray-200 bg-light px-4 py-3.5">
+            {comChaves(card.items, (item) => item.label).map(({ item, chave }) => (
+                <div key={chave} className="rounded-lg border border-gray-200 bg-light px-4 py-3.5">
                     <div className="text-2sm text-gray-600 mb-1">{item.label}</div>
                     <div className="flex items-baseline gap-2 flex-wrap">
                         <span className="text-2xl font-semibold text-gray-900 leading-tight">{item.value}</span>
@@ -211,8 +212,8 @@
                         </thead>
                     )}
                     <tbody>
-                        {rows.map((row, i) => (
-                            <tr key={i} className="border-b border-gray-100 last:border-b-0">
+                        {comChaves(rows, (row) => JSON.stringify(row)).map(({ item: row, chave }) => (
+                            <tr key={chave} className="border-b border-gray-100 last:border-b-0">
                                 {(Array.isArray(row) ? row : Object.values(row || {})).map((v, j) => {
                                     const c = celula(v)
                                     const texto = <span dangerouslySetInnerHTML={{ __html: String(c.text ?? '') }} />
@@ -269,8 +270,8 @@
         return (
             <TooltipProvider delayDuration={150}>
                 <div className="legacy-charts grid grid-cols-1 lg:grid-cols-6 gap-5">
-                    {cards.map((card, i) => (
-                        <section key={i} className={clsx('card min-w-0', LARGURA[card.size] || LARGURA[1])}>
+                    {comChaves(cards, (card) => `${card.type}|${card.title}`).map(({ item: card, chave }) => (
+                        <section key={chave} className={clsx('card min-w-0', LARGURA[card.size] || LARGURA[1])}>
 
                             {(card.title || card.description) && (
                                 <div className="card-header min-h-0 py-3.5">

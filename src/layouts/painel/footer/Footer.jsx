@@ -1,5 +1,4 @@
 import { Container } from '@/components/container'
-import { generalSettings } from '@/config'
 const Footer = () => {
     const currentYear = new Date().getFullYear()
     return (

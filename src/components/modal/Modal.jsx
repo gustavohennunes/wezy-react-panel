@@ -26,4 +26,5 @@ const Modal = forwardRef(
         )
     }
 )
+Modal.displayName = 'Modal'
 export { Modal }

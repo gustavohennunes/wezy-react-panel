@@ -1,4 +1,4 @@
-    import { useEffect, useState } from 'react'
+    import { useState } from 'react'
     import { Combobox } from './FormCombobox'
 
     // CAMPO Mul DO PAINEL LEGADO — A PONTE (panel/module) ENVIA type 'select-multiple'
@@ -10,23 +10,26 @@
 
         const isTags = (fieldData.class || '').includes('select-tag')
 
-        const [options, setOptions]   = useState([])
-        const [selected, setSelected] = useState([])
+        //MODO TAGS: A PONTE MANDA COMO OPÇÕES SÓ OS VALORES JÁ SALVOS NO REGISTRO (PanelModule, Mul SEM TABELA) —
+        //TODOS PODEM SAIR PELO X DA LISTA; AO SALVAR, SAEM DO REGISTRO
+        const opcoesIniciais = (dados) => (dados.options || []).map((option) => ({
+            ...option,
+            selected: option.selected === true || option.selected === 'selected',
+            removable: (dados.class || '').includes('select-tag'),
+        }))
+        const selecionadasDe = (lista) => lista.filter((option) => option.selected).map((option) => String(option.value))
 
-        useEffect(() => {
+        const [options, setOptions]   = useState(() => opcoesIniciais(fieldData))
+        const [selected, setSelected] = useState(() => selecionadasDe(opcoesIniciais(fieldData)))
 
-            //MODO TAGS: A PONTE MANDA COMO OPÇÕES SÓ OS VALORES JÁ SALVOS NO REGISTRO (PanelModule, Mul SEM TABELA) —
-            //TODOS PODEM SAIR PELO X DA LISTA; AO SALVAR, SAEM DO REGISTRO
-            const initial = (fieldData.options || []).map((option) => ({
-                ...option,
-                selected: option.selected === true || option.selected === 'selected',
-                removable: isTags,
-            }))
-
+        //NOVO fieldData (OUTRA RESPOSTA DA PONTE): RECOMEÇA DURANTE O RENDER, SEM UM FRAME COM AS OPÇÕES ANTIGAS
+        const [fieldDataAnterior, setFieldDataAnterior] = useState(fieldData)
+        if (fieldData !== fieldDataAnterior) {
+            const initial = opcoesIniciais(fieldData)
+            setFieldDataAnterior(fieldData)
             setOptions(initial)
-            setSelected(initial.filter((option) => option.selected).map((option) => String(option.value)))
-
-        }, [fieldData])
+            setSelected(selecionadasDe(initial))
+        }
 
         const handleChange = (values) => {
 

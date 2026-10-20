@@ -1,4 +1,3 @@
-import React from 'react'
 import { KeenIcon } from '@/components/keenicons'
 const variantStyles = {
     success: 'border-success-clarity bg-success-light text-success',

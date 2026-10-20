@@ -1,6 +1,9 @@
 import clsx from 'clsx'
 import { Link } from 'react-router-dom'
 import { propsDeBotao } from './keyboard'
+
+// LINK DO ITEM DO MENU: <a> PARA LINK EXTERNO, <Link> DO ROUTER PARA ROTA INTERNA. ITEM COM SUBMENU (OU SEM path) É UM
+// "BOTÃO" (div COM role/teclado — VER propsDeBotao) QUE ABRE O SUBMENU OU SÓ EXECUTA O CLIQUE
 const MenuLink = ({
     path,
     newTab,
@@ -11,51 +14,31 @@ const MenuLink = ({
     handleClick,
     children,
 }) => {
-    if (!hasItemSub && path) {
-        if (externalLink) {
-            const target = newTab ? '_blank' : '_self'
-            return (
-                <a
-                    href={path}
-                    target={target}
-                    rel="noopener"
-                    onClick={handleClick}
-                    className={clsx('menu-link', className && className)}
-                >
-                    {children}
-                </a>
-            )
-        } else {
-            return (
-                <Link
-                    to={path}
-                    onClick={handleClick}
-                    className={clsx('menu-link', className && className)}
-                >
-                    {children}
-                </Link>
-            )
-        }
-    } else {
-        if (hasItemSub) {
-            return (
-                <div
-                    className={clsx('menu-link', className && className)}
-                    {...propsDeBotao(handleToggle)}
-                >
-                    {children}
-                </div>
-            )
-        } else {
-            return (
-                <div
-                    className={clsx('menu-link', className && className)}
-                    {...propsDeBotao(handleClick)}
-                >
-                    {children}
-                </div>
-            )
-        }
+
+    const classe = clsx('menu-link', className)
+
+    if (hasItemSub || !path) {
+        return (
+            <div className={classe} {...propsDeBotao(hasItemSub ? handleToggle : handleClick)}>
+                {children}
+            </div>
+        )
     }
+
+    if (externalLink) {
+        return (
+            <a href={path} target={newTab ? '_blank' : '_self'} rel="noopener" onClick={handleClick} className={classe}>
+                {children}
+            </a>
+        )
+    }
+
+    return (
+        <Link to={path} onClick={handleClick} className={classe}>
+            {children}
+        </Link>
+    )
+
 }
+
 export { MenuLink }

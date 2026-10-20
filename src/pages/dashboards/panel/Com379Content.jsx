@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from 'react'
 import Chart from 'react-apexcharts'
 import { api } from '@/services/api'
+import { comChaves } from '@/utils/chavesUnicas'
 
 // The workspace uses the same authenticated transport as native panel forms.
 // No tokens or tenant credentials are placed in server-generated HTML.
@@ -23,7 +24,11 @@ export function Com379Content({ data }) {
         host.addEventListener('com379-request', request)
         const script = document.createElement('script')
         script.textContent = data.javascript
+        //SCRIPT INLINE RODA NA HORA DO append: UM ERRO NELE CHEGA SÓ NO window 'error' (O onError DO <div> NUNCA DISPARAVA)
+        const aoFalhar = () => setError('Não foi possível carregar a simulação.')
+        window.addEventListener('error', aoFalhar)
         host.append(script)
+        window.removeEventListener('error', aoFalhar)
         return () => {
             disposed = true
             const workbench = host.querySelector('#com379-workbench')
@@ -37,7 +42,7 @@ export function Com379Content({ data }) {
         return <div className="com379-financial">
             <p className="mb-5 text-sm">{data.note}</p>
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-5">
-                {data.charts.map((card, index) => <section key={index} className="card p-5" style={{ gridColumn: `span ${Math.min(3, card.size)}` }}>
+                {comChaves(data.charts, (card) => card.title).map(({ item: card, chave }) => <section key={chave} className="card p-5" style={{ gridColumn: `span ${Math.min(3, card.size)}` }}>
                     <h2 className="text-lg font-semibold mb-3">{card.title}</h2>
                     {card.description && <p className="text-sm text-gray-600 mb-4">{card.description}</p>}
                     <FinancialCard card={card} />
@@ -49,7 +54,7 @@ export function Com379Content({ data }) {
     return <>
         {error && <p role="alert">{error}</p>}
         <style>{data.css}</style>
-        <div ref={root} dangerouslySetInnerHTML={{ __html: data.html }} onError={() => setError('Não foi possível carregar a simulação.')} />
+        <div ref={root} dangerouslySetInnerHTML={{ __html: data.html }} />
     </>
 }
 
@@ -60,7 +65,7 @@ function FinancialCard({ card }) {
         const entries = Object.entries(card.data)
         const headers = card.type === 'list' ? entries[0] : card.data.headers
         const rows = card.type === 'list' ? entries.slice(1) : card.data.rows
-        return <div className="overflow-auto"><table className="table"><thead><tr>{headers.map((h, i) => <th key={i}>{cell(h)}</th>)}</tr></thead><tbody>{rows.map((row, i) => <tr key={i}>{row.map((value, j) => <td key={j}>{cell(value)}</td>)}</tr>)}</tbody></table></div>
+        return <div className="overflow-auto"><table className="table"><thead><tr>{comChaves(headers, cell).map(({ item: h, chave }) => <th key={chave}>{cell(h)}</th>)}</tr></thead><tbody>{comChaves(rows, (row) => JSON.stringify(row)).map(({ item: row, chave }) => <tr key={chave}>{comChaves(row, cell).map(({ item: value, chave: chaveDaCelula }) => <td key={chaveDaCelula}>{cell(value)}</td>)}</tr>)}</tbody></table></div>
     }
     const multi = typeof Object.values(card.data)[0] === 'object'
     const categories = multi ? Object.keys(Object.values(card.data)[0]) : Object.keys(card.data)

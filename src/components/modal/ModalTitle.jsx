@@ -7,4 +7,5 @@ const ModalTitle = forwardRef(({ className, children }, ref) => {
         </h3>
     )
 })
+ModalTitle.displayName = 'ModalTitle'
 export { ModalTitle }

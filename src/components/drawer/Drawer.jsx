@@ -1,4 +1,3 @@
-import React from 'react'
 import MuiDrawer from '@mui/material/Drawer'
 import { styled } from '@mui/material/styles'
 const StyledDrawer = styled(MuiDrawer)(() => ({

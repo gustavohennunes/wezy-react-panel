@@ -14,4 +14,5 @@ const ModalBody = forwardRef(
         )
     }
 )
+ModalBody.displayName = 'ModalBody'
 export { ModalBody }

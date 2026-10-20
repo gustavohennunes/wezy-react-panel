@@ -13,17 +13,42 @@ import {
     createContext,
     useContext,
     useEffect,
+    useLayoutEffect,
+    useMemo,
+    useRef,
     useState,
     useCallback,
 } from 'react'
-import { useSearchParams } from 'react-router-dom'
 import { DataGridInner } from './DataGridInner'
 import { deepMerge, debounce } from '@/lib/helpers'
-import { usePageData } from '@/context/PageDataContext'
-import { updateTablePagination } from '@/utils/urlHelper'
 
 //ARRAY VAZIO FIXO: UM [] NOVO A CADA RENDER FARIA A TABELA RECALCULAR AS LINHAS SEMPRE
 const SEM_DADOS = []
+
+//PADRÕES DO GRID QUE AS PROPS SOBRESCREVEM
+const VALORES_PADRAO = {
+    messages: {
+        empty: 'Nenhum conteúdo encontrado!',
+        loading: 'carregando...',
+    },
+    layout: {
+        cellSpacing: 'md',
+        cellBorder: true,
+        card: false,
+    },
+    pagination: {
+        info: '{from} - {to} de {count}',
+        sizes: [5, 10, 20, 50, 100],
+        sizesLabel: 'Show',
+        sizesDescription: 'por página',
+        size: 10,
+        page: 0,
+        moreLimit: 5,
+        more: false,
+    },
+    rowSelection: false,
+    serverSide: false,
+}
 
 const DataGridContext = createContext(undefined)
 
@@ -38,36 +63,10 @@ export const useDataGrid = () => {
 }
 
 export const DataGridProvider = (props) => {
-    const { callApi } = usePageData()
-
-    const defaultValues = {
-        messages: {
-            empty: 'Nenhum conteúdo encontrado!',
-            loading: 'carregando...',
-        },
-        layout: {
-            cellSpacing: 'md',
-            cellBorder: true,
-            card: false,
-        },
-        pagination: {
-            info: '{from} - {to} de {count}',
-            sizes: [5, 10, 20, 50, 100],
-            sizesLabel: 'Show',
-            sizesDescription: 'por página',
-            size: 10,
-            page: 0,
-            moreLimit: 5,
-            more: false,
-        },
-        rowSelection: false,
-        serverSide: false,
-    }
-
-    const mergedProps = deepMerge(defaultValues, props)
+    //MESMAS PROPS = MESMO OBJETO (O value DO CONTEXTO ABAIXO SÓ MUDA QUANDO ALGO MUDA DE VERDADE)
+    const mergedProps = useMemo(() => deepMerge(VALORES_PADRAO, props), [props])
     const [data, setData] = useState(mergedProps.data || [])
     const [loading, setLoading] = useState(false)
-    const { pageData } = usePageData()
     const [totalRows, setTotalRows] = useState(
         mergedProps.data ? mergedProps.data.length : 0
     )
@@ -79,13 +78,16 @@ export const DataGridProvider = (props) => {
 
     // O pageSize É CAPTURADO NO useState ACIMA SÓ NA MONTAGEM; SE O PAI TROCAR
     // props.pagination.size DEPOIS (ex.: modo "Carregar mais" do Models), A TABELA
-    // FICAVA PRESA NO TAMANHO INICIAL E ESCONDIA AS LINHAS EXCEDENTES
-    useEffect(() => {
-        const size = props.pagination?.size
-        if (size && size !== pagination.pageSize) {
-            setPagination((prev) => ({ ...prev, pageSize: size }))
+    // FICAVA PRESA NO TAMANHO INICIAL E ESCONDIA AS LINHAS EXCEDENTES.
+    // AJUSTE DURANTE O RENDER (NÃO NUM useEffect), SEM UM FRAME COM O TAMANHO ANTIGO
+    const sizeDoPai = props.pagination?.size
+    const [sizeAnterior, setSizeAnterior] = useState(sizeDoPai)
+    if (sizeDoPai !== sizeAnterior) {
+        setSizeAnterior(sizeDoPai)
+        if (sizeDoPai && sizeDoPai !== pagination.pageSize) {
+            setPagination((prev) => ({ ...prev, pageSize: sizeDoPai }))
         }
-    }, [props.pagination?.size])
+    }
 
     const [rowSelection, setRowSelection] = useState(mergedProps.rowSelection)
     const [sorting, setSorting] = useState(mergedProps.sorting ?? [])
@@ -115,9 +117,14 @@ export const DataGridProvider = (props) => {
         } finally {
             setLoading(false)
         }
-    }, [loading, pagination, sorting, columnFilters, mergedProps.onFetchData])
+    }, [loading, pagination, sorting, columnFilters, mergedProps])
 
-    const debouncedFetchData = debounce(fetchServerSideData, 100)
+    //O debounce PRECISA SER O MESMO ENTRE RENDERS (UM NOVO A CADA RENDER NÃO SEGURAVA NADA); A REF LEVA O FETCH ATUAL
+    const fetchRef = useRef(fetchServerSideData)
+    useLayoutEffect(() => {
+        fetchRef.current = fetchServerSideData
+    })
+    const debouncedFetchData = useMemo(() => debounce(() => fetchRef.current(), 100), [])
 
     //DADOS LOCAIS (serverSide false) VÃO DIRETO PARA A TABELA, SEM CÓPIA EM STATE: A CÓPIA POR useEffect
     //FAZIA A TABELA DESENHAR UM FRAME COM AS LINHAS ANTIGAS A CADA MUDANÇA (ex.: FILTRO AO DIGITAR)
@@ -125,22 +132,18 @@ export const DataGridProvider = (props) => {
     const tableData   = mergedProps.serverSide ? data : dadosLocais
     const tableTotal  = mergedProps.serverSide ? totalRows : dadosLocais.length
 
-    const loadData = () => {
-        if (mergedProps.serverSide) {
+    const serverSide = mergedProps.serverSide
+
+    const loadData = useCallback(() => {
+        if (serverSide) {
             debouncedFetchData()
         }
-    }
+    }, [serverSide, debouncedFetchData])
 
-    // Trigger debounced fetch for server-side data; load local data if serverSide is false
+    // Trigger debounced fetch for server-side data; local data goes straight to the table
     useEffect(() => {
         loadData()
-    }, [
-        pagination,
-        sorting,
-        columnFilters,
-        mergedProps.data,
-        mergedProps.serverSide,
-    ])
+    }, [loadData, pagination, sorting, columnFilters])
 
     const handleRowSelectionChange = (updaterOrValue) => {
         setRowSelection((prev) =>
@@ -190,17 +193,17 @@ export const DataGridProvider = (props) => {
         manualFiltering: mergedProps.serverSide,
     })
 
+    //O table DO TanStack É O MESMO OBJETO ENTRE RENDERS: O ESTADO DELE ENTRA NAS DEPENDÊNCIAS PARA OS LEITORES DO CONTEXTO
+    //VEREM A MUDANÇA (ORDEM, SELEÇÃO, PAGINAÇÃO, DADOS)
+    const tableState = table.getState()
+    const value = useMemo(
+        () => ({ props: mergedProps, table, totalRows: tableTotal, loading, setLoading, reload: loadData }),
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+        [mergedProps, table, tableTotal, loading, loadData, tableData, tableState.sorting, tableState.rowSelection, tableState.columnFilters, tableState.columnVisibility, tableState.pagination]
+    )
+
     return (
-        <DataGridContext.Provider
-            value={{
-                props: mergedProps,
-                table,
-                totalRows: tableTotal,
-                loading,
-                setLoading,
-                reload: loadData,
-            }}
-        >
+        <DataGridContext.Provider value={value}>
             <DataGridInner />
         </DataGridContext.Provider>
     )

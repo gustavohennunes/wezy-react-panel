@@ -1,5 +1,6 @@
     import { useEffect } from 'react'
     import { cleanUrl } from '@/utils/urlHelper'
+    import { comChaves } from '@/utils/chavesUnicas'
     import { transformOldIcon } from '@/lib/transformOldIcon'
     import { OldIcon } from '@/components/legacy/OldIcon'
     import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip'
@@ -57,18 +58,18 @@
 
                         {Array.isArray(row.content) && row.content.length > 0 ? (
 
-                            row.content.map(acaoDoHtml).map((item, index) => {
+                            comChaves(row.content.map(acaoDoHtml), (acao) => `${acao.url}|${acao.title}`).map(({ item, chave }) => {
 
                                 const sprite = spriteDoIcone(item.icon)
                                 const keen   = sprite ? null : transformOldIcon(item.icon)
 
                                 return (
-                                    <Tooltip key={index}>
+                                    <Tooltip key={chave}>
                                         <TooltipTrigger asChild>
                                             <a
                                                 href={cleanUrl(item.url) || '#'}
                                                 target={item.target || '_self'}
-                                                rel={(item.target || '').includes('_blank') ? 'noopener noreferrer' : undefined}
+                                                rel={/_blank/.test(item.target || '') ? 'noopener noreferrer' : undefined}
                                                 aria-label={item.title}
                                                 className="inline-flex items-center opacity-80 hover:opacity-100 transition-opacity"
                                                 onClick={(e) => onClickAcao(e, item)}

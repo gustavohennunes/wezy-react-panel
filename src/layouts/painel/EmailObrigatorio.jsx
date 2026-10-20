@@ -1,4 +1,4 @@
-    import { useState } from 'react'
+    import { useRef, useState } from 'react'
     import axios from 'axios'
     import { toast } from 'sonner'
     import { KeenIcon } from '@/components/keenicons'
@@ -23,12 +23,16 @@
         const [email, setEmail]       = useState('')
         const [erro, setErro]         = useState('')
         const [enviando, setEnviando] = useState(false)
+        const emAndamento             = useRef(false)
 
         if (getMenuConfig('primary')?.email_pendente !== true) return null
 
         const salvar = async (event) => {
 
             event.preventDefault()
+
+            //O SEGUNDO Enter PODE CHEGAR ANTES DO setEnviando VALER
+            if (emAndamento.current) return
 
             const valor = email.trim()
             if (!EMAIL_VALIDO.test(valor)) {
@@ -37,6 +41,7 @@
             }
 
             setErro('')
+            emAndamento.current = true
             setEnviando(true)
 
             try {
@@ -52,6 +57,7 @@
             } catch (error) {
                 setErro(error?.response?.data?.error?.message || 'Não foi possível salvar o e-mail. Tente novamente.')
             } finally {
+                emAndamento.current = false
                 setEnviando(false)
             }
 
@@ -83,12 +89,13 @@
                                 <label htmlFor="email-obrigatorio" className="form-label text-gray-900 gap-[2px]">
                                     E-mail <span className="text-danger">*</span>
                                 </label>
-                                <label className="input">
+                                {/* div E NÃO label: O NOME DO CAMPO VEM DO label htmlFor ACIMA. SEM autoFocus: O Dialog JÁ
+                                    FOCA O PRIMEIRO CAMPO (O X DE FECHAR ESTÁ ESCONDIDO) */}
+                                <div className="input">
                                     <input
                                         id="email-obrigatorio"
                                         type="email"
                                         autoComplete="email"
-                                        autoFocus
                                         placeholder="seu@email.com.br"
                                         value={email}
                                         onChange={(event) => setEmail(event.target.value)}
@@ -96,7 +103,7 @@
                                         aria-invalid={Boolean(erro)}
                                         aria-describedby={erro ? 'email-obrigatorio-erro' : undefined}
                                     />
-                                </label>
+                                </div>
                                 {erro && (
                                     <span id="email-obrigatorio-erro" role="alert" className="text-danger text-xs mt-1">
                                         {erro}

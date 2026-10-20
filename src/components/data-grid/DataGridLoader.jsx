@@ -1,4 +1,3 @@
-import React from 'react'
 import { useDataGrid } from '.'
 export const DataGridLoader = () => {
     const { props } = useDataGrid()

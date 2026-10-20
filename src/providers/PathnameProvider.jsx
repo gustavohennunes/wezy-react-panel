@@ -1,5 +1,5 @@
 /* eslint-disable react-refresh/only-export-components */
-import React, { createContext, useState, useContext, useEffect, useMemo } from 'react'
+import { createContext, useState, useContext, useEffect, useMemo } from 'react'
 import { useLocation } from 'react-router-dom'
 const PathnameContext = createContext(undefined)
 const PathnameProvider = ({ children }) => {

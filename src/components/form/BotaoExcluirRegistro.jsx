@@ -1,4 +1,4 @@
-    import { useState } from 'react'
+    import { useRef, useState } from 'react'
     import { useNavigate } from 'react-router-dom'
     import qs from 'qs'
     import { api } from '@/services/api'
@@ -28,17 +28,23 @@
         const navigate                 = useNavigate()
         const [confirm, confirmDialog] = useConfirm()
         const [excluindo, setExcluindo] = useState(false)
+        //O CLIQUE PODE REPETIR ANTES DO setExcluindo VALER (O confirm FICA NO MEIO)
+        const emAndamento              = useRef(false)
 
         const excluir = async () => {
 
             const id = new URLSearchParams(window.location.search).get('id')
-            if (!id || excluindo) return
+            if (!id || excluindo || emAndamento.current) return
+            emAndamento.current = true
 
             const confirmado = await confirm({
                 title: 'Excluir registro?',
                 description: 'Tem certeza que deseja excluir este registro? Essa ação não pode ser desfeita.',
             })
-            if (!confirmado) return
+            if (!confirmado) {
+                emAndamento.current = false
+                return
+            }
 
             setExcluindo(true)
 
@@ -60,6 +66,7 @@
 
                 avisoErro(err?.response?.data?.error?.message || err?.message || 'Não foi possível excluir o registro.')
                 setExcluindo(false)
+                emAndamento.current = false
 
             }
 

@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import { useState } from 'react'
 import { DefaultTooltip, KeenIcon } from '@/components'
 import {
     Dialog,

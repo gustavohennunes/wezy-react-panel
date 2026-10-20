@@ -1,82 +1,59 @@
-    import qs from 'qs'
-    import { useMemo, useRef, useState, useEffect, useCallback } from 'react'
-    import { useNavigate } from 'react-router-dom'
-    import { DataGrid, KeenIcon, DataGridColumnHeader, DataGridRowSelectAll, DataRowContext } from '@/components'
-    import { toast } from 'sonner'
-    import { Input } from '@/components/ui/input'
-    import { buildApiUrl, buildRemoveItemsUrl, buildSortListUrl, cleanUrl } from '@/utils/urlHelper'
-    import { arrayMove } from '@dnd-kit/sortable'
-    import { api } from '@/services/api'
-    import { Tabs } from '@/components/custom/tabs/tabs'
+    import { useMemo, useState } from 'react'
+    import { DataGrid } from '@/components'
     import { LegacyList } from './LegacyList'
     import { LegacyHtml } from '@/components/legacy/LegacyHtml'
     import { useConfirm } from '@/components/ui/confirm-dialog'
-    import { contemTodasAsPalavras, textoDoHtml } from '@/utils/textSearch'
-    import { devePaginaSerRestaurada, lerPaginasCarregadas, gravarPaginasCarregadas, inicioCarregamentoExtra, fimCarregamentoExtra } from '@/utils/restauraPagina'
+    import { criarColunas } from './colunasDoGrid'
+    import { useCarregarMais } from './useCarregarMais'
+    import { useRemocaoDeItens } from './useRemocaoDeItens'
+    import { useBuscaDaListagem } from './useBuscaDaListagem'
+    import { useAcoesDasLinhas } from './useAcoesDasLinhas'
+    import { BarraDaListagem } from './BarraDaListagem'
+    import { RodapeCarregarMais, RodapeExclusao } from './RodapesDaListagem'
+
+    //ORDEM INICIAL DO GRID (A PONTE JÁ MANDA AS LINHAS ORDENADAS)
+    const ORDEM_INICIAL = [{ id: 'id', desc: false }]
+
+    //TUDO QUE FOI CARREGADO FICA EM UMA ÚNICA "PÁGINA" (TAMANHO GIGANTE DESDE O PRIMEIRO RENDER:
+    //O DataGridProvider CAPTURA O pageSize NA MONTAGEM) — QUEM CONTROLA O CARREGAMENTO É O BOTÃO
+    //"Carregar mais conteúdo" DO RODAPÉ
+    const TAMANHO_DA_PAGINA = 1000000
+
+    const LAYOUT_DO_GRID = {
+        card: true,
+        hidePagination: true,
+        //LINHAS ESPAÇADAS EM TODAS AS LISTAGENS (O md PADRÃO DO GRID DEIXAVA OS REGISTROS COLADOS)
+        cellSpacing: 'xl',
+    }
+
+    const idDaLinha = (row) => row['row-id']
+
+    // HTML DA LISTAGEM MONTADO PELO PRÓPRIO CARD ($novoResultadoInicial) — CHEGA EM
+    // list.content, ÀS VEZES ANINHADO EM ARRAYS, ENTÃO ACHATAMOS ANTES DE RENDERIZAR
+    const achatarHtml = (value) => {
+        if (typeof value === 'string') return value
+        if (Array.isArray(value)) return value.map(achatarHtml).join('')
+        return ''
+    }
+
+    // PAGINAÇÃO DO GRID — DERIVADA DAS PROPS (SEM STATE + useEffect, QUE CUSTAVA UM RENDER A MAIS)
+    // QUANDO O CARD ESCONDE O "Exibindo de X até Y" ($bloqExibindo), A PONTE NÃO ENVIA
+    // pagination.information — E O RODAPÉ MOSTRAVA "1 - 0 de 0" MESMO COM REGISTROS NA
+    // TELA. NESSE CASO CONSIDERAMOS QUE TUDO QUE FOI CARREGADO ESTÁ NA PÁGINA ATUAL.
+    const totalDaListagem = (pagination, model, removidos) => {
+        const total = typeof pagination?.information?.total === 'number' ? pagination.information.total : (model?.length || 0)
+        return Math.max(0, total - removidos)
+    }
 
     const Models = ({ model, columnHeader, btnAdd, search, btnExcluir, extraButton, pagination, tabs, content, sequence = false }) => {
 
-        const [ confirm, confirmDialog ]            = useConfirm()
-        const [ models, setModels ]                 = useState(model || [])
-        const [ footer, setFooter ]                 = useState('')
-        const [ selectedRows, setSelectedRows ]     = useState([])
-        const [activeTab, setActiveTab]             = useState('')
-        const [ searchInput, setSearchInput ]       = useState(search?.value || '')
-        const navigate                              = useNavigate()
-        const selectionTable = useRef(null)
-        const deletionBusy = useRef(false)
+        const [ confirm, confirmDialog ]        = useConfirm()
+        const [ models, setModels ]             = useState(model || [])
+        const [ selectedRows, setSelectedRows ] = useState([])
         const scope = useMemo(() => ({ model, content }), [model, content])
-        const currentScope = useRef(scope)
-        currentScope.current = scope
-        const [removals, setRemovals] = useState({ scope, ids: new Set() })
-        const removedIds = useMemo(() => removals.scope === scope ? removals.ids : new Set(), [removals, scope])
+
+        const { removedIds, removeItems, selectionTable, excluindo } = useRemocaoDeItens({ scope, confirm, setSelectedRows })
         const visibleModels = useMemo(() => models.filter((row) => !removedIds.has(String(row['row-id']))), [models, removedIds])
-
-        //A BUSCA DO SERVIDOR MUDOU (NOVA RESPOSTA DA PONTE) — O CAMPO ACOMPANHA
-        useEffect(() => {
-            setSearchInput(search?.value || '')
-        }, [search?.value])
-
-        // PAGINAÇÃO DO GRID — DERIVADA DAS PROPS (SEM STATE + useEffect, QUE CUSTAVA UM RENDER A MAIS)
-        // QUANDO O CARD ESCONDE O "Exibindo de X até Y" ($bloqExibindo), A PONTE NÃO ENVIA
-        // pagination.information — E O RODAPÉ MOSTRAVA "1 - 0 de 0" MESMO COM REGISTROS NA
-        // TELA. NESSE CASO CONSIDERAMOS QUE TUDO QUE FOI CARREGADO ESTÁ NA PÁGINA ATUAL.
-        const totalRegistros = Math.max(0, (typeof pagination?.information?.total === 'number'
-            ? pagination.information.total
-            : (model?.length || 0)) - removedIds.size)
-
-        //FILTRO AO DIGITAR: ATUA SÓ NAS LINHAS JÁ CARREGADAS, SEM CHAMAR A API — POR ISSO SÓ LIGA QUANDO TODOS OS
-        //REGISTROS JÁ ESTÃO NA TELA. COM MAIS RESULTADOS NO SERVIDOR (ex.: "Mostrando 100 de 48340" DOS PROSPECTS DO
-        //360) ELE ESCONDIA O QUE NÃO TINHA CARREGADO, E A BUSCA SÓ VALE NO ENTER/LUPA (?busca= NO SERVIDOR).
-        //ENQUANTO O TEXTO FOR IGUAL AO ?busca= JÁ APLICADO, NÃO FILTRA — O SERVIDOR PODE TER ACHADO O TERMO EM CAMPOS
-        //QUE NÃO APARECEM NA TABELA, E ESSAS LINHAS SUMIRIAM
-        const todosCarregados = totalRegistros <= visibleModels.length
-        const filtroLocal = todosCarregados && searchInput.trim() !== (search?.value || '').trim() ? searchInput.trim() : ''
-
-        const textoDasLinhas = useMemo(() => {
-            const textos = new Map()
-            models.forEach((linha) => {
-                textos.set(
-                    linha,
-                    (linha.columns || [])
-                        .map((coluna) => (typeof coluna?.content === 'string' ? textoDoHtml(coluna.content) : ''))
-                        .join(' ')
-                )
-            })
-            return textos
-        }, [models])
-
-        const data = useMemo(
-            () => (filtroLocal === '' ? visibleModels : visibleModels.filter((linha) => contemTodasAsPalavras(textoDasLinhas.get(linha), filtroLocal))),
-            [visibleModels, filtroLocal, textoDasLinhas]
-        )
-
-        // MODO "CARREGAR MAIS": em vez de trocar de página, os registros vão se acumulando na
-        // MESMA tabela. É o que permite ao drag-and-drop mover um item para uma posição que
-        // antes estaria em outra página (a reordenação envia a lista inteira em tela).
-        //REF: A PÁGINA CARREGADA SÓ É LIDA NO CLIQUE DO "Carregar mais", NÃO APARECE NA TELA
-        const paginaCarregada                         = useRef(1)
-        const [ carregandoMais, setCarregandoMais ]   = useState(false)
 
         // ATUALIZA O ESTADO QUANDO O MODELO É ALTERADO — DURANTE O RENDER, E NÃO NUM useEffect: COM O EFFECT,
         // O PRIMEIRO RENDER DEPOIS DO LOADER AINDA MOSTRAVA AS LINHAS ANTERIORES (OU "Nenhum conteúdo encontrado!")
@@ -86,578 +63,37 @@
             setModels(Array.isArray(model) ? model : [])
         }
 
-        useEffect(() => {
+        const totalRegistros = totalDaListagem(pagination, model, removedIds.size)
 
-            //TROCA DE MÓDULO/BUSCA REINICIA O ACUMULADO
-            const paginaUrl = parseInt(new URLSearchParams(window.location.search).get('pagina') || '1', 10)
-            paginaCarregada.current = isNaN(paginaUrl) ? 1 : paginaUrl
+        const { carregarMais, carregandoMais } = useCarregarMais(model, setModels)
+        const busca = useBuscaDaListagem({ search, models, visibleModels, totalRegistros })
+        const { handleReorder, handleToggle } = useAcoesDasLinhas({ models, visibleModels, setModels, excluindo })
 
-            //F5 / ABA RECARREGADA PELO NAVEGADOR: REABRE AS PÁGINAS DO "Carregar mais conteúdo" QUE ESTAVAM NA TELA, PARA A
-            //ROLAGEM (Main.jsx) CONSEGUIR VOLTAR AO MESMO PONTO. FORA DISSO, A LISTAGEM RECOMEÇA E O CONTADOR TAMBÉM
-            if (!devePaginaSerRestaurada()) {
-                gravarPaginasCarregadas(paginaCarregada.current)
-                return
-            }
-
-            const paginasAntes = lerPaginasCarregadas()
-            if (paginasAntes <= paginaCarregada.current) return
-
-            let cancelado = false
-
-            inicioCarregamentoExtra()
-
-            ;(async () => {
-                while (!cancelado && paginaCarregada.current < paginasAntes) {
-                    if (!(await carregarMais())) break
-                }
-            })().finally(fimCarregamentoExtra)
-
-            return () => {
-                cancelado = true
-            }
-
-        // eslint-disable-next-line react-hooks/exhaustive-deps
-        }, [ model ])
-
-        // BUSCA A PRÓXIMA PÁGINA E CONCATENA NO QUE JÁ ESTÁ NA TELA
-        const carregarMais = async () => {
-
-            if (carregandoMais) return false
-
-            setCarregandoMais(true)
-
-            try {
-
-                const url = new URL(window.location.href)
-                url.searchParams.set('pagina', String(paginaCarregada.current + 1))
-
-                const response = await api.get(buildApiUrl(url.searchParams.toString()))
-                const novos    = response?.data?.success?.response?.data?.params?.list?.rows || []
-
-                if (novos.length > 0) {
-
-                    //EVITA DUPLICAR SE A MESMA PÁGINA FOR CARREGADA DUAS VEZES
-                    setModels((prev) => {
-
-                        const existentes = new Set(prev.map((linha) => linha['row-id']))
-
-                        return [...prev, ...novos.filter((linha) => !existentes.has(linha['row-id']))]
-
-                    })
-
-                    paginaCarregada.current += 1
-                    gravarPaginasCarregadas(paginaCarregada.current)
-
-                    return true
-
-                }
-
-                return false
-
-            } catch (err) {
-
-                toast(`❌ Erro`, {
-                    description: <span style={{ 'color': 'white' }}>{'Não foi possível carregar mais conteúdo'}</span>,
-                    style: {
-                        color: 'white',
-                        background: 'var(--tw-danger)',
-                        border: 'none',
-                        fontWeight: 'bold'
-                    }
-                })
-
-                return false
-
-            } finally {
-                setCarregandoMais(false)
-            }
-
-        }
-
-        //TUDO QUE FOI CARREGADO FICA EM UMA ÚNICA "PÁGINA" (TAMANHO GIGANTE DESDE O PRIMEIRO RENDER:
-        //O DataGridProvider CAPTURA O pageSize NA MONTAGEM) — QUEM CONTROLA O CARREGAMENTO É O BOTÃO
-        //"Carregar mais conteúdo" DO RODAPÉ
         const gridPagination = useMemo(
-            () => ({ size: 1000000, rowCount: totalRegistros, pageCount: 1 }),
+            () => ({ size: TAMANHO_DA_PAGINA, rowCount: totalRegistros, pageCount: 1 }),
             [totalRegistros]
         )
 
-        // REMOVE DA TELA APÓS CONFIRMAR E ENVIA POR AJAX, SEM RECARREGAR O MÓDULO.
-        const removeItems = useCallback(async (items, legacyRow = null) => {
-            const ids = [...new Set(items.map(String))]
-            if (ids.length === 0 || deletionBusy.current || currentScope.current !== scope) return
-            deletionBusy.current = true
-            try {
-                const url = buildRemoveItemsUrl()
-                const confirmado = await confirm({
-                    title: ids.length === 1 ? 'Excluir item?' : `Excluir ${ids.length} itens?`,
-                    description: ids.length === 1
-                        ? 'Tem certeza que deseja excluir este item? Essa ação não pode ser desfeita.'
-                        : `Tem certeza que deseja excluir os ${ids.length} itens selecionados? Essa ação não pode ser desfeita.`,
-                })
-                if (!confirmado || currentScope.current !== scope) return
-                const previousHidden = legacyRow?.hidden
-                if (legacyRow) legacyRow.hidden = true
-                else setRemovals((prev) => ({
-                    scope,
-                    ids: new Set([...(prev.scope === scope ? prev.ids : []), ...ids]),
-                }))
-                selectionTable.current?.setRowSelection((selection) => Object.fromEntries(
-                    Object.entries(selection).filter(([id]) => !ids.includes(String(id)))
-                ))
-                setSelectedRows((prev) => prev.filter((id) => !ids.includes(String(id))))
-                try {
-                    const response = await api.post(url, qs.stringify({ items: ids }), {
-                        headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-                    })
-                    const resultado = response.data?.success?.response
-                    if (!resultado || resultado.status === false || resultado.data?.status === false) {
-                        throw new Error(resultado?.message || resultado?.data?.message || 'Não foi possível excluir os itens')
-                    }
-                    toast('✅ Sucesso!', {
-                        description: resultado.data?.message || resultado.message || 'Exclusão concluída com sucesso!',
-                        style: { color: 'white', background: 'var(--tw-success)', border: 'none', fontWeight: 'bold' },
-                    })
-                } catch (err) {
-                    if (legacyRow) legacyRow.hidden = previousHidden
-                    else setRemovals((prev) => prev.scope !== scope ? prev : ({
-                        scope,
-                        ids: new Set([...prev.ids].filter((id) => !ids.includes(id))),
-                    }))
-                    toast('❌ Erro', {
-                        description: err?.response?.data?.error?.message || err?.message || 'Não foi possível excluir os itens',
-                        style: { color: 'white', background: 'var(--tw-danger)', border: 'none', fontWeight: 'bold' },
-                    })
-                }
-            } finally {
-                deletionBusy.current = false
-            }
-        }, [confirm, scope])
-
-        const handleExcluir = useCallback(() => removeItems(selectedRows), [removeItems, selectedRows])
-
-        // REORDENAÇÃO POR ARRASTAR (CARD COM $sequencia = true — A PONTE MANDA params.sequence). A LINHA MUDA DE
-        // LUGAR NA HORA E A ORDEM DE TODAS AS LINHAS EM TELA VAI PARA O acao=sort-list, QUE REDISTRIBUI A
-        // sequencia ENTRE ELAS (MESMO CRITÉRIO DO PAINEL ANTIGO). SE O SERVIDOR RECUSAR, A ORDEM VOLTA.
-        const handleReorder = async (idArrastado, idAlvo) => {
-
-            if (deletionBusy.current) return
-            const anterior = visibleModels
-            const de       = anterior.findIndex((linha) => String(linha['row-id']) === String(idArrastado))
-            const para     = anterior.findIndex((linha) => String(linha['row-id']) === String(idAlvo))
-
-            if (de < 0 || para < 0) return
-
-            const nova = arrayMove(anterior, de, para)
-            setModels(nova)
-
-            try {
-
-                const response = await api.post(
-                    buildSortListUrl(),
-                    qs.stringify({ items: nova.map((linha) => linha['row-id']) }),
-                    { headers: { 'Content-Type': 'application/x-www-form-urlencoded' } }
-                )
-
-                const resultado = response.data?.success?.response
-                if (!resultado || resultado.status === false || resultado.data?.status === false) {
-                    throw new Error(resultado?.message || resultado?.data?.message || '')
-                }
-
-            } catch (err) {
-
-                setModels(anterior)
-
-                toast(`❌ Erro`, {
-                    description: <span style={{ 'color': 'white' }}>{err?.response?.data?.error?.message || err?.message || 'Não foi possível alterar a sequência'}</span>,
-                    style: {
-                        color: 'white',
-                        background: 'var(--tw-danger)',
-                        border: 'none',
-                        fontWeight: 'bold'
-                    }
-                })
-
-            }
-
-        }
-
-        // HANDLER PARA ATUALIZAR STATUS DO ITEM
-        // RECEBE A PRÓPRIA CÉLULA (cell) DO GRID — FUNCIONA EM QUALQUER PÁGINA, SEM DEPENDER
-        // DO ESTADO `models`. O VISUAL OTIMISTA/ROLLBACK FICA NO DataRowToggle, QUE LÊ O
-        // RETORNO (true/false) DESTA FUNÇÃO.
-        const handleToggle = async (rowId, colIndex, cell) => {
-
-            const toggleAction = cell?.action || models.find((row) => row['row-id'] === rowId)?.columns?.[colIndex]?.action
-
-            if (!toggleAction) {
-                return false
-            }
-
-            try {
-
-                const response = await api.post(buildApiUrl(toggleAction.toString()))
-
-                toast(`✅ Sucesso!`, {
-                    description: <span style={{ 'color': 'white' }}>{response?.data?.success?.response?.data?.message || 'Status alterado com sucesso!'}</span>,
-                    style: {
-                        color: 'white',
-                        background: 'var(--tw-success)',
-                        border: 'none',
-                        fontWeight: 'bold'
-                    }
-                })
-
-                return true
-
-            } catch (err) {
-
-                toast(`❌ Erro`, {
-                    description: <span style={{ 'color': 'white' }}>{'Não foi possível alterar o status deste item'}</span>,
-                    style: {
-                        color: 'white',
-                        background: 'var(--tw-danger)',
-                        border: 'none',
-                        fontWeight: 'bold'
-                    }
-                })
-
-                return false
-
-            }
-
-        }
-
-        // CRIA AS COLUNAS DO GRID
-        const createColumns = (columnsData) => {
-            
-            if (!columnsData) return false
-
-            return columnsData.map((col, index) => {
-
-                const isCheckbox = col.component === 'select_all_checkbox'
-
-                // A LARGURA VEM DA PONTE COMO '12.9%' OU '110px'. ANTES ERA APLICADA VIA
-                // CLASSE TAILWIND DINÂMICA (w-[${col.width}]) — QUE NUNCA FUNCIONA, PORQUE O
-                // JIT SÓ GERA CSS DAS CLASSES QUE ENXERGA EM TEMPO DE BUILD. RESULTADO: TODAS
-                // AS COLUNAS FICAVAM COM LARGURA AUTOMÁTICA E O TEXTO QUEBRAVA EM VÁRIAS LINHAS.
-                const hasWidth = col.width && col.width !== '0%' && col.width !== '0'
-
-                const columnStyle = {}
-
-                if (isCheckbox) {
-                    columnStyle.width = '52px'
-                    columnStyle.minWidth = '52px'
-                } else if (hasWidth) {
-                    columnStyle.width = col.width
-                }
-
-                columnStyle.textAlign = col.align === 'center' ? 'center' : col.align === 'right' ? 'right' : 'left'
-
-                // ESTILO INLINE DECLARADO PELO CARD (ex.: 'color:#F00;')
-                const backendStyle = col.style
-                    ? Object.fromEntries(
-                        col.style
-                            .split(';')
-                            .map((rule) => rule.split(':').map((s) => s.trim()))
-                            .filter(([key, value]) => key && value)
-                    )
-                    : {}
-
-                return {
-                    accessorKey: `col_${index}`,
-                    id: col.component === 'select_all_checkbox' ? 'id' : col?.content?.toLowerCase().replace(/\s/g, '_'),
-                    header: ({ column }) => col.component === 'select_all_checkbox' ? (
-                        
-                        <DataGridRowSelectAll />
-
-                    ) : (
-
-                        <DataGridColumnHeader
-                            title={col.content}
-                            column={column}
-                            filter={false}
-                        />
-
-                    ),
-                    enableSorting: false,
-                    enableHiding: false,
-                    cell: ({ row }) => {
-
-                        return (
-                            <DataRowContext
-                                fullRow={row}
-                                row={row.original.columns[index]}
-                                index={index}
-                                //PASSA A FUNÇÃO DIRETO: uma closure aqui descartaria os argumentos
-                                //que o DataRowContext envia (id, índice e a própria célula com o action)
-                                handleToggle={handleToggle}
-                                onRemoveItems={removeItems}
-                            />
-                        )
-
-                    },
-                    meta: {
-                        headerClassName: [
-                            isCheckbox ? '!ps-4 !pe-2' : '!px-3',
-                            'whitespace-nowrap',
-                            col.class ? col.class : '',
-                        ]
-                            .filter(Boolean)
-                            .join(' '),
-
-                        cellClassName: [
-                            isCheckbox ? '!ps-4 !pe-2' : '!px-3',
-                            'text-gray-800 font-normal align-middle',
-                        ]
-                            .filter(Boolean)
-                            .join(' '),
-
-                        headerStyle: columnStyle,
-                        cellStyle: { ...columnStyle, ...backendStyle },
-                    },
-                }
-            })
-        }
+        const column = useMemo(() => criarColunas(columnHeader, { handleToggle, removeItems }), [columnHeader, handleToggle, removeItems])
 
         const handleRowSelection = (state, table) => {
             selectionTable.current = table
-
-            const selectedRowIds = Object.keys(state).filter((key) => {
-                return state[key]
-            })
-
-            setSelectedRows(selectedRowIds)
-
+            setSelectedRows(Object.keys(state).filter((key) => state[key]))
         }
 
-        //BUSCA SEM RECARREGAR A PÁGINA: SÓ TROCA O ?busca= NA URL. O PageDataContext ESCUTA OS
-        //searchParams E REFAZ A CHAMADA DA LISTAGEM. PARTE DA URL ATUAL (E NÃO DO search.action
-        //DA PONTE) PARA NÃO PERDER PARÂMETROS DE CONTEXTO COMO O cliente
-        const aplicaBusca = (termo) => {
+        const legacyHtml = useMemo(() => achatarHtml(content).trim(), [content])
 
-            const params = new URLSearchParams(window.location.search)
-
-            if (termo) {
-                params.set('busca', termo)
-            } else {
-                params.delete('busca')
-            }
-            params.delete('pagina')
-
-            navigate({ search: '?' + params.toString() })
-
-        }
-
-        //ENTER → BUSCA NO SERVIDOR (?busca=termo)
-        const submitSearch = (e) => {
-            e.preventDefault()
-            aplicaBusca(searchInput.trim())
-        }
-
-        // LIMPA A BUSCA — MESMO COMPORTAMENTO DO LINK "LIMPAR" DO PAINEL-PHP
-        const limparBusca = () => {
-            setSearchInput('')
-            if ((search?.value || '') !== '') {
-                aplicaBusca('')
-            }
-        }
-
-        //FUNÇÃO DE RENDER (E NÃO COMPONENTE): UM COMPONENTE DECLARADO AQUI DENTRO SERIA RECRIADO A
-        //CADA RENDER DO Models — COM O FILTRO AO DIGITAR, O INPUT PERDERIA O FOCO A CADA LETRA
-        const renderToolbar = () => {
-
-            const buscaAtiva = (search?.value || '') !== '' || searchInput !== ''
-
-            const addBtn = btnAdd?.label ? (
-
-                <a
-                    className="btn btn-primary btn-sm"
-                    href={cleanUrl(btnAdd?.url)}
-                    target="_self"
-                >
-                    <i className="ki-filled ki-plus !text-sm"></i>
-                    {btnAdd?.label}
-                </a>
-
-            ) : (
-                ''
-            )
-
-            return (
-                <>
-                
-                    {tabs?.before && Array.isArray(tabs?.before) ? (
-
-                        <Tabs
-                            activeTab={activeTab}
-                            setActiveTab={setActiveTab}
-                            tabs={tabs?.before}
-                            className="tabs w-f px-6"
-                        />
-
-                    ) : null}
-
-                    {/* FILTRO Todos/Ativos/Inativos DO CARTÃO ($setBotoesStatus) */}
-                    {tabs?.status && Array.isArray(tabs?.status) ? (
-
-                        <Tabs
-                            activeTab={activeTab}
-                            setActiveTab={setActiveTab}
-                            tabs={tabs?.status}
-                            className="tabs w-f px-6"
-                        />
-
-                    ) : null}
-
-                    <div className="bg-transparent">
-
-                        {search !== undefined && addBtn !== undefined && (
-
-                            <div className="card-header flex-wrap my-0 gap-2 border-b-0 px-3">
-
-                                {addBtn}
-                                
-                                {search !== undefined && search !== false && (
-
-                                    <div className="flex flex-wrap gap-2 lg:gap-5">
-
-                                        <form
-                                            id="form2"
-                                            name="form2"
-                                            role="search"
-                                            onSubmit={(e) => submitSearch(e)}
-                                            className="flex form-busca"
-                                        >
-
-                                            <label className="input input-sm">
-                                                <input
-                                                    type="text"
-                                                    name="FrmBusca"
-                                                    id="FrmBusca"
-                                                    className="inputBusca"
-                                                    aria-label={search?.placeholder || 'Buscar'}
-                                                    placeholder={search?.placeholder}
-                                                    value={searchInput}
-                                                    onChange={(e) =>
-                                                        setSearchInput(e.target.value)
-                                                    }
-                                                />
-                                            </label>
-
-                                            <button
-                                                type="submit"
-                                                className="btn btn-primary btn-sm ml-1"
-                                                aria-label="Buscar"
-                                            >
-                                                <KeenIcon
-                                                    icon="magnifier"
-                                                    className="!text-sm"
-                                                />
-                                            </button>
-
-                                            {buscaAtiva && (
-                                                <button
-                                                    type="button"
-                                                    className="btn btn-light btn-sm ml-1"
-                                                    onClick={limparBusca}
-                                                    title="Limpar busca"
-                                                >
-                                                    LIMPAR
-                                                </button>
-                                            )}
-
-                                        </form>
-
-                                    </div>
-
-                                )}
-
-                            </div>
-                        )}
-
-                        {tabs?.after && Array.isArray(tabs?.after) ? (
-                            <div className="card-header justify-start flex-wrap gap-2 border-b-0 px-5">
-                                {tabs?.after?.map((afterTab, i) => {
-                                    return (
-                                        <a
-                                            key={i}
-                                            className="btn btn-primary"
-                                            href={
-                                                !afterTab.url ||
-                                                afterTab.url === 'javascript:;'
-                                                    ? ''
-                                                    : cleanUrl(afterTab.url)
-                                            }
-                                            target={afterTab.target ?? '_self'}
-                                        >
-                                            {afterTab.content}
-                                        </a>
-                                    )
-                                })}
-                            </div>
-                        ) : null}
-                    </div>
-                </>
-            )
-        }
-
-        // BOTÃO DE EXCLUSÃO EM LOTE — SEMPRE VISÍVEL; SEM SELEÇÃO FICA ESMAECIDO E
-        // INCLICÁVEL, COM SELEÇÃO GANHA OPACIDADE TOTAL E MOSTRA O CONTADOR
-        useEffect(() => {
-
-            if (btnExcluir !== false) {
-
-                const hasSelection = selectedRows.length > 0
-
-                setFooter(
-                    <div className="flex items-center gap-3 mt-3">
-
-                        <button
-                            type="button"
-                            className={`btn btn-sm btn-danger transition-opacity ${hasSelection ? '' : 'opacity-40 cursor-not-allowed'}`}
-                            disabled={!hasSelection}
-                            onClick={handleExcluir}
-                        >
-                            <i className="ki-filled ki-trash !text-sm"></i>
-                            Excluir selecionados
-                        </button>
-
-                        {hasSelection && (
-                            <span className="text-2sm text-gray-700">
-                                {selectedRows.length === 1
-                                    ? '1 item selecionado'
-                                    : `${selectedRows.length} itens selecionados`}
-                            </span>
-                        )}
-
-                    </div>
-                )
-
-            } else {
-                setFooter('')
-            }
-
-        }, [btnExcluir, selectedRows, handleExcluir])
-
-        const column = useMemo(() => (columnHeader ? createColumns(columnHeader) : []), [columnHeader, removeItems]);
-
-        // HTML DA LISTAGEM MONTADO PELO PRÓPRIO CARD ($novoResultadoInicial) — CHEGA EM
-        // list.content, ÀS VEZES ANINHADO EM ARRAYS, ENTÃO ACHATAMOS ANTES DE RENDERIZAR
-        const legacyHtml = useMemo(() => {
-
-            const flatten = (value) => {
-
-                if (typeof value === 'string') return value
-                if (Array.isArray(value)) return value.map(flatten).join('')
-
-                return ''
-
-            }
-
-            return flatten(content).trim()
-
-        }, [content])
+        const barra = (
+            <BarraDaListagem
+                tabs={tabs}
+                btnAdd={btnAdd}
+                search={search}
+                searchInput={busca.searchInput}
+                setSearchInput={busca.setSearchInput}
+                onBuscar={busca.aplicaBusca}
+                onLimpar={busca.limparBusca}
+            />
+        )
 
         // O CARD MONTOU A LISTAGEM INTEIRA EM HTML E NÃO HÁ LINHAS ESTRUTURADAS
         // (é o caso de $bloqResultados = true no painel-php): renderiza o HTML do card
@@ -669,7 +105,7 @@
                     {confirmDialog}
                     <div className="card card-grid min-w-full">
 
-                        {renderToolbar()}
+                        {barra}
 
                         <div className="card-body">
                             <LegacyList html={legacyHtml} columnHeader={columnHeader} onRemoveItems={removeItems} />
@@ -698,63 +134,34 @@
 
                 <DataGrid
                     columns={column}
-                    data={data}
+                    data={busca.linhasFiltradas}
                     rowSelection={true}
                     onRowSelectionChange={handleRowSelection}
                     pagination={gridPagination}
-                    getRowId={(row) => row['row-id']}
+                    getRowId={idDaLinha}
                     //ARRASTAR PARA REORDENAR SÓ NOS CARDS COM $sequencia; DESATIVADO COM O FILTRO AO DIGITAR ATIVO,
                     //QUE ESCONDE LINHAS E MANDARIA UMA ORDEM INCOMPLETA
                     onRowReorder={sequence === true ? handleReorder : undefined}
-                    rowReorderDisabled={filtroLocal !== ''}
-                    sorting={[
-                        {
-                            id: 'id',
-                            desc: false,
-                        },
-                    ]}
+                    rowReorderDisabled={busca.filtroLocal !== ''}
+                    sorting={ORDEM_INICIAL}
                     //TODOS OS REGISTROS JÁ CARREGADOS FICAM NA TELA; A BUSCA DA PRÓXIMA
                     //PÁGINA É FEITA PELO BOTÃO DO RODAPÉ, NÃO PELO GRID
                     serverSide={false}
-                    toolbar={renderToolbar()}
-                    layout={{
-                        card: true,
-                        hidePagination: true,
-                        //LINHAS ESPAÇADAS EM TODAS AS LISTAGENS (O md PADRÃO DO GRID DEIXAVA OS REGISTROS COLADOS)
-                        cellSpacing: 'xl',
-                    }}
-                    //RODAPÉ DENTRO DO CARD (mesma posição da paginação que ele substitui).
-                    //data-pagination faz herdar o padding do layout de card.
+                    toolbar={barra}
+                    layout={LAYOUT_DO_GRID}
                     footer={
-                        visibleModels.length > 0 ? (
-
-                            <div data-pagination className="flex flex-col items-center gap-3">
-
-                                {totalRegistros > visibleModels.length && (
-                                    <button
-                                        type="button"
-                                        //leading-none + items-center: O line-height HERDADO DO RODAPÉ DEIXAVA O TEXTO MAIS PARA BAIXO DO QUE O CENTRO
-                                        className="btn btn-light btn-sm items-center justify-center leading-none"
-                                        onClick={carregarMais}
-                                        disabled={carregandoMais}
-                                    >
-                                        {carregandoMais ? 'Carregando...' : 'Carregar mais conteúdo'}
-                                    </button>
-                                )}
-
-                                {totalRegistros > 0 && (
-                                    <span className="text-2sm text-gray-600">
-                                        Mostrando {visibleModels.length} de {totalRegistros} {totalRegistros === 1 ? 'resultado' : 'resultados'}
-                                    </span>
-                                )}
-
-                            </div>
-
-                        ) : null
+                        <RodapeCarregarMais
+                            exibidos={visibleModels.length}
+                            total={totalRegistros}
+                            carregando={carregandoMais}
+                            onCarregarMais={carregarMais}
+                        />
                     }
                 />
 
-                {footer}
+                {btnExcluir !== false && (
+                    <RodapeExclusao selecionados={selectedRows.length} onExcluir={() => removeItems(selectedRows)} />
+                )}
 
                 {/* $addBotaoListagem DO CARTÃO (HTML DO LEGADO, ex.: confirmar(...)) */}
                 {typeof extraButton === 'string' && extraButton.trim() !== '' && (

@@ -5,6 +5,7 @@
     import { useConfirm } from '@/components/ui/confirm-dialog'
     import { cn } from '@/lib/utils'
     import { normalizaTexto, contemTodasAsPalavras } from '@/utils/textSearch'
+    import { comChaves } from '@/utils/chavesUnicas'
 
     // SUBSTITUI O select2 DO PAINEL ANTIGO (wezy-panel/jscripts/painel.js):
     // - BUSCA POR PALAVRAS: "cli ativo" ACHA OPÇÕES QUE TENHAM AS DUAS, EM QUALQUER ORDEM (customMatcher)
@@ -58,6 +59,89 @@
 
     }
 
+    //CHIPS DO multiple: O X DO CHIP SÓ DESMARCA (SEM PERGUNTAR)
+    const ChipsSelecionados = ({ selecionados, placeholder, labelDoValor, corExtra, onDesmarcar }) => (
+        <span className="flex flex-1 flex-wrap gap-1.5 min-w-0">
+
+            {selecionados.length === 0 && (
+                <span className="text-gray-500 font-normal">{placeholder}</span>
+            )}
+
+            {selecionados.map((valor) => (
+                <span key={valor} className="badge flex items-center gap-1.5 max-w-full px-2 py-1 text-2sm font-medium !text-[var(--form-control-text)] !bg-gray-200 !border-gray-300">
+                    <LabelComCor option={labelDoValor(valor)} corExtra={corExtra} />
+                    <button
+                        type="button"
+                        aria-label="Remover"
+                        className="cursor-pointer"
+                        onClick={(e) => {
+                            e.stopPropagation()
+                            onDesmarcar(valor)
+                        }}
+                    >
+                        <X className="size-3" />
+                    </button>
+                </span>
+            ))}
+
+        </span>
+    )
+
+    //OPÇÃO ESCOLHIDA: SÓ O CHECK QUASE NÃO APARECIA (PRINCIPALMENTE NO ESCURO). GANHA FUNDO E TEXTO
+    //PRIMARY (E NEGRITO), MESMO COM O MOUSE/TECLADO SOBRE ELA (data-selected DO cmdk).
+    //HOVER DAS OUTRAS: NO CLARO O PADRÃO DO TEMA; NO ESCURO SEM FUNDO, SÓ O TEXTO EM AZUL
+    const CLASSE_SELECIONADA = 'bg-primary-light text-primary font-semibold data-[selected=true]:bg-primary-light data-[selected=true]:text-primary'
+    const CLASSE_NAO_SELECIONADA = 'dark:data-[selected=true]:bg-transparent dark:data-[selected=true]:text-primary'
+
+    //valorDoCmdk: ÚNICO NA LISTA (O cmdk USA O value COMO CHAVE; DUAS OPÇÕES COM O MESMO value SE CONFUNDIAM)
+    const OpcaoDoCombobox = ({ option, valorDoCmdk, selecionada, corExtra, onEscolher, onRemover }) => (
+        <CommandItem
+            value={valorDoCmdk}
+            keywords={[String(option.label ?? '')]}
+            onSelect={() => onEscolher(option)}
+            className={cn('cursor-pointer', selecionada ? CLASSE_SELECIONADA : CLASSE_NAO_SELECIONADA)}
+        >
+            <Check className={cn('shrink-0', selecionada ? 'opacity-100 text-primary' : 'opacity-0')} />
+            <LabelComCor option={option} quebra corExtra={corExtra} />
+            {option.removable && onRemover && (
+                <button
+                    type="button"
+                    aria-label={`Remover "${option.label}"`}
+                    title="Remover"
+                    className="ms-auto flex size-5 shrink-0 items-center justify-center rounded text-gray-500 hover:bg-gray-200 hover:text-danger"
+                    //O cmdk SELECIONA O ITEM NO pointerdown/click: O X NÃO PODE MARCAR A OPÇÃO
+                    onPointerDown={(e) => { e.preventDefault(); e.stopPropagation() }}
+                    onClick={(e) => { e.preventDefault(); e.stopPropagation(); onRemover(option) }}
+                >
+                    <X className="size-3.5" />
+                </button>
+            )}
+        </CommandItem>
+    )
+
+    const ABRE_COM_TECLA = new Set(['Enter', ' ', 'ArrowDown'])
+
+    //O QUE ESTÁ ESCOLHIDO: multiple = LISTA DE VALORES (STRING); SENÃO UM VALOR SÓ
+    const selecaoDoCombobox = (options, value, multiple) => {
+
+        const selecionados = multiple ? (value || []).map(String) : []
+        const marcados     = new Set(selecionados)
+        const valorUnico   = String(value ?? '')
+
+        return {
+            selecionados,
+            marcados,
+            atual: multiple ? null : options.find((option) => String(option.value) === valorUnico),
+            estaSelecionado: (option) => (multiple ? marcados.has(String(option.value)) : String(option.value) === valorUnico),
+            labelDoValor: (valor) => options.find((option) => String(option.value) === valor) || { label: valor, value: valor },
+        }
+
+    }
+
+    //creatable: O TEXTO DIGITADO VIRA OPÇÃO NOVA QUANDO NENHUMA OPÇÃO TEM ESSE RÓTULO/VALOR
+    const podeCriarOpcao = (options, creatable, termo) =>
+        creatable && termo !== '' && !options.some((option) => normaliza(option.label) === normaliza(termo) || String(option.value) === termo)
+
     const Combobox = ({
         options = [],
         value,
@@ -90,35 +174,24 @@
             if (confirmou) onRemoveOption(option)
         }
 
-        const selecionados = multiple ? (value || []).map(String) : []
-        const atual        = multiple ? null : options.find((option) => String(option.value) === String(value ?? ''))
-
-        const estaSelecionado = (option) =>
-            multiple ? selecionados.includes(String(option.value)) : String(option.value) === String(value ?? '')
+        const { selecionados, marcados, atual, estaSelecionado, labelDoValor } = selecaoDoCombobox(options, value, multiple)
 
         const escolhe = (option) => {
 
             if (multiple) {
-
                 const valor = String(option.value)
-                onChange(selecionados.includes(valor) ? selecionados.filter((item) => item !== valor) : [...selecionados, valor])
+                onChange(marcados.has(valor) ? selecionados.filter((item) => item !== valor) : [...selecionados, valor])
                 setSearch('')
-
-            } else {
-
-                onChange(option.value)
-                setOpen(false)
-
+                return
             }
+
+            onChange(option.value)
+            setOpen(false)
 
         }
 
-        const termo        = search.trim()
-        const podeCriar    = creatable && termo !== '' &&
-            !options.some((option) => normaliza(option.label) === normaliza(termo) || String(option.value) === termo)
-
-        const labelDoValor = (valor) =>
-            options.find((option) => String(option.value) === valor) || { label: valor, value: valor }
+        const termo     = search.trim()
+        const podeCriar = podeCriarOpcao(options, creatable, termo)
 
         return (
             <>
@@ -133,7 +206,7 @@
                         aria-disabled={disabled}
                         tabIndex={disabled ? -1 : 0}
                         onKeyDown={(e) => {
-                            if (!disabled && (e.key === 'Enter' || e.key === ' ' || e.key === 'ArrowDown')) {
+                            if (!disabled && ABRE_COM_TECLA.has(e.key)) {
                                 e.preventDefault()
                                 setOpen(true)
                             }
@@ -147,38 +220,17 @@
                     >
 
                         {multiple ? (
-
-                            <span className="flex flex-1 flex-wrap gap-1.5 min-w-0">
-
-                                {selecionados.length === 0 && (
-                                    <span className="text-gray-500 font-normal">{placeholder}</span>
-                                )}
-
-                                {selecionados.map((valor) => (
-                                    <span key={valor} className="badge flex items-center gap-1.5 max-w-full px-2 py-1 text-2sm font-medium !text-[var(--form-control-text)] !bg-gray-200 !border-gray-300">
-                                        <LabelComCor option={labelDoValor(valor)} corExtra={corExtra} />
-                                        <button
-                                            type="button"
-                                            aria-label="Remover"
-                                            className="cursor-pointer"
-                                            onClick={(e) => {
-                                                e.stopPropagation()
-                                                onChange(selecionados.filter((item) => item !== valor))
-                                            }}
-                                        >
-                                            <X className="size-3" />
-                                        </button>
-                                    </span>
-                                ))}
-
-                            </span>
-
+                            <ChipsSelecionados
+                                selecionados={selecionados}
+                                placeholder={placeholder}
+                                labelDoValor={labelDoValor}
+                                corExtra={corExtra}
+                                onDesmarcar={(valor) => onChange(selecionados.filter((item) => item !== valor))}
+                            />
                         ) : (
-
                             <span className={cn('flex-1 min-w-0', !atual && 'text-gray-500 font-normal')}>
                                 {atual ? <LabelComCor option={atual} corExtra={corExtra} /> : placeholder}
                             </span>
-
                         )}
 
                         <ChevronDown className="size-4 shrink-0 opacity-50" />
@@ -211,38 +263,16 @@
 
                             <CommandGroup>
 
-                                {options.map((option, index) => (
-                                    <CommandItem
-                                        key={`${index}-${option.value}`}
-                                        value={`${index}-${option.value}`}
-                                        keywords={[String(option.label ?? '')]}
-                                        onSelect={() => escolhe(option)}
-                                        //OPÇÃO ESCOLHIDA: SÓ O CHECK QUASE NÃO APARECIA (PRINCIPALMENTE NO ESCURO). GANHA FUNDO E TEXTO
-                                        //PRIMARY (E NEGRITO), MESMO COM O MOUSE/TECLADO SOBRE ELA (data-selected DO cmdk).
-                                        //HOVER DAS OUTRAS: NO CLARO O PADRÃO DO TEMA; NO ESCURO SEM FUNDO, SÓ O TEXTO EM AZUL
-                                        className={cn(
-                                            'cursor-pointer',
-                                            estaSelecionado(option)
-                                                ? 'bg-primary-light text-primary font-semibold data-[selected=true]:bg-primary-light data-[selected=true]:text-primary'
-                                                : 'dark:data-[selected=true]:bg-transparent dark:data-[selected=true]:text-primary'
-                                        )}
-                                    >
-                                        <Check className={cn('shrink-0', estaSelecionado(option) ? 'opacity-100 text-primary' : 'opacity-0')} />
-                                        <LabelComCor option={option} quebra corExtra={corExtra} />
-                                        {option.removable && onRemoveOption && (
-                                            <button
-                                                type="button"
-                                                aria-label={`Remover "${option.label}"`}
-                                                title="Remover"
-                                                className="ms-auto flex size-5 shrink-0 items-center justify-center rounded text-gray-500 hover:bg-gray-200 hover:text-danger"
-                                                //O cmdk SELECIONA O ITEM NO pointerdown/click: O X NÃO PODE MARCAR A OPÇÃO
-                                                onPointerDown={(e) => { e.preventDefault(); e.stopPropagation() }}
-                                                onClick={(e) => { e.preventDefault(); e.stopPropagation(); confirmaRemocao(option) }}
-                                            >
-                                                <X className="size-3.5" />
-                                            </button>
-                                        )}
-                                    </CommandItem>
+                                {comChaves(options, (option) => option.value).map(({ item: option, chave }) => (
+                                    <OpcaoDoCombobox
+                                        key={chave}
+                                        option={option}
+                                        valorDoCmdk={chave}
+                                        selecionada={estaSelecionado(option)}
+                                        corExtra={corExtra}
+                                        onEscolher={escolhe}
+                                        onRemover={onRemoveOption ? confirmaRemocao : null}
+                                    />
                                 ))}
 
                                 {podeCriar && (

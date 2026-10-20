@@ -1,8 +1,9 @@
 import { useEffect, useRef } from 'react'
 import { cn } from '@/lib/utils'
 import { cleanUrl } from '@/utils/urlHelper'
+import { comChaves } from '@/utils/chavesUnicas'
 
-const Tabs = ({ activeTab, setActiveTab, className, tabs }) => {
+const Tabs = ({ className, tabs }) => {
 
     const containerRef = useRef(null)
 
@@ -35,7 +36,7 @@ const Tabs = ({ activeTab, setActiveTab, className, tabs }) => {
                 'overflow-x-auto overflow-y-hidden [scrollbar-width:thin]'
             )}
         >
-            {tabs?.map((tab, i) => {
+            {comChaves(tabs, (tab) => `${tab.url || ''}|${tab.categoria || ''}|${tab.content}`).map(({ item: tab, chave }) => {
 
                 const isInvalidUrl = !tab.url || tab.url === 'javascript:;'
 
@@ -43,7 +44,7 @@ const Tabs = ({ activeTab, setActiveTab, className, tabs }) => {
                 if (tab.onClick) {
                     return (
                         <button
-                            key={i}
+                            key={chave}
                             type="button"
                             className={`tab shrink-0 whitespace-nowrap${tab.ativa ? ' active' : ''}`}
                             onClick={tab.onClick}
@@ -55,14 +56,15 @@ const Tabs = ({ activeTab, setActiveTab, className, tabs }) => {
 
                 return isInvalidUrl ? (
                     <button
-                        key={i}
+                        key={chave}
+                        type="button"
                         className={`active tab shrink-0 whitespace-nowrap`}
                     >
                         {tab.content}
                     </button>
                 ) : (
                     <a
-                        key={i}
+                        key={chave}
                         className={`tab shrink-0 whitespace-nowrap`}
                         href={cleanUrl(tab.url)}
                         target={tab.target ?? '_self'}

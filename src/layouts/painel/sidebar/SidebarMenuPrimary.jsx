@@ -11,7 +11,12 @@
     import { OldIcon } from '@/components/legacy/OldIcon'
     import { SidebarEditorTree } from './SidebarEditorTree'
     import { useMemo } from 'react'
-    import { DestaqueBusca, normalizarBusca } from '@/utils/buscaSidebar'
+    import { DestaqueBusca } from './DestaqueBusca'
+    import { normalizarBusca } from '@/utils/normalizarBusca'
+    import { comChaves } from '@/utils/chavesUnicas'
+
+    //CHAVE DO ITEM PELO LINK (OU PELO TÍTULO, NOS GRUPOS SEM LINK)
+    const chaveDoItem = (item) => item.path || item.title
 
     const iconeDoItem = iconeDoMenu
 
@@ -71,17 +76,19 @@
 
         const buildMenu = (items) => {
 
-            return items?.main.map((item, index) => {
+            return comChaves(items?.main, chaveDoItem).map(({ item, chave }) => {
 
                 if (!item.heading && !item.disabled && item.title != 'Dashboards') {
-                    return buildMenuItemRoot(item, index, 0)
+                    return buildMenuItemRoot(item, chave, 0)
                 }
+
+                return null
 
             })
 
         }
 
-        const buildMenuItemRoot = (item, index, level) => {
+        const buildMenuItemRoot = (item, chave, level) => {
 
             var icon = iconeDoItem(item)
 
@@ -89,7 +96,7 @@
 
                 //COM BUSCA O GRUPO REMONTA (key) JÁ ABERTO (open SÓ VALE NA MONTAGEM); SEM BUSCA VOLTA AO NORMAL
                 return (
-                    <MenuItem key={termo ? 'busca-' + index : index} toggle="accordion" trigger="click" open={!!item.aberto}>
+                    <MenuItem key={termo ? 'busca-' + chave : chave} toggle="accordion" trigger="click" open={!!item.aberto}>
                         <MenuLink className="gap-2.5 py-2 px-2.5 rounded-md border border-transparent">
                             <MenuIcon className="items-start text-gray-600 text-lg menu-item-here:text-gray-800 menu-item-show:text-gray-800 menu-link-hover:text-gray-800 dark:menu-item-here:text-gray-900 dark:menu-item-show:text-gray-900 dark:menu-link-hover:text-gray-900">
                                 <OldIcon icon={icon} />
@@ -105,7 +112,7 @@
                                 subIndetion[level]
                             )}
                         >
-                            {buildMenuItemChildren(item.children, index, level + 1)}
+                            {buildMenuItemChildren(item.children, level + 1)}
                         </MenuSub>
                     </MenuItem>
                 )
@@ -119,7 +126,7 @@
                 }
 
                 return (
-                    <MenuItem key={index} className={className}>
+                    <MenuItem key={chave} className={className}>
                         <MenuLink
                             path={item.path}
                             className={clsx(
@@ -141,19 +148,13 @@
 
         }
 
-        const buildMenuItemChildren = (items, index, level = 0) => {
+        const buildMenuItemChildren = (items, level = 0) => {
 
-            return items.map((item, index) => {
-
-                if (!item.disabled) {
-                    return buildMenuItemChild(item, index, level)
-                }
-
-            })
+            return comChaves(items, chaveDoItem).map(({ item, chave }) => (item.disabled ? null : buildMenuItemChild(item, chave, level)))
 
         }
 
-        const buildMenuItemChild = (item, index, level = 0) => {
+        const buildMenuItemChild = (item, chave, level = 0) => {
 
             var icon = iconeDoItem(item)
 
@@ -161,7 +162,7 @@
 
                 return (
                     <MenuItem
-                        key={termo ? 'busca-' + index : index}
+                        key={termo ? 'busca-' + chave : chave}
                         toggle="accordion"
                         trigger="click"
                         open={!!item.aberto}
@@ -194,11 +195,7 @@
                                 !item.collapse && subIndetion[level]
                             )}
                         >
-                            {buildMenuItemChildren(
-                                item.children,
-                                index,
-                                item.collapse ? level : level + 1
-                            )}
+                            {buildMenuItemChildren(item.children, item.collapse ? level : level + 1)}
                         </MenuSub>
                     </MenuItem>
                 )
@@ -206,7 +203,7 @@
             } else {
 
                 return (
-                    <MenuItem key={index}>
+                    <MenuItem key={chave}>
                         <MenuLink
                             path={item.path}
                             className="py-2 px-2.5 rounded-md border border-transparent menu-item-active:border-gray-200 menu-item-active:bg-light menu-link-hover:bg-light menu-link-hover:border-gray-200"

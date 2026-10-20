@@ -29,6 +29,11 @@ export default [
             ...react.configs['jsx-runtime'].rules,
             ...reactHooks.configs.recommended.rules,
             'react/jsx-no-target-blank': 'off',
+            //O PAINEL NÃO USA PropTypes: AS PROPS VÊM DA PONTE (DADOS DINÂMICOS). A REGRA SÓ GERAVA CENTENAS DE ERROS
+            //E ESCONDIA OS REAIS
+            'react/prop-types': 'off',
+            //ATRIBUTO QUE O cmdk LÊ NO CSS DO COMMAND (components/ui/command.jsx, PADRÃO DO shadcn)
+            'react/no-unknown-property': ['error', { ignore: ['cmdk-input-wrapper'] }],
             'react-refresh/only-export-components': [
                 'warn',
                 { allowConstantExport: true },

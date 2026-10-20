@@ -1,4 +1,4 @@
-    import { useEffect, useRef } from 'react'
+    import { useEffect, useLayoutEffect, useRef } from 'react'
     import { useNavigate } from 'react-router-dom'
     import { useConfirm } from '@/components/ui/confirm-dialog'
     import { applyLegacyRedirect } from '@/utils/legacyRedirect'
@@ -25,7 +25,9 @@
 
         //AS FUNÇÕES GLOBAIS FICAM FIXAS; O QUE MUDA ENTRE RENDERS ENTRA PELA REF
         const atual = useRef({ confirm, navigate })
-        atual.current = { confirm, navigate }
+        useLayoutEffect(() => {
+            atual.current = { confirm, navigate }
+        })
 
         useEffect(() => {
 

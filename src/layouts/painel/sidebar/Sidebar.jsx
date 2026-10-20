@@ -1,9 +1,7 @@
-    /* eslint-disable react-hooks/exhaustive-deps */
     import { useEffect, useRef, useState } from 'react'
-    import { useResponsive, useViewport } from '@/hooks'
+    import { useResponsive } from '@/hooks'
     import { usePanelLayout } from '../'
     import { SidebarHeader, SidebarMenu, SidebarFooter } from './'
-    import { getHeight } from '@/utils'
     import { usePathname } from '@/providers'
     import { Sheet, SheetContent, SheetDescription, SheetHeader, SheetTitle } from '@/components/ui/sheet'
 
@@ -13,12 +11,9 @@
         const footerRef                                   = useRef(null)
         const desktopMode                                 = useResponsive('up', 'lg')
         const { pathname, prevPathname }                  = usePathname()
-        const [viewportHeight]                            = useViewport()
         const { mobileSidebarOpen, setMobileSidebarOpen } = usePanelLayout()
-        const [ scrollableHeight, setScrollableHeight]    = useState(0)
         const [ search, setSearch ]                       = useState('')
         
-        const scrollableOffset = 0
 
         const handleMobileSidebarClose = () => {
             setMobileSidebarOpen(false)
@@ -36,7 +31,6 @@
                     />
 
                     <SidebarMenu 
-                        height={scrollableHeight} 
                         search={search}
                         setSearch={setSearch}
                     />
@@ -50,19 +44,11 @@
 
         useEffect(() => {
 
-            const availableHeight = viewportHeight - 250
-
-            setScrollableHeight(availableHeight)
-
-        }, [viewportHeight])
-
-        useEffect(() => {
-
             if (!desktopMode && prevPathname !== pathname) {
-                handleMobileSidebarClose()
+                setMobileSidebarOpen(false)
             }
 
-        }, [desktopMode, pathname, prevPathname])
+        }, [desktopMode, pathname, prevPathname, setMobileSidebarOpen])
 
         if (desktopMode) {
             return renderContent()

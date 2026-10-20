@@ -1,4 +1,4 @@
-    import { createContext, useContext, useEffect, useState, useCallback, useMemo, useRef } from 'react'
+    import { createContext, useContext, useEffect, useLayoutEffect, useState, useCallback, useMemo, useRef } from 'react'
     import { useSearchParams, useNavigate } from 'react-router-dom'
     import { api } from '@/services/api'
     import { buildApiUrl } from '@/utils/urlHelper'
@@ -22,14 +22,24 @@
         const [searchParams]          = useSearchParams();
         const [redirecting, setRedirecting] = useState(false);
         const { logout }              = useAuth();
-        const navigate                = useNavigate();
+        const navigateAtual           = useNavigate();
+
+        //callApi E O EFFECT DA URL FICAM FIXOS (UMA CHAMADA POR MUDANÇA DE URL); navigate/logout ATUAIS ENTRAM PELA REF
+        const rotasRef = useRef({ navigate: navigateAtual, logout });
+        useLayoutEffect(() => {
+            rotasRef.current = { navigate: navigateAtual, logout };
+        }, [navigateAtual, logout]);
+        const navigate = useCallback((...args) => rotasRef.current.navigate(...args), []);
 
         //MODO DE EDIÇÃO DO SITE: A SIDEBAR MOSTRA A ÁRVORE DO PROJETO (panel/menus). O MENU É RECARREGADO AO LIGAR/DESLIGAR
         //O MODO (?pag=ativar-modulo-edicao) E, COM ELE LIGADO, NAS TELAS DO PROJETO — PÁGINA/SECTION/BACK-END NOVOS
         //APARECEM NA ÁRVORE, COMO NO LEGADO (QUE MONTAVA O MENU A CADA CARREGAMENTO)
         const { fetchMenu, getMenuConfig } = useMenus();
         const menusRef = useRef({ fetchMenu, editor: false });
-        menusRef.current = { fetchMenu, editor: Boolean(getMenuConfig('primary')?.editor) };
+        const menuEditor = Boolean(getMenuConfig('primary')?.editor);
+        useLayoutEffect(() => {
+            menusRef.current = { fetchMenu, editor: menuEditor };
+        }, [fetchMenu, menuEditor]);
 
         //SEM DEDUPLICAÇÃO POR URL: O ANTIGO "if (urlApi === lastUrl) return" NUNCA FUNCIONOU (lastUrl FICAVA
         //PRESO NO null DO PRIMEIRO RENDER DENTRO DO useCallback) — E OS REFRESHS APÓS EXCLUIR/ALTERAR
@@ -99,8 +109,6 @@
                         }
                     })
 
-                    setLoading(false)
-
                     return
 
                 }
@@ -130,16 +138,15 @@
                 setError(err)
 
                 if (err.status == 401 && getAuthToken() === tokenUsado) {
-                    logout()
+                    rotasRef.current.logout()
                 }
 
             } finally {
-                if (!redirecionou) {
-                    setLoading(false)
-                }
+                //REDIRECIONOU: O LOADER CONTINUA (true) ATÉ A PRÓXIMA URL CARREGAR
+                setLoading(redirecionou)
             }
 
-        }, [])
+        }, [navigate])
 
         //TELA ANTERIOR (QUERY STRING) PARA O ?pag=ativar-modulo-edicao VOLTAR A ELA (ex.: A SECTION ABERTA) EM VEZ DE CAIR NA
         //LISTA DE PÁGINAS. NO PAINEL ANTIGO O CARTÃO USA O REFERER; AQUI A URL JÁ MUDOU QUANDO A API É CHAMADA, ENTÃO VAI EM &voltar=
@@ -192,22 +199,11 @@
 
                 return;
 
-            } else if (urlApi === '/panel/module?slug=planos') {
-
-                let pageData = {
-                    layout: 'plans',
-                }
-
-                setPageData(pageData)
-                setLoading(false)
-
-                return;
-
             }
 
             callApi(urlApi)
 
-        }, [ searchParams ])
+        }, [ searchParams, navigate, callApi ])
 
         const value = useMemo(
             () => ({ pageData, loading, error, callApi, redirecting }),

@@ -1,6 +1,7 @@
     import { useEffect, useRef } from 'react'
     import { toast } from 'sonner'
     import { limparGlobal } from '@/utils/limparGlobal'
+    import { HIDDEN_DO_CARTAO, modoDoEditor, definirEditorReal, soltarEditorReal } from './editorGlobal'
     import { recarregarSeVersaoNova } from '@/utils/versaoNova'
 
     // EDITOR DE CÓDIGO (ACE) PARA CAMPOS Txt QUE O index.php LEGADO TRANSFORMAVA EM EDITOR (index.php:573-610:
@@ -9,80 +10,12 @@
     // NO TxtConteudo, TAMBÉM EM HdnConteudo — O JS DO CARTÃO (QUE A API NÃO MANDA) COPIAVA O EDITOR PARA ESSE HIDDEN
     // ANTES DO ENVIO, E O forms() DE CARTÕES COMO projetos-paginas-sections-css/-js LÊ $_POST['HdnConteudo']
 
-    //PÁGINAS E CAMPOS COM EDITOR NO LEGADO
-    const PAGINAS_COM_ACAO = ['modulos', 'modulos-versoes', 'planos-itens', 'componentes', 'projetos-paginas-sections', 'actions-pages', 'formulario-webhooks', 'commerce-custom-css', 'paginas-avulsas', 'planos-comerciais']
-    const PAGINAS_SEMPRE   = ['projetos-paginas-sections-js', 'projetos-paginas-sections-css', 'projetos-css-padrao', 'actions-pages', 'configuracoes-core', 'projeto-404']
-    const CAMPOS           = ['TxtConteudo', 'TxtConteudoFinal', 'TxtConteudo_json', 'TxtConteudo_js']
-
-    //HIDDEN QUE O prePost DO CARTÃO LÊ (O JS DO CARTÃO COPIAVA O EDITOR PARA ELE ANTES DO ENVIO). TxtConteudo_js: JS DO
-    //PROJETO NA FOLHA DE ESTILO (projetos-css-padrao, $post['HdnConteudo_js'])
-    const HIDDEN_DO_CARTAO = { TxtConteudo: 'HdnConteudo', TxtConteudo_js: 'HdnConteudo_js' }
-
     //IMPORT FIXO POR LINGUAGEM: O VITE NÃO RESOLVE import() COM VARIÁVEL EM PACOTE DO node_modules
     const CARREGAR_MODO = {
         css: () => import('ace-builds/src-noconflict/mode-css'),
         javascript: () => import('ace-builds/src-noconflict/mode-javascript'),
         json: () => import('ace-builds/src-noconflict/mode-json'),
         php: () => import('ace-builds/src-noconflict/mode-php'),
-    }
-
-    const temEditorDeCodigo = (fieldName) => {
-        if (!CAMPOS.includes(fieldName)) return false
-        const params = new URLSearchParams(window.location.search)
-        const pag    = params.get('pag') || params.get('slug') || ''
-        return PAGINAS_SEMPRE.includes(pag) || (PAGINAS_COM_ACAO.includes(pag) && (params.get('acao') || '') !== '')
-    }
-
-    //LINGUAGEM PELA PÁGINA (O JS DE CADA CARTÃO TROCAVA O MODO DO ACE)
-    const modoDoEditor = (fieldName) => {
-        if (fieldName === 'TxtConteudo_json') return 'json'
-        if (fieldName === 'TxtConteudo_js') return 'javascript'
-        const params = new URLSearchParams(window.location.search)
-        const pag    = params.get('pag') || params.get('slug') || ''
-        if (/-js$/.test(pag)) return 'javascript'
-        if (/css/.test(pag) || pag === 'projeto-404') return 'css'
-        if (PAGINAS_SEMPRE.includes(pag)) return 'javascript'
-        return 'php'
-    }
-
-    // window.editor PROVISÓRIO: O JS DO CARTÃO (ex.: projetos-paginas-sections-css/-js) RODA NO $(function(){...}) E JÁ CHAMA
-    // editor.session.setOptions(...), juntaConteudos() USA editor.getSession().getValue() — NO LEGADO O index.php CRIAVA O
-    // ACE ANTES. AQUI O ACE CARREGA DEPOIS (CHUNK SOB DEMANDA), ENTÃO ATÉ ELE FICAR PRONTO AS CHAMADAS CAEM NUMA SESSÃO
-    // RESERVA (SEM "editor is not defined"); DEPOIS DISSO TUDO VAI PARA O EDITOR REAL
-    let editorReal   = null
-    let valorReserva = ''
-
-    const sessaoReserva = {
-        setOptions() {},
-        setMode() {},
-        setUseWorker() {},
-        on() {},
-        getValue: () => valorReserva,
-        setValue: (texto) => { valorReserva = String(texto ?? '') },
-        getLength: () => valorReserva.split('\n').length,
-    }
-
-    const editorGlobal = new Proxy({}, {
-        get(_, prop) {
-            if (editorReal) {
-                const valor = editorReal[prop]
-                return typeof valor === 'function' ? valor.bind(editorReal) : valor
-            }
-            if (prop === 'session') return sessaoReserva
-            if (prop === 'getSession') return () => sessaoReserva
-            return () => {}
-        },
-    })
-
-    //CHAMADO PELO FormContext (useLayoutEffect, ANTES DO <script> DO CARTÃO) QUANDO O FORMULÁRIO TEM CAMPO DE CÓDIGO
-    const instalarEditorGlobal = () => {
-        if (window.editor && window.editor !== editorGlobal) return () => {}
-        window.editor = editorGlobal
-        return () => {
-            editorReal = null
-            valorReserva = ''
-            limparGlobal('editor', editorGlobal)
-        }
     }
 
     const FormCodeEditor = ({ fieldName, value, onChange }) => {
@@ -99,6 +32,7 @@
 
             let destruido  = false
             let observador = null
+            let remedicao  = null
 
             ;(async () => {
 
@@ -131,8 +65,8 @@
                     })
 
                     editorRef.current = editor
-                    if (fieldName === 'TxtConteudo') editorReal = editor
-                    setTimeout(() => !destruido && editor.resize(true), 300)
+                    if (fieldName === 'TxtConteudo') definirEditorReal(editor)
+                    remedicao = setTimeout(() => !destruido && editor.resize(true), 300)
 
                     //EDITOR QUE NASCE ESCONDIDO (ABA DE CATEGORIA FECHADA) FICA SEM TAMANHO: AO APARECER, REMEDE
                     if (typeof ResizeObserver !== 'undefined') {
@@ -176,12 +110,13 @@
 
             return () => {
                 destruido = true
+                clearTimeout(remedicao)
                 observador?.disconnect()
                 if (fieldName === 'TxtConteudo') {
                     limparGlobal('addMediaTablet')
                     limparGlobal('addMediaMobile')
                 }
-                if (editorReal === editorRef.current) editorReal = null
+                soltarEditorReal(editorRef.current)
                 editorRef.current?.destroy()
                 editorRef.current = null
             }
@@ -218,4 +153,4 @@
 
     }
 
-    export { FormCodeEditor, temEditorDeCodigo, instalarEditorGlobal }
+    export { FormCodeEditor }

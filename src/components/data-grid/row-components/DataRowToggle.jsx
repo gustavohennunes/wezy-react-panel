@@ -1,16 +1,19 @@
-import { useEffect, useState } from 'react'
+import { useState } from 'react'
 
 // TOGGLE DE STATUS DA LISTAGEM (equivalente ao altStt() do painel-php).
 // Atualização otimista: troca na hora e reverte se o backend recusar (handleToggle devolve false).
-export const DataRowToggle = ({ row, fullRow, handleToggle }) => {
+export const DataRowToggle = ({ row, handleToggle }) => {
 
     const [toggleState, setToggleState] = useState(row.content)
     const [salvando, setSalvando]       = useState(false)
 
-    // MANTÉM SINCRONIZADO QUANDO A LISTAGEM É RECARREGADA (troca de página, busca, refresh)
-    useEffect(() => {
+    // MANTÉM SINCRONIZADO QUANDO A LISTAGEM É RECARREGADA (troca de página, busca, refresh) — DURANTE O RENDER,
+    // SEM UM FRAME COM O STATUS ANTIGO
+    const [conteudoAnterior, setConteudoAnterior] = useState(row.content)
+    if (row.content !== conteudoAnterior) {
+        setConteudoAnterior(row.content)
         setToggleState(row.content)
-    }, [row.content])
+    }
 
     const handleToggleItem = async () => {
 

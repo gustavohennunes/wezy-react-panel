@@ -68,8 +68,9 @@
             if (multiple) {
 
                 novo.forEach(garanteOpcao)
+                const escolhidos = new Set(novo)
                 Array.from(select.options).forEach((option) => {
-                    option.selected = novo.includes(option.value)
+                    option.selected = escolhidos.has(option.value)
                 })
 
             } else {

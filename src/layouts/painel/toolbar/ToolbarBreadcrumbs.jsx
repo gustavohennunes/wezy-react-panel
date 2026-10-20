@@ -3,14 +3,14 @@ import { useMenuBreadcrumbs } from '@/components'
 import { Link } from 'react-router-dom'
 import { useMenus } from '@/providers'
 import { useLocation } from 'react-router'
-const ToolbarBreadcrumbs = ({ title = '' }) => {
+const ToolbarBreadcrumbs = () => {
     const { getMenuConfig } = useMenus()
     const { pathname } = useLocation()
     const items = useMenuBreadcrumbs(pathname, getMenuConfig('primary'))
     return (
         <div className="flex items-center gap-1 text-sm font-normal">
             {items.map((item, index) => (
-                <Fragment key={index}>
+                <Fragment key={`${item.path || ''}|${item.title}`}>
                     {item.path ? (
                         <Link
                             to={item.path}

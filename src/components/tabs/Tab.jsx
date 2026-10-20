@@ -1,4 +1,4 @@
-import React, { forwardRef } from 'react'
+import { forwardRef } from 'react'
 import { Tab as MuiTab } from '@mui/base/Tab'
 import clsx from 'clsx'
 
@@ -20,4 +20,5 @@ const Tab = forwardRef((props, ref) => {
         />
     )
 })
+Tab.displayName = 'Tab'
 export { Tab }

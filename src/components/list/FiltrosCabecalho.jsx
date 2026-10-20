@@ -1,4 +1,4 @@
-    import { useEffect, useState } from 'react'
+    import { useState } from 'react'
     import { useLocation, useNavigate } from 'react-router-dom'
     import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider'
     import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs'
@@ -91,10 +91,13 @@
 
         const [valores, setValores] = useState(() => valoresIniciais(campos))
 
-        //NOVA RESPOSTA DA API (FILTRO APLICADO, LIMPO OU OUTRA TELA): OS CAMPOS VOLTAM PARA OS VALORES QUE ELA MANDOU
-        useEffect(() => {
+        //NOVA RESPOSTA DA API (FILTRO APLICADO, LIMPO OU OUTRA TELA): OS CAMPOS VOLTAM PARA OS VALORES QUE ELA MANDOU.
+        //DURANTE O RENDER, NÃO NUM useEffect — SEM UM FRAME COM OS VALORES ANTERIORES
+        const [formularioAnterior, setFormularioAnterior] = useState(formulario)
+        if (formulario !== formularioAnterior) {
+            setFormularioAnterior(formulario)
             setValores(valoresIniciais(campos))
-        }, [formulario])
+        }
 
         const aoMudar = (name, valor) => {
             setValores((atuais) => ({ ...atuais, [name]: valor }))
@@ -163,6 +166,7 @@
                 case 'checkbox':
                     //COM options: GRUPO, VALOR EM ARRAY. SEM options: UM QUADRADINHO, '1' OU ''
                     if (campo.multiple) {
+                        const marcados = new Set(Array.isArray(valor) ? valor : [valor])
                         return (
                             <div key={name} className="flex flex-wrap items-center gap-x-4 gap-y-2 min-h-10">
                                 {(campo.options || []).map((opcao) => (
@@ -170,7 +174,7 @@
                                         <input
                                             type="checkbox"
                                             className="checkbox checkbox-sm"
-                                            checked={valor.includes(String(opcao.value))}
+                                            checked={marcados.has(String(opcao.value))}
                                             onChange={(event) => alternaNaLista(name, String(opcao.value), event.target.checked)}
                                         />
                                         {opcao.label}
@@ -187,6 +191,7 @@
                                 className="checkbox"
                                 checked={valor !== ''}
                                 onChange={(event) => aoMudar(name, event.target.checked ? '1' : '')}
+                                aria-label={campo.label || name}
                             />
                         </label>
                     )

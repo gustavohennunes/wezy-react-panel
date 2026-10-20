@@ -1,6 +1,6 @@
 import plugin from 'tailwindcss/plugin'
 
-export default plugin(({ addComponents, theme }) => {
+export default plugin(({ addComponents }) => {
     addComponents({
         '.rating': {
             display: 'inline-flex',

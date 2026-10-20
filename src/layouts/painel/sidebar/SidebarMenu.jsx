@@ -1,7 +1,7 @@
 
     import { SidebarMenuPrimary } from './'
 
-    const SidebarMenu = ({ height = 0, search, setSearch }) => {
+    const SidebarMenu = ({ search, setSearch }) => {
 
         return (
             <div

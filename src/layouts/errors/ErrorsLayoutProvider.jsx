@@ -1,4 +1,4 @@
-import { createContext, useContext, useEffect, useState } from 'react'
+import { createContext, useContext, useEffect, useMemo, useState } from 'react'
 import { deepMerge } from '@/utils'
 import { useLayout } from '@/providers'
 import { errorsLayoutConfig } from './ErrorsLayoutConfig'
@@ -31,13 +31,12 @@ const ErrorsLayoutProvider = ({ children }) => {
     // Effect to set the current layout whenever the layout state changes
     useEffect(() => {
         setCurrentLayout(layout) // Sets the layout context to the current layout configuration
-    })
+    }, [layout, setCurrentLayout])
+
+    const value = useMemo(() => ({ layout }), [layout]) // Providing the layout object to child components
+
     return (
-        <LayoutContext.Provider
-            value={{
-                layout, // Providing the layout object to child components
-            }}
-        >
+        <LayoutContext.Provider value={value}>
             {children}
         </LayoutContext.Provider>
     )

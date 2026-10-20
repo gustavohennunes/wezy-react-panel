@@ -1,5 +1,4 @@
 
-import React, { useState } from 'react'
 import { useDataGrid } from '.'
 import { ChevronRightIcon, ChevronLeftIcon } from 'lucide-react'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
@@ -9,7 +8,8 @@ import { cn } from '@/lib/utils'
 const DataGridPagination = () => {
 
     const { table, totalRows, props, loading } = useDataGrid()
-    const [useRowsPerPage, setUseRowsPerPage] = useState(false)
+    //SELETOR "por página" DESLIGADO NAS LISTAGENS DO PAINEL
+    const useRowsPerPage = false
 
     const btnBaseClasses = 'size-7 p-0 text-[13px]'
     const btnArrowClasses = btnBaseClasses + ' rtl:transform rtl:rotate-180'

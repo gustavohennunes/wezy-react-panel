@@ -3,8 +3,7 @@ import { DataRowToggle, DataRowActionsMenu, DataRowPicture } from '.'
 import { DataGridRowSelect } from '@/components'
 import { LegacyHtml } from '@/components/legacy/LegacyHtml'
 import { injectLegacyIconsCss } from '@/utils/legacyIcons'
-import { isLegacyUrl } from '@/utils/legacyBridge'
-import { cleanUrl } from '@/utils/urlHelper'
+import { tratarCliqueEmLinkDoLegado } from '@/components/legacy/cliqueEmLinkDoLegado'
 
 //CÉLULA COM HTML DO CARTÃO (ex.: COLUNA "Ações" MONTADA NO arrumaConteudo, COMO NO projetos-paginas-sections-backend)
 const CelulaHtml = ({ html, onRemoveItems }) => {
@@ -18,26 +17,15 @@ const CelulaHtml = ({ html, onRemoveItems }) => {
         injectLegacyIconsCss()
     }
 
-    //LINK ?pag=... DO CARTÃO NAVEGA PELO ROUTER (SEM RECARREGAR O PAINEL INTEIRO)
-    const aoClicar = (event) => {
-        if (event.defaultPrevented || event.button !== 0 || event.metaKey || event.ctrlKey || event.shiftKey || event.altKey) return
-        const link = event.target.closest?.('a[href]')
-        if (!link || (link.target && link.target !== '_self')) return
-        const href = link.getAttribute('href') || ''
-        const params = new URL(href, window.location.href).searchParams
-        if (params.has('excluir')) {
-            event.preventDefault()
-            event.stopPropagation()
-            onRemoveItems?.([params.get('excluir')])
-            return
-        }
-        if (!isLegacyUrl(href)) return
-        event.preventDefault()
-        const destino = cleanUrl(href)
-        navigate(destino.startsWith('?') || destino.startsWith('/') ? destino : '/' + destino)
-    }
-
-    return <div className="celula-html" onClick={aoClicar} dangerouslySetInnerHTML={{ __html: html }} />
+    //role="presentation": O div SÓ RECEBE O CLIQUE DOS LINKS DE DENTRO (DELEGAÇÃO), ELE MESMO NÃO É UM CONTROLE
+    return (
+        <div
+            role="presentation"
+            className="celula-html"
+            onClick={(event) => tratarCliqueEmLinkDoLegado(event, navigate, (ids) => onRemoveItems?.(ids))}
+            dangerouslySetInnerHTML={{ __html: html }}
+        />
+    )
 
 }
 

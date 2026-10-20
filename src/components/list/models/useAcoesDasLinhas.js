@@ -2,7 +2,7 @@
     import { useCallback, useLayoutEffect, useRef } from 'react'
     import { arrayMove } from '@dnd-kit/sortable'
     import { api } from '@/services/api'
-    import { buildApiUrl, buildSortListUrl } from '@/utils/urlHelper'
+    import { buildSortListUrl, buildToggleUrl } from '@/utils/urlHelper'
     import { avisoErro, avisoSucesso } from '@/utils/avisos'
 
     //A RESPOSTA DA PONTE COM status false (OU SEM RESPOSTA) É ERRO MESMO COM HTTP 200
@@ -65,11 +65,20 @@
             }
 
             try {
-                const response = await api.post(buildApiUrl(toggleAction.toString()))
-                avisoSucesso(response?.data?.success?.response?.data?.message || 'Status alterado com sucesso!')
+
+                const response  = await api.post(buildToggleUrl(toggleAction))
+                const resultado = response?.data?.success?.response
+
+                //REDIRECT DO CARTÃO (exit(loc(...)) ANTES DE A PONTE ALTERAR) TAMBÉM CHEGA COM HTTP 200: NADA FOI ALTERADO
+                if (respostaDeErro(resultado) || resultado?.data?.redirect || resultado?.redirect) {
+                    throw new Error(resultado?.message || resultado?.data?.message || '')
+                }
+
+                avisoSucesso(resultado?.data?.message || 'Status alterado com sucesso!')
                 return true
-            } catch {
-                avisoErro('Não foi possível alterar o status deste item')
+
+            } catch (err) {
+                avisoErro(err?.response?.data?.error?.message || err?.message || 'Não foi possível alterar o status deste item')
                 return false
             }
 

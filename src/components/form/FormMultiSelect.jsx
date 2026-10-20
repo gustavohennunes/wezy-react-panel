@@ -10,6 +10,9 @@
 
         const isTags = (fieldData.class || '').includes('select-tag')
 
+        //Mul DE TABELA COM A CLASSE mul-criar NO CARTÃO: ACEITA DIGITAR UMA OPÇÃO QUE AINDA NÃO EXISTE (CRIADA AO SALVAR)
+        const criaNaTabela = !isTags && (fieldData.class || '').includes('mul-criar')
+
         //MODO TAGS: A PONTE MANDA COMO OPÇÕES SÓ OS VALORES JÁ SALVOS NO REGISTRO (PanelModule, Mul SEM TABELA) —
         //TODOS PODEM SAIR PELO X DA LISTA; AO SALVAR, SAEM DO REGISTRO
         const opcoesIniciais = (dados) => (dados.options || []).map((option) => ({
@@ -31,13 +34,24 @@
             setSelected(selecionadasDe(initial))
         }
 
-        const handleChange = (values) => {
+        const handleChange = (valores) => {
+
+            let values = valores
+
+            //OPÇÃO NOVA NUM Mul DE TABELA COM mul-criar: VAI COMO "novo:<texto>" E A API CRIA O REGISTRO NA TABELA AO SALVAR
+            //(PanelRequest::criarOpcoesNovasMul). REMOVIDA DA SELEÇÃO ANTES DE SALVAR, NÃO É CRIADA
+            if (criaNaTabela) {
+                const existentes = new Set(options.map((option) => String(option.value)))
+                values = valores.map((value) => (existentes.has(value) ? value : `novo:${value}`))
+            }
 
             //TAG CRIADA PELO USUÁRIO ENTRA NA LISTA DE OPÇÕES PARA CONTINUAR APARECENDO NA BUSCA (COM O X, COMO AS SALVAS)
-            if (isTags) {
+            if (isTags || criaNaTabela) {
                 setOptions((prev) => {
                     const novas = values.filter((value) => !prev.some((option) => String(option.value) === value))
-                    return novas.length ? [...prev, ...novas.map((value) => ({ label: value, value, removable: true }))] : prev
+                    return novas.length
+                        ? [...prev, ...novas.map((value) => ({ label: value.replace(/^novo:/, ''), value, removable: true }))]
+                        : prev
                 })
             }
 
@@ -74,7 +88,7 @@
                     <Combobox
                         ariaLabel={title || undefined}
                         multiple
-                        creatable={isTags}
+                        creatable={isTags || criaNaTabela}
                         options={options}
                         value={selected}
                         onChange={handleChange}

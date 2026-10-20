@@ -69,6 +69,22 @@
 
     }
 
+    //TOGGLE DE STATUS DA LISTAGEM: A AÇÃO DA PONTE (?pag=x&toggle-status=status&id=1) POR CIMA DOS PARÂMETROS DA PÁGINA
+    //ATUAL — SEM O cliente/parametro DA TELA, CARTÕES COMO O formularios-campos REDIRECIONAM SEM ALTERAR NADA
+    export const buildToggleUrl = (action) => {
+
+        const params = new URLSearchParams(window.location.search)
+        params.delete('acao')
+        params.delete('excluir')
+
+        new URLSearchParams(cleanUrl(String(action)).replace(/^[^?]*\?/, '')).forEach((valor, chave) => {
+            params.set(chave, valor)
+        })
+
+        return buildApiUrl(params)
+
+    }
+
     export const updateTablePagination = async (params) => {
 
         const url = new URL(window.location.href)

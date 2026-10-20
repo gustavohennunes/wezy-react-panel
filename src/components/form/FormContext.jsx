@@ -26,7 +26,35 @@
     const prepararEnvioLegado = (form) => {
         if (form) {
             form.submit = () => form.dispatchEvent(new Event('submit', { bubbles: true, cancelable: true }))
+            acompanharObrigatorios(form)
         }
+    }
+
+    //CLASSE obg DO LEGADO = OBRIGATÓRIO (O painel.js VALIDA SÓ O QUE TEM obg NA HORA DO ENVIO). O JS DO CARTÃO TROCA obg POR
+    //obgOld/oldObg PARA DISPENSAR UM CAMPO QUE ESCONDEU (ex.: ITENS DO planos-comerciais) — O required DO REACT CONTINUAVA E O
+    //NAVEGADOR BLOQUEAVA O ENVIO SEM AVISO ("An invalid form control ... is not focusable"). AQUI O required SEGUE A CLASSE
+    const sincronizarObrigatorios = (form) => {
+        form.querySelectorAll('input, select, textarea').forEach((campo) => {
+            if (campo.classList.contains('obg')) {
+                if (campo.dataset.obgDispensado) {
+                    campo.required = true
+                    delete campo.dataset.obgDispensado
+                }
+            } else if (campo.required && (campo.classList.contains('obgOld') || campo.classList.contains('oldObg'))) {
+                campo.required = false
+                campo.dataset.obgDispensado = '1'
+            }
+        })
+    }
+
+    const acompanharObrigatorios = (form) => {
+
+        if (form.__obrigatoriosAcompanhados) return
+        form.__obrigatoriosAcompanhados = true
+
+        sincronizarObrigatorios(form)
+        new MutationObserver(() => sincronizarObrigatorios(form)).observe(form, { subtree: true, attributes: true, attributeFilter: ['class'] })
+
     }
 
     //LINHAS CONDICIONAIS (data-valid-xxx) DO FORMULÁRIO INTEIRO — VER FormSection

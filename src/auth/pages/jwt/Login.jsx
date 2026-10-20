@@ -12,6 +12,7 @@ import { useAuthContext } from '@/auth'
 import { useLayout } from '@/providers'
 import { Alert } from '@/components'
 import { lerVoltaAposLogin, limparVoltaAposLogin } from '@/auth/voltaAposLogin'
+import { getAuthToken } from '@/auth/_helpers'
 
 const loginSchema = Yup.object().shape({
     email: Yup.string()
@@ -32,7 +33,7 @@ const initialValues = {
 // destino: PARA ONDE IR DEPOIS DO LOGIN QUANDO A TELA NÃO VEM DO REDIRECT PARA /auth/login (VER RequireAuth)
 const Login = ({ destino }) => {
     const [loading, setLoading] = useState(false)
-    const { login } = useAuthContext()
+    const { login, auth, loading: verificandoSessao } = useAuthContext()
     const navigate = useNavigate()
     const location = useLocation()
     //VOLTA PARA A TELA QUE PEDIU O LOGIN COM A QUERY (?pag=...&acao=...). ANTES SÓ O pathname: NESTE PAINEL ELE É SEMPRE "/",
@@ -44,9 +45,36 @@ const Login = ({ destino }) => {
     const [paineis, setPaineis] = useState(null)
     const { currentLayout } = useLayout()
 
+    //JÁ LOGADO (ex.: A SESSÃO EXPIROU EM VÁRIAS ABAS E O LOGIN FOI FEITO EM OUTRA): O F5 NO /auth/login CONTINUAVA NO LOGIN.
+    //COM A SESSÃO VÁLIDA (DEPOIS DO verify, QUE LIMPA TOKEN INVÁLIDO) SEGUE PARA A TELA GUARDADA DESTA ABA, COMO APÓS O LOGIN.
+    //O ?a= (destino) JÁ TROCA SOZINHO PELO RequireAuth
+    useEffect(() => {
+        if (destino || verificandoSessao || !auth) return
+        limparVoltaAposLogin()
+        navigate(from, { replace: true })
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [auth, verificandoSessao, destino])
+
+    //LOGIN FEITO EM OUTRA ABA (O TOKEN APARECE NO localStorage): ESTA ABA SEGUE SOZINHA PARA A TELA GUARDADA, SEM PRECISAR DO F5.
+    //RECARREGA (E NÃO SÓ navigate) PARA O PROVIDER LER A SESSÃO NOVA E VALIDAR NO verify
+    useEffect(() => {
+        if (destino) return
+        const aoMudarStorage = () => {
+            if (getAuthToken()) {
+                limparVoltaAposLogin()
+                window.location.replace(from)
+            }
+        }
+        window.addEventListener('storage', aoMudarStorage)
+        return () => window.removeEventListener('storage', aoMudarStorage)
+    }, [destino, from])
+
     //DESLOGADO EM /auth/login (OU / -> /auth/login) SEM ?a=: ESQUECE O customer-host / customer-host-fixo DE UM ?a=
     //ANTERIOR — SENÃO O LOGIN IA DIRETO PARA AQUELE CLIENTE (panel/login) EM VEZ DO CENTRAL
+    //COM SESSÃO SALVA (LOGIN FEITO EM OUTRA ABA) NÃO APAGA: O customer-host É DO localStorage, COMPARTILHADO ENTRE AS ABAS, E
+    //É O PAINEL DAQUELE TOKEN. APAGADO, O F5 DESTA ABA VALIDAVA O TOKEN NO PAINEL ERRADO ("Token de sessão inválido")
     useEffect(() => {
+        if (getAuthToken()) return
         clearCustomerHostWithoutParam()
     }, [location.search])
 

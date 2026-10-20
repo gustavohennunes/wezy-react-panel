@@ -1,5 +1,6 @@
     import { createContext, useContext, useEffect, useLayoutEffect, useState, useCallback, useMemo, useRef } from 'react'
     import { useSearchParams, useNavigate } from 'react-router-dom'
+    import axios from 'axios'
     import { api } from '@/services/api'
     import { buildApiUrl } from '@/utils/urlHelper'
     import { toast } from 'sonner'
@@ -44,7 +45,16 @@
         //SEM DEDUPLICAÇÃO POR URL: O ANTIGO "if (urlApi === lastUrl) return" NUNCA FUNCIONOU (lastUrl FICAVA
         //PRESO NO null DO PRIMEIRO RENDER DENTRO DO useCallback) — E OS REFRESHS APÓS EXCLUIR/ALTERAR
         //DEPENDEM DE PODER CHAMAR A MESMA URL DE NOVO
+        //SÓ A ÚLTIMA CHAMADA VALE: AO NAVEGAR ANTES DE A TELA ANTERIOR RESPONDER, A REQUISIÇÃO ANTIGA É CANCELADA (LIBERA A
+        //CONEXÃO PARA A NOVA) E, SE A RESPOSTA DELA CHEGAR MESMO ASSIM, NÃO SOBRESCREVE A TELA NOVA NEM TIRA O LOADER
+        const chamadaAtualRef = useRef(null);
+
         const callApi = useCallback(async (urlApi) => {
+
+            chamadaAtualRef.current?.abort();
+            const chamada = new AbortController();
+            chamadaAtualRef.current = chamada;
+            const atual = () => chamadaAtualRef.current === chamada;
 
             setLoading(true);
 
@@ -58,13 +68,15 @@
             try {
                 
                 //Blob: O CARTÃO PODE DEVOLVER UM ARQUIVO (EXPORTAÇÃO, PDF, XML) EM VEZ DO JSON DA PONTE
-                const response = await api.get(urlApi, { responseType: 'blob' });
+                const response = await api.get(urlApi, { responseType: 'blob', signal: chamada.signal });
+                if (!atual()) return;
 
                 if (/[?&]slug=ativar-modulo-edicao(&|$)/.test(urlApi) || (menusRef.current.editor && /[?&]slug=projetos-paginas/.test(urlApi))) {
                     menusRef.current.fetchMenu();
                 }
 
                 const corpo = await lerRespostaApi(response);
+                if (!atual()) return;
                 if (corpo === null) {
 
                     //ARQUIVO BAIXADO: VOLTA PARA A TELA DE ONDE O LINK FOI CLICADO, COMO O NAVEGADOR FAZIA NO LEGADO
@@ -117,6 +129,8 @@
 
             } catch (err) {
 
+                if (!atual() || axios.isCancel(err)) return;
+
                 //COM responseType blob O CORPO DO ERRO TAMBÉM VEM COMO Blob
                 if (err?.response?.data instanceof Blob) {
                     err.response.data = await lerBlob(err.response.data);
@@ -143,7 +157,9 @@
 
             } finally {
                 //REDIRECIONOU: O LOADER CONTINUA (true) ATÉ A PRÓXIMA URL CARREGAR
-                setLoading(redirecionou)
+                if (atual()) {
+                    setLoading(redirecionou)
+                }
             }
 
         }, [navigate])
@@ -189,6 +205,10 @@
             }
 
             if (urlApi === false || urlApi === '/panel/module?slug=dashboard') {
+
+                //RESPOSTA DE UMA TELA ANTERIOR AINDA PENDENTE NÃO PODE TROCAR O DASHBOARD
+                chamadaAtualRef.current?.abort()
+                chamadaAtualRef.current = null
 
                 let pageData = {
                     layout: 'dashboard',

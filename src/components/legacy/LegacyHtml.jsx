@@ -7,6 +7,7 @@
     import { findLegacyRedirectDeep, applyLegacyRedirect } from '@/utils/legacyRedirect'
     import { isLegacyUrl, legacyUrlToApiUrl } from '@/utils/legacyBridge'
     import { executarScript } from './executarScript'
+    import { transformOldIcon } from '@/lib/transformOldIcon'
     import './legacy-fotos.css'
 
     // HTML MONTADO PELO PAINEL LEGADO (echo DO CARTÃO, framework/charts.php, funil.php, fotos.php, $cabecalhoPagina...).
@@ -51,6 +52,26 @@
             }
 
             container.innerHTML = html || ''
+
+            //ÍCONES DO SPRITE DO PAINEL ANTIGO (<div class="figura-black l2 c12">, ex.: "Atividades" E "Alterar" NOS CARTÕES DO
+            //FUNIL) VIRAM KEENICONS PELO MESMO MAPA DO MENU (transformOldIcon). O QUE SÓ TEM EQUIVALENTE NO lucide FICA NUM GENÉRICO
+            container.querySelectorAll('.figura-black, .figura-white, .figura-svg').forEach((sprite) => {
+                const icone = transformOldIcon(sprite.getAttribute('class'))
+                const novo  = document.createElement('i')
+                novo.className = `ki-filled ki-${icone.lib === 'keen' ? icone.icon : 'element-11'} legacy-sprite-icone`
+                novo.setAttribute('aria-hidden', 'true')
+
+                //TOOLTIP NO HOVER (data-tooltip, VER globals.css) COM O title DO LINK. SEM O title NATIVO, QUE DEMORA E FICARIA DUPLICADO
+                const link   = sprite.closest('a')
+                const titulo = link?.getAttribute('title') || link?.getAttribute('data-original-title') || ''
+                if (link && titulo) {
+                    link.setAttribute('data-tooltip', titulo)
+                    link.setAttribute('aria-label', titulo)
+                    link.removeAttribute('title')
+                }
+
+                sprite.replaceWith(novo)
+            })
 
             let cancelado = false
 

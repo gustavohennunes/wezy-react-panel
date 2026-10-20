@@ -728,12 +728,13 @@
                     footer={
                         visibleModels.length > 0 ? (
 
-                            <div data-pagination className="flex flex-col items-center gap-2">
+                            <div data-pagination className="flex flex-col items-center gap-3">
 
                                 {totalRegistros > visibleModels.length && (
                                     <button
                                         type="button"
-                                        className="btn btn-light btn-sm"
+                                        //leading-none + items-center: O line-height HERDADO DO RODAPÉ DEIXAVA O TEXTO MAIS PARA BAIXO DO QUE O CENTRO
+                                        className="btn btn-light btn-sm items-center justify-center leading-none"
                                         onClick={carregarMais}
                                         disabled={carregandoMais}
                                     >

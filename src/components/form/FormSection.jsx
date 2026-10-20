@@ -299,6 +299,22 @@
                 attributes[key] = aspasDuplas ?? aspasSimples ?? semAspas ?? '';
             }
 
+            //style="display:none; width:50%" DO CARTÃO (ex.: planos-comerciais DO 360): O React SÓ ACEITA style COMO OBJETO E O
+            //TEXTO DERRUBAVA O FORMULÁRIO INTEIRO (ERRO #62). VIRA { display: 'none', width: '50%' }; --var FICA COMO ESTÁ
+            if (typeof attributes.style === 'string') {
+                const estilo = {}
+                attributes.style.split(';').forEach((declaracao) => {
+                    const posicao = declaracao.indexOf(':')
+                    if (posicao < 1) return
+                    const propriedade = declaracao.slice(0, posicao).trim()
+                    const valor       = declaracao.slice(posicao + 1).trim()
+                    if (!propriedade || valor === '') return
+                    const chave = propriedade.startsWith('--') ? propriedade : propriedade.replace(/-([a-z])/g, (_, letra) => letra.toUpperCase())
+                    estilo[chave] = valor.replace(/\s*!important$/i, '')
+                })
+                attributes.style = estilo
+            }
+
             return attributes;
 
         };

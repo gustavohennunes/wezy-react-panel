@@ -103,16 +103,25 @@
 
         const [ formTabs, setFormTabs ]             = useState(null)
         const [ categoriaAtiva, setCategoriaAtiva ] = useState(null)
+        const params = new URLSearchParams(window.location.search)
+        const categoriaRetorno = params.get('pag') === 'projetos-css-padrao' ? params.get('category') : null
+        const [ categoriaRetornoAnterior, setCategoriaRetornoAnterior ] = useState(null)
+        const mudouCategoriaRetorno = categoriaRetorno !== categoriaRetornoAnterior
 
         //RECALCULADAS DURANTE O RENDER QUANDO CHEGA OUTRO data (SEM UM FRAME COM AS ABAS ANTERIORES)
         const [ dataDasAbas, setDataDasAbas ] = useState(null)
-        if (data !== dataDasAbas) {
+        if (data !== dataDasAbas || mudouCategoriaRetorno) {
             setDataDasAbas(data)
+            setCategoriaRetornoAnterior(categoriaRetorno)
             if (data?.buttons?.form) {
                 const { abas, categorias } = lerAbas(data.buttons.form)
                 setFormTabs(abas)
-                //ABRE NA PRIMEIRA ABA (O CARTÃO CHAMAVA openCategory('colors') AO CARREGAR); APÓS SALVAR CONTINUA NA MESMA
-                setCategoriaAtiva((atual) => (categorias.length === 0 ? null : categorias.includes(atual) ? atual : categorias[0]))
+                // Um novo retorno de criar/excluir prevalece sobre a seleção anterior.
+                // Atualizar os dados ao salvar continua preservando a aba escolhida.
+                setCategoriaAtiva((atual) => (categorias.length === 0 ? null
+                    : mudouCategoriaRetorno && categorias.includes(categoriaRetorno) ? categoriaRetorno
+                    : categorias.includes(atual) ? atual
+                    : categorias.includes(categoriaRetorno) ? categoriaRetorno : categorias[0]))
             }
         }
 

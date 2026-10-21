@@ -13,6 +13,7 @@
 
     //ORDEM INICIAL DO GRID (A PONTE JÁ MANDA AS LINHAS ORDENADAS)
     const ORDEM_INICIAL = [{ id: 'id', desc: false }]
+    const BUSCA_BACKENDS = { value: '', placeholder: 'Buscar backends' }
 
     //TUDO QUE FOI CARREGADO FICA EM UMA ÚNICA "PÁGINA" (TAMANHO GIGANTE DESDE O PRIMEIRO RENDER:
     //O DataGridProvider CAPTURA O pageSize NA MONTAGEM) — QUEM CONTROLA O CARREGAMENTO É O BOTÃO
@@ -45,7 +46,7 @@
         return Math.max(0, total - removidos)
     }
 
-    const Models = ({ model, columnHeader, btnAdd, search, btnExcluir, extraButton, pagination, tabs, content, sequence = false }) => {
+    const Models = ({ model, columnHeader, btnAdd, search, btnExcluir, extraButton, pagination, tabs, content, sequence = false, localSearch = false, hideUntilSearch = false }) => {
 
         const [ confirm, confirmDialog ]        = useConfirm()
         const [ models, setModels ]             = useState(model || [])
@@ -66,7 +67,8 @@
         const totalRegistros = totalDaListagem(pagination, model, removedIds.size)
 
         const { carregarMais, carregandoMais } = useCarregarMais(model, setModels)
-        const busca = useBuscaDaListagem({ search, models, visibleModels, totalRegistros })
+        const searchConfig = localSearch ? BUSCA_BACKENDS : search
+        const busca = useBuscaDaListagem({ search: searchConfig, models, visibleModels, totalRegistros, localOnly: localSearch })
         const { handleReorder, handleToggle } = useAcoesDasLinhas({ models, visibleModels, setModels, excluindo })
 
         const gridPagination = useMemo(
@@ -74,7 +76,7 @@
             [totalRegistros]
         )
 
-        const column = useMemo(() => criarColunas(columnHeader, { handleToggle, removeItems }), [columnHeader, handleToggle, removeItems])
+        const column = useMemo(() => criarColunas(columnHeader, { handleToggle, removeItems, destaque: busca.destaque }), [columnHeader, handleToggle, removeItems, busca.destaque])
 
         const handleRowSelection = (state, table) => {
             selectionTable.current = table
@@ -87,7 +89,7 @@
             <BarraDaListagem
                 tabs={tabs}
                 btnAdd={btnAdd}
-                search={search}
+                search={searchConfig}
                 searchInput={busca.searchInput}
                 setSearchInput={busca.setSearchInput}
                 onBuscar={busca.aplicaBusca}
@@ -107,9 +109,9 @@
 
                         {barra}
 
-                        <div className="card-body">
-                            <LegacyList html={legacyHtml} columnHeader={columnHeader} onRemoveItems={removeItems} />
-                        </div>
+                        {(!hideUntilSearch || busca.searchInput.trim()) && <div className="card-body">
+                            <LegacyList html={legacyHtml} columnHeader={columnHeader} onRemoveItems={removeItems} filtro={localSearch ? busca.searchInput : ''} />
+                        </div>}
 
                     </div>
                 </div>

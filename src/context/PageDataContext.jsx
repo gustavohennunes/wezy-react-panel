@@ -1,5 +1,5 @@
     import { createContext, useContext, useEffect, useLayoutEffect, useState, useCallback, useMemo, useRef } from 'react'
-    import { useSearchParams, useNavigate } from 'react-router-dom'
+    import { useSearchParams, useNavigate, useLocation } from 'react-router-dom'
     import axios from 'axios'
     import { api } from '@/services/api'
     import { buildApiUrl } from '@/utils/urlHelper'
@@ -24,6 +24,7 @@
         const [redirecting, setRedirecting] = useState(false);
         const { logout }              = useAuth();
         const navigateAtual           = useNavigate();
+        const location = useLocation();
 
         //callApi E O EFFECT DA URL FICAM FIXOS (UMA CHAMADA POR MUDANÇA DE URL); navigate/logout ATUAIS ENTRAM PELA REF
         const rotasRef = useRef({ navigate: navigateAtual, logout });
@@ -49,14 +50,14 @@
         //CONEXÃO PARA A NOVA) E, SE A RESPOSTA DELA CHEGAR MESMO ASSIM, NÃO SOBRESCREVE A TELA NOVA NEM TIRA O LOADER
         const chamadaAtualRef = useRef(null);
 
-        const callApi = useCallback(async (urlApi) => {
+        const callApi = useCallback(async (urlApi, { background = false } = {}) => {
 
             chamadaAtualRef.current?.abort();
             const chamada = new AbortController();
             chamadaAtualRef.current = chamada;
             const atual = () => chamadaAtualRef.current === chamada;
 
-            setLoading(true);
+            if (!background) setLoading(true);
 
             //REDIRECT DO CARTÃO (ex.: ?pag=analytics -> &acao=Dashboard): O LOADER CONTINUA ATÉ A PRÓXIMA URL CARREGAR.
             //SEM ISSO O finally TIRAVA O LOADER, A TELA ANTERIOR APARECIA POR UM INSTANTE E O LOADER VOLTAVA
@@ -221,9 +222,19 @@
 
             }
 
-            callApi(urlApi)
+            const contextoBusca = (query) => {
+                const params = new URLSearchParams(query)
+                params.delete('busca')
+                params.delete('pagina')
+                params.sort()
+                return params.toString()
+            }
+            const background = location.state?.buscaInstantanea === true
+                && searchParams.get('pag') === 'user-admin-restrito'
+                && contextoBusca(buscaAnterior) === contextoBusca(searchParams)
+            callApi(urlApi, { background })
 
-        }, [ searchParams, navigate, callApi ])
+        }, [ searchParams, navigate, callApi, location.state ])
 
         const value = useMemo(
             () => ({ pageData, loading, error, callApi, redirecting }),

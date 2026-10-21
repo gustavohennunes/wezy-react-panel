@@ -12,7 +12,7 @@
             : {}
 
     // CRIA AS COLUNAS DO GRID A PARTIR DO CABEÇALHO QUE A PONTE MANDA (list.header)
-    const criarColunas = (columnsData, { handleToggle, removeItems }) => {
+    const criarColunas = (columnsData, { handleToggle, removeItems, destaque }) => {
 
         if (!columnsData) return []
 
@@ -60,6 +60,7 @@
                         //que o DataRowContext envia (id, índice e a própria célula com o action)
                         handleToggle={handleToggle}
                         onRemoveItems={removeItems}
+                        destaque={destaque}
                     />
                 ),
                 meta: {

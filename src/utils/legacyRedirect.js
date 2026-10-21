@@ -140,7 +140,10 @@
             }
 
             if (navigate) {
-                navigate(destino.pathname + destino.search, { replace: true })
+                // this.href do HTML legado transforma index.php em URL absoluta.
+                // O router do React usa /?pag=..., sem a rota /index.php.
+                const interno = cleanUrl(destino.pathname + destino.search)
+                navigate(interno.startsWith('?') ? '/' + interno : interno, { replace: true })
             } else {
                 window.location.href = url
             }

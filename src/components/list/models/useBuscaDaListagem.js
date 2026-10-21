@@ -1,5 +1,5 @@
-    import { useMemo, useState } from 'react'
-    import { useNavigate } from 'react-router-dom'
+    import { useEffect, useMemo, useState } from 'react'
+    import { useLocation, useNavigate } from 'react-router-dom'
     import { contemTodasAsPalavras, textoDoHtml } from '@/utils/textSearch'
 
     const textoDaLinha = (linha) =>
@@ -8,9 +8,11 @@
             .join(' ')
 
     // BUSCA DA LISTAGEM: ENTER/LUPA BUSCA NO SERVIDOR (?busca=) E, COM TODAS AS LINHAS NA TELA, FILTRA AO DIGITAR
-    const useBuscaDaListagem = ({ search, models, visibleModels, totalRegistros }) => {
+    const useBuscaDaListagem = ({ search, models, visibleModels, totalRegistros, localOnly = false }) => {
 
         const navigate = useNavigate()
+        const location = useLocation()
+        const instantanea = new URLSearchParams(location.search).get('pag') === 'user-admin-restrito'
         const buscaAplicada = search?.value || ''
         const [ searchInput, setSearchInput ] = useState(buscaAplicada)
 
@@ -18,7 +20,7 @@
         const [ buscaAnterior, setBuscaAnterior ] = useState(search?.value)
         if (search?.value !== buscaAnterior) {
             setBuscaAnterior(search?.value)
-            setSearchInput(buscaAplicada)
+            if (!location.state?.buscaInstantanea) setSearchInput(buscaAplicada)
         }
 
         //FILTRO AO DIGITAR: ATUA SÓ NAS LINHAS JÁ CARREGADAS, SEM CHAMAR A API — POR ISSO SÓ LIGA QUANDO TODOS OS
@@ -29,6 +31,21 @@
         const todosCarregados = totalRegistros <= visibleModels.length
         const digitado        = searchInput.trim()
         const filtroLocal     = todosCarregados && digitado !== buscaAplicada.trim() ? digitado : ''
+
+        // Com paginação, consulta o servidor sem desmontar o campo nem perder o foco.
+        // Uma busca já aplicada também precisa consultar novamente ao ampliar/limpar o termo.
+        useEffect(() => {
+            if (!instantanea || search === false || (todosCarregados && !buscaAplicada)) return
+            const params = new URLSearchParams(location.search)
+            if ((params.get('busca') || '') === digitado) return
+            const timer = setTimeout(() => {
+                if (digitado) params.set('busca', digitado)
+                else params.delete('busca')
+                params.delete('pagina')
+                navigate({ search: '?' + params.toString() }, { replace: true, state: { buscaInstantanea: true } })
+            }, 300)
+            return () => clearTimeout(timer)
+        }, [instantanea, search, todosCarregados, buscaAplicada, digitado, location.search, navigate])
 
         const textoDasLinhas = useMemo(() => new Map(models.map((linha) => [linha, textoDaLinha(linha)])), [models])
 
@@ -41,6 +58,7 @@
         //searchParams E REFAZ A CHAMADA DA LISTAGEM. PARTE DA URL ATUAL (E NÃO DO search.action
         //DA PONTE) PARA NÃO PERDER PARÂMETROS DE CONTEXTO COMO O cliente
         const aplicaBusca = (termo) => {
+            if (localOnly) { setSearchInput(termo); return }
             const params = new URLSearchParams(window.location.search)
             if (termo) {
                 params.set('busca', termo)
@@ -57,7 +75,8 @@
             if (buscaAplicada !== '') aplicaBusca('')
         }
 
-        return { searchInput, setSearchInput, filtroLocal, linhasFiltradas, aplicaBusca, limparBusca }
+        const destaque = instantanea || localOnly ? digitado : ''
+        return { searchInput, setSearchInput, filtroLocal, linhasFiltradas, aplicaBusca, limparBusca, destaque }
 
     }
 

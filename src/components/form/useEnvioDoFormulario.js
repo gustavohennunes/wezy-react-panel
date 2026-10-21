@@ -50,19 +50,12 @@
         const [ loading, setLoading ] = useState(false)
 
         //DEPOIS DE SALVAR SEM REDIRECT DO CARTÃO
+        //PAINEL ANTIGO (framework/formulario.php): DEPOIS DE ALTERAR, VOLTA PARA O MESMO FORMULÁRIO; DEPOIS DE INSERIR, FICA NO
+        //acao=Inserir COM O FORMULÁRIO LIMPO PARA CADASTRAR OUTRO (ANTES O INSERIR VOLTAVA PARA A LISTAGEM). O RECARREGAMENTO
+        //PASSA PELO ScreenLoader, QUE DESMONTA O FORMULÁRIO — POR ISSO O INSERIR VOLTA VAZIO. PÁGINA SÓ DE FORMULÁRIO (SEM acao)
+        //TAMBÉM RECARREGA
         const seguirDepoisDeSalvar = (params) => {
 
-            if (params.get('acao') === 'Inserir') {
-                //INSERIR SEM REDIRECT DO CARD: VAI PARA A LISTAGEM PELA URL (O PageDataContext BUSCA OS DADOS)
-                params.delete('acao')
-                params.delete('id')
-                navigate({ search: '?' + params.toString() })
-                return
-            }
-
-            //PAINEL ANTIGO (framework/formulario.php): DEPOIS DE ALTERAR, VOLTA PARA O MESMO FORMULÁRIO.
-            //ANTES CARREGAVA A LISTAGEM COM A URL AINDA EM acao=Alterar (TIRAVA DO EDITOR DE MÓDULOS
-            //A CADA SALVAMENTO E O F5 REABRIA O FORMULÁRIO). PÁGINA SÓ DE FORMULÁRIO (SEM acao) TAMBÉM RECARREGA
             callApi(buildApiUrl(params))
 
         }

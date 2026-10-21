@@ -1,4 +1,6 @@
 import { useNavigate } from 'react-router-dom'
+import { useMemo } from 'react'
+import { destacarBuscaHtml, escaparHtml } from '@/utils/destacarBuscaHtml'
 import { DataRowToggle, DataRowActionsMenu, DataRowPicture } from '.'
 import { DataGridRowSelect } from '@/components'
 import { LegacyHtml } from '@/components/legacy/LegacyHtml'
@@ -6,9 +8,10 @@ import { injectLegacyIconsCss } from '@/utils/legacyIcons'
 import { tratarCliqueEmLinkDoLegado } from '@/components/legacy/cliqueEmLinkDoLegado'
 
 //CÉLULA COM HTML DO CARTÃO (ex.: COLUNA "Ações" MONTADA NO arrumaConteudo, COMO NO projetos-paginas-sections-backend)
-const CelulaHtml = ({ html, onRemoveItems }) => {
+const CelulaHtml = ({ html, onRemoveItems, destaque }) => {
 
     const navigate = useNavigate()
+    const conteudo = useMemo(() => destacarBuscaHtml(html, destaque), [html, destaque])
 
     //ÍCONES DO SPRITE DO PAINEL ANTIGO (<div class="icones"><div class="figura-black l4 c1">): O TAMANHO (16x16) E O
     //RECORTE VÊM DO /css/icons.css DO LEGADO. ELE SÓ ERA CARREGADO PELO MENU DE AÇÕES E PELO EDITOR — AQUI O ÍCONE FICAVA
@@ -23,13 +26,13 @@ const CelulaHtml = ({ html, onRemoveItems }) => {
             role="presentation"
             className="celula-html"
             onClick={(event) => tratarCliqueEmLinkDoLegado(event, navigate, (ids) => onRemoveItems?.(ids))}
-            dangerouslySetInnerHTML={{ __html: html }}
+            dangerouslySetInnerHTML={{ __html: conteudo }}
         />
     )
 
 }
 
-export const DataRowContext = ({ fullRow, row, index, handleToggle, onRemoveItems }) => {
+export const DataRowContext = ({ fullRow, row, index, handleToggle, onRemoveItems, destaque }) => {
     if (!row) return
 
     if (row.component === 'checkbox_delete') {
@@ -56,7 +59,7 @@ export const DataRowContext = ({ fullRow, row, index, handleToggle, onRemoveItem
         )
     } else if (row.component === 'html') {
         // RETORNA COMO TEXTO
-        return row.content || '-'
+        return destaque ? <CelulaHtml html={escaparHtml(row.content || '-')} destaque={destaque} /> : row.content || '-'
     }
 
     if (row.content) {
@@ -67,7 +70,7 @@ export const DataRowContext = ({ fullRow, row, index, handleToggle, onRemoveItem
             return <LegacyHtml html={row.content} />
         }
 
-        return <CelulaHtml html={row.content} onRemoveItems={onRemoveItems} />
+        return <CelulaHtml html={row.content} onRemoveItems={onRemoveItems} destaque={destaque} />
     }
 
     return row.content || '-'

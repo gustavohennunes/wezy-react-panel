@@ -89,7 +89,8 @@
 
         const params = new URLSearchParams(window.location.search)
         const textoDoBackend = (params.get('pag') || params.get('slug')) === 'projetos-paginas-sections-backend' &&
-            ['TxtContent', 'TxtDinamic_content'].every((nome) => data.fields.some((field) => (field.field?.name || field.name) === nome))
+            [['TxtContent', 'TxtDinamic_content'], ['FrmContent', 'FrmDinamic_content']].some((par) =>
+                par.every((nome) => data.fields.some((field) => (field.field?.name || field.name) === nome)))
 
         const atualiza = (name, value) => setFormState((prev) => textoDoBackend
             ? atualizarConteudoTextoBackend(prev, name, value)

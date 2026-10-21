@@ -57,12 +57,25 @@
 
     //TELA FORA DO MENU (ex.: CSS/JS/BACK-END DE CABEÇALHO, ?pag=projetos-paginas-sections-css): O ITEM A DESTACAR É O
     //MÓDULO MAIS PRÓXIMO NO BREADCRUMB QUE ESTÁ NO MENU ("Cabeçalho/Rodapé" = ?pag=projeto-header-footer), E O GRUPO DELE
-    //("Restrito") FICA ABERTO. TELA QUE ESTÁ NO MENU = '' (SEGUE A URL, COMO SEMPRE)
-    const moduloDoMenu = (items, moduloAtual, breadcrumbs) => {
+    //("Restrito") FICA ABERTO. CABEÇALHO/RODAPÉ TEM PRIORIDADE NAS ABAS DA SECTION, MESMO SE A ABA ESTÁ NO MENU.
+    const moduloDoMenu = (items, moduloAtual, breadcrumbs, paisDosModulos = {}) => {
 
-        if (!items || !moduloAtual || menuTemModulo(items, moduloAtual) || typeof breadcrumbs !== 'string') return ''
+        if (!items || !moduloAtual) return ''
 
-        const modulos = Array.from(breadcrumbs.matchAll(/href=["']([^"']*)["']/gi), ([, href]) => moduloDoLink(href))
+        const modulos = typeof breadcrumbs === 'string'
+            ? Array.from(breadcrumbs.matchAll(/href=["']([^"']*)["']/gi), ([, href]) => moduloDoLink(href))
+            : []
+
+        const abaDaSection = ['projetos-paginas-sections', 'projetos-paginas-sections-css', 'projetos-paginas-sections-js', 'projetos-paginas-sections-backend'].includes(moduloAtual)
+        if (abaDaSection && modulos.includes('projeto-header-footer') && menuTemModulo(items, 'projeto-header-footer')) {
+            return 'projeto-header-footer'
+        }
+
+        if (menuTemModulo(items, moduloAtual)) return ''
+
+        //SUBPÁGINAS COMO FORMULÁRIOS/WHATSAPP/LGPD DESTACAM FERRAMENTAS, PELOS VÍNCULOS DA ESTRUTURA DO CLIENTE.
+        const paiVisivel = (paisDosModulos[moduloAtual] || []).find((modulo) => menuTemModulo(items, modulo))
+        if (paiVisivel) return paiVisivel
 
         return modulos.reverse().find((modulo) => modulo && modulo !== moduloAtual && menuTemModulo(items, modulo)) || ''
 
@@ -253,7 +266,7 @@
         const { pageData } = usePageData() || {}
         const breadcrumbs  = pageData?.params?.breadcrumbs
         const moduloMenu   = useMemo(
-            () => moduloDoMenu(menuConfig?.main, moduloDaUrl(location.search), breadcrumbs),
+            () => moduloDoMenu(menuConfig?.main, moduloDaUrl(location.search), breadcrumbs, menuConfig?.module_parents),
             [menuConfig, location.search, breadcrumbs]
         )
 
@@ -268,10 +281,10 @@
                 <Menu
                     highlight={true}
                     multipleExpand={!!termo}
-                    className="flex flex-col w-full gap-1.5 px-3.5"
+                    className="flex min-w-0 flex-col w-full gap-1.5 px-3.5"
                 >
                     {menuFiltrado && menuFiltrado.main.length === 0 && (
-                        <span className="px-2.5 text-2sm text-gray-600">{`Nenhum menu com "${search.trim()}".`}</span>
+                        <span className="min-w-0 whitespace-normal [overflow-wrap:anywhere] px-2.5 text-2sm text-gray-600">{`Nenhum menu com "${search.trim()}".`}</span>
                     )}
                     {menuConfig && buildMenu(menuFiltrado || menuConfig)}
                 </Menu>

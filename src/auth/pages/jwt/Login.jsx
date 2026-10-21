@@ -96,11 +96,24 @@ const Login = ({ destino }) => {
         onSubmit: (values, { setStatus }) => handleLogin(values, setStatus),
     })
 
+    //ENTER COM E-MAIL/SENHA PREENCHIDOS PELO NAVEGADOR: O CHROME SÓ REPASSA O AUTOPREENCHIMENTO AO REACT DEPOIS DE UM CLIQUE
+    //NA PÁGINA, ENTÃO NO ENTER O FORMIK AINDA ESTAVA VAZIO E O LOGIN NÃO SAÍA (COM O CLIQUE NO BOTÃO FUNCIONAVA). AQUI OS
+    //VALORES VÊM DOS PRÓPRIOS CAMPOS ANTES DE ENVIAR
+    const enviar = async (event) => {
+        event.preventDefault()
+        const dados = new FormData(event.currentTarget)
+        await formik.setValues({
+            email: String(dados.get('email') ?? formik.values.email),
+            password: String(dados.get('password') ?? formik.values.password),
+        }, false)
+        formik.submitForm()
+    }
+
     return (
         <div className="card max-w-[390px] w-full">
             <form
                 className="card-body flex flex-col gap-5 p-10"
-                onSubmit={formik.handleSubmit}
+                onSubmit={enviar}
                 noValidate
             >
                 <LogoDoAcesso />

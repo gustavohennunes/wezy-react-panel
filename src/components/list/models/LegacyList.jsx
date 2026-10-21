@@ -5,6 +5,7 @@
     import { executarScript } from '@/components/legacy/executarScript'
     import { injectLegacyIconsCss } from '@/utils/legacyIcons'
     import { tratarCliqueEmLinkDoLegado } from '@/components/legacy/cliqueEmLinkDoLegado'
+    import { filtrarBackendsHtml } from '@/utils/backendSearch'
 
     // LISTAGEM MONTADA EM HTML PELO PRÓPRIO CARD ($novoResultadoInicial no painel-php).
     // A ponte entrega esse HTML em params.list.content; como são <tr> crus, não é possível
@@ -15,10 +16,11 @@
     //DEFAULT FORA DO COMPONENTE: UM [] NOVO A CADA RENDER INVALIDAVA O useMemo DAS COLUNAS
     const SEM_COLUNAS = []
 
-    const LegacyList = ({ html, columnHeader = SEM_COLUNAS, showHeader = true, onRemoveItems }) => {
+    const LegacyList = ({ html, columnHeader = SEM_COLUNAS, showHeader = true, onRemoveItems, filtro = '' }) => {
 
         const corpoRef = useRef(null)
         const navigate = useNavigate()
+        const htmlFiltrado = useMemo(() => filtrarBackendsHtml(html, filtro), [html, filtro])
 
         //ÍCONES DO SPRITE DO LEGADO NAS AÇÕES (<div class="icones"><div class="figura-black l4 c1">, ex.: "Alterar" DO
         //projetos-paginas-sections-backend): TAMANHO E RECORTE VÊM DO /css/icons.css DO PAINEL ANTIGO, QUE ESTA LISTAGEM
@@ -71,7 +73,7 @@
 
             setCelulasDeAcoes(encontradas)
 
-        }, [html])
+        }, [htmlFiltrado])
 
         //LINK ?pag=... DA LISTAGEM NAVEGA PELO ROUTER (VER tratarCliqueEmLinkDoLegado)
         const aoClicar = (event) => tratarCliqueEmLinkDoLegado(event, navigate)
@@ -134,7 +136,7 @@
 
                         )}
 
-                        <tbody ref={corpoRef} onClick={aoClicar} dangerouslySetInnerHTML={{ __html: html }} />
+                        <tbody ref={corpoRef} onClick={aoClicar} dangerouslySetInnerHTML={{ __html: htmlFiltrado }} />
 
                         {celulasDeAcoes.map((celula, indice) => createPortal(<DataRowActionsMenu row={celula.row} onRemoveItems={(ids) => onRemoveItems(ids, celula.element)} />, celula.host, `acoes-${indice}`))}
 

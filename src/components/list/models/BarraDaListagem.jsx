@@ -14,7 +14,7 @@
         }
 
         return (
-            <div className="flex flex-wrap gap-2 lg:gap-5">
+            <div className="ml-auto flex flex-wrap gap-2 lg:gap-5">
 
                 <form
                     id="form2"

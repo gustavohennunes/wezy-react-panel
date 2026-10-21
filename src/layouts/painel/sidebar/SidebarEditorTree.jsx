@@ -17,6 +17,8 @@
         const parametros = params.get('parametros') || ''
         const cliente    = params.get('cliente') || ''
 
+        //TUDO COMEÇA FECHADO; SÓ ABRE O CAMINHO DA TELA ATUAL. O "Cabeçalho e rodapé" (shared) ABRIA SEMPRE, A CADA TROCA DE
+        //TELA, MESMO FECHADO PELA SETA — AGORA SEGUE A MESMA REGRA DAS PÁGINAS
         const abertos = new Set()
         let atual = null
 
@@ -34,6 +36,7 @@
             //projetos-paginas-sections&parametro= SEM id) E "Ações/ajax" (actions-pages&cliente= — O CARTÃO MANDA O id DA
             //PÁGINA NO cliente). TODAS DESTACAM A PÁGINA COMO TELA ATUAL
             const telaDaPagina =
+                (page.shared && pag === 'projeto-header-footer' && id === '') ||
                 (pag === 'projetos-paginas' && id === page.id) ||
                 (pag === 'projetos-paginas-sections' && id === '' && parametro === page.id) ||
                 (pag === 'actions-pages' && cliente === page.id)
@@ -56,6 +59,7 @@
 
                 if (
                     (pag === 'projetos-paginas-sections' && id === section.id) ||
+                    (page.shared && pag === 'projeto-header-footer' && id === section.id) ||
                     (['projetos-paginas-sections-css', 'projetos-paginas-sections-js', 'projetos-paginas-sections-backend'].includes(pag) && parametros === section.id) ||
                     backendAtual
                 ) {
@@ -175,7 +179,19 @@
     const SidebarEditorTree = ({ editor, search = '' }) => {
 
         const location = useLocation()
-        const pages    = useMemo(() => editor?.pages || [], [editor])
+        const pages = useMemo(() => {
+            const globais = editor?.shared_sections || []
+            if (globais.length === 0) return editor?.pages || []
+
+            const idsGlobais = new Set(globais.map((section) => section.id))
+            return [
+                { id: 'header-footer', name: 'Cabeçalho e rodapé', shared: true, sections: globais },
+                ...(editor?.pages || []).map((page) => ({
+                    ...page,
+                    sections: page.sections.filter((section) => !idsGlobais.has(section.id)),
+                })),
+            ]
+        }, [editor])
 
         const { abertos: abertosDaUrl, atual, grupo } = useMemo(
             () => caminhosAbertos(pages, new URLSearchParams(location.search)),
@@ -223,6 +239,12 @@
                         <KeenIcon icon="arrow-left" className="text-sm" />
                         Voltar para modo normal
                     </Link>
+                    {/* NOVA PÁGINA SEM SAIR DO MODO DE EDIÇÃO. A ÁRVORE RECARREGA NAS TELAS projetos-paginas (PageDataContext),
+                        ENTÃO A PÁGINA CRIADA JÁ APARECE AQUI */}
+                    <Link to="/?pag=projetos-paginas&acao=Inserir" className="btn btn-sm btn-primary w-full min-w-0 justify-center gap-1.5">
+                        <KeenIcon icon="plus" className="text-sm" />
+                        Adicionar página
+                    </Link>
                 </div>
 
                 {pages.length === 0 && (
@@ -230,7 +252,7 @@
                 )}
 
                 {pages.length > 0 && filtro && paginasVisiveis.length === 0 && (
-                    <span className="px-1 text-2sm text-gray-600">{`Nenhuma página, section ou back-end com "${search.trim()}".`}</span>
+                    <span className="min-w-0 whitespace-normal [overflow-wrap:anywhere] px-1 text-2sm text-gray-600">{`Nenhuma página, section ou back-end com "${search.trim()}".`}</span>
                 )}
 
                 <ul className="flex min-w-0 flex-col gap-0.5">
@@ -247,7 +269,7 @@
                                     aberto={paginaAberta}
                                     temFilhos={page.sections.length > 0}
                                     onToggle={() => alternar(chavePagina)}
-                                    to={`/?pag=projetos-paginas&acao=Alterar&id=${page.id}`}
+                                    to={page.shared ? '/?pag=projeto-header-footer' : `/?pag=projetos-paginas&acao=Alterar&id=${page.id}`}
                                     ativo={atual === chavePagina}
                                     noGrupo={grupo.has(chavePagina)}
                                     semBarra
@@ -272,11 +294,12 @@
                                                         aberto={sectionAberta}
                                                         temFilhos={section.backend.length > 0}
                                                         onToggle={() => alternar(chaveSection)}
-                                                        to={`/?pag=projetos-paginas-sections&acao=Alterar&id=${section.id}&parametro=${page.id}`}
+                                                        to={`/?pag=projetos-paginas-sections&acao=Alterar&id=${section.id}${page.shared ? '&section_type=ok' : `&parametro=${page.id}`}`}
                                                         ativo={atual === chaveSection}
                                                         noGrupo={grupo.has(chaveSection)}
                                                         titulo={section.name}
                                                     >
+                                                        {section.type && <Sigla>{section.type === 'header' ? 'CAB' : 'ROD'}</Sigla>}
                                                         {section.clone && <Sigla>CLONE</Sigla>}
                                                         <span className="truncate"><Destaque texto={section.name} termo={termo} /></span>
                                                     </Linha>
@@ -287,7 +310,7 @@
                                                                 <li key={'b' + backend.id} className="min-w-0">
                                                                     <Linha
                                                                         nivel={2}
-                                                                        to={`/?pag=projetos-paginas-sections-backend&acao=Alterar&id=${backend.id}&parametros=${section.id}&parametro=${page.id}`}
+                                                                        to={`/?pag=projetos-paginas-sections-backend&acao=Alterar&id=${backend.id}&parametros=${section.id}${page.shared ? '&section_type=ok' : `&parametro=${page.id}`}`}
                                                                         ativo={atual === 'b' + backend.id}
                                                                         noGrupo={grupo.has('b' + backend.id)}
                                                                         titulo={`[${backend.type}] ${backend.name}`}

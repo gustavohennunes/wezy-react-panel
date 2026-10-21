@@ -2,6 +2,7 @@
     import { usePageData } from '@/context/PageDataContext'
     import { abasDaListagemNoTopo } from '@/utils/listTabs'
     import { Models } from '@/components/list/models'
+    import { BackendSearch } from '@/components/list/models/BackendSearch'
     import { FormContext } from '@/components/form/FormContext'
     import { DashboardContext } from '@/components/dashboard/DashboardContext'
     import { ScreenLoader } from '@/components/loaders'
@@ -34,6 +35,7 @@
             extraButton={pageData?.params?.footer?.extra_button}
             pagination={pageData?.params?.pagination}
             sequence={pageData?.params?.sequence === true}
+            localSearch={typeof pageData?.params?.backend_search_html === 'string'}
         />
     )
 
@@ -77,7 +79,10 @@
     //memo: SÓ REFAZ A TELA QUANDO CHEGA OUTRO pageData (NÃO A CADA RENDER DO PanelContent)
     const ConteudoDoModulo = memo(({ pageData }) => {
 
-        const principal = conteudoPrincipal(pageData)
+        const principal = <>
+            {pageData?.layout === 'form' && typeof pageData?.params?.backend_search_html === 'string' && <BackendSearch html={pageData.params.backend_search_html} />}
+            {conteudoPrincipal(pageData)}
+        </>
 
         //O QUE O CARTÃO IMPRIMIU (echo) VEM ANTES DO CONTEÚDO, COMO NO PAINEL LEGADO
         const outputHtml = pageData?.['output-html'] || ''

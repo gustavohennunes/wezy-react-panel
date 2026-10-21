@@ -1,5 +1,6 @@
     import { useEffect } from 'react'
     import { cleanUrl } from '@/utils/urlHelper'
+    import { alvoDoLink, relDoAlvo } from '@/utils/alvoDoLink'
     import { comChaves } from '@/utils/chavesUnicas'
     import { transformOldIcon } from '@/lib/transformOldIcon'
     import { OldIcon } from '@/components/legacy/OldIcon'
@@ -68,8 +69,8 @@
                                         <TooltipTrigger asChild>
                                             <a
                                                 href={cleanUrl(item.url) || '#'}
-                                                target={item.target || '_self'}
-                                                rel={/_blank/.test(item.target || '') ? 'noopener noreferrer' : undefined}
+                                                target={alvoDoLink(item.target)}
+                                                rel={relDoAlvo(item.target)}
                                                 aria-label={item.title}
                                                 className="inline-flex items-center opacity-80 hover:opacity-100 transition-opacity"
                                                 onClick={(e) => onClickAcao(e, item)}

@@ -1,6 +1,7 @@
 import { useEffect, useRef } from 'react'
 import { cn } from '@/lib/utils'
 import { cleanUrl } from '@/utils/urlHelper'
+import { alvoDoLink, relDoAlvo } from '@/utils/alvoDoLink'
 import { comChaves } from '@/utils/chavesUnicas'
 
 const Tabs = ({ className, tabs }) => {
@@ -67,7 +68,8 @@ const Tabs = ({ className, tabs }) => {
                         key={chave}
                         className={`tab shrink-0 whitespace-nowrap`}
                         href={cleanUrl(tab.url)}
-                        target={tab.target ?? '_self'}
+                        target={alvoDoLink(tab.target)}
+                        rel={relDoAlvo(tab.target)}
                     >
                         {tab.content}
                     </a>

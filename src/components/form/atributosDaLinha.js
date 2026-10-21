@@ -35,6 +35,10 @@
 
     }
 
+    //MARCA DA LINHA ESCONDIDA POR data-valid-* (FICA NO DOM; O FormContext DISPENSA O required DOS CAMPOS DENTRO DELA).
+    //O MESMO NOME ESTÁ ESCRITO POR EXTENSO NAS CLASSES DO card-body DO FormSection (O TAILWIND NÃO LÊ CLASSE MONTADA)
+    export const LINHA_ESCONDIDA = 'linha-valid-escondida'
+
     //LINHA CONDICIONAL: TODOS OS data-valid-* PRECISAM CASAR (ex.: "Métodos liberados" EXIGE
     //data-valid-ativar-api="ok" E data-valid-limitar-metodos="ok"). ANTES SÓ O PRIMEIRO
     //ERA CONFERIDO E A LINHA APARECIA COM APENAS UMA DAS CONDIÇÕES ATIVA.

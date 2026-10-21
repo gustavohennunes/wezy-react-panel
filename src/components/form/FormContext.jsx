@@ -2,7 +2,7 @@
     import { useNavigate } from 'react-router-dom'
     import { FormSection } from './FormSection'
     import { FormTabs } from './FormTabs'
-    import { chaveValid } from './atributosDaLinha'
+    import { chaveValid, LINHA_ESCONDIDA } from './atributosDaLinha'
     import { arquivosRemovidos } from './arquivosRemovidos'
     import { lerAbas, lerControladores, montaSecoes, valorDoControlador } from './estruturaDoFormulario'
     import { useEnvioDoFormulario } from './useEnvioDoFormulario'
@@ -33,14 +33,17 @@
     //CLASSE obg DO LEGADO = OBRIGATÓRIO (O painel.js VALIDA SÓ O QUE TEM obg NA HORA DO ENVIO). O JS DO CARTÃO TROCA obg POR
     //obgOld/oldObg PARA DISPENSAR UM CAMPO QUE ESCONDEU (ex.: ITENS DO planos-comerciais) — O required DO REACT CONTINUAVA E O
     //NAVEGADOR BLOQUEAVA O ENVIO SEM AVISO ("An invalid form control ... is not focusable"). AQUI O required SEGUE A CLASSE
+    //CAMPO DE LINHA ESCONDIDA POR data-valid-* (FICA NO DOM PARA O VALOR IR NO ENVIO — VER FormSection) TAMBÉM É DISPENSADO,
+    //COMO O obg -> oldObg DO ajustaValidFromTr
     const sincronizarObrigatorios = (form) => {
         form.querySelectorAll('input, select, textarea').forEach((campo) => {
-            if (campo.classList.contains('obg')) {
+            const dispensado = campo.classList.contains('obgOld') || campo.classList.contains('oldObg') || Boolean(campo.closest('.' + LINHA_ESCONDIDA))
+            if (!dispensado) {
                 if (campo.dataset.obgDispensado) {
                     campo.required = true
                     delete campo.dataset.obgDispensado
                 }
-            } else if (campo.required && (campo.classList.contains('obgOld') || campo.classList.contains('oldObg'))) {
+            } else if (campo.required) {
                 campo.required = false
                 campo.dataset.obgDispensado = '1'
             }

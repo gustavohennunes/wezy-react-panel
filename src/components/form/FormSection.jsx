@@ -1,7 +1,7 @@
 
     import { useState } from 'react'
     import { BotaoExcluirRegistro } from './BotaoExcluirRegistro'
-    import { chaveValid, parseAttributes, linhaEscondidaPorValid } from './atributosDaLinha'
+    import { chaveValid, parseAttributes, linhaEscondidaPorValid, LINHA_ESCONDIDA } from './atributosDaLinha'
     import { montaEstadoInicial } from './estadoInicialDaSecao'
     import { useBuscaCep } from './useBuscaCep'
     import { CampoDaSecao } from './LinhasDaSecao'
@@ -137,48 +137,56 @@
 
         const secao = { formState, onInput: atualiza, onDate: atualiza, onSelect, onRadio, onCheckbox, buscaCepDoCampo }
 
-        //CLASSE E ATRIBUTOS DA LINHA (row_attr); null = LINHA ESCONDIDA POR data-valid-* (NÃO VAI NEM PARA O DOM)
+        //CLASSE E ATRIBUTOS DA LINHA (row_attr). LINHA ESCONDIDA POR data-valid-* CONTINUA NO DOM (SÓ ESCONDIDA), COMO O .hide()
+        //DO ajustaValidFromTr: O VALOR DELA VAI NO ENVIO. ANTES ELA SAÍA DO DOM E, NA SECTION NOVA, OS CAMPOS DO "Desktop"
+        //SUMIAM DO POST AO TROCAR PARA "Mobile" (SÓ O DISPOSITIVO MARCADO ERA SALVO). O required DELA É DISPENSADO PELO
+        //FormContext (sincronizarObrigatorios), COMO O obg -> oldObg DO LEGADO
         const linhaDoCampo = (field) => {
 
             const atributos = parseAttributes(field.row_attr)
-            if (linhaEscondidaPorValid(atributos, validRows, controladores)) return null
+            const escondidaPorValid = linhaEscondidaPorValid(atributos, validRows, controladores)
 
             //px-4 = mesmo recuo que o .card-body tinha (custom.components.card.px)
             let className = `flex items-start flex-wrap lg:flex-nowrap gap-2.5 lg:gap-4 px-4 ${atributos.class || ''}`
             delete atributos.class
+
+            if (escondidaPorValid) {
+                return { className: `${className} ${LINHA_ESCONDIDA} !hidden`, atributos, visivel: false }
+            }
 
             const categoriaLinha = atributos['data-category']
             if (categoriaAtiva && categoriaLinha && categoriaLinha !== 'url' && categoriaLinha !== categoriaAtiva) {
                 className += ' !hidden'
             }
 
-            return { className, atributos }
+            return { className, atributos, visivel: !className.includes('!hidden') }
 
         }
+
+        const linhas = comChaves(data?.fields, (field) => field.field?.name || field.name || `${field.type}|${field.title}`)
+            .map(({ item: field, chave }, idx) => ({ field, chave, idx }))
+            .filter(({ field }) => field.field)
+            .map((item) => ({ ...item, linha: linhaDoCampo(item.field) }))
+        const semLinhaVisivel = !linhas.some(({ linha }) => linha.visivel) && !(button && form.submit_button)
 
         return (
             //SEÇÃO SEM NENHUMA LINHA VISÍVEL (ex.: "CAMPOS DA PÁGINA (home)" DO textos-e-imagens, SÓ TÍTULO; OU TODAS AS LINHAS
             //ESCONDIDAS POR data-valid-*): O card-body VAZIO SOME (empty:hidden) E O CABEÇALHO FICA SEM A BORDA DE BAIXO E
             //ARREDONDADO EMBAIXO, EM VEZ DE UMA FAIXA COM PADDING E NADA DENTRO
-            <div className={`card mb-3 [&:has(>.card-body:empty)>.card-header]:border-b-0 [&:has(>.card-body:empty)>.card-header]:rounded-b-[8px]${oculta ? ' !hidden' : ''}`}>
+            <div className={`card mb-3 [&:has(>.card-body:empty)>.card-header]:border-b-0 [&:has(>.card-body:empty)>.card-header]:rounded-b-[8px]${semLinhaVisivel ? ' [&>.card-header]:border-b-0 [&>.card-header]:rounded-b-[8px]' : ''}${oculta ? ' !hidden' : ''}`}>
 
                 <CabecalhoDaSecao secao={data} />
 
                 {/* CADA CAMPO GANHA UMA LINHA SEPARADORA ACIMA (EXCETO O PRIMEIRO).
                     O padding lateral SAI do container e vai para cada linha, senão a borda
                     ficaria recuada nas laterais em vez de atravessar o card inteiro. */}
-                <div className="card-body !px-0 grid gap-4 empty:hidden [&>*+*]:border-t [&>*+*]:border-[color:var(--form-divider)] [&>*+*]:pt-4">
+                {/* A BORDA SEPARADORA SÓ CONTA AS LINHAS VISÍVEIS: A ESCONDIDA POR data-valid-* (NO DOM) NÃO FAZ A PRIMEIRA
+                    VISÍVEL GANHAR BORDA EM CIMA */}
+                <div className={`card-body !px-0 grid gap-4 empty:hidden [&>:not(.linha-valid-escondida)~:not(.linha-valid-escondida)]:border-t [&>:not(.linha-valid-escondida)~:not(.linha-valid-escondida)]:border-[color:var(--form-divider)] [&>:not(.linha-valid-escondida)~:not(.linha-valid-escondida)]:pt-4${semLinhaVisivel ? ' !hidden' : ''}`}>
 
-                    {comChaves(data?.fields, (field) => field.field?.name || field.name || `${field.type}|${field.title}`).map(({ item: field, chave }, idx) => {
-
-                        if (!field.field) return null
-
-                        const linha = linhaDoCampo(field)
-                        if (!linha) return null
-
-                        return <CampoDaSecao key={chave} field={field} idx={idx} className={linha.className} atributos={linha.atributos} secao={secao} />
-
-                    })}
+                    {linhas.map(({ field, chave, idx, linha }) => (
+                        <CampoDaSecao key={chave} field={field} idx={idx} className={linha.className} atributos={linha.atributos} secao={secao} />
+                    ))}
 
                     {button && form.submit_button && <BotoesDaSecao form={form} loading={loading} />}
 

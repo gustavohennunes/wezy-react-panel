@@ -89,28 +89,32 @@
         const abas = { before: [], after: [] }
         const categorias = []
 
-        html.split('</a>').forEach((tab) => {
+        const documento = new DOMParser().parseFromString(html, 'text/html')
+        const grupos = Array.from(documento.querySelectorAll('.buttons-group'))
 
-            const depoisDoHref = tab.split('href="')[1]
-            const tabUrl  = depoisDoHref ? depoisDoHref.split('"')[0] : ''
-            const tabName = depoisDoHref ? depoisDoHref.split('>')[1] : ''
+        documento.querySelectorAll('a[href]').forEach((link) => {
+
+            const tabUrl = link.getAttribute('href') || ''
+            const tabName = link.textContent.trim()
+            const grupo = Math.max(0, grupos.indexOf(link.closest('.buttons-group')))
 
             const categoria = categoriaDaAba(tabUrl)
 
             if (categoria) {
 
                 categorias.push(categoria)
-                abas.before.push({ content: tabName, categoria })
+                abas.before.push({ content: tabName, categoria, grupo })
 
             } else if (tabUrl) {
 
                 //target="_blank" DO setButtonsModule (BOTÃO DECLARADO COMO array('Nome', true) NO CARTÃO, ex.: "Acessar
                 //Painel" DO menuModulos) — ANTES SE PERDIA AQUI E O BOTÃO ABRIA NA MESMA ABA
-                const tabTarget = /\btarget=["']([^"']+)["']/i.exec(tab)?.[1]
+                const tabTarget = link.getAttribute('target')
 
                 abas.before.push({
                     content: tabName,
                     url: tabUrl,
+                    grupo,
                     ...(tabTarget ? { target: tabTarget } : {}),
                 })
 

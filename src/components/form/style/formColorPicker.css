@@ -13,12 +13,30 @@
     cursor: pointer;
 }
 
-.popover {
+.picker .popover {
     display: block;
     position: absolute;
     top: calc(100% + 2px);
     left: 0;
+    width: 248px;
+    padding: 12px;
+    background: var(--tw-light-active);
+    color: var(--tw-gray-900);
+    border: 1px solid var(--tw-gray-300);
     border-radius: 9px;
     box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
     z-index: 11111;
+}
+
+.picker .popover .react-colorful {
+    width: 100%;
+}
+
+.color-picker-value {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    margin-top: 12px;
+    font-size: 12px;
+    font-weight: 500;
 }

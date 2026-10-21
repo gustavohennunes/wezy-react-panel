@@ -1,7 +1,6 @@
     import { useState } from 'react'
     import { useLocation, useNavigate } from 'react-router-dom'
-    import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider'
-    import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs'
+    import { DatePickersProvider } from '@/components/form/DatePickersProvider'
     import { DatePicker } from '@mui/x-date-pickers/DatePicker'
     import { DateTimePicker } from '@mui/x-date-pickers/DateTimePicker'
     import dayjs from 'dayjs'
@@ -265,7 +264,7 @@
         const camposVisiveis = campos.filter((campo) => campo.type !== 'hidden')
 
         return (
-            <LocalizationProvider dateAdapter={AdapterDayjs}>
+            <DatePickersProvider>
                 <form className="card" onSubmit={filtrar}>
                     <div className="card-body flex flex-wrap items-end gap-4 py-4">
 
@@ -300,7 +299,7 @@
 
                     </div>
                 </form>
-            </LocalizationProvider>
+            </DatePickersProvider>
         )
 
     }

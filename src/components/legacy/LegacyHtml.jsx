@@ -53,6 +53,11 @@
 
             container.innerHTML = html || ''
 
+            //BOTOES PRIMARIOS DOS CAMPOS aut DO LEGADO USAM O MESMO ESTILO DOS BOTOES DO PAINEL.
+            container.querySelectorAll('a.button-primary, button.button-primary').forEach((botao) => {
+                botao.classList.add('btn', 'btn-primary', 'justify-center')
+            })
+
             //ÍCONES DO SPRITE DO PAINEL ANTIGO (<div class="figura-black l2 c12">, ex.: "Atividades" E "Alterar" NOS CARTÕES DO
             //FUNIL) VIRAM KEENICONS PELO MESMO MAPA DO MENU (transformOldIcon). O QUE SÓ TEM EQUIVALENTE NO lucide FICA NUM GENÉRICO
             container.querySelectorAll('.figura-black, .figura-white, .figura-svg').forEach((sprite) => {

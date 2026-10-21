@@ -6,6 +6,7 @@
     import { useBuscaCep } from './useBuscaCep'
     import { CampoDaSecao } from './LinhasDaSecao'
     import { comChaves } from '@/utils/chavesUnicas'
+    import { atualizarConteudoTextoBackend } from './conteudoTextoBackend'
 
     const SEM_VALID = {}
     const SEM_CONTROLADORES = new Set()
@@ -86,7 +87,13 @@
 
         const buscaCepDoCampo = useBuscaCep(data, formState, setFormState)
 
-        const atualiza = (name, value) => setFormState((prev) => ({ ...prev, [name]: value }))
+        const params = new URLSearchParams(window.location.search)
+        const textoDoBackend = (params.get('pag') || params.get('slug')) === 'projetos-paginas-sections-backend' &&
+            ['TxtContent', 'TxtDinamic_content'].every((nome) => data.fields.some((field) => (field.field?.name || field.name) === nome))
+
+        const atualiza = (name, value) => setFormState((prev) => textoDoBackend
+            ? atualizarConteudoTextoBackend(prev, name, value)
+            : { ...prev, [name]: value })
 
         //CAMPO CONTROLADOR DE LINHAS CONDICIONAIS (classe valid valid-xxx): O VALOR DELE MOSTRA/ESCONDE AS LINHAS data-valid-xxx
         const atualizaValid = (className, value) => {

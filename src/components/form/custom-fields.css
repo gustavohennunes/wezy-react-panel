@@ -146,19 +146,18 @@
     background-color: var(--cf-box-bg);
     transition: 0.5s;
 }
-[data-custom-field='radiobutton'] input[type='radio']:checked ~ .custom-radiobutton .custom-radiobutton-icon > span {
-    background: #0075a7;
-    border-color: #0075a7;
-    transition: 0.5s;
+/* BOLINHA BRANCA = FUNDO BRANCO + ANEL AZUL POR box-shadow inset, NÃO UM ::before COM margin: FORA DO ZOOM 100% A BORDA E
+   A MARGEM ARREDONDAVAM PARA PIXELS DIFERENTES E A BOLINHA SAÍA DO CENTRO. O box-shadow (AO CONTRÁRIO DE UM GRADIENTE)
+   ANIMA, ENTÃO O ANEL FECHA SUAVE AO MARCAR. POR BAIXO, O MESMO DESENHO EM radial-gradient: SEM ELE O FUNDO BRANCO VAZAVA
+   COMO UMA LINHA FINA NO ENCONTRO DA BORDA COM O ANEL (ANTIALIAS DAS DUAS BORDAS) */
+[data-custom-field='radiobutton'] .custom-radiobutton .custom-radiobutton-icon > span {
+    box-shadow: inset 0 0 0 7px var(--cf-box-bg);
+    transition: box-shadow 0.2s ease, border-color 0.2s ease, background-color 0.2s ease;
 }
-[data-custom-field='radiobutton'] input[type='radio']:checked ~ .custom-radiobutton .custom-radiobutton-icon > span:before {
-    content: '';
-    width: 8px;
-    height: 8px;
-    background: #fff;
-    display: block;
-    border-radius: 50px;
-    margin: 3px;
+[data-custom-field='radiobutton'] input[type='radio']:checked ~ .custom-radiobutton .custom-radiobutton-icon > span {
+    background: radial-gradient(circle, #fff 0 4px, #0075a7 4.5px);
+    border-color: #0075a7;
+    box-shadow: inset 0 0 0 3px #0075a7;
 }
 
 /* CHECKBOX E RADIO CRUS DO HTML LEGADO (CAMPOS aut, ex.: OS custom-field[...] DO BACK-END DAS SECTIONS): VINHAM COM O

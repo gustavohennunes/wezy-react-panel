@@ -214,7 +214,11 @@
 
                                         {comChaves(mensagens, (mensagem) => `${mensagem.variant}|${mensagem.html}`).map(({ item: mensagem, chave }) => (
                                             <Alert key={chave} variant={mensagem.variant} className="mt-4 w-full">
-                                                <span dangerouslySetInnerHTML={{ __html: mensagem.html }} />
+                                                {/* LINK DENTRO DA MENSAGEM DO CARTÃO (ex.: "clique aqui" DO projetos-css-padrao) SAÍA COMO TEXTO COMUM */}
+                                                <span
+                                                    className="[&_a]:font-semibold [&_a]:underline [&_a]:underline-offset-2 [&_a:hover]:opacity-80"
+                                                    dangerouslySetInnerHTML={{ __html: mensagem.html }}
+                                                />
                                             </Alert>
                                         ))}
 

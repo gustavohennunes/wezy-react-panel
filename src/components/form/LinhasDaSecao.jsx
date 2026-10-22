@@ -4,6 +4,7 @@
     import { FormDate } from './FormDate'
     import { CustomCheckbox, CustomRadio } from './CustomFields'
     import { comChaves } from '@/utils/chavesUnicas'
+    import { LINHA_ESCONDIDA } from './atributosDaLinha'
 
     //TÍTULO/SUBTÍTULO À ESQUERDA DA LINHA, NA MESMA COLUNA DOS RÓTULOS DO FormInput
     const RotuloDaLinha = ({ title, subtitle, required = false }) => (
@@ -130,13 +131,15 @@
 
     //Cab CONDICIONAL DENTRO DA SEÇÃO (VER FormContext) — TÍTULO EM LINHA, COM OS ATRIBUTOS
     //DA PONTE PARA O JS DO CARD (ex.: useLegacyModoCriacao) PODER ESCONDÊ-LO
-    const TituloEmLinha = ({ valor, atributos }) => {
+    //ESCONDIDO POR data-valid-* (ex.: "CONTEÚDO" DA SECTION CLONADA): LEVA A MARCA E O !hidden DA LINHA (VER FormSection)
+    const TituloEmLinha = ({ valor, atributos, className = '' }) => {
 
         const numero = valor?.number
         const titulo = String(valor?.title || '').split('//')[0].trim()
+        const escondido = className.includes(LINHA_ESCONDIDA)
 
         return (
-            <div className="flex items-center gap-2.5 px-4" {...atributos}>
+            <div className={`flex items-center gap-2.5 px-4${escondido ? ` ${LINHA_ESCONDIDA} !hidden` : ''}`} {...atributos}>
                 {(numero || numero === 0) && (
                     <span className="flex size-[22px] shrink-0 items-center justify-center rounded bg-primary text-[11px] font-semibold tabular-nums text-primary-inverse">
                         {String(numero).padStart(2, '0')}
@@ -256,7 +259,7 @@
                 return <LinhaTabela field={field} className={className} atributos={atributos} />
 
             case 'Cab':
-                return <TituloEmLinha valor={fieldData?.value} atributos={atributos} />
+                return <TituloEmLinha valor={fieldData?.value} atributos={atributos} className={className} />
 
             //Hdn NÃO RENDERIZA LINHA — OS VALORES VÊM EM form.hidden_fields (FormContext)
             default:

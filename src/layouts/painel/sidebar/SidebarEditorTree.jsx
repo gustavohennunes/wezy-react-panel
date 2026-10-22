@@ -1,4 +1,4 @@
-    import { useMemo, useState } from 'react'
+    import { Fragment, useMemo, useState } from 'react'
     import { Link, useLocation } from 'react-router-dom'
     import clsx from 'clsx'
     import { KeenIcon } from '@/components/keenicons'
@@ -16,6 +16,7 @@
         const parametro  = params.get('parametro') || ''
         const parametros = params.get('parametros') || ''
         const cliente    = params.get('cliente') || ''
+        const sectionType = params.get('section_type') || ''
 
         //TUDO COMEÇA FECHADO; SÓ ABRE O CAMINHO DA TELA ATUAL. O "Cabeçalho e rodapé" (shared) ABRIA SEMPRE, A CADA TROCA DE
         //TELA, MESMO FECHADO PELA SETA — AGORA SEGUE A MESMA REGRA DAS PÁGINAS
@@ -37,6 +38,8 @@
             //PÁGINA NO cliente). TODAS DESTACAM A PÁGINA COMO TELA ATUAL
             const telaDaPagina =
                 (page.shared && pag === 'projeto-header-footer' && id === '') ||
+                //"Adicionar section" DO CABEÇALHO E RODAPÉ: projetos-paginas-sections&acao=Inserir&section_type=ok (SEM parametro)
+                (page.shared && pag === 'projetos-paginas-sections' && id === '' && sectionType !== '') ||
                 (pag === 'projetos-paginas' && id === page.id) ||
                 (pag === 'projetos-paginas-sections' && id === '' && parametro === page.id) ||
                 (pag === 'actions-pages' && cliente === page.id)
@@ -179,17 +182,16 @@
     const SidebarEditorTree = ({ editor, search = '' }) => {
 
         const location = useLocation()
+        //PÁGINAS DESATIVADAS (inactive_pages, status != 1) VÊM DEPOIS DAS ATIVAS, MARCADAS COMO inativa: A LISTA MOSTRA
+        //UM SEPARADOR ANTES DELAS E AS DEIXA APAGADAS. BUSCA E CAMINHO DA URL VALEM PARA ELAS TAMBÉM
         const pages = useMemo(() => {
             const globais = editor?.shared_sections || []
-            if (globais.length === 0) return editor?.pages || []
-
             const idsGlobais = new Set(globais.map((section) => section.id))
+            const semGlobais = (page) => ({ ...page, sections: page.sections.filter((section) => !idsGlobais.has(section.id)) })
             return [
-                { id: 'header-footer', name: 'Cabeçalho e rodapé', shared: true, sections: globais },
-                ...(editor?.pages || []).map((page) => ({
-                    ...page,
-                    sections: page.sections.filter((section) => !idsGlobais.has(section.id)),
-                })),
+                ...(globais.length > 0 ? [{ id: 'header-footer', name: 'Cabeçalho e rodapé', shared: true, sections: globais }] : []),
+                ...(editor?.pages || []).map(semGlobais),
+                ...(editor?.inactive_pages || []).map((page) => ({ ...semGlobais(page), inativa: true })),
             ]
         }, [editor])
 
@@ -247,7 +249,7 @@
                     </Link>
                 </div>
 
-                {pages.length === 0 && (
+                {pages.every((page) => page.inativa) && (
                     <span className="px-1 text-2sm text-gray-600">Nenhuma página ativa no projeto.</span>
                 )}
 
@@ -256,24 +258,30 @@
                 )}
 
                 <ul className="flex min-w-0 flex-col gap-0.5">
-                    {paginasVisiveis.map((page) => {
+                    {paginasVisiveis.map((page, indice) => {
 
                         const chavePagina = 'p' + page.id
                         const paginaAberta = abertosVisiveis.has(chavePagina)
 
+                        //PRIMEIRA DESATIVADA DEPOIS DE UMA ATIVA: SEPARADOR ABAIXO DA ÚLTIMA ATIVA
+                        const separador = page.inativa && indice > 0 && !paginasVisiveis[indice - 1].inativa
+
                         return (
-                            <li key={chavePagina} className="min-w-0 overflow-hidden rounded-md">
+                            <Fragment key={chavePagina}>
+                            {separador && <li role="separator" className="mb-1.5 border-b border-gray-300 pb-1.5" />}
+                            {/* DESATIVADA: APAGADA (opacity FUNCIONA NOS DOIS TEMAS); A TELA ATUAL OU O HOVER A MOSTRAM INTEIRA */}
+                            <li className={clsx('min-w-0 overflow-hidden rounded-md', page.inativa && atual !== chavePagina && 'opacity-60 transition-opacity hover:opacity-100')}>
 
                                 <Linha
                                     nivel={0}
                                     aberto={paginaAberta}
-                                    temFilhos={page.sections.length > 0}
+                                    temFilhos={page.sections.length > 0 || !filtro}
                                     onToggle={() => alternar(chavePagina)}
                                     to={page.shared ? '/?pag=projeto-header-footer' : `/?pag=projetos-paginas&acao=Alterar&id=${page.id}`}
                                     ativo={atual === chavePagina}
                                     noGrupo={grupo.has(chavePagina)}
                                     semBarra
-                                    titulo={page.name}
+                                    titulo={page.inativa ? `${page.name} (desativada)` : page.name}
                                     icone={<KeenIcon icon="document" className="shrink-0 text-base text-gray-500" />}
                                 >
                                     <span className="truncate">{page.subpage ? '» ' : ''}<Destaque texto={page.name} termo={termo} /></span>
@@ -327,10 +335,28 @@
                                             )
 
                                         })}
+
+                                        {/* NOVA SECTION NA PÁGINA SEM SAIR DO MODO DE EDIÇÃO (COMO O "Adicionar página"). CABEÇALHO E RODAPÉ
+                                            USAM O MESMO ENDEREÇO DO projeto-header-footer LEGADO (section_type=ok). FORA DA BUSCA */}
+                                        {!filtro && (
+                                            <li className="min-w-0">
+                                                <Link
+                                                    to={page.shared ? '/?pag=projetos-paginas-sections&acao=Inserir&section_type=ok' : `/?pag=projetos-paginas-sections&acao=Inserir&parametro=${page.id}`}
+                                                    className="flex min-h-8 w-full min-w-0 items-center gap-1.5 pe-2 text-[13px] font-medium text-primary transition-colors hover:bg-gray-100"
+                                                    style={{ paddingInlineStart: 4 + 14 }}
+                                                >
+                                                    <span className="flex size-5 shrink-0 items-center justify-center">
+                                                        <KeenIcon icon="plus" className="text-xs" />
+                                                    </span>
+                                                    <span className="truncate">Adicionar section</span>
+                                                </Link>
+                                            </li>
+                                        )}
                                     </ul>
                                 )}
 
                             </li>
+                            </Fragment>
                         )
 
                     })}

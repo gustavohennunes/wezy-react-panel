@@ -187,7 +187,14 @@
         const pages = useMemo(() => {
             const globais = editor?.shared_sections || []
             const idsGlobais = new Set(globais.map((section) => section.id))
-            const semGlobais = (page) => ({ ...page, sections: page.sections.filter((section) => !idsGlobais.has(section.id)) })
+            //SECTIONS DESATIVADAS (inactive_sections) ENTRAM NA POSIÇÃO DELAS: LOGO DEPOIS DA ATIVA after ('' = ANTES DE TODAS)
+            const comInativas = (page) => {
+                const inativas = (page.inactive_sections || []).map((section) => ({ ...section, inativa: true }))
+                if (inativas.length === 0) return page.sections
+                const depoisDe = (id) => inativas.filter((section) => (section.after || '') === id)
+                return [...depoisDe(''), ...page.sections.flatMap((section) => [section, ...depoisDe(section.id)])]
+            }
+            const semGlobais = (page) => ({ ...page, sections: comInativas(page).filter((section) => !idsGlobais.has(section.id)) })
             return [
                 ...(globais.length > 0 ? [{ id: 'header-footer', name: 'Cabeçalho e rodapé', shared: true, sections: globais }] : []),
                 ...(editor?.pages || []).map(semGlobais),
@@ -216,6 +223,29 @@
             setFiltroAnterior(filtro)
             setAbertosBusca(filtro ? new Set(filtro.abertos) : null)
         }
+
+        //"Textos e imagens" ABRE DIRETO NO GRUPO DA PÁGINA DA TELA ATUAL (texts_id DA API). NO CABEÇALHO E RODAPÉ, NO DA SECTION
+        //ATUAL (OU NA PRIMEIRA QUE TIVER). SEM REGISTRO, ABRE A LISTAGEM
+        //A PÁGINA SAI DO ENDEREÇO (id NA TELA DA PÁGINA, parametro NAS TELAS DE SECTION, cliente NO actions-pages); SEM texts_id
+        //NA PÁGINA, VALE O DA SECTION ATUAL OU O DA PRIMEIRA SECTION DELA QUE TIVER
+        const linkDosTextos = useMemo(() => {
+            const params    = new URLSearchParams(location.search)
+            const pag       = params.get('pag') || params.get('slug') || ''
+            const idDaPagina =
+                pag === 'projetos-paginas' ? params.get('id') :
+                pag === 'actions-pages' ? params.get('cliente') :
+                params.get('parametro')
+            const naTela = (chave) => atual === chave || grupo.has(chave)
+            const pagina =
+                pages.find((page) => !page.shared && idDaPagina && page.id === idDaPagina) ||
+                pages.find((page) => naTela('p' + page.id) || page.sections.some((section) => naTela('s' + section.id)))
+            const daTela = pagina?.sections.find((section) => naTela('s' + section.id))
+            const id =
+                (pagina?.shared ? '' : pagina?.texts_id) ||
+                daTela?.texts_id ||
+                pagina?.sections.find((section) => section.texts_id)?.texts_id
+            return id ? `/?pag=textos-e-imagens&acao=Alterar&id=${id}` : '/?pag=textos-e-imagens'
+        }, [pages, atual, grupo, location.search])
 
         const paginasVisiveis = filtro ? filtro.paginas : pages
         const abertosVisiveis = filtro ? abertosBusca || filtro.abertos : abertos
@@ -295,7 +325,9 @@
                                             const sectionAberta = abertosVisiveis.has(chaveSection)
 
                                             return (
-                                                <li key={chaveSection} className="min-w-0">
+                                                //DESATIVADA: APAGADA COMO AS PÁGINAS DESATIVADAS, COM O ÍCONE DE OLHO CORTADO; A TELA ATUAL OU O
+                                                //HOVER A MOSTRAM INTEIRA
+                                                <li key={chaveSection} className={clsx('min-w-0', section.inativa && atual !== chaveSection && 'opacity-60 transition-opacity hover:opacity-100')}>
 
                                                     <Linha
                                                         nivel={1}
@@ -305,11 +337,12 @@
                                                         to={`/?pag=projetos-paginas-sections&acao=Alterar&id=${section.id}${page.shared ? '&section_type=ok' : `&parametro=${page.id}`}`}
                                                         ativo={atual === chaveSection}
                                                         noGrupo={grupo.has(chaveSection)}
-                                                        titulo={section.name}
+                                                        titulo={section.inativa ? `${section.name} (desativada)` : section.name}
                                                     >
                                                         {section.type && <Sigla>{section.type === 'header' ? 'CAB' : 'ROD'}</Sigla>}
                                                         {section.clone && <Sigla>CLONE</Sigla>}
                                                         <span className="truncate"><Destaque texto={section.name} termo={termo} /></span>
+                                                        {section.inativa && <KeenIcon icon="eye-slash" className="ms-auto shrink-0 text-xs text-gray-500" />}
                                                     </Linha>
 
                                                     {sectionAberta && (
@@ -361,6 +394,25 @@
 
                     })}
                 </ul>
+
+                {/* ATALHO PARA O textos-e-imagens: IMAGENS E TEXTOS USADOS PELAS SECTIONS SÃO CADASTRADOS LÁ. FORA DA BUSCA */}
+                {!filtro && (
+                    <div className="min-w-0 border-t border-gray-300 pt-1.5">
+                        {/* MESMO CANTO DAS PÁGINAS: A Linha NÃO ARREDONDA, QUEM ARREDONDA É O BLOCO EM VOLTA */}
+                        <div className="min-w-0 overflow-hidden rounded-md">
+                        <Linha
+                            nivel={0}
+                            to={linkDosTextos}
+                            ativo={new URLSearchParams(location.search).get('pag') === 'textos-e-imagens'}
+                            semBarra
+                            titulo="Textos e imagens"
+                            icone={<KeenIcon icon="picture" className="shrink-0 text-base text-gray-500" />}
+                        >
+                            <span className="truncate">Textos e imagens</span>
+                        </Linha>
+                        </div>
+                    </div>
+                )}
 
             </div>
         )

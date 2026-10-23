@@ -70,6 +70,8 @@
             tituloDaAba: titulo ? `${titulo} - ${TITULO_DO_SITE}` : TITULO_DO_SITE,
             breadcrumbs: resolveModuleBreadcrumbs(params?.breadcrumbs, menuConfig, slugAtual, acaoAtual)
                 .replaceAll('index.php', '')
+                //"Início" VEM COMO href="index.php" (OU VAZIO): SEM O index.php FICAVA href="" E RECARREGAVA A PRÓPRIA PÁGINA
+                .replace(/(<a\b[^>]*\bhref=)(["'])\s*\2/gi, '$1$2/$2')
                 .replaceAll('class="', 'class="text-[13px] ')
                 .replaceAll(' > ', '<i class="ki-filled ki-right text-gray-500 !text-[11px] mx-1"></i>'),
             aviso: params?.message || (action == 'finalizar-cadastro' ? 'Você está quase lá! Complete seu cadastro!' : ''),

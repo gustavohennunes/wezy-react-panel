@@ -5,6 +5,7 @@
     import { FormColorPicker } from './FormColorPicker'
     import { FormIconSelector } from './FormIconSelector'
     import { FormCodeEditor } from './FormCodeEditor'
+    import { CampoComSugestoes } from './CampoComSugestoes'
     import { temEditorDeCodigo } from './editorGlobal'
     import { isLegacyIconField } from '@/utils/legacyIcons'
     import { LegacyHtml } from '@/components/legacy/LegacyHtml'
@@ -51,6 +52,21 @@
                 e.preventDefault()
                 buscaCep.buscar()
             }
+        }
+
+        //SUGESTÕES DO CARTÃO (ÍNDICE 11 DO Frm, VER CampoComSugestoes): DROPDOWN AO CLICAR, SEM MÁSCARA
+        if (Array.isArray(fieldData.suggestions) && fieldData.suggestions.length > 0 && !inputMask) {
+            return (
+                <CampoComSugestoes
+                    sugestoes={fieldData.suggestions}
+                    className={classeDoInput(fieldClass, fieldData)}
+                    name={fieldName}
+                    id={inputId}
+                    required={required}
+                    valor={valor}
+                    onValor={onValor}
+                />
+            )
         }
 
         const input = (

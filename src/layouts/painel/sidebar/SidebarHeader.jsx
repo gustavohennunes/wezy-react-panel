@@ -50,9 +50,23 @@
                             value={search}
                             onChange={handleInputChange}
                         />
-                        <span className="text-2sm text-gray-700 text-nowrap">
-                            Ctrl + /
-                        </span>
+                        {search ? (
+                            <button
+                                type="button"
+                                aria-label="Limpar busca"
+                                className="flex size-5 shrink-0 items-center justify-center rounded text-gray-500 hover:bg-gray-200 hover:text-gray-800"
+                                onClick={() => {
+                                    setSearch('')
+                                    inputRef.current.focus()
+                                }}
+                            >
+                                <KeenIcon icon="cross" />
+                            </button>
+                        ) : (
+                            <span className="text-2sm text-gray-700 text-nowrap">
+                                Ctrl + /
+                            </span>
+                        )}
                     </div>
                 </div>
             </div>

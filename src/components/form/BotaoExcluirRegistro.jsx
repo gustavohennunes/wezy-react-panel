@@ -74,7 +74,7 @@
 
         return (
             <>
-                <button type="button" className="btn btn-light text-danger" onClick={excluir} disabled={excluindo}>
+                <button type="button" className="btn btn-danger text-white [&_i]:text-white" onClick={excluir} disabled={excluindo}>
                     <KeenIcon icon="trash" />
                     {excluindo ? 'Excluindo...' : 'Excluir'}
                 </button>

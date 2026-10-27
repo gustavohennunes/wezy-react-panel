@@ -4,6 +4,7 @@
     import { KeenIcon } from '@/components/keenicons'
     import { DestaqueBusca as Destaque } from './DestaqueBusca'
     import { normalizarBusca as normalizar } from '@/utils/normalizarBusca'
+    import { urlDoPainelMestre } from '@/utils/painelMestre'
 
     // MODO DE EDIÇÃO DO SITE (?pag=ativar-modulo-edicao, ACESSO DE SUPORTE): A SIDEBAR VIRA A ÁRVORE PÁGINAS > SECTIONS >
     // BACK-ENDS, COMO O class/ProjectStructure.php DO PAINEL ANTIGO. OS DADOS VÊM DO panel/menus (data.editor.pages).
@@ -147,7 +148,8 @@
     //ativo: A TELA ATUAL (editor-tree-atual); noGrupo: PARENTE DESTACADO JUNTO (editor-tree-grupo) — VER globals.css
     //SEM rounded POR LINHA: O BLOCO DA PÁGINA (<li> COM overflow-hidden) É QUE ARREDONDA — SÓ O PRIMEIRO E O ÚLTIMO ITEM
     //FICAM COM CANTO. semBarra: A PÁGINA ATUAL NÃO LEVA A BARRA DA ESQUERDA
-    const Linha = ({ nivel, aberto, temFilhos, onToggle, to, ativo, noGrupo, semBarra, icone, children, titulo }) => (
+    //externo: to É UMA URL DE OUTRO HOST (ex.: MÓDULOS NO PAINEL MESTRE), ABERTA NUMA ABA NOVA
+    const Linha = ({ nivel, aberto, temFilhos, onToggle, to, externo = false, ativo, noGrupo, semBarra, icone, children, titulo }) => (
         <div
             className={clsx(
                 'group flex min-h-8 w-full min-w-0 items-center gap-1 pe-2 transition-colors',
@@ -169,13 +171,25 @@
                 <span className="size-5 shrink-0" />
             )}
             {icone}
-            <Link
-                to={to}
-                title={titulo}
-                className={clsx('flex min-w-0 flex-1 items-center gap-1.5 py-1 text-[13px]', ativo ? 'font-semibold' : 'font-medium')}
-            >
-                {children}
-            </Link>
+            {externo ? (
+                <a
+                    href={to}
+                    target="_blank"
+                    rel="noopener"
+                    title={titulo}
+                    className="flex min-w-0 flex-1 items-center gap-1.5 py-1 text-[13px] font-medium"
+                >
+                    {children}
+                </a>
+            ) : (
+                <Link
+                    to={to}
+                    title={titulo}
+                    className={clsx('flex min-w-0 flex-1 items-center gap-1.5 py-1 text-[13px]', ativo ? 'font-semibold' : 'font-medium')}
+                >
+                    {children}
+                </Link>
+            )}
         </div>
     )
 
@@ -410,6 +424,20 @@
                         >
                             <span className="truncate">Textos e imagens</span>
                         </Linha>
+                        {/* MÓDULOS DO PROJETO NO PAINEL MESTRE (modules_path DA API; O HOST PERDE O "sub.") */}
+                        {editor?.modules_path && (
+                            <Linha
+                                nivel={0}
+                                to={urlDoPainelMestre(editor.modules_path)}
+                                externo
+                                semBarra
+                                titulo="Módulos do projeto (abre no painel mestre)"
+                                icone={<KeenIcon icon="element-11" className="shrink-0 text-base text-gray-500" />}
+                            >
+                                <span className="truncate">Módulos</span>
+                                <KeenIcon icon="exit-right-corner" className="ms-auto shrink-0 text-xs text-gray-500" />
+                            </Linha>
+                        )}
                         </div>
                     </div>
                 )}

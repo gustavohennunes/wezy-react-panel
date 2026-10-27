@@ -14,6 +14,7 @@
     import { DestaqueBusca } from './DestaqueBusca'
     import { normalizarBusca } from '@/utils/normalizarBusca'
     import { comChaves } from '@/utils/chavesUnicas'
+    import { urlDoPainelMestre } from '@/utils/painelMestre'
 
     //CHAVE DO ITEM PELO LINK (OU PELO TÍTULO, NOS GRUPOS SEM LINK)
     const chaveDoItem = (item) => item.path || item.title
@@ -215,10 +216,13 @@
 
             } else {
 
+                //master_panel (ex.: "Módulos" DO "Acesso restrito"): ABRE NO PAINEL MESTRE, NUMA ABA NOVA
                 return (
                     <MenuItem key={chave}>
                         <MenuLink
-                            path={item.path}
+                            path={item.master_panel ? urlDoPainelMestre(item.path) : item.path}
+                            externalLink={!!item.master_panel}
+                            newTab={!!item.master_panel}
                             className="py-2 px-2.5 rounded-md border border-transparent menu-item-active:border-gray-200 menu-item-active:bg-light menu-link-hover:bg-light menu-link-hover:border-gray-200"
                         >
                             <MenuIcon className="items-start text-lg text-gray-600 pr-2 menu-item-active:text-gray-800 menu-item-here:text-gray-800 menu-item-show:text-gray-800 menu-link-hover:text-gray-800 dark:menu-item-active:text-gray-900 dark:menu-item-here:text-gray-900 dark:menu-item-show:text-gray-900 dark:menu-link-hover:text-gray-900">

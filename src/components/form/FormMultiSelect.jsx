@@ -1,5 +1,6 @@
     import { useState } from 'react'
     import { Combobox } from './FormCombobox'
+    import { formatarTelefone, telefoneCompleto } from '@/utils/formMask'
 
     // CAMPO Mul DO PAINEL LEGADO — A PONTE (panel/module) ENVIA type 'select-multiple'
     // COM name JÁ SUFIXADO COM [] E options [{label, value, selected}].
@@ -12,6 +13,10 @@
 
         //Mul DE TABELA COM A CLASSE mul-criar NO CARTÃO: ACEITA DIGITAR UMA OPÇÃO QUE AINDA NÃO EXISTE (CRIADA AO SALVAR)
         const criaNaTabela = !isTags && (fieldData.class || '').includes('mul-criar')
+
+        //TAGS COM A CLASSE mascara-telefone (ex.: Telefones adicionais DO cadastro-clientes): CADA TAG É UM TELEFONE FIXO (8
+        //DÍGITOS) OU CELULAR/WHATSAPP (9) COM DDD, FORMATADO AO DIGITAR; SÓ VIRA TAG QUANDO O NÚMERO ESTÁ COMPLETO
+        const tagsDeTelefone = isTags && (fieldData.class || '').includes('mascara-telefone')
 
         //MODO TAGS: A PONTE MANDA COMO OPÇÕES SÓ OS VALORES JÁ SALVOS NO REGISTRO (PanelModule, Mul SEM TABELA) —
         //TODOS PODEM SAIR PELO X DA LISTA; AO SALVAR, SAEM DO REGISTRO
@@ -93,7 +98,10 @@
                         value={selected}
                         onChange={handleChange}
                         onRemoveOption={removeOpcao}
-                        placeholder={isTags ? 'Digite para adicionar' : options.length ? 'Selecione' : 'Nenhuma opção disponível'}
+                        formatarTermo={tagsDeTelefone ? formatarTelefone : undefined}
+                        termoValido={tagsDeTelefone ? telefoneCompleto : undefined}
+                        avisoTermoInvalido="Digite o telefone completo com DDD (8 ou 9 dígitos)"
+                        placeholder={tagsDeTelefone ? 'Digite um telefone para adicionar' : isTags ? 'Digite para adicionar' : options.length ? 'Selecione' : 'Nenhuma opção disponível'}
                     />
 
                     {selected.map((value) => (

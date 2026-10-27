@@ -153,6 +153,9 @@
         ariaLabel,
         onRemoveOption,
         corExtra,
+        formatarTermo,
+        termoValido,
+        avisoTermoInvalido = 'Nenhum resultado',
     }) => {
 
         const [open, setOpen]     = useState(false)
@@ -190,8 +193,10 @@
 
         }
 
-        const termo     = search.trim()
-        const podeCriar = podeCriarOpcao(options, creatable, termo)
+        //formatarTermo: MÁSCARA NO TEXTO DIGITADO (ex.: TELEFONE NAS TAGS); termoValido: SÓ CRIA QUANDO O TEXTO ESTÁ COMPLETO
+        const termo         = search.trim()
+        const termoInvalido = creatable && termo !== '' && termoValido && !termoValido(termo)
+        const podeCriar     = !termoInvalido && podeCriarOpcao(options, creatable, termo)
 
         return (
             <>
@@ -245,7 +250,7 @@
                         <CommandInput
                             placeholder={creatable ? 'Buscar ou criar…' : 'Buscar…'}
                             value={search}
-                            onValueChange={setSearch}
+                            onValueChange={(texto) => setSearch(formatarTermo ? formatarTermo(texto) : texto)}
                             onKeyDown={(e) => {
                                 //ENTER SEM NENHUMA OPÇÃO NA LISTA CRIA A TAG (COMPORTAMENTO DO select2 tags:true)
                                 if (e.key === 'Enter' && podeCriar && !document.querySelector('[cmdk-item][data-selected="true"]')) {
@@ -259,7 +264,7 @@
                             THUMB FICAR VISÍVEL SOBRE O FUNDO DO POPOVER NOS DOIS MODOS */}
                         <CommandList id={listaId} className="scrollable-y-auto [--tw-scrollbar-thumb-color:var(--tw-gray-300)]">
 
-                            {!podeCriar && <CommandEmpty>Nenhum resultado</CommandEmpty>}
+                            {!podeCriar && <CommandEmpty>{termoInvalido ? avisoTermoInvalido : 'Nenhum resultado'}</CommandEmpty>}
 
                             <CommandGroup>
 

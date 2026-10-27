@@ -55,7 +55,7 @@
             <>
 
                 <TooltipProvider delayDuration={200}>
-                    <div className="inline-flex items-center justify-center gap-2.5">
+                    <div className="inline-flex items-center justify-center gap-px">
 
                         {Array.isArray(row.content) && row.content.length > 0 ? (
 
@@ -72,7 +72,8 @@
                                                 target={alvoDoLink(item.target)}
                                                 rel={relDoAlvo(item.target)}
                                                 aria-label={item.title}
-                                                className="inline-flex items-center opacity-80 hover:opacity-100 transition-opacity"
+                                                //ÁREA DE CLIQUE 28x28 EM VOLTA DO ÍCONE (ANTES SÓ O ÍCONE DE ~16px RESPONDIA AO CLIQUE)
+                                                className="inline-flex size-7 shrink-0 items-center justify-center rounded-md opacity-80 hover:opacity-100 hover:bg-gray-100 transition-[opacity,background-color]"
                                                 onClick={(e) => onClickAcao(e, item)}
                                             >
                                                 {sprite ? (

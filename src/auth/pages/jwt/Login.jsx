@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { comCliente } from '@/utils/customerHost'
+import { comCliente, getFixedCustomerHost } from '@/utils/customerHost'
 import { Link, useLocation, useNavigate } from 'react-router-dom'
 import * as Yup from 'yup'
 import { useFormik } from 'formik'
@@ -9,15 +9,28 @@ import { lerVoltaAposLogin, limparVoltaAposLogin } from '@/auth/voltaAposLogin'
 import { LogoDoAcesso, CampoDoAcesso, CampoSenhaDoAcesso, BotaoDoAcesso } from './CamposDoAcesso'
 import { useSessaoNoLogin, useCadastroLiberado } from './useSessaoNoLogin'
 
+const senhaSchema = Yup.string()
+    .min(3, 'Digite pelo menos 3 caracteres')
+    .max(50, 'Digite no máximo 50 caracteres')
+    .required('Campo obrigatório')
+
+//LOGIN CENTRAL (/auth/master): SÓ E-MAIL. LOGIN DIRETO NO PAINEL DE UM CLIENTE (?a=, panel/login): CONTINUA PELO LOGIN DO
+//USUÁRIO DAQUELE PAINEL (E PELO ACESSO MASTER DE SUPORTE), QUE NÃO É E-MAIL
 const loginSchema = Yup.object().shape({
+    email: Yup.string()
+        .trim()
+        .email('Digite um e-mail válido')
+        .max(255, 'Digite no máximo 255 caracteres')
+        .required('Campo obrigatório'),
+    password: senhaSchema,
+})
+
+const loginDoPainelSchema = Yup.object().shape({
     email: Yup.string()
         .min(3, 'Digite pelo menos 3 caracteres')
         .max(50, 'Digite no máximo 50 caracteres')
         .required('Campo obrigatório'),
-    password: Yup.string()
-        .min(3, 'Digite pelo menos 3 caracteres')
-        .max(50, 'Digite no máximo 50 caracteres')
-        .required('Campo obrigatório'),
+    password: senhaSchema,
 })
 
 const initialValues = {
@@ -90,9 +103,12 @@ const Login = ({ destino }) => {
 
     }
 
+    //?a= (LOGIN DIRETO NO PAINEL DE UM CLIENTE): ACEITA O LOGIN DO USUÁRIO; SENÃO SÓ E-MAIL
+    const loginDoPainel = Boolean(getFixedCustomerHost())
+
     const formik = useFormik({
         initialValues,
-        validationSchema: loginSchema,
+        validationSchema: loginDoPainel ? loginDoPainelSchema : loginSchema,
         onSubmit: (values, { setStatus }) => handleLogin(values, setStatus),
     })
 
@@ -138,8 +154,10 @@ const Login = ({ destino }) => {
                     formik={formik}
                     name="email"
                     id="login-email"
-                    label="E-mail ou login"
-                    placeholder="Digite seu e-mail ou login"
+                    label={loginDoPainel ? 'E-mail ou login' : 'E-mail'}
+                    placeholder={loginDoPainel ? 'Digite seu e-mail ou login' : 'Digite seu e-mail'}
+                    type={loginDoPainel ? 'text' : 'email'}
+                    autoComplete={loginDoPainel ? 'username' : 'email'}
                 />
 
                 {/* "Esqueceu sua senha?" NÃO EXISTE: O PAINEL NÃO TEM RECUPERAÇÃO DE SENHA */}

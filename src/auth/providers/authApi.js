@@ -100,7 +100,7 @@
             )
 
             if (!auth?.status || !auth?.data?.session_token) {
-                throw new Error(auth?.message || 'Usuário ou senha inválidos.')
+                throw new Error(auth?.message || 'E-mail ou senha inválidos.')
             }
 
             // As demais APIs do painel resolvem o cliente pelo host,

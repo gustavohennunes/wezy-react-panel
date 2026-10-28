@@ -438,6 +438,17 @@
                                 <KeenIcon icon="exit-right-corner" className="ms-auto shrink-0 text-xs text-gray-500" />
                             </Linha>
                         )}
+                        {/* BANCO DE ARQUIVOS DO PROJETO (MÓDULO banco-de-arquivos DO SUPORTE): IMAGENS E ARQUIVOS USADOS NO SITE */}
+                        <Linha
+                            nivel={0}
+                            to="/?pag=banco-de-arquivos"
+                            ativo={new URLSearchParams(location.search).get('pag') === 'banco-de-arquivos'}
+                            semBarra
+                            titulo="Banco de arquivos"
+                            icone={<KeenIcon icon="folder" className="shrink-0 text-base text-gray-500" />}
+                        >
+                            <span className="truncate">Banco de arquivos</span>
+                        </Linha>
                         </div>
                     </div>
                 )}

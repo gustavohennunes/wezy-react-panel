@@ -53,7 +53,9 @@
                         style={{ backgroundColor: cor, opacity: extra?.opacidade ?? 1 }}
                     />
                 )}
-                <span className={quebra ? 'min-w-0 whitespace-normal break-words' : 'truncate'}>{option?.label}</span>
+                {/* truncate = overflow hidden: COM A ALTURA DE LINHA JUSTA DO .input, A PERNA DO "g" E A CEDILHA DO "ç" FICAVAM
+                    FORA DA CAIXA E ERAM CORTADAS. leading-normal + py-px DÃO ESPAÇO PARA ELAS DENTRO DO RECORTE */}
+                <span className={quebra ? 'min-w-0 whitespace-normal break-words' : 'truncate py-px leading-normal'}>{option?.label}</span>
             </span>
         )
 

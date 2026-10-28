@@ -1,5 +1,5 @@
     import { useRef, useState } from 'react'
-    import { useNavigate } from 'react-router-dom'
+    import { Link } from 'react-router-dom'
     import { toast } from 'sonner'
     import clsx from 'clsx'
     import { KeenIcon } from '@/components/keenicons'
@@ -76,7 +76,6 @@
 
     const PicturesGallery = ({ data = SEM_FOTOS }) => {
 
-        const navigate = useNavigate()
         const [confirm, confirmDialog] = useConfirm()
 
         const [fotos, setFotos] = useState(data?.items || [])
@@ -141,10 +140,11 @@
 
         }
 
-        const voltar = () => {
-            const destino = cleanUrl(data.back)
-            navigate(destino.startsWith('?') ? '/' + destino : destino)
-        }
+        //"Voltar" COMO <Link>: O BOTÃO DO MEIO E O CTRL+CLIQUE ABREM O DESTINO NUMA ABA NOVA
+        const destinoVoltar = (() => {
+            const destino = cleanUrl(data.back || '')
+            return destino.startsWith('?') ? '/' + destino : destino
+        })()
 
         return (
             <div className="grid gap-5">
@@ -186,10 +186,10 @@
 
                 {data?.back && (
                     <div className="flex justify-center">
-                        <button type="button" onClick={voltar} className="btn btn-sm btn-light text-sm gap-1.5">
+                        <Link to={destinoVoltar} className="btn btn-sm btn-light text-sm gap-1.5">
                             <KeenIcon icon="arrow-left" className="text-base" />
                             Voltar
-                        </button>
+                        </Link>
                     </div>
                 )}
 

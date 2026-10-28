@@ -3,20 +3,28 @@
     import { toast } from 'sonner'
     import { KeenIcon } from '@/components/keenicons'
     import { Dialog, DialogBody, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from '@/components/ui/dialog'
+    import { useConfirm } from '@/components/ui/confirm-dialog'
     import { api } from '@/services/api'
     import { buildApiUrl } from '@/utils/urlHelper'
     import { diffDeLinhas, comContexto } from '@/utils/diffDeLinhas'
     import { criaMontadorLegado } from '@/components/legacy/criaMontadorLegado'
+    import { Combobox } from './FormCombobox'
 
-    // VERSÕES DO CAMPO "Conteúdo" DA SECTION (?pag=projetos-paginas-sections): O EDITOR TEM HTML, CSS E JS NO MESMO uso_livre
-    // E CADA SAVE GUARDA UMA VERSÃO (registraVersaoSection NO CARTÃO). AQUI DÁ PARA VER CADA VERSÃO, COMPARAR (DIFF COMO O
-    // git diff) COM O QUE ESTÁ NO EDITOR OU COM A VERSÃO ANTERIOR, E RESTAURAR UMA ÁREA NO EDITOR — O SAVE CONTINUA O NORMAL
-    // DO FORMULÁRIO (QUE TAMBÉM REGERA O component_processed). O CARTÃO MARCA O LUGAR COM <div data-versoes-section="ID">
+    // VERSÕES DO HTML, CSS E JS DA SECTION (?pag=projetos-paginas-sections). CADA ABA TEM A PRÓPRIA LINHA DO TEMPO
+    // (includes/config.php: listaVersoesSection), SÓ COM AS VERSÕES EM QUE ELA MUDOU, E A PRIMEIRA É O QUE ESTÁ SALVO HOJE:
+    // - HTML: ÁREA principal DO EDITOR "Conteúdo" (uso_livre). RESTAURA NO EDITOR; O SAVE CONTINUA O NORMAL DO FORMULÁRIO
+    //   (QUE TAMBÉM REGERA O component_processed)
+    // - CSS / JS: ABAS CSS E JS DA SECTION (sg_projetos_paginas_sections_css/_js). O EDITOR DELAS NÃO ESTÁ NESTA TELA, ENTÃO
+    //   RESTAURAR GRAVA DIRETO (acao=versoes-restaurar NO CARTÃO)
+    // - CSS/JS DO EDITOR: ÁREAS css/js DO uso_livre, SÓ QUANDO ALGUMA VERSÃO USA. RESTAURA NO EDITOR, COMO O HTML
+    // O CARTÃO MARCA O LUGAR COM <div data-versoes-section="ID">
 
-    const AREAS = [
+    const ABAS = [
         { chave: 'html', titulo: 'HTML', area: 'principal' },
-        { chave: 'css', titulo: 'CSS', area: 'css' },
-        { chave: 'js', titulo: 'JS', area: 'js' },
+        { chave: 'css', titulo: 'CSS' },
+        { chave: 'js', titulo: 'JS' },
+        { chave: 'css_editor', titulo: 'CSS do editor', area: 'css', opcional: true },
+        { chave: 'js_editor', titulo: 'JS do editor', area: 'js', opcional: true },
     ]
 
     //CONTEÚDO DE UMA ÁREA NO EDITOR AGORA: A ÁREA ABERTA ESTÁ NO ACE (window.editor), AS OUTRAS NOS HIDDEN .conteudo-area
@@ -37,6 +45,15 @@
             window.editor.getSession().setValue(texto)
         }
     }
+
+    const urlDoCartao = (extras) => {
+        const params = new URLSearchParams(window.location.search)
+        Object.entries(extras).forEach(([chave, valor]) => params.set(chave, valor))
+        return buildApiUrl(params)
+    }
+
+    //O CARTÃO RESPONDE COM exit(json_encode(...)): VEM CRU OU DENTRO DO ENVELOPE DA API
+    const dadosDaResposta = (resposta) => resposta.data?.success?.response?.data ?? resposta.data
 
     const MARCA_DA_LINHA = { igual: ' ', removida: '-', adicionada: '+' }
 
@@ -81,65 +98,113 @@
 
         const idSection = elemento.getAttribute('data-versoes-section')
 
-        const [aberto, setAberto]         = useState(false)
-        const [carregando, setCarregando] = useState(false)
-        const [versoes, setVersoes]       = useState(null)
+        const [aberto, setAberto]           = useState(false)
+        const [carregando, setCarregando]   = useState(false)
+        const [restaurando, setRestaurando] = useState(false)
+        const [linhasDoTempo, setLinhasDoTempo] = useState(null)
+        const [aba, setAba]                 = useState('html')
         const [selecionada, setSelecionada] = useState(0)
-        const [aba, setAba]               = useState('html')
-        const [comparar, setComparar]     = useState('editor')
-        const [inteiro, setInteiro]       = useState(false)
-        //CONTEÚDO DO EDITOR LIDO AO ABRIR (O EDITOR NÃO MUDA COM O MODAL ABERTO)
-        const [noEditor, setNoEditor]     = useState({})
+        const [comparar, setComparar]       = useState('anterior')
+        const [inteiro, setInteiro]         = useState(false)
+        //ÁREAS DO EDITOR LIDAS AO ABRIR (O EDITOR NÃO MUDA COM O MODAL ABERTO)
+        const [noEditor, setNoEditor]       = useState({})
+        const [confirm, confirmDialog]      = useConfirm()
 
-        const abre = async () => {
-
-            setAberto(true)
-            setNoEditor(Object.fromEntries(AREAS.map(({ chave, area }) => [chave, conteudoNoEditor(area)])))
+        const carrega = async () => {
             setCarregando(true)
-
             try {
-                const params = new URLSearchParams(window.location.search)
-                params.set('acao', 'versoes-conteudo')
-                params.set('id', idSection)
-                const resposta = await api.get(buildApiUrl(params))
-                const dados    = resposta.data?.success?.response?.data ?? resposta.data
-                setVersoes(Array.isArray(dados?.versions) ? dados.versions : [])
-                setSelecionada(0)
+                const dados = dadosDaResposta(await api.get(urlDoCartao({ acao: 'versoes-conteudo', id: idSection })))
+                setLinhasDoTempo(dados?.timelines && typeof dados.timelines === 'object' ? dados.timelines : {})
             } catch {
-                setVersoes(null)
+                setLinhasDoTempo(null)
                 toast.error('Não foi possível carregar as versões.')
             } finally {
                 setCarregando(false)
             }
-
         }
 
-        const versao   = versoes?.[selecionada]
-        const anterior = versoes?.[selecionada + 1]
-        const areaAtual = AREAS.find((item) => item.chave === aba)
+        //A VERSÃO SALVA HOJE COMPARADA COM ELA MESMA NÃO MOSTRAVA NADA: ELA ABRE COM "versão anterior" (O QUE O ÚLTIMO SAVE
+        //MUDOU); AS ANTIGAS ABREM COM "atual" (O QUE MUDA SE RESTAURAR)
+        const seleciona = (indice, lista) => {
+            setSelecionada(indice)
+            setComparar(lista?.[indice]?.current === false ? 'atual' : 'anterior')
+        }
 
-        //"editor": O QUE MUDA SE RESTAURAR ESTA VERSÃO (EDITOR -> VERSÃO). "anterior": O QUE ESTE SAVE MUDOU (ANTERIOR -> VERSÃO)
+        const abre = () => {
+            setAberto(true)
+            seleciona(0)
+            setNoEditor(Object.fromEntries(ABAS.filter((item) => item.area).map(({ chave, area }) => [chave, conteudoNoEditor(area)])))
+            carrega()
+        }
+
+        //CSS/JS DO EDITOR SÓ APARECEM QUANDO ALGUMA VERSÃO TEM CONTEÚDO NELES
+        const abasVisiveis = ABAS.filter((item) => !item.opcional || (linhasDoTempo?.[item.chave] || []).some((versao) => versao.content !== ''))
+        const abaAtual     = ABAS.find((item) => item.chave === aba)
+        const versoes      = linhasDoTempo?.[aba] || []
+        const versao       = versoes[selecionada]
+        const anterior     = versoes[selecionada + 1]
+        const noEditorAba  = abaAtual?.area !== undefined
+
+        //"atual": O QUE MUDA AO RESTAURAR ESTA VERSÃO (EDITOR, OU O SALVO HOJE NAS ABAS CSS/JS -> VERSÃO).
+        //"anterior": O QUE ESTE SAVE MUDOU (VERSÃO ANTERIOR -> VERSÃO)
+        const atual = noEditorAba ? noEditor[aba] ?? '' : versoes[0]?.content ?? ''
         const linhas = useMemo(() => {
             if (!versao) return []
-            const base = comparar === 'editor' ? noEditor[aba] ?? '' : anterior?.areas?.[aba] ?? ''
-            return diffDeLinhas(base, versao.areas?.[aba] ?? '')
-        }, [versao, anterior, aba, comparar, noEditor])
+            return diffDeLinhas(comparar === 'atual' ? atual : anterior?.content ?? '', versao.content ?? '')
+        }, [versao, anterior, comparar, atual])
 
         const adicionadas = linhas.filter((linha) => linha.tipo === 'adicionada').length
         const removidas   = linhas.filter((linha) => linha.tipo === 'removida').length
 
-        //ABA QUE MUDOU NESTA VERSÃO (PARA MARCAR NA LISTA E NAS ABAS)
-        const mudou = (atual, outra, chave) => (atual?.areas?.[chave] ?? '') !== (outra?.areas?.[chave] ?? '')
+        const trocaAba = (chave) => {
+            setAba(chave)
+            seleciona(0)
+        }
 
-        const restaura = () => {
-            restauraNoEditor(areaAtual.area, versao.areas?.[aba] ?? '')
+        const restaura = async () => {
+
+            if (noEditorAba) {
+                restauraNoEditor(abaAtual.area, versao.content ?? '')
+                setAberto(false)
+                toast.success(`${abaAtual.titulo} da versão de ${versao.date || 'agora'} restaurado no editor. Salve a section para aplicar.`)
+                return
+            }
+
+            //ABAS CSS/JS: GRAVA DIRETO. FECHA O MODAL ANTES PARA A CONFIRMAÇÃO NÃO DISPUTAR FOCO COM ELE
             setAberto(false)
-            toast.success(`${areaAtual.titulo} da versão de ${versao.date} restaurado no editor. Salve a section para aplicar.`)
+            const confirmou = await confirm({
+                title: `Restaurar o ${abaAtual.titulo}?`,
+                description: `O ${abaAtual.titulo} da section volta para a versão de ${versao.date} e é salvo agora. O conteúdo atual continua guardado nas versões.`,
+                confirmText: 'Restaurar',
+                cancelText: 'Cancelar',
+                confirmClass: 'btn-primary',
+            })
+            if (!confirmou) {
+                setAberto(true)
+                return
+            }
+
+            setRestaurando(true)
+            try {
+                const dados = dadosDaResposta(await api.post(urlDoCartao({ acao: 'versoes-restaurar', id: idSection, timeline: aba, versao: versao.id }), {}))
+                if (dados?.status !== true) throw new Error(dados?.message)
+                toast.success(dados.message || `${abaAtual.titulo} restaurado.`)
+            } catch (erro) {
+                toast.error(erro?.message || `Não foi possível restaurar o ${abaAtual.titulo}.`)
+            } finally {
+                setRestaurando(false)
+            }
+
+        }
+
+        const descricaoDaVersao = (item) => {
+            if (item.current) return item.date ? `Salva atualmente (desde ${item.date})` : 'Salva atualmente'
+            return item.date
         }
 
         return (
             <>
-                <button type="button" className="btn btn-sm btn-light gap-1.5" onClick={abre}>
+                <button type="button" className="btn btn-sm btn-light gap-1.5" onClick={abre} disabled={restaurando}>
                     <KeenIcon icon="time" className="text-sm" />
                     Ver versões do HTML, CSS e JS
                 </button>
@@ -148,99 +213,100 @@
                     <DialogContent className="flex max-h-[90vh] w-[calc(100vw-32px)] max-w-6xl flex-col p-0">
 
                         <DialogHeader className="px-5">
-                            <DialogTitle>Versões do conteúdo</DialogTitle>
+                            <DialogTitle>Versões do HTML, CSS e JS</DialogTitle>
                             <DialogDescription className="sr-only">Versões salvas do HTML, CSS e JS da section, com comparação</DialogDescription>
                         </DialogHeader>
 
-                        <DialogBody className="flex min-h-0 flex-1 flex-col gap-4 overflow-hidden p-5 md:flex-row">
+                        <DialogBody className="flex min-h-0 flex-1 flex-col gap-4 overflow-hidden p-5">
 
                             {carregando && <div className="w-full py-10 text-center text-2sm text-gray-600">Carregando versões…</div>}
 
-                            {!carregando && versoes?.length === 0 && (
-                                <div className="w-full py-10 text-center text-2sm text-gray-600">
-                                    Nenhuma versão salva ainda. A partir de agora, cada vez que a section for salva, uma versão fica guardada aqui.
-                                </div>
-                            )}
-
-                            {!carregando && versao && (
+                            {!carregando && linhasDoTempo && (
                                 <>
-                                    {/* LISTA DE VERSÕES: A MAIS NOVA EM CIMA (= O QUE ESTÁ SALVO HOJE) */}
-                                    <ul className="flex max-h-48 shrink-0 flex-col gap-1 overflow-y-auto md:max-h-none md:w-60">
-                                        {versoes.map((item, indice) => (
-                                            <li key={item.id}>
-                                                <button
-                                                    type="button"
-                                                    onClick={() => setSelecionada(indice)}
-                                                    className={clsx(
-                                                        'flex w-full flex-col items-start rounded-md border px-3 py-2 text-start',
-                                                        indice === selecionada ? 'border-primary bg-primary-light' : 'border-gray-200 hover:bg-gray-100'
-                                                    )}
-                                                >
-                                                    <span className={clsx('text-2sm font-semibold', indice === selecionada ? 'text-primary' : 'text-gray-900')}>
-                                                        {item.date}
-                                                    </span>
-                                                    <span className="text-xs text-gray-600">
-                                                        {indice === 0 ? 'Salva atualmente' : item.user || 'Usuário não identificado'}
-                                                    </span>
-                                                    <span className="mt-1 flex gap-1">
-                                                        {AREAS.filter(({ chave }) => mudou(item, versoes[indice + 1], chave)).map(({ chave, titulo }) => (
-                                                            <span key={chave} className="badge badge-sm badge-outline">{titulo}</span>
-                                                        ))}
-                                                    </span>
-                                                </button>
-                                            </li>
+                                    <div className="flex flex-wrap gap-1" role="tablist">
+                                        {abasVisiveis.map(({ chave, titulo }) => (
+                                            <button
+                                                key={chave}
+                                                type="button"
+                                                role="tab"
+                                                aria-selected={aba === chave}
+                                                onClick={() => trocaAba(chave)}
+                                                className={clsx('btn btn-sm gap-1.5', aba === chave ? 'btn-primary' : 'btn-light')}
+                                            >
+                                                {titulo}
+                                                <span className="text-xs opacity-75">{(linhasDoTempo[chave] || []).length}</span>
+                                            </button>
                                         ))}
-                                    </ul>
+                                    </div>
 
-                                    <div className="flex min-h-0 min-w-0 flex-1 flex-col gap-3">
+                                    {versao && (
+                                        <div className="flex min-h-0 flex-1 flex-col gap-4 md:flex-row">
 
-                                        <div className="flex flex-wrap items-center gap-2">
-                                            <div className="flex gap-1" role="tablist">
-                                                {AREAS.map(({ chave, titulo }) => (
-                                                    <button
-                                                        key={chave}
-                                                        type="button"
-                                                        role="tab"
-                                                        aria-selected={aba === chave}
-                                                        onClick={() => setAba(chave)}
-                                                        className={clsx('btn btn-sm', aba === chave ? 'btn-primary' : 'btn-light')}
-                                                    >
-                                                        {titulo}
-                                                    </button>
+                                            {/* VERSÕES DA ABA: A MAIS NOVA EM CIMA (= O QUE ESTÁ SALVO HOJE) */}
+                                            <ul className="flex max-h-48 shrink-0 flex-col gap-1 overflow-y-auto md:max-h-none md:w-60">
+                                                {versoes.map((item, indice) => (
+                                                    <li key={item.id + indice}>
+                                                        <button
+                                                            type="button"
+                                                            onClick={() => seleciona(indice, versoes)}
+                                                            className={clsx(
+                                                                'flex w-full flex-col items-start rounded-md border px-3 py-2 text-start',
+                                                                indice === selecionada ? 'border-primary bg-primary-light' : 'border-gray-200 hover:bg-gray-100'
+                                                            )}
+                                                        >
+                                                            <span className={clsx('text-2sm font-semibold', indice === selecionada ? 'text-primary' : 'text-gray-900')}>
+                                                                {descricaoDaVersao(item)}
+                                                            </span>
+                                                            {item.user && <span className="text-xs text-gray-600">{item.user}</span>}
+                                                        </button>
+                                                    </li>
                                                 ))}
+                                                {versoes.length === 1 && (
+                                                    <li className="px-1 pt-1 text-xs text-gray-600">Nenhuma versão anterior ainda. A cada save, a versão nova aparece aqui.</li>
+                                                )}
+                                            </ul>
+
+                                            <div className="flex min-h-0 min-w-0 flex-1 flex-col gap-3">
+
+                                                <div className="flex flex-wrap items-center gap-2">
+                                                    {/* MESMO COMBOBOX DOS FORMULÁRIOS NO LUGAR DO <select> NATIVO */}
+                                                    <div className="w-72 max-w-full">
+                                                        <Combobox
+                                                            ariaLabel="Comparar com"
+                                                            value={comparar}
+                                                            onChange={setComparar}
+                                                            options={[
+                                                                { value: 'atual', label: noEditorAba ? 'Comparar com o editor atual' : 'Comparar com o salvo atualmente' },
+                                                                { value: 'anterior', label: 'Comparar com a versão anterior' },
+                                                            ]}
+                                                        />
+                                                    </div>
+
+                                                    <label className="flex items-center gap-1.5 text-2sm text-gray-700">
+                                                        <input type="checkbox" className="checkbox checkbox-sm" checked={inteiro} onChange={(e) => setInteiro(e.target.checked)} />
+                                                        Arquivo inteiro
+                                                    </label>
+
+                                                    <span className="ms-auto flex items-center gap-3 text-xs">
+                                                        <span className="font-semibold text-success">+{adicionadas}</span>
+                                                        <span className="font-semibold text-danger">−{removidas}</span>
+                                                    </span>
+                                                </div>
+
+                                                <span className="text-xs text-gray-600">
+                                                    {comparar === 'atual'
+                                                        ? 'Verde: entra ao restaurar esta versão. Vermelho: sai.'
+                                                        : anterior ? `Mudanças desde a versão de ${anterior.date}.` : 'Versão mais antiga guardada.'}
+                                                </span>
+
+                                                <div className="min-h-[240px] flex-1 overflow-auto rounded-md border border-gray-200">
+                                                    <DiffView linhas={linhas} inteiro={inteiro} />
+                                                </div>
+
                                             </div>
 
-                                            <select
-                                                className="select select-sm ms-auto w-auto"
-                                                value={comparar}
-                                                onChange={(e) => setComparar(e.target.value)}
-                                                aria-label="Comparar com"
-                                            >
-                                                <option value="editor">Comparar com o editor atual</option>
-                                                <option value="anterior">Comparar com a versão anterior</option>
-                                            </select>
-
-                                            <label className="flex items-center gap-1.5 text-2sm text-gray-700">
-                                                <input type="checkbox" className="checkbox checkbox-sm" checked={inteiro} onChange={(e) => setInteiro(e.target.checked)} />
-                                                Arquivo inteiro
-                                            </label>
                                         </div>
-
-                                        <div className="flex items-center gap-3 text-xs text-gray-600">
-                                            <span className="font-semibold text-success">+{adicionadas}</span>
-                                            <span className="font-semibold text-danger">−{removidas}</span>
-                                            <span>
-                                                {comparar === 'editor'
-                                                    ? 'Verde: entra no editor ao restaurar. Vermelho: sai do editor.'
-                                                    : anterior ? `Mudanças desde a versão de ${anterior.date}.` : 'Primeira versão guardada.'}
-                                            </span>
-                                        </div>
-
-                                        <div className="min-h-[240px] flex-1 overflow-auto rounded-md border border-gray-200">
-                                            <DiffView linhas={linhas} inteiro={inteiro} />
-                                        </div>
-
-                                    </div>
+                                    )}
                                 </>
                             )}
 
@@ -248,11 +314,13 @@
 
                         {!carregando && versao && (
                             <DialogFooter className="flex flex-wrap items-center justify-between gap-2 px-5">
-                                <span className="text-xs text-gray-600">Restaurar coloca a versão no editor; salve a section para aplicar.</span>
+                                <span className="text-xs text-gray-600">
+                                    {noEditorAba ? 'Restaurar coloca a versão no editor; salve a section para aplicar.' : `Restaurar salva o ${abaAtual.titulo} da section na hora.`}
+                                </span>
                                 <div className="flex gap-2">
                                     <button type="button" className="btn btn-light" onClick={() => setAberto(false)}>Fechar</button>
-                                    <button type="button" className="btn btn-primary" onClick={restaura} disabled={(noEditor[aba] ?? '') === (versao.areas?.[aba] ?? '')}>
-                                        {`Restaurar ${areaAtual.titulo} desta versão`}
+                                    <button type="button" className="btn btn-primary" onClick={restaura} disabled={restaurando || atual === (versao.content ?? '')}>
+                                        {`Restaurar ${abaAtual.titulo} desta versão`}
                                     </button>
                                 </div>
                             </DialogFooter>
@@ -260,6 +328,8 @@
 
                     </DialogContent>
                 </Dialog>
+
+                {confirmDialog}
             </>
         )
 

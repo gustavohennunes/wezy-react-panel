@@ -64,9 +64,10 @@ const Tabs = ({ className, tabs }) => {
                         {tab.content}
                     </button>
                 ) : (
+                    //active: ABA ATUAL QUE O CARTÃO MANDA COM LINK (ex.: "Módulos" DENTRO DE UM MÓDULO VOLTA PARA A LISTAGEM)
                     <a
                         key={chave}
-                        className={`tab shrink-0 whitespace-nowrap`}
+                        className={`tab shrink-0 whitespace-nowrap${tab.active ? ' active' : ''}`}
                         href={cleanUrl(tab.url)}
                         target={alvoDoLink(tab.target)}
                         rel={relDoAlvo(tab.target)}

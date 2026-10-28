@@ -116,6 +116,8 @@
                     url: tabUrl,
                     grupo,
                     ...(tabTarget ? { target: tabTarget } : {}),
+                    //ABA ATUAL COM LINK (data-ativa DO setButtonsModule): ATIVA E CLICÁVEL
+                    ...(link.hasAttribute('data-ativa') ? { active: true } : {}),
                 })
 
             }

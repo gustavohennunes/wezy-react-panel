@@ -3,6 +3,7 @@ import { useLocation } from 'react-router'
 import { useAuthContext } from '@/auth'
 import { useLoaders } from '@/providers'
 import { AppRoutingSetup } from '.'
+import { registraUrlDoHistorico } from '@/utils/urlAnterior'
 const AppRouting = () => {
     const { setProgressBarLoader } = useLoaders()
     const { verify, setLoading } = useAuthContext()
@@ -20,6 +21,10 @@ const AppRouting = () => {
         })
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [])
+    //URL DESTA POSIÇÃO DO HISTÓRICO, PARA O href DO "Voltar" (BotaoVoltar)
+    useEffect(() => {
+        registraUrlDoHistorico()
+    }, [location])
     useEffect(() => {
         if (!firstLoad.current) {
             setProgressBarLoader(true)

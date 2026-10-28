@@ -1,5 +1,4 @@
     import { useState, useEffect, useLayoutEffect, useMemo } from 'react'
-    import { useNavigate } from 'react-router-dom'
     import { FormSection } from './FormSection'
     import { FormTabs } from './FormTabs'
     import { chaveValid, LINHA_ESCONDIDA } from './atributosDaLinha'
@@ -8,10 +7,17 @@
     import { useEnvioDoFormulario } from './useEnvioDoFormulario'
     import { temEditorDeCodigo, instalarEditorGlobal } from './editorGlobal'
     import { ScreenLoader } from '@/components/loaders'
-    import { KeenIcon } from '@/components/keenicons'
     import { useLegacyCodeEditor } from './LegacyCodeEditor'
     import { useLegacyModoCriacao } from './LegacyModoCriacao'
     import { comChaves } from '@/utils/chavesUnicas'
+    import { BotaoVoltar } from './BotaoVoltar'
+
+    //"Voltar" ABERTO DIRETO PELO LINK (SEM PÁGINA ANTERIOR NA ABA): A LISTAGEM DO MESMO MÓDULO, COM OS PARÂMETROS DE CONTEXTO
+    const listagemDoFormulario = () => {
+        const params = new URLSearchParams(window.location.search)
+        ;['acao', 'id', 'alterado', 'inserido'].forEach((chave) => params.delete(chave))
+        return `/?${params.toString()}`
+    }
 
     const SEM_CAMPOS = []
 
@@ -165,7 +171,6 @@
 
     const FormContext = ({ data }) => {
 
-        const navigate = useNavigate()
         const campos   = Array.isArray(data?.form?.fields) ? data.form.fields : SEM_CAMPOS
 
         const { submitForm, loading }                    = useEnvioDoFormulario()
@@ -259,14 +264,7 @@
                 )}
 
                 <div className="flex justify-center mt-5">
-                    <button
-                        type="button"
-                        onClick={() => navigate(-1)}
-                        className="btn btn-sm btn-light text-sm gap-1.5"
-                    >
-                        <KeenIcon icon="arrow-left" className="text-base" />
-                        Voltar
-                    </button>
+                    <BotaoVoltar reserva={listagemDoFormulario()} />
                 </div>
 
             </div>

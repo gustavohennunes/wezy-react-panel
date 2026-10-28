@@ -72,8 +72,11 @@
                                                 target={alvoDoLink(item.target)}
                                                 rel={relDoAlvo(item.target)}
                                                 aria-label={item.title}
-                                                //ÁREA DE CLIQUE 28x28 EM VOLTA DO ÍCONE (ANTES SÓ O ÍCONE DE ~16px RESPONDIA AO CLIQUE)
-                                                className="inline-flex size-7 shrink-0 items-center justify-center rounded-md opacity-80 hover:opacity-100 hover:bg-gray-100 transition-[opacity,background-color]"
+                                                //ÁREA DE CLIQUE 28x28 EM VOLTA DO ÍCONE (ANTES SÓ O ÍCONE DE ~16px RESPONDIA AO CLIQUE).
+                                                //CLIQUE COM O BOTÃO DO MEIO (ABRE NOUTRA ABA) FOCA O ÍCONE E A BORDA ESCURA MARCA QUAL FOI
+                                                //AO VOLTAR PARA ESTA ABA, COMO O :focus DO PAINEL ANTIGO; SOME AO CLICAR EM OUTRO LUGAR
+                                                className="inline-flex size-7 shrink-0 items-center justify-center rounded-md opacity-80 hover:opacity-100 hover:bg-gray-100 transition-[opacity,background-color] focus:opacity-100 focus:outline-none focus:ring-1 focus:ring-gray-900"
+                                                onAuxClick={(e) => e.button === 1 && e.currentTarget.focus()}
                                                 onClick={(e) => onClickAcao(e, item)}
                                             >
                                                 {sprite ? (

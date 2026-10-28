@@ -182,8 +182,10 @@
                         open={!!item.aberto}
                         className={clsx(item.collapse && 'flex-col-reverse')}
                     >
+                        {/* MESMO ÍCONE (text-lg + pr-2) E TÍTULO DOS ITENS FILHOS: O PAI DE UM SUBMENU FICAVA COM O ÍCONE MENOR,
+                            COLADO NO TEXTO, E PARECIA MENOR QUE OS FILHOS */}
                         <MenuLink className="py-2 px-2.5 rounded-md border border-transparent">
-                            <MenuIcon className="text-gray-600">
+                            <MenuIcon className="items-start text-lg text-gray-600 pr-2 menu-item-here:text-gray-800 menu-item-show:text-gray-800 menu-link-hover:text-gray-800 dark:menu-item-here:text-gray-900 dark:menu-item-show:text-gray-900 dark:menu-link-hover:text-gray-900">
                                 <OldIcon icon={icon} />
                             </MenuIcon>
                             {item.collapse ? (

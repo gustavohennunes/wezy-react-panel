@@ -395,6 +395,9 @@ input[name="FrmPagina"] {
     color: var(--tw-primary);
     font-size: 0.75rem;
     font-weight: 500;
+    /* line-height 1: A CAIXA DO TEXTO FICA DO TAMANHO DA FONTE, ENTÃO O align-items:center ALINHA O MEIO DO TEXTO COM O
+       MEIO DO "+" (COM O line-height HERDADO A CAIXA FICAVA ALTA E O TEXTO DESCENTRALIZADO EM RELAÇÃO AO ÍCONE) */
+    line-height: 1;
     text-decoration: none;
     cursor: pointer;
     transition: background-color 0.15s ease, color 0.15s ease, border-color 0.15s ease;
@@ -403,6 +406,9 @@ input[name="FrmPagina"] {
 .legacy-html a[href^="javascript:addMedia" i]::before {
     content: '';
     flex: none;
+    align-self: center;
+    position: relative;
+    top: -1px;
     width: 0.5625rem;
     height: 0.5625rem;
     background:

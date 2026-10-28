@@ -4,6 +4,7 @@ import { PageDataProvider, usePageData } from '@/context/PageDataContext'
 import { ScreenLoader } from '@/components/loaders'
 import { LegacySelectEnhancer } from '@/components/form/LegacySelectEnhancer'
 import { LegacyInputSugestoes } from '@/components/form/LegacyInputSugestoes'
+import { LegacyVersoesDaSection } from '@/components/form/VersoesDaSection'
 import { EmailObrigatorio } from './EmailObrigatorio'
 import { LegacyDialogs } from '@/components/legacy/LegacyDialogs'
 import { DestravaScroll } from './DestravaScroll'
@@ -24,6 +25,7 @@ const PanelBody = () => {
             <Main />
             <LegacySelectEnhancer />
             <LegacyInputSugestoes />
+            <LegacyVersoesDaSection />
             <EmailObrigatorio />
             <LegacyDialogs />
             <DestravaScroll />

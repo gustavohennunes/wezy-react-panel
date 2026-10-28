@@ -1,12 +1,10 @@
     import { useEffect, useReducer, useRef } from 'react'
-    import { createRoot } from 'react-dom/client'
     import { SugestoesDoInput } from './CampoComSugestoes'
+    import { criaMontadorLegado } from '@/components/legacy/criaMontadorLegado'
 
     // DROPDOWN DE SUGESTÕES NOS <input> CRUS DOS CARTÕES (HTML DO aut, ex.: Src DO IMAGE DENTRO DE UMA LISTA NO BACK-END DAS
     // SECTIONS): data-sugestoes='[{"value":"...","description":"..."}]'. O INPUT ORIGINAL CONTINUA VISÍVEL E DIGITÁVEL — A
     // LISTA SÓ ESCREVE NELE (E DISPARA input/change PARA O CÓDIGO DO CARTÃO)
-
-    const MARCADOR = 'data-legacy-sugestoes'
 
     const lerSugestoes = (input) => {
         try {
@@ -17,9 +15,10 @@
         }
     }
 
-    const LegacySugestoes = ({ input, sugestoes }) => {
+    const LegacySugestoes = ({ elemento: input }) => {
 
         const inputRef     = useRef(input)
+        const sugestoes    = useRef(lerSugestoes(input)).current
         const [, atualiza] = useReducer((n) => n + 1, 0)
 
         //VALOR DIGITADO OU TROCADO POR OUTRO CÓDIGO DO CARTÃO → MARCA A SUGESTÃO CERTA
@@ -38,79 +37,16 @@
             input.dispatchEvent(new Event('change', { bubbles: true }))
         }
 
+        if (sugestoes.length === 0) return null
+
         return <SugestoesDoInput inputRef={inputRef} sugestoes={sugestoes} valor={input.value} onEscolher={escolhe} />
 
     }
 
-    const montados = new Map()
-
-    const aprimora = (input) => {
-
-        input.setAttribute(MARCADOR, '')
-
-        const sugestoes = lerSugestoes(input)
-        if (sugestoes.length === 0) return
-
-        //O POPOVER VAI POR PORTAL: O CONTAINER SÓ HOSPEDA A RAIZ DO REACT, SEM OCUPAR ESPAÇO NA LINHA
-        const container = document.createElement('div')
-        container.style.display = 'contents'
-        input.insertAdjacentElement('afterend', container)
-
-        const root = createRoot(container)
-        root.render(<LegacySugestoes input={input} sugestoes={sugestoes} />)
-
-        montados.set(input, { root, container })
-
-    }
-
-    const limpaRemovidos = () => {
-
-        montados.forEach(({ root, container }, input) => {
-
-            if (!input.isConnected) {
-                montados.delete(input)
-                //DESMONTA FORA DO CICLO ATUAL — O REACT NÃO ACEITA unmount DURANTE OUTRO RENDER
-                setTimeout(() => {
-                    root.unmount()
-                    container.remove()
-                })
-            }
-
-        })
-
-    }
-
-    const varre = () => {
-        document.querySelectorAll(`input[data-sugestoes]:not([${MARCADOR}])`).forEach(aprimora)
-        limpaRemovidos()
-    }
-
-    const LegacyInputSugestoes = () => {
-
-        useEffect(() => {
-
-            varre()
-
-            //VÁRIAS MUTAÇÕES NO MESMO FRAME VIRAM UMA VARREDURA SÓ
-            let agendado = null
-            const observer = new MutationObserver(() => {
-                if (agendado) return
-                agendado = requestAnimationFrame(() => {
-                    agendado = null
-                    varre()
-                })
-            })
-            observer.observe(document.body, { childList: true, subtree: true })
-
-            return () => {
-                observer.disconnect()
-                if (agendado) cancelAnimationFrame(agendado)
-            }
-
-        }, [])
-
-        return null
-
-    }
+    const LegacyInputSugestoes = criaMontadorLegado({
+        seletor: 'input[data-sugestoes]',
+        marcador: 'data-legacy-sugestoes',
+        Componente: LegacySugestoes,
+    })
 
     export { LegacyInputSugestoes }

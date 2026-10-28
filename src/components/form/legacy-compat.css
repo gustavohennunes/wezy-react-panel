@@ -399,11 +399,15 @@ input[name="FrmPagina"] {
     cursor: pointer;
     transition: background-color 0.15s ease, color 0.15s ease, border-color 0.15s ease;
 }
+/* "+" DESENHADO COM DOIS TRAÇOS: O CARACTERE FICAVA ABAIXO DO MEIO DO TEXTO (MÉTRICA DA FONTE) */
 .legacy-html a[href^="javascript:addMedia" i]::before {
-    content: '+';
-    font-size: 0.9375rem;
-    font-weight: 600;
-    line-height: 1;
+    content: '';
+    flex: none;
+    width: 0.5625rem;
+    height: 0.5625rem;
+    background:
+        linear-gradient(currentColor, currentColor) center / 100% 1.5px no-repeat,
+        linear-gradient(currentColor, currentColor) center / 1.5px 100% no-repeat;
 }
 .legacy-html a[href^="javascript:addMedia" i]:hover,
 .legacy-html a[href^="javascript:addMedia" i]:focus-visible {

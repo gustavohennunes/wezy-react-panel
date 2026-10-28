@@ -1,10 +1,10 @@
 import { useState } from 'react'
-import { comCliente, getFixedCustomerHost } from '@/utils/customerHost'
+import { comCliente } from '@/utils/customerHost'
 import { Link, useLocation, useNavigate } from 'react-router-dom'
 import * as Yup from 'yup'
 import { useFormik } from 'formik'
 import { useAuthContext } from '@/auth'
-import { Alert } from '@/components'
+import { Alert, KeenIcon } from '@/components'
 import { lerVoltaAposLogin, limparVoltaAposLogin } from '@/auth/voltaAposLogin'
 import { LogoDoAcesso, CampoDoAcesso, CampoSenhaDoAcesso, BotaoDoAcesso } from './CamposDoAcesso'
 import { useSessaoNoLogin, useCadastroLiberado } from './useSessaoNoLogin'
@@ -14,21 +14,12 @@ const senhaSchema = Yup.string()
     .max(50, 'Digite no máximo 50 caracteres')
     .required('Campo obrigatório')
 
-//LOGIN CENTRAL (/auth/master): SÓ E-MAIL. LOGIN DIRETO NO PAINEL DE UM CLIENTE (?a=, panel/login): CONTINUA PELO LOGIN DO
-//USUÁRIO DAQUELE PAINEL (E PELO ACESSO MASTER DE SUPORTE), QUE NÃO É E-MAIL
+//SÓ E-MAIL, NO LOGIN CENTRAL (/auth/master) E NO DIRETO NO PAINEL DE UM CLIENTE (?a=, panel/login)
 const loginSchema = Yup.object().shape({
     email: Yup.string()
         .trim()
         .email('Digite um e-mail válido')
         .max(255, 'Digite no máximo 255 caracteres')
-        .required('Campo obrigatório'),
-    password: senhaSchema,
-})
-
-const loginDoPainelSchema = Yup.object().shape({
-    email: Yup.string()
-        .min(3, 'Digite pelo menos 3 caracteres')
-        .max(50, 'Digite no máximo 50 caracteres')
         .required('Campo obrigatório'),
     password: senhaSchema,
 })
@@ -45,19 +36,23 @@ const telaDeOrigem = (destino, origem) =>
 
 //USUÁRIO QUE EXISTE EM MAIS DE UM PAINEL (409 DO /auth/master): ESCOLHE QUAL ACESSAR
 const EscolhaDePainel = ({ paineis, desabilitado, onEscolher }) => (
-    <div className="flex flex-col gap-2">
+    <div className="flex flex-col gap-2.5">
         {paineis.map((painel) => (
             <button
                 key={painel.id_painel_cliente}
                 type="button"
-                className="btn btn-light justify-start"
+                className="group flex items-center gap-3 w-full rounded-lg border border-gray-300 bg-light px-3.5 py-3 text-start transition-colors hover:border-primary hover:bg-primary-light focus-visible:outline-none focus-visible:border-primary focus-visible:ring-2 focus-visible:ring-primary/30 disabled:pointer-events-none disabled:opacity-60"
                 disabled={desabilitado}
                 onClick={() => onEscolher(painel.id_painel_cliente)}
             >
-                <span className="flex flex-col items-start">
-                    <span className="font-medium">{painel.cliente}</span>
-                    <span className="text-2sm text-gray-600">{painel.dominio}</span>
+                <span className="flex size-9 shrink-0 items-center justify-center rounded-lg bg-primary-light text-primary transition-colors group-hover:bg-primary group-hover:text-primary-inverse">
+                    <KeenIcon icon="abstract-26" className="text-lg" />
                 </span>
+                <span className="flex min-w-0 grow flex-col gap-0.5">
+                    <span className="truncate text-sm font-semibold text-gray-900">{painel.cliente}</span>
+                    <span className="truncate text-2sm text-gray-600">{painel.dominio}</span>
+                </span>
+                <KeenIcon icon="right" className="shrink-0 text-sm text-gray-500 transition-transform group-hover:translate-x-0.5 group-hover:text-primary" />
             </button>
         ))}
     </div>
@@ -103,12 +98,9 @@ const Login = ({ destino }) => {
 
     }
 
-    //?a= (LOGIN DIRETO NO PAINEL DE UM CLIENTE): ACEITA O LOGIN DO USUÁRIO; SENÃO SÓ E-MAIL
-    const loginDoPainel = Boolean(getFixedCustomerHost())
-
     const formik = useFormik({
         initialValues,
-        validationSchema: loginDoPainel ? loginDoPainelSchema : loginSchema,
+        validationSchema: loginSchema,
         onSubmit: (values, { setStatus }) => handleLogin(values, setStatus),
     })
 
@@ -154,10 +146,10 @@ const Login = ({ destino }) => {
                     formik={formik}
                     name="email"
                     id="login-email"
-                    label={loginDoPainel ? 'E-mail ou login' : 'E-mail'}
-                    placeholder={loginDoPainel ? 'Digite seu e-mail ou login' : 'Digite seu e-mail'}
-                    type={loginDoPainel ? 'text' : 'email'}
-                    autoComplete={loginDoPainel ? 'username' : 'email'}
+                    label="E-mail"
+                    placeholder="Digite seu e-mail"
+                    type="email"
+                    autoComplete="email"
                 />
 
                 {/* "Esqueceu sua senha?" NÃO EXISTE: O PAINEL NÃO TEM RECUPERAÇÃO DE SENHA */}

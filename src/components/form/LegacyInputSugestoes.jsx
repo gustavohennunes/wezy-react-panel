@@ -3,7 +3,7 @@
     import { criaMontadorLegado } from '@/components/legacy/criaMontadorLegado'
 
     // DROPDOWN DE SUGESTÕES NOS <input> CRUS DOS CARTÕES (HTML DO aut, ex.: Src DO IMAGE DENTRO DE UMA LISTA NO BACK-END DAS
-    // SECTIONS): data-sugestoes='[{"value":"...","description":"..."}]'. O INPUT ORIGINAL CONTINUA VISÍVEL E DIGITÁVEL — A
+    // SECTIONS): data-sugestoes='[{"value":"...","description":"..."}]' E, OPCIONAL, data-sugestoes-titulo (CABEÇALHO). O INPUT ORIGINAL CONTINUA VISÍVEL E DIGITÁVEL — A
     // LISTA SÓ ESCREVE NELE (E DISPARA input/change PARA O CÓDIGO DO CARTÃO)
 
     const lerSugestoes = (input) => {
@@ -39,7 +39,15 @@
 
         if (sugestoes.length === 0) return null
 
-        return <SugestoesDoInput inputRef={inputRef} sugestoes={sugestoes} valor={input.value} onEscolher={escolhe} />
+        return (
+            <SugestoesDoInput
+                inputRef={inputRef}
+                sugestoes={sugestoes}
+                valor={input.value}
+                onEscolher={escolhe}
+                titulo={input.getAttribute('data-sugestoes-titulo')}
+            />
+        )
 
     }
 

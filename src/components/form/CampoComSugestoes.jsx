@@ -7,7 +7,8 @@
     // O CAMPO CONTINUA DIGITÁVEL PARA VALORES QUE AINDA NÃO ESTÃO NELA. O INPUT PODE SER DO REACT (CampoComSugestoes, ÍNDICE 11
     // DO Frm NO CARTÃO) OU DO HTML DO CARTÃO (data-sugestoes, VER LegacyInputSugestoes): OS EVENTOS VÃO DIRETO NO ELEMENTO
 
-    const SugestoesDoInput = ({ inputRef, sugestoes, valor, onEscolher }) => {
+    // titulo: CABEÇALHO OPCIONAL DA LISTA (ex.: "Possíveis variáveis")
+    const SugestoesDoInput = ({ inputRef, sugestoes, valor, onEscolher, titulo }) => {
 
         const [aberto, setAberto]       = useState(false)
         const [destacada, setDestacada] = useState(-1)
@@ -98,7 +99,12 @@
                         if (e.target === inputRef.current) e.preventDefault()
                     }}
                 >
-                    <ul id={listaId} role="listbox" className="scrollable-y-auto max-h-72 [--tw-scrollbar-thumb-color:var(--tw-gray-300)]">
+                    {titulo && (
+                        <div className="px-2.5 pt-1.5 pb-1 text-2xs font-semibold uppercase tracking-wide text-gray-500">
+                            {titulo}
+                        </div>
+                    )}
+                    <ul id={listaId} role="listbox" aria-label={titulo || undefined} className="scrollable-y-auto max-h-72 [--tw-scrollbar-thumb-color:var(--tw-gray-300)]">
                         {sugestoes.map((sugestao, indice) => {
 
                             const selecionada = sugestao.value === valor

@@ -129,15 +129,14 @@
     }
 
     /**
-     * Login no painel de um cliente só (panel/login com o Customer-Host do ?a=). Igual ao
-     * painel legado em painel.../?a=dominio: o usuário precisa existir naquele painel
-     * (ex.: "admin"), não no cadastro central.
+     * Login no painel de um cliente só (panel/login com o Customer-Host do ?a=): o usuário precisa
+     * existir naquele painel, não no cadastro central. Só pelo e-mail (o legado continua pelo login).
      */
-    export const entrarNoPainel = async (login, senha) => {
+    export const entrarNoPainel = async (email, senha) => {
 
         try {
-            const { data: resposta } = await axios.post(`${CAYMAN_API_URL}/panel/login`, { login, senha }, { headers: JSON_DO_CLIENTE() })
-            return sessaoDoPainel(resposta, 'Usuário ou senha inválidos.')
+            const { data: resposta } = await axios.post(`${CAYMAN_API_URL}/panel/login`, { email, senha }, { headers: JSON_DO_CLIENTE() })
+            return sessaoDoPainel(resposta, 'E-mail ou senha inválidos.')
         } catch (error) {
             avisarSistemaForaDoAr(error)
             throw new Error(error.response?.data?.error?.message || error.message || 'Não foi possível autenticar. Tente novamente.')

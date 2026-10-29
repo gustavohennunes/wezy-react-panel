@@ -7,6 +7,9 @@ import { CSS } from '@dnd-kit/utilities'
 import { GripVertical } from 'lucide-react'
 import { useDataGrid } from '.'
 import { cn } from '@/lib/utils'
+import { useLayoutEffect, useRef } from 'react'
+import { useNavigate } from 'react-router-dom'
+import { tratarCliqueEmLinkDoLegado } from '@/components/legacy/cliqueEmLinkDoLegado'
 
 //ARRASTAR SÓ NO EIXO VERTICAL E SEM SAIR DO <tbody>
 const MODIFICADORES = [restrictToVerticalAxis, restrictToParentElement]
@@ -66,6 +69,41 @@ const LinhaOrdenavel = ({ row, desativado, className, celulaAlca, children }) =>
             </td>
             {children}
         </tr>
+    )
+
+}
+
+//LINHAS EM HTML DO CARTÃO NUM <tbody> PRÓPRIO ANTES DO CORPO DO GRID: GANHAM O ESPAÇAMENTO E A BORDA DAS LINHAS DO GRID
+//E, NA LISTAGEM ORDENÁVEL, UMA CÉLULA VAZIA NO LUGAR DA ALÇA PARA AS COLUNAS NÃO DESALINHAREM. LINK ?pag= VAI PELO ROUTER
+const LinhasHtmlNoTopo = ({ html, ordenavel, classeCelula, classeLinha }) => {
+
+    const corpoRef = useRef(null)
+    const navigate = useNavigate()
+
+    useLayoutEffect(() => {
+
+        const corpo = corpoRef.current
+        if (!corpo) return
+
+        //SÓ UMA VEZ POR HTML: O innerHTML SÓ É RECRIADO QUANDO O html MUDA
+        corpo.querySelectorAll(':scope > tr:not([data-linha-ajustada])').forEach((tr) => {
+            tr.setAttribute('data-linha-ajustada', '')
+            tr.className = cn(tr.className, classeLinha)
+            if (ordenavel) tr.insertBefore(document.createElement('td'), tr.firstChild)
+            tr.querySelectorAll(':scope > td').forEach((td) => {
+                td.className = cn(td.className, classeCelula)
+            })
+        })
+
+    }, [html, ordenavel, classeCelula, classeLinha])
+
+    return (
+        <tbody
+            ref={corpoRef}
+            className="legacy-html"
+            onClick={(event) => tratarCliqueEmLinkDoLegado(event, navigate)}
+            dangerouslySetInnerHTML={{ __html: html }}
+        />
     )
 
 }
@@ -212,6 +250,15 @@ const DataGridTable = () => {
                     </tr>
                 ))}
             </thead>
+            {/* props.linhasHtmlNoTopo: <tr> CRUS DO CARTÃO ($novoResultadoInicial) COMO PRIMEIRAS LINHAS DA PRÓPRIA TABELA */}
+            {props.linhasHtmlNoTopo && (
+                <LinhasHtmlNoTopo
+                    html={props.linhasHtmlNoTopo}
+                    ordenavel={ordenavel}
+                    classeCelula={cn(bodyCellSpacing, cellBorder && 'border-e', 'align-middle !text-[13px]')}
+                    classeLinha={classeLinha}
+                />
+            )}
             <tbody className="[&_tr:last-child]:border-0">
                 {ordenavel ? (
                     <SortableContext items={linhas.map((row) => row.id)} strategy={verticalListSortingStrategy}>

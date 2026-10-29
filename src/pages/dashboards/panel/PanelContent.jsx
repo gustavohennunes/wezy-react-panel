@@ -76,8 +76,18 @@
 
     }
 
+    //JAVASCRIPT DO MÓDULO (CAMPO javascript + ÁREA js DO CARTÃO): NO LEGADO O includes/pagina.php IMPRIMIA ANTES DO CARTÃO.
+    //ANTES IA NO <Helmet>: RODAVA FORA DA FILA DOS SCRIPTS (ÀS VEZES ANTES DO HTML DOS CAMPOS) E NÃO RODAVA DE NOVO AO
+    //VOLTAR PARA UM CARTÃO COM O MESMO JS. PASSANDO PELO LegacyHtml GANHA A FILA E O ambienteDoCartao.
+    //</script NO MEIO DO JS FECHARIA A TAG NO innerHTML: <\/script É O MESMO TEXTO PARA O JS
+    const ScriptDoModulo = ({ javascript }) => (
+        <LegacyHtml html={'<script>' + javascript.replace(/<\/script/gi, '<\\/script') + '</script>'} style={{ display: 'none' }} />
+    )
+
     //memo: SÓ REFAZ A TELA QUANDO CHEGA OUTRO pageData (NÃO A CADA RENDER DO PanelContent)
     const ConteudoDoModulo = memo(({ pageData }) => {
+
+        const javascript = typeof pageData?.javascript === 'string' && pageData.javascript.trim() ? pageData.javascript : ''
 
         const principal = <>
             {pageData?.layout === 'form' && typeof pageData?.params?.backend_search_html === 'string' && <BackendSearch html={pageData.params.backend_search_html} />}
@@ -86,14 +96,14 @@
 
         //O QUE O CARTÃO IMPRIMIU (echo) VEM ANTES DO CONTEÚDO, COMO NO PAINEL LEGADO
         const outputHtml = pageData?.['output-html'] || ''
-        if (outputHtml.trim().length === 0) return principal
 
         //TELA FEITA SÓ POR echo ($lista = false SEM CAMPOS): NÃO MOSTRA O FORMULÁRIO VAZIO
-        const formularioVazio = pageData?.layout === 'form' && !(pageData?.params?.form?.fields?.length > 0)
+        const formularioVazio = outputHtml.trim().length > 0 && pageData?.layout === 'form' && !(pageData?.params?.form?.fields?.length > 0)
 
         return (
             <>
-                <LegacyHtml html={outputHtml} className={temConteudoVisivel(outputHtml) ? 'legacy-output mb-5' : 'legacy-output'} />
+                {javascript && <ScriptDoModulo javascript={javascript} />}
+                {outputHtml.trim().length > 0 && <LegacyHtml html={outputHtml} className={temConteudoVisivel(outputHtml) ? 'legacy-output mb-5' : 'legacy-output'} />}
                 {formularioVazio ? null : principal}
             </>
         )

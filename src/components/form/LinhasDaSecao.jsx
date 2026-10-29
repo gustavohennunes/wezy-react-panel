@@ -69,11 +69,17 @@
 
     const conteudoDaLinha = (linha) => (linha.columns || []).map((col) => col.content).join('|')
 
-    //TABELA READ-ONLY ({header, rows}) — A PONTE ATUAL NÃO ENVIA OS DADOS
-    //DO Tab (field chega vazio); NESSE CASO NÃO RENDERIZA NADA
+    //LARGURA DO CABEÇALHO DO Tab: "160" (SEM UNIDADE, COMO NO LEGADO) VIRA 160px; "30%" FICA COMO VEIO
+    const larguraDaColuna = (largura) => {
+        const valor = String(largura ?? '').trim()
+        if (valor === '') return undefined
+        return /^\d+(\.\d+)?$/.test(valor) ? `${valor}px` : valor
+    }
+
+    //TABELA READ-ONLY DO Tab ({header, rows}); SEM DADOS NÃO RENDERIZA NADA
     const LinhaTabela = ({ field, className, atributos }) => {
 
-        const { title, subtitle, field: tabela } = field
+        const { title, subtitle, field: tabela = {} } = field
 
         if (!(tabela.header?.length || tabela.rows?.length)) {
             return null
@@ -89,17 +95,18 @@
                     </div>
                 )}
 
-                <div className="w-full overflow-x-auto">
-                    <table className="table table-auto w-full text-[13px]">
+                <div className="w-full lg:flex-1 min-w-0 overflow-x-auto rounded-lg border border-gray-200">
+                    <table className="w-full table-auto text-[13px] text-gray-800">
 
                         {(tabela.header || []).length > 0 && (
-                            <thead>
+                            <thead className="bg-gray-50">
                                 {comChaves(tabela.header, conteudoDaLinha).map(({ item: linha, chave }) => (
-                                    <tr key={chave}>
+                                    <tr key={chave} className="border-b border-gray-200">
                                         {comChaves(linha.columns, (col) => col.content).map(({ item: col, chave: chaveDaColuna }) => (
                                             <th
                                                 key={chaveDaColuna}
-                                                style={{ width: col.width || 'auto', textAlign: col.align || 'left' }}
+                                                className="px-3 py-2 font-medium text-gray-600 whitespace-nowrap"
+                                                style={{ width: larguraDaColuna(col.width), textAlign: col.align || 'left' }}
                                                 dangerouslySetInnerHTML={{ __html: col.content }}
                                             />
                                         ))}
@@ -110,10 +117,12 @@
 
                         <tbody>
                             {comChaves(tabela.rows, conteudoDaLinha).map(({ item: linha, chave }) => (
-                                <tr key={chave}>
+                                <tr key={chave} className="border-b border-gray-200 last:border-0 hover:bg-gray-50">
                                     {comChaves(linha.columns, (col) => col.content).map(({ item: col, chave: chaveDaColuna }) => (
                                         <td
                                             key={chaveDaColuna}
+                                            className="px-3 py-2 align-middle"
+                                            style={{ textAlign: col.align || 'left' }}
                                             dangerouslySetInnerHTML={{ __html: col.content }}
                                         />
                                     ))}

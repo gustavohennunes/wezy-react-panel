@@ -3,6 +3,7 @@
     import { useNavigate } from 'react-router-dom'
     import { DataRowActionsMenu } from '@/components/data-grid/row-components/DataRowActionsMenu'
     import { executarScript } from '@/components/legacy/executarScript'
+    import { criarRegistros, dispararCarregamento, desfazerRegistros } from '@/components/legacy/ambienteDoCartao'
     import { injectLegacyIconsCss } from '@/utils/legacyIcons'
     import { tratarCliqueEmLinkDoLegado } from '@/components/legacy/cliqueEmLinkDoLegado'
     import { filtrarBackendsHtml } from '@/utils/backendSearch'
@@ -85,18 +86,21 @@
             if (!corpo) return
 
             let cancelado = false
+            const registros = criarRegistros()
 
             const executar = async () => {
                 for (const script of Array.from(corpo.querySelectorAll('script'))) {
                     if (cancelado) return
-                    await executarScript(script)
+                    await executarScript(script, registros)
                 }
+                if (!cancelado) dispararCarregamento(registros)
             }
 
             executar()
 
             return () => {
                 cancelado = true
+                desfazerRegistros(registros)
             }
 
         }, [html])

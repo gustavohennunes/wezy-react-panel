@@ -438,3 +438,36 @@ form [data-style] {
     margin-bottom: -1rem;
     box-shadow: inset 3px 0 0 var(--tw-primary);
 }
+
+/* Tab MONTADO EM HTML PELO LEGADO (<table id="listaTudo">, ex.: CARTÕES QUE CHEGAM COMO HTML): SEM O CSS DO PAINEL ANTIGO A
+   TABELA FICAVA ESPREMIDA NO CANTO. OCUPA A LARGURA E GANHA O MESMO VISUAL DA TABELA DO Tab NO FORMULÁRIO */
+.legacy-html table#listaTudo {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 0.8125rem;
+    color: var(--tw-gray-800);
+    border: 1px solid var(--tw-gray-200);
+}
+.legacy-html table#listaTudo th,
+.legacy-html table#listaTudo td {
+    padding: 0.5rem 0.75rem;
+    border-bottom: 1px solid var(--tw-gray-200);
+}
+.legacy-html table#listaTudo tr:first-child:not(.listaConteudo) {
+    background-color: var(--tw-gray-50, var(--tw-light));
+    color: var(--tw-gray-600);
+    font-weight: 500;
+}
+
+/* LINKS DE TEXTO DAS LINHAS "aut" DO FORMULÁRIO (ex.: "Códigos iniciais" / "Acessos rápidos" DO CARTÃO DE MÓDULOS):
+   O PREFLIGHT DO TAILWIND DEIXA O <a> COM A COR DO TEXTO, SEM CARA DE LINK. SÓ PEGA <a> SEM CLASSE (BOTÕES DO LEGADO
+   TÊM .padrao/.btt-*), SEM ÍCONE/IMAGEM DENTRO E FORA OS "Adicionar @media", QUE TÊM CARA DE BOTÃO */
+.campo-aut .legacy-html a:not([class]):not([href^="javascript:addMedia" i]):not(:has(img, svg, i, [class*="ki-"])) {
+    color: var(--tw-primary);
+    text-decoration: none;
+}
+.campo-aut .legacy-html a:not([class]):not([href^="javascript:addMedia" i]):not(:has(img, svg, i, [class*="ki-"])):hover,
+.campo-aut .legacy-html a:not([class]):not([href^="javascript:addMedia" i]):not(:has(img, svg, i, [class*="ki-"])):focus-visible {
+    text-decoration: underline;
+    text-underline-offset: 2px;
+}

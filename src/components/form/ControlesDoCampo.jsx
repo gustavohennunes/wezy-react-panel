@@ -186,7 +186,8 @@
         }
 
         return (
-            <div className={fieldData.class + ' text-[13px] w-full'}>
+            //campo-aut: GANCHO DO legacy-compat.css PARA OS LINKS DE TEXTO DESSAS LINHAS
+            <div className={fieldData.class + ' campo-aut text-[13px] w-full'}>
                 <LegacyHtml style={{ display: 'contents' }} html={fieldData.extra_html} />
             </div>
         )

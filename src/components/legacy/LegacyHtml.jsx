@@ -7,6 +7,7 @@
     import { findLegacyRedirectDeep, applyLegacyRedirect } from '@/utils/legacyRedirect'
     import { isLegacyUrl, legacyUrlToApiUrl } from '@/utils/legacyBridge'
     import { executarScript } from './executarScript'
+    import { criarRegistros, dispararCarregamento, desfazerRegistros } from './ambienteDoCartao'
     import { transformOldIcon } from '@/lib/transformOldIcon'
     import './legacy-fotos.css'
 
@@ -82,11 +83,18 @@
 
             const scripts = Array.from(container.querySelectorAll('script'))
 
+            //HANDLERS DO DOCUMENTO, setInterval E DOMContentLoaded/load DOS SCRIPTS DESTE HTML (VER ambienteDoCartao)
+            const registros = criarRegistros()
+
             const executar = async () => {
                 for (const script of scripts) {
                     if (cancelado) return
-                    await executarScript(script)
+                    await executarScript(script, registros)
                 }
+            }
+
+            const disparar = () => {
+                if (!cancelado) dispararCarregamento(registros)
             }
 
             //FILA ÚNICA ENTRE TODOS OS LegacyHtml DA TELA: NO LEGADO É UM DOCUMENTO SÓ E OS SCRIPTS RODAM NA ORDEM.
@@ -94,8 +102,15 @@
             //SÃO INSTÂNCIAS SEPARADAS — SEM A FILA, O new Chart RODAVA ANTES DE O Chart.js CARREGAR
             filaScripts = filaScripts.then(executar, executar)
 
+            //DOMContentLoaded/load SÓ DEPOIS DOS SCRIPTS DE TODOS OS LegacyHtml DESTE RENDER (JS DO MÓDULO, echo, CAMPOS aut),
+            //COMO NO DOCUMENTO ÚNICO DO LEGADO: O MICROTASK RODA QUANDO TODOS OS EFFECTS JÁ ENTRARAM NA FILA
+            queueMicrotask(() => {
+                filaScripts = filaScripts.then(disparar, disparar)
+            })
+
             return () => {
                 cancelado = true
+                desfazerRegistros(registros)
             }
 
         }, [html])

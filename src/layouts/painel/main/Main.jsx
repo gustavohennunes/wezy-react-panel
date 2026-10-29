@@ -79,10 +79,9 @@
             //$cabecalhoPagina DO CARTÃO (HTML ANTES DA LISTAGEM — MUITAS VEZES OS FILTROS)
             depoisDoCabecalho: extra?.header?.after || '',
             rodape: extra?.footer || '',
-            //CSS VAI COMO data: URI EM BASE64 (UTF-8 SEGURO); O JS VAI COMO TEXTO. ANTES OS DOIS PASSAVAM
-            //POR btoa(), QUE QUEBRA COM QUALQUER CARACTERE FORA DO latin1 (ç, é, emoji...)
+            //CSS VAI COMO data: URI EM BASE64 (UTF-8 SEGURO): btoa() QUEBRA COM QUALQUER CARACTERE FORA DO latin1 (ç, é, emoji...).
+            //O JS DO MÓDULO RODA NO PanelContent (ScriptDoModulo), NA FILA DOS SCRIPTS DO CARTÃO
             css: pageData?.css ? utf8ParaBase64(pageData.css) : '',
-            js: pageData?.javascript || '',
         }
 
     }
@@ -154,7 +153,7 @@
         }, []);
 
         const mensagens = mensagensDaPagina(pageData?.params?.messages);
-        const { titulo: title, breadcrumbs, aviso: pageMessage, antesDoCabecalho: headerContent, depoisDoCabecalho: headerAfterContent, rodape: footerContent, css: pageCss, js: pageJs } = cabecalho;
+        const { titulo: title, breadcrumbs, aviso: pageMessage, antesDoCabecalho: headerContent, depoisDoCabecalho: headerAfterContent, rodape: footerContent, css: pageCss } = cabecalho;
 
         return (
             <Fragment>
@@ -172,12 +171,6 @@
 
                     {pageCss && (
                         <link rel="stylesheet" href={"data:text/css;charset=utf-8;base64," + pageCss} />
-                    )}
-
-                    {pageJs && (
-                        <script>  
-                            {pageJs}
-                        </script>
                     )}
 
                 </Helmet>

@@ -124,17 +124,10 @@
 
                 {confirmDialog}
 
-                {/* LINHAS EXTRAS DECLARADAS PELO CARD, EXIBIDAS ACIMA DA LISTAGEM PADRÃO */}
-                {legacyHtml !== '' && (
-                    <LegacyList
-                        html={legacyHtml}
-                        columnHeader={columnHeader}
-                        showHeader={false}
-                        onRemoveItems={removeItems}
-                    />
-                )}
-
                 <DataGrid
+                    //LINHAS EXTRAS DO CARD ($novoResultadoInicial): PRIMEIRAS LINHAS DENTRO DA TABELA (ANTES FICAVAM NUMA TABELA
+                    //SOLTA ACIMA DO CARD DA LISTAGEM)
+                    linhasHtmlNoTopo={legacyHtml}
                     columns={column}
                     data={busca.linhasFiltradas}
                     rowSelection={true}

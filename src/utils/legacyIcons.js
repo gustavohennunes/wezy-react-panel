@@ -1,7 +1,8 @@
-    //ORIGEM DO PAINEL LEGADO (assets como css/icons.css e o sprite de ícones)
+    //ORIGEM DO PAINEL LEGADO (assets como css/icons.css e o sprite de ícones). NÃO SAI DA URL DA API: OS HOSTS api.br-1 /
+    //api.us-1 SÓ RESPONDEM /api/v1 (O RESTO É 404)
     export const LEGACY_ORIGIN = (() => {
         try {
-            return new URL(import.meta.env.VITE_CAYMAN_API_URL).origin
+            return new URL(import.meta.env.VITE_LEGACY_ORIGIN).origin
         } catch {
             return 'https://painel.wezy.com.br'
         }

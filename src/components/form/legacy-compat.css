@@ -477,6 +477,7 @@ form [data-style] {
    REGRA OS DIVs FICAVAM VAZIOS E PAI E FILHO APARECIAM NO MESMO NÍVEL (ex.: "Produtos" REPETIDO EM "Acessos API") */
 .legacy-html .admin-secao,
 .legacy-html .admin-sub-secao,
+.legacy-html .admin-subsub-secao,
 .legacy-html .sub-secao {
     float: left;
     height: 12px;
@@ -493,4 +494,8 @@ form [data-style] {
 }
 .legacy-html .sub-secao {
     width: 40px;
+}
+/* TERCEIRO NÍVEL (SUBMÓDULO DE SUBMÓDULO) — SÓ EXISTE NO CARTÃO, NÃO NO style.css DO LEGADO */
+.legacy-html .admin-subsub-secao {
+    width: 105px;
 }

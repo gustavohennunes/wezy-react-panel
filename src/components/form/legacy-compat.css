@@ -471,3 +471,26 @@ form [data-style] {
     text-decoration: underline;
     text-underline-offset: 2px;
 }
+
+/* ÁRVORE DE MÓDULOS DOS CHECKBOXES DO administracao (css/style.css DO LEGADO): O TRAÇO .admin-secao / .admin-sub-secao
+   FLUTUA À ESQUERDA DO CHECKBOX SEGUINTE — O [data-custom-field] TEM overflow:hidden E FICA AO LADO DO float. SEM ESSA
+   REGRA OS DIVs FICAVAM VAZIOS E PAI E FILHO APARECIAM NO MESMO NÍVEL (ex.: "Produtos" REPETIDO EM "Acessos API") */
+.legacy-html .admin-secao,
+.legacy-html .admin-sub-secao,
+.legacy-html .sub-secao {
+    float: left;
+    height: 12px;
+    margin-left: 7px;
+    margin-right: 7px;
+    border-left: 1px solid var(--tw-gray-300);
+    border-bottom: 1px solid var(--tw-gray-300);
+}
+.legacy-html .admin-secao {
+    width: 15px;
+}
+.legacy-html .admin-sub-secao {
+    width: 60px;
+}
+.legacy-html .sub-secao {
+    width: 40px;
+}

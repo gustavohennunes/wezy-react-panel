@@ -201,6 +201,20 @@
 
         }
 
+        // CHECKBOX/RADIO DO Forms::createCheckbox/createRadiobutton NO HTML DOS CARTÕES (ex.: "Acessos" DO administracao):
+        // O INPUT FICA ESCONDIDO E NO LEGADO O custom-fields.js REPASSA O CLIQUE DO .custom-checkbox PARA ELE. AQUI É POR
+        // DELEGAÇÃO (O HTML ENTRA DEPOIS). O <label data-custom-field> DO CustomFields.jsx JÁ CLICA NATIVO: FICA DE FORA
+        document.addEventListener('click', (event) => {
+
+            const alvo = event.target instanceof Element ? event.target.closest('.custom-checkbox, .custom-radiobutton') : null
+            const container = alvo?.parentElement
+            if (!container || container.tagName === 'LABEL' || !container.matches('[data-custom-field]')) return
+
+            const input = container.querySelector(alvo.classList.contains('custom-checkbox') ? 'input[type="checkbox"]' : 'input[type="radio"]')
+            if (input && !input.disabled) input.click()
+
+        })
+
         // XMLHttpRequest DIRETO (SEM jQuery). O jQuery TAMBÉM USA XHR, MAS A URL DELE JÁ CHEGA REESCRITA PELO
         // ajaxPrefilter — AÍ NÃO É MAIS "LEGADA" E PASSA DIRETO POR AQUI
         if (typeof window.XMLHttpRequest === 'function') {

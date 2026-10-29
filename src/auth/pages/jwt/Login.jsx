@@ -39,11 +39,11 @@ const EscolhaDePainel = ({ paineis, desabilitado, onEscolher }) => (
     <div className="flex flex-col gap-2.5">
         {paineis.map((painel) => (
             <button
-                key={painel.id_painel_cliente}
+                key={`${painel.host || ''}-${painel.id_painel_cliente}`}
                 type="button"
                 className="group flex items-center gap-3 w-full rounded-lg border border-gray-300 bg-light px-3.5 py-3 text-start transition-colors hover:border-primary hover:bg-primary-light focus-visible:outline-none focus-visible:border-primary focus-visible:ring-2 focus-visible:ring-primary/30 disabled:pointer-events-none disabled:opacity-60"
                 disabled={desabilitado}
-                onClick={() => onEscolher(painel.id_painel_cliente)}
+                onClick={() => onEscolher(painel)}
             >
                 <span className="flex size-9 shrink-0 items-center justify-center rounded-lg bg-primary-light text-primary transition-colors group-hover:bg-primary group-hover:text-primary-inverse">
                     <KeenIcon icon="abstract-26" className="text-lg" />
@@ -138,7 +138,7 @@ const Login = ({ destino }) => {
                     <EscolhaDePainel
                         paineis={paineis}
                         desabilitado={loading}
-                        onEscolher={(idPainel) => handleLogin(formik.values, formik.setStatus, idPainel)}
+                        onEscolher={(painel) => handleLogin(formik.values, formik.setStatus, painel)}
                     />
                 )}
 

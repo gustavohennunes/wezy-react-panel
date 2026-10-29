@@ -1,6 +1,7 @@
     import { createContext, useCallback, useContext, useEffect, useMemo, useRef, useState } from 'react'
     import { useAuth } from '../auth/providers/JWTProvider'
     import { getCustomerHost } from '@/utils/customerHost'
+    import { getApiUrl } from '@/utils/apiUrl'
     import { getAuthToken } from '@/auth/_helpers'
     import {
         isSystemNotFoundError,
@@ -63,7 +64,7 @@
             try {
 
                 await axios
-                    .get(`${import.meta.env.VITE_CAYMAN_API_URL}/panel/menus`, {
+                    .get(`${getApiUrl()}/panel/menus`, {
                         headers: {
                             'Content-Type': 'application/x-www-form-urlencoded',
                             'Customer-Host': getCustomerHost(),

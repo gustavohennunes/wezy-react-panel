@@ -1,9 +1,11 @@
     import axios from 'axios'
     import * as authHelper from '../_helpers'
     import { getCustomerHost, setCustomerHost } from '@/utils/customerHost'
+    import { getApiUrl, setApiUrl, clearApiUrl } from '@/utils/apiUrl'
     import { isSystemNotFoundError, notifySystemNotFound } from '@/utils/systemStatus'
 
-    // CHAMADAS DE AUTENTICAÇÃO DO PAINEL (SEM ESTADO DO REACT) — O AuthProvider SÓ GUARDA O RESULTADO
+    // CHAMADAS DE AUTENTICAÇÃO DO PAINEL (SEM ESTADO DO REACT) — O AuthProvider SÓ GUARDA O RESULTADO.
+    // ANTES DE LOGAR TUDO VAI PARA A API PADRÃO; O LOGIN CENTRAL DEVOLVE A API DO SERVIDOR DO PAINEL (VER utils/apiUrl)
 
     const CAYMAN_API_URL = import.meta.env.VITE_CAYMAN_API_URL
 
@@ -48,10 +50,12 @@
 
     }
 
-    //SESSÃO DO panel/login E DO panel/login-hash: O DOMÍNIO DEVOLVIDO PELA API PASSA A SER O Customer-Host
+    //SESSÃO DO panel/login E DO panel/login-hash: O DOMÍNIO DEVOLVIDO PELA API PASSA A SER O Customer-Host. O LOGIN FOI NA
+    //API PADRÃO, ENTÃO A SESSÃO É DELA (ESQUECE A API DE UM LOGIN CENTRAL ANTERIOR)
     const sessaoDoPainel = (resposta, mensagemSemToken) => {
         const dados = resposta?.success?.response?.data
         if (!dados?.session_token) throw new Error(mensagemSemToken)
+        clearApiUrl()
         if (dados.dominio) setCustomerHost(dados.dominio)
         return { status: true, data: dados }
     }
@@ -83,9 +87,9 @@
      * Quando o mesmo login/senha existe em mais de um painel, a API
      * responde 409 com a lista de painéis; nesse caso é lançado um erro
      * com `code = 'MULTIPLE_PANELS'` e `paineis`, para a tela de login
-     * exibir a escolha e reenviar com `idPainelCliente`.
+     * exibir a escolha e reenviar com o painel escolhido ({ id_painel_cliente, host } de um item de `paineis`).
      */
-    export const entrarNoCentral = async (login, senha, idPainelCliente = null) => {
+    export const entrarNoCentral = async (login, senha, painelEscolhido = null) => {
 
         try {
 
@@ -94,7 +98,8 @@
                 {
                     email: login,
                     senha: senha,
-                    ...(idPainelCliente ? { id_painel_cliente: idPainelCliente } : {}),
+                    //host: O MESMO id_painel_cliente PODE EXISTIR NOS DOIS SERVIDORES (br-1 / us-1)
+                    ...(painelEscolhido ? { id_painel_cliente: painelEscolhido.id_painel_cliente, host: painelEscolhido.host } : {}),
                 },
                 { headers: { 'Content-Type': 'application/json' } }
             )
@@ -106,6 +111,9 @@
             // As demais APIs do painel resolvem o cliente pelo host,
             // então o domínio retornado passa a ser o Customer-Host
             setCustomerHost(auth.data.dominio)
+
+            // E vão para a API do servidor do painel (br-1 / us-1)
+            setApiUrl(auth.data.api_url)
 
             return auth
 
@@ -192,7 +200,7 @@
         if (!token) return
 
         axios
-            .post(`${CAYMAN_API_URL}/panel/logout`, {}, {
+            .post(`${getApiUrl()}/panel/logout`, {}, {
                 headers: { ...JSON_DO_CLIENTE(), Authorization: `Bearer ${token}` },
             })
             .catch(() => {})

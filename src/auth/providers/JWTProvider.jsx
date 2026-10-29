@@ -4,6 +4,7 @@
     import * as authHelper from '../_helpers'
     import { api } from '@/services/api'
     import { clearCustomerHost, getFixedCustomerHost } from '@/utils/customerHost'
+    import { clearApiUrl } from '@/utils/apiUrl'
     import { hashDaUrl, gravarSessao, entrarPorHash, entrarNoCentral, entrarNoPainel, cadastrar, encerrarSessaoNaApi, usuarioDaSessao } from './authApi'
 
     //O JS DOS CARTÕES LEGADOS USA O CLIENTE DA API DO PAINEL (window.api)
@@ -65,8 +66,9 @@
         }, [saveAuth])
 
         //ENTROU POR ?a=dominio: LOGIN DIRETO NO BANCO DESSE CLIENTE, COMO O index.php LEGADO
-        const login = useCallback((usuario, senha, idPainelCliente = null) =>
-            entrarCom(() => (getFixedCustomerHost() ? entrarNoPainel(usuario, senha) : entrarNoCentral(usuario, senha, idPainelCliente))),
+        //painelEscolhido: { id_painel_cliente, host } DA LISTA DO 409 (USUÁRIO EM MAIS DE UM PAINEL)
+        const login = useCallback((usuario, senha, painelEscolhido = null) =>
+            entrarCom(() => (getFixedCustomerHost() ? entrarNoPainel(usuario, senha) : entrarNoCentral(usuario, senha, painelEscolhido))),
         [entrarCom])
 
         const register = useCallback((...dados) => entrarCom(() => cadastrar(...dados)), [entrarCom])
@@ -74,8 +76,9 @@
         const logout = useCallback(() => {
             encerrarSessaoNaApi()
             saveAuth(undefined)
-            // O próximo login pode pertencer a outro painel: esquece o cliente salvo (inclusive o do ?a=)
+            // O próximo login pode pertencer a outro painel: esquece o cliente salvo (inclusive o do ?a=) e a API do servidor dele
             clearCustomerHost()
+            clearApiUrl()
         }, [saveAuth])
 
         const usuarioLogado = useMemo(() => usuarioDaSessao(auth), [auth])

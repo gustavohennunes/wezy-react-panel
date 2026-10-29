@@ -1,13 +1,12 @@
     import { buildApiUrl } from './urlHelper'
     import { getAuthToken } from '@/auth/_helpers'
     import { getCustomerHost } from './customerHost'
+    import { getApiUrl } from './apiUrl'
 
     // PONTE PARA O JAVASCRIPT DOS CARTÕES DO PAINEL LEGADO.
     // NO PAINEL ANTIGO O JS DOS CARTÕES CHAMA index.php?pag=...&layout=false (OU ?pag=...) NO MESMO HOST, COM O
     // COOKIE DE SESSÃO. NO REACT ESSA URL CAI NO PRÓPRIO SPA. AQUI ELA É REESCRITA PARA A ROTA panel/module DA API,
     // COM O TOKEN E O Customer-Host — A API DEVOLVE O QUE O CARTÃO IMPRIMIR QUANDO layout=false.
-
-    const API_URL = import.meta.env.VITE_CAYMAN_API_URL
 
     // index.php, index.php?..., ?pag=..., /index.php?... OU URL ABSOLUTA DO PRÓPRIO SPA
     const legacySearch = (url) => {
@@ -81,7 +80,7 @@
             return null
         }
 
-        return `${API_URL}${path}`
+        return `${getApiUrl()}${path}`
 
     }
 

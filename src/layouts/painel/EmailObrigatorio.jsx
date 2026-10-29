@@ -6,6 +6,7 @@
     import { useMenus } from '@/providers/MenusProvider'
     import { useAuth } from '@/auth/providers/JWTProvider'
     import { getCustomerHost } from '@/utils/customerHost'
+    import { getApiUrl } from '@/utils/apiUrl'
 
     // PRIMEIRO ACESSO SEM E-MAIL: O panel/menus MANDA email_pendente E O PAINEL FICA TRAVADO NESTE MODAL (SEM FECHAR NO
     // X, NO Esc OU CLICANDO FORA) ATÉ O USUÁRIO INFORMAR UM E-MAIL (panel/user-email). A API SÓ GRAVA PARA O USUÁRIO DO
@@ -45,7 +46,7 @@
             setEnviando(true)
 
             try {
-                await axios.post(`${import.meta.env.VITE_CAYMAN_API_URL}/panel/user-email`, { email: valor }, {
+                await axios.post(`${getApiUrl()}/panel/user-email`, { email: valor }, {
                     headers: {
                         'Content-Type': 'application/json',
                         'Customer-Host': getCustomerHost(),

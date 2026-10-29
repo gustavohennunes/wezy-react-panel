@@ -1,6 +1,7 @@
 import axios from 'axios'
 import * as authHelper from '../auth/_helpers'
 import { getCustomerHost } from '@/utils/customerHost'
+import { getApiUrl } from '@/utils/apiUrl'
 import {
     isSystemNotFoundError,
     notifySystemNotFound,
@@ -15,8 +16,10 @@ const api = axios.create({
     },
 })
 
-// O Customer-Host é resolvido dinamicamente a cada requisição (depende da URL/?a=)
+// O Customer-Host é resolvido dinamicamente a cada requisição (depende da URL/?a=). A API TAMBÉM: É A DO SERVIDOR DO
+// PAINEL DO USUÁRIO (br-1 / us-1), DEVOLVIDA PELO LOGIN CENTRAL (VER utils/apiUrl)
 api.interceptors.request.use((config) => {
+    config.baseURL = getApiUrl()
     config.headers['Customer-Host'] = getCustomerHost()
     return config
 })

@@ -1210,3 +1210,22 @@ body .tox.tox-tinymce .tox-tbtn--enabled:hover {
     white-space: nowrap;
     pointer-events: none;
 }
+
+/* CampoDeData (DATA DIGITÁVEL): MESMA CARA DO DatePicker DO MUI ACIMA (.MuiPickers*), AGORA NUM TextField COM <input> */
+.campo-de-data .MuiInputBase-root {
+    font-family: Inter, system-ui, Avenir, Helvetica, Arial, sans-serif !important;
+    font-size: 0.8125rem !important;
+    font-weight: 500 !important;
+    line-height: 1.5 !important;
+    color: var(--tw-gray-700) !important;
+    border-radius: 0.375rem !important;
+}
+.campo-de-data .MuiInputBase-input {
+    height: auto !important;
+    padding-top: 10px !important;
+    padding-bottom: 10px !important;
+    line-height: 1.5 !important;
+}
+.campo-de-data .MuiOutlinedInput-root:not(.Mui-error):not(.Mui-focused) .MuiOutlinedInput-notchedOutline {
+    border-color: var(--tw-gray-300) !important;
+}

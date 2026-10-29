@@ -1,93 +1,45 @@
-import { useState } from 'react';
-    import { DatePickersProvider } from './DatePickersProvider';
-    import { DateTimePicker } from '@mui/x-date-pickers/DateTimePicker';
-    import { DatePicker } from '@mui/x-date-pickers/DatePicker';
     import dayjs from 'dayjs';
-    import utc from 'dayjs/plugin/utc'; 
     import customParseFormat from 'dayjs/plugin/customParseFormat';
+    import { CampoDeData, FORMATO_DATA, FORMATO_DATA_HORA } from './CampoDeData';
 
     dayjs.extend(customParseFormat);
-    dayjs.extend(utc);
 
-    const FormDate = ({ title, idx, fieldName, fieldClass, combinedClass, rowAttr, fieldData, formState, handleDateChange, ampm = false }) => {
-        
-        //CALENDÁRIO ABRE AO CLICAR EM QUALQUER PARTE DO CAMPO, NÃO SÓ NO ÍCONE. A DIGITAÇÃO DIRETA CONTINUA FUNCIONANDO
-        const [aberto, setAberto] = useState(false)
+    // VALOR DO formState (YYYY-MM-DD, DD/MM/YYYY OU DD/MM/YYYY - HH:mm, CONFORME VEIO DA API OU DO CAMPO) NO FORMATO DA TELA
+    const textoDaData = (valor, comHora) => {
 
-        const pickerProps = {
-            open: aberto,
-            onOpen: () => setAberto(true),
-            onClose: () => setAberto(false),
-            slotProps: {
-                textField: {
-                    onClick: () => setAberto(true),
-                    sx: { cursor: 'pointer' },
-                },
-            },
+        if (!valor || typeof valor !== 'string') return ''
+
+        const formato = comHora ? FORMATO_DATA_HORA : FORMATO_DATA
+        const formatos = comHora
+            ? [FORMATO_DATA_HORA, 'YYYY-MM-DD HH:mm:ss', 'YYYY-MM-DD HH:mm', FORMATO_DATA, 'YYYY-MM-DD']
+            : [FORMATO_DATA, 'YYYY-MM-DD', 'YYYY-MM-DD HH:mm:ss', FORMATO_DATA_HORA]
+
+        //0000-00-00 DO BANCO É "SEM DATA"
+        if (/^0{4}-0{2}-0{2}/.test(valor) || /^0{2}\/0{2}\/0{4}/.test(valor)) return ''
+
+        const data = dayjs(valor.trim(), formatos, true)
+        return data.isValid() ? data.format(formato) : ''
+
+    }
+
+    const FormDate = ({ title, idx, fieldName, fieldClass, combinedClass, rowAttr, parsedAttributes, fieldData, formState, handleDateChange, ampm = false }) => {
+
+        const requiredField = (fieldClass + fieldData.class).indexOf('obg') !== -1
+
+        //formState CONTINUA COM O MESMO FORMATO DE ANTES: YYYY-MM-DD NA DATA E DD/MM/YYYY - HH:mm NA DATA/HORA.
+        //O POST LEVA O TEXTO DO <input name> (dd/mm/aaaa), COMO O DatePicker DO MUI FAZIA
+        const aoMudar = (texto) => {
+            if (texto === '') return handleDateChange(fieldName, null)
+            handleDateChange(fieldName, ampm ? texto : dayjs(texto, FORMATO_DATA, true).format('YYYY-MM-DD'))
         }
 
-        let requiredField = false
-        if ((fieldClass + fieldData.class).indexOf('obg') !== -1) {
-            requiredField = true
-        }
-
-        // FUNÇÃO PARA INTERPRETAR O VALOR DA DATA CORRETAMENTE
-        const parseDate = (dateStr) => {
-            
-            if (!dateStr || dateStr === '') return null;
-
-            try {
-                // Se já for um objeto dayjs
-                if (dayjs.isDayjs(dateStr)) {
-                    return dateStr;
-                }
-                
-                // Se for um objeto Date
-                if (dateStr instanceof Date) {
-                    return dayjs(dateStr);
-                }
-                
-                // Se for string
-                if (typeof dateStr === 'string') {
-                    // Verifica se é uma data no formato DD/MM/YYYY
-                    if (/^\d{2}\/\d{2}\/\d{4}$/.test(dateStr)) {
-                        const [day, month, year] = dateStr.split('/');
-                        // Criar a data usando ano-mês-dia para evitar problemas de timezone
-                        const jsDate = new Date(`${year}-${month}-${day}T12:00:00`);
-                        return dayjs(jsDate);
-                    }
-                    
-                    // Verifica se é uma data no formato YYYY-MM-DD (formato ISO)
-                    if (/^\d{4}-\d{2}-\d{2}$/.test(dateStr)) {
-                        return dayjs(dateStr + 'T12:00:00');
-                    }
-                    
-                    // Para datas com hora no formato brasileiro
-                    if (/^\d{2}\/\d{2}\/\d{4} - \d{2}:\d{2}$/.test(dateStr)) {
-                        const parts = dateStr.split(' - ');
-                        const [day, month, year] = parts[0].split('/');
-                        const time = parts[1];
-                        return dayjs(`${year}-${month}-${day}T${time}:00`);
-                    }
-                    
-                    // Tentativa com formato padrão
-                    const parsedDate = dayjs(dateStr);
-                    return parsedDate.isValid() ? parsedDate : null;
-                }
-                
-                return null;
-            } catch (e) {
-                console.error("Erro ao processar data:", e);
-                return null;
-            }
-        };
-        
         return (
-            <div className={combinedClass} {...rowAttr}>
+            //rowAttr OU parsedAttributes: OS DOIS CHAMADORES DO LinhasDaSecao MANDAM parsedAttributes (data-valid-*, id DA LINHA)
+            <div className={combinedClass} {...(rowAttr || parsedAttributes)}>
 
                 {/* flex-col COMO OS OUTROS CAMPOS: justify-center CENTRALIZA NA VERTICAL. EM LINHA (flex) ELE
                     CENTRALIZAVA O TÍTULO NA HORIZONTAL, FORA DO ALINHAMENTO À ESQUERDA DO FORMULÁRIO */}
-                <label className="form-label flex flex-col w-full lg:w-56 lg:min-w-56 lg:shrink-0 h-full justify-center">
+                <label htmlFor={`${fieldName}-${idx}`} className="form-label flex flex-col w-full lg:w-56 lg:min-w-56 lg:shrink-0 h-full justify-center">
                     <b>
                         {fieldData.title || title}
                         {requiredField && (
@@ -96,42 +48,14 @@ import { useState } from 'react';
                     </b>
                 </label>
 
-                <DatePickersProvider>
-
-                    {ampm === false ? (
-
-                        <DatePicker 
-                            key={`${fieldName}-${idx}`}
-                            {...pickerProps}
-                            format='DD/MM/YYYY'                        
-                            name={fieldName}
-                            value={parseDate(formState[fieldName])}
-                            required={requiredField}
-                            onChange={(newValue) => {
-                                const utcValue = newValue ? newValue.utc(true).format('YYYY-MM-DD') : null;
-                                handleDateChange(fieldName, utcValue);
-                            }}
-                        />
-
-                    ) : (
-
-                        <DateTimePicker
-                            key={`${fieldName}-${idx}`}
-                            {...pickerProps}
-                            format='DD/MM/YYYY - HH:mm'
-                            ampm={false}                            
-                            name={fieldName}
-                            value={parseDate(formState[fieldName])}
-                            required={requiredField}
-                            onChange={(newValue) => {
-                                const utcValue = newValue ? newValue.utc(true).format('DD/MM/YYYY - HH:mm') : null;
-                                handleDateChange(fieldName, utcValue);
-                            }}   
-                        />
-
-                    )}
-
-                </DatePickersProvider>
+                <CampoDeData
+                    id={`${fieldName}-${idx}`}
+                    name={fieldName}
+                    comHora={ampm}
+                    required={requiredField}
+                    valor={textoDaData(formState[fieldName], ampm)}
+                    aoMudar={aoMudar}
+                />
 
             </div>
         )

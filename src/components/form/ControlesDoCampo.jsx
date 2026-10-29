@@ -185,11 +185,12 @@
             return <FormIconSelector className={fieldData.class} html={fieldData.extra_html} />
         }
 
+        //O PRÓPRIO .legacy-html É O CONTAINER (SEM UM <div> POR FORA): O HTML DO CARTÃO FICA A 3 NÍVEIS DA LINHA, COMO NO LEGADO
+        //(div.conteudo-formulario > td > tr). JS COMO O $('[data-proposta-item]').parent().parent().parent().show() DO
+        //planos-comerciais (360) CHEGA NA LINHA — COM O <div> A MAIS PARAVA NO CONTAINER E A LINHA ESCONDIDA NÃO ABRIA.
+        //campo-aut: GANCHO DO legacy-compat.css PARA OS LINKS DE TEXTO DESSAS LINHAS
         return (
-            //campo-aut: GANCHO DO legacy-compat.css PARA OS LINKS DE TEXTO DESSAS LINHAS
-            <div className={fieldData.class + ' campo-aut text-[13px] w-full'}>
-                <LegacyHtml style={{ display: 'contents' }} html={fieldData.extra_html} />
-            </div>
+            <LegacyHtml className={fieldData.class + ' campo-aut text-[13px] w-full'} html={fieldData.extra_html} />
         )
 
     }

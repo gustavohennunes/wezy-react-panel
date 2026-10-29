@@ -462,12 +462,12 @@ form [data-style] {
 /* LINKS DE TEXTO DAS LINHAS "aut" DO FORMULÁRIO (ex.: "Códigos iniciais" / "Acessos rápidos" DO CARTÃO DE MÓDULOS):
    O PREFLIGHT DO TAILWIND DEIXA O <a> COM A COR DO TEXTO, SEM CARA DE LINK. SÓ PEGA <a> SEM CLASSE (BOTÕES DO LEGADO
    TÊM .padrao/.btt-*), SEM ÍCONE/IMAGEM DENTRO E FORA OS "Adicionar @media", QUE TÊM CARA DE BOTÃO */
-.campo-aut .legacy-html a:not([class]):not([href^="javascript:addMedia" i]):not(:has(img, svg, i, [class*="ki-"])) {
+.campo-aut.legacy-html a:not([class]):not([href^="javascript:addMedia" i]):not(:has(img, svg, i, [class*="ki-"])) {
     color: var(--tw-primary);
     text-decoration: none;
 }
-.campo-aut .legacy-html a:not([class]):not([href^="javascript:addMedia" i]):not(:has(img, svg, i, [class*="ki-"])):hover,
-.campo-aut .legacy-html a:not([class]):not([href^="javascript:addMedia" i]):not(:has(img, svg, i, [class*="ki-"])):focus-visible {
+.campo-aut.legacy-html a:not([class]):not([href^="javascript:addMedia" i]):not(:has(img, svg, i, [class*="ki-"])):hover,
+.campo-aut.legacy-html a:not([class]):not([href^="javascript:addMedia" i]):not(:has(img, svg, i, [class*="ki-"])):focus-visible {
     text-decoration: underline;
     text-underline-offset: 2px;
 }

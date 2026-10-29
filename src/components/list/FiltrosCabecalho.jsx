@@ -1,15 +1,9 @@
     import { useState } from 'react'
     import { useLocation, useNavigate } from 'react-router-dom'
-    import { DatePickersProvider } from '@/components/form/DatePickersProvider'
-    import { DatePicker } from '@mui/x-date-pickers/DatePicker'
-    import { DateTimePicker } from '@mui/x-date-pickers/DateTimePicker'
-    import dayjs from 'dayjs'
-    import customParseFormat from 'dayjs/plugin/customParseFormat'
+    import { CampoDeData } from '@/components/form/CampoDeData'
     import { KeenIcon } from '@/components/keenicons'
     import { Combobox } from '@/components/form/FormCombobox'
     import { utf8ParaBase64 } from '@/utils/base64'
-
-    dayjs.extend(customParseFormat)
 
     // FILTROS DO CABEÇALHO DA LISTAGEM DEFINIDOS EM ARRAY NO CARTÃO ($formCabecalho). A API (class/HeaderFilters.php) MANDA
     // OS CAMPOS EM extra_content.header_form JÁ COM OS VALORES ATUAIS E AS OPÇÕES. AO FILTRAR, OS VALORES VÃO PARA A URL EM
@@ -17,7 +11,7 @@
     // DATAS EM dd/mm/aaaa E DATA/HORA EM dd/mm/aaaa - hh:mm, COMO NOS FILTROS E FORMULÁRIOS ANTIGOS.
     // CAMPOS MÚLTIPLOS (multiselect E GRUPO DE checkbox) TÊM VALOR EM ARRAY.
 
-    //DATA: SEM O BOTÃO DE LIMPAR DO MUI (clearable), QUE OCUPAVA ESPAÇO MESMO ESCONDIDO E CORTAVA O dd/mm/aaaa
+    //LARGURA DE CADA TIPO DE CAMPO (px)
     const LARGURA_PADRAO = {
         text: 200, email: 220, tel: 160, url: 220, number: 140, color: 70, time: 120, month: 160,
         textarea: 260, select: 180, multiselect: 260, date: 160, datetime: 210, period: 160,
@@ -29,8 +23,6 @@
     //PARÂMETROS QUE NÃO SEGUEM PARA A LISTAGEM FILTRADA: O FILTRO ANTERIOR E A PÁGINA DA PAGINAÇÃO
     const PARAMETROS_DESCARTADOS = ['parametro', 'pagina', 'acao', 'id']
 
-    const FORMATO_DATA      = 'DD/MM/YYYY'
-    const FORMATO_DATA_HORA = 'DD/MM/YYYY - HH:mm'
 
     const valoresIniciais = (campos) => {
         const valores = {}
@@ -49,37 +41,18 @@
         ...(campo.options || []),
     ]
 
-    const CampoData = ({ name, valor, placeholder, largura, aoMudar, comHora = false }) => {
-
-        //CALENDÁRIO ABRE AO CLICAR EM QUALQUER PARTE DO CAMPO, COMO NO FormDate
-        const [aberto, setAberto] = useState(false)
-
-        const formato = comHora ? FORMATO_DATA_HORA : FORMATO_DATA
-        const data    = valor ? dayjs(valor, formato, true) : null
-        const Picker  = comHora ? DateTimePicker : DatePicker
-
-        return (
-            <Picker
-                format={formato}
-                ampm={comHora ? false : undefined}
-                name={name}
-                value={data && data.isValid() ? data : null}
-                open={aberto}
-                onOpen={() => setAberto(true)}
-                onClose={() => setAberto(false)}
-                onChange={(novo) => aoMudar(name, novo && novo.isValid() ? novo.format(formato) : '')}
-                slotProps={{
-                    textField: {
-                        size: 'small',
-                        placeholder,
-                        onClick: () => setAberto(true),
-                        sx: { width: largura, cursor: 'pointer' },
-                    },
-                }}
-            />
-        )
-
-    }
+    //DATA DIGITÁVEL COM CALENDÁRIO NO BOTÃO, A MESMA DO FORMULÁRIO (VER CampoDeData)
+    const CampoData = ({ name, valor, placeholder, largura, aoMudar, comHora = false }) => (
+        <CampoDeData
+            name={name}
+            valor={valor || ''}
+            comHora={comHora}
+            placeholder={placeholder || undefined}
+            tamanho="sm"
+            style={{ width: largura }}
+            aoMudar={(texto) => aoMudar(name, texto)}
+        />
+    )
 
     const FiltrosCabecalho = ({ formulario }) => {
 
@@ -264,42 +237,40 @@
         const camposVisiveis = campos.filter((campo) => campo.type !== 'hidden')
 
         return (
-            <DatePickersProvider>
-                <form className="card" onSubmit={filtrar}>
-                    <div className="card-body flex flex-wrap items-end gap-4 py-4">
+            <form className="card" onSubmit={filtrar}>
+                <div className="card-body flex flex-wrap items-end gap-4 py-4">
 
-                        {camposVisiveis.map((campo) => (
-                            <div key={campo.names.join('|')} className="flex flex-col gap-1.5">
+                    {camposVisiveis.map((campo) => (
+                        <div key={campo.names.join('|')} className="flex flex-col gap-1.5">
 
-                                <span className="flex items-center gap-1 text-xs font-medium text-gray-700" title={campo.title || undefined}>
-                                    {campo.label}
-                                    {campo.title && (
-                                        <KeenIcon icon="information-2" className="text-sm text-gray-500 cursor-help" />
-                                    )}
-                                </span>
+                            <span className="flex items-center gap-1 text-xs font-medium text-gray-700" title={campo.title || undefined}>
+                                {campo.label}
+                                {campo.title && (
+                                    <KeenIcon icon="information-2" className="text-sm text-gray-500 cursor-help" />
+                                )}
+                            </span>
 
-                                <div className="flex items-center gap-2">
-                                    {campo.names.map((name, posicao) => renderizarEntrada(campo, name, posicao))}
-                                </div>
-
+                            <div className="flex items-center gap-2">
+                                {campo.names.map((name, posicao) => renderizarEntrada(campo, name, posicao))}
                             </div>
-                        ))}
 
-                        <div className="flex items-center gap-2">
-                            <button type="submit" className="btn btn-primary">
-                                <KeenIcon icon="magnifier" />
-                                Filtrar
-                            </button>
-                            {formulario?.applied && (
-                                <button type="button" className="btn btn-light" onClick={limpar}>
-                                    Limpar
-                                </button>
-                            )}
                         </div>
+                    ))}
 
+                    <div className="flex items-center gap-2">
+                        <button type="submit" className="btn btn-primary">
+                            <KeenIcon icon="magnifier" />
+                            Filtrar
+                        </button>
+                        {formulario?.applied && (
+                            <button type="button" className="btn btn-light" onClick={limpar}>
+                                Limpar
+                            </button>
+                        )}
                     </div>
-                </form>
-            </DatePickersProvider>
+
+                </div>
+            </form>
         )
 
     }

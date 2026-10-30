@@ -62,15 +62,25 @@
 
             const confirmar = (texto, link, novoTitle) => {
                 let excluirEstilo = false
+                let remocao       = false
                 try {
                     const params = new URL(String(link || ''), window.location.href).searchParams
                     excluirEstilo = params.get('pag') === 'projetos-css-padrao' && params.has('removeStyle')
+                    //LINK QUE REMOVE ALGO (excluir=, remover...=, ex.: removerTagCliente DAS TAGS DO 360): MESMO DIALOG DE
+                    //EXCLUSÃO DAS SECTIONS/PÁGINAS/MÓDULOS (BOTÃO VERMELHO), COM O TEXTO DO CARTÃO
+                    remocao = [...params.keys()].some((chave) => /^(excluir|remover|remove)/i.test(chave))
                 } catch { /* URLs de outros formatos continuam com a confirmação do legado. */ }
 
                 const resposta = excluirEstilo
                     ? atual.current.confirm({
                         title: 'Excluir item?',
                         description: 'Tem certeza que deseja excluir este item? Essa ação não pode ser desfeita.',
+                    })
+                    : remocao
+                    ? atual.current.confirm({
+                        title: novoTitle || 'Remover item?',
+                        description: semTags(texto),
+                        confirmText: 'Remover',
                     })
                     : perguntar(novoTitle, texto)
 

@@ -23,10 +23,18 @@
     //?hash= NA URL DE ENTRADA (ACESSO DE SUPORTE ABERTO PELO PAINEL MESTRE)
     export const hashDaUrl = () => new URLSearchParams(window.location.search).get('hash')
 
+    //&servidor= DO "Acessar Painel" (br-1 / us-1): O HASH FOI GRAVADO NO auth_session DAQUELE SERVIDOR, ENTÃO O
+    //panel/login-hash E A SESSÃO SEGUINTE VÃO PARA A API DELE. SÓ O FORMATO xx-N (A URL SAI DE apiUrl COM A LISTA BRANCA)
+    const apiDoServidorDaUrl = () => {
+        const servidor = new URLSearchParams(window.location.search).get('servidor') || ''
+        return /^[a-z]{2}-\d+$/.test(servidor) ? `https://api.${servidor}.wezy.com.br/api/v1` : null
+    }
+
     //O HASH NÃO FICA NA URL NEM NO HISTÓRICO
     const tirarHashDaUrl = () => {
         const params = new URLSearchParams(window.location.search)
         params.delete('hash')
+        params.delete('servidor')
         const query = params.toString()
         window.history.replaceState(window.history.state, '', window.location.pathname + (query ? '?' + query : ''))
     }
@@ -52,10 +60,12 @@
 
     //SESSÃO DO panel/login E DO panel/login-hash: O DOMÍNIO DEVOLVIDO PELA API PASSA A SER O Customer-Host. O LOGIN FOI NA
     //API PADRÃO, ENTÃO A SESSÃO É DELA (ESQUECE A API DE UM LOGIN CENTRAL ANTERIOR)
-    const sessaoDoPainel = (resposta, mensagemSemToken) => {
+    const sessaoDoPainel = (resposta, mensagemSemToken, apiDoServidor = null) => {
         const dados = resposta?.success?.response?.data
         if (!dados?.session_token) throw new Error(mensagemSemToken)
-        clearApiUrl()
+        //ACESSO POR HASH DE OUTRO SERVIDOR (&servidor=us-1): A SESSÃO É DA API DELE
+        if (apiDoServidor) setApiUrl(apiDoServidor)
+        else clearApiUrl()
         if (dados.dominio) setCustomerHost(dados.dominio)
         return { status: true, data: dados }
     }
@@ -68,11 +78,12 @@
     //A API (panel/login-hash) CONFERE VALIDADE, CLIENTE E USO ÚNICO E DEVOLVE O TOKEN DE SESSÃO
     export const entrarPorHash = async (hash) => {
 
+        const apiDoServidor = apiDoServidorDaUrl()
         tirarHashDaUrl()
 
         try {
-            const { data: resposta } = await axios.post(`${CAYMAN_API_URL}/panel/login-hash`, { hash }, { headers: JSON_DO_CLIENTE() })
-            return sessaoDoPainel(resposta, 'Acesso inválido ou expirado.')
+            const { data: resposta } = await axios.post(`${apiDoServidor || CAYMAN_API_URL}/panel/login-hash`, { hash }, { headers: JSON_DO_CLIENTE() })
+            return sessaoDoPainel(resposta, 'Acesso inválido ou expirado.', apiDoServidor)
         } catch (error) {
             avisarSistemaForaDoAr(error)
             //SEM ISSO CAI NO LOGIN SEM EXPLICAÇÃO (ex.: 403 api_disabled — O PAINEL REACT EXIGE API ATIVA NO CLIENTE)

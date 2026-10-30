@@ -11,6 +11,7 @@
     import { PicturesGallery } from '@/components/pictures/PicturesGallery'
     import { LegacyHtml } from '@/components/legacy/LegacyHtml'
     import { registrarRecente } from '@/utils/modulosRecentes'
+    import { buildApiUrl } from '@/utils/urlHelper'
 
     //O echo DO CARTÃO MUITAS VEZES É SÓ <script>/<style> (ex.: 1/modulos): NADA APARECE NA TELA E O mb-5
     //DEIXAVA UM VÃO ACIMA DO CONTEÚDO. OS SCRIPTS CONTINUAM RODANDO — SÓ O ESPAÇAMENTO DEPENDE DISTO
@@ -116,7 +117,7 @@
     //FRAMES ATÉ O EFFECT TROCAR PELO NOVO
     const PanelContent = () => {
 
-        const { pageData, loading } = usePageData()
+        const { pageData, loading, error, callApi } = usePageData()
 
         //"RECENTES" DO DASHBOARD: SÓ MÓDULO QUE CARREGOU (pageData DA API), NÃO QUALQUER URL DIGITADA
         useEffect(() => {
@@ -127,6 +128,23 @@
 
         if (loading) {
             return <ScreenLoader />
+        }
+
+        //A TELA NÃO CARREGOU (REDE, SERVIDOR): AVISO COM "Tentar novamente" EM VEZ DA LISTA VAZIA ("Nenhum conteúdo
+        //encontrado!"), QUE PARECIA QUE O REGISTRO NÃO EXISTIA
+        if (!pageData && error) {
+            const tentarDeNovo = () => {
+                const urlApi = buildApiUrl(window.location.search)
+                if (urlApi) callApi(urlApi)
+            }
+            return (
+                <div className="card p-10 flex flex-col items-center gap-4 text-center">
+                    <i className="ki-filled ki-information-2 text-4xl text-danger" />
+                    <div className="text-sm font-semibold text-gray-900">Não foi possível carregar esta página.</div>
+                    <div className="text-2sm text-gray-600">Verifique a conexão e tente novamente.</div>
+                    <button type="button" className="btn btn-primary" onClick={tentarDeNovo}>Tentar novamente</button>
+                </div>
+            )
         }
 
         return (

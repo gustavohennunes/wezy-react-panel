@@ -7,9 +7,18 @@
     // VALOR DO formState (YYYY-MM-DD, DD/MM/YYYY OU DD/MM/YYYY - HH:mm, CONFORME VEIO DA API OU DO CAMPO) NO FORMATO DA TELA
     const textoDaData = (valor, comHora) => {
 
-        if (!valor || typeof valor !== 'string') return ''
-
         const formato = comHora ? FORMATO_DATA_HORA : FORMATO_DATA
+
+        //O estadoInicialDaSecao CONVERTE O VALOR DA PONTE EM Date, MONTADO EM UTC A PARTIR DO DIA/HORA DO LEGADO (Dta AO
+        //MEIO-DIA UTC): LÊ OS CAMPOS EM UTC PARA MOSTRAR O MESMO DIA/HORA. SEM ISSO A DATA GRAVADA ABRIA VAZIA
+        if (valor instanceof Date) {
+            if (isNaN(valor)) return ''
+            const doisDigitos = (numero) => String(numero).padStart(2, '0')
+            const data = `${doisDigitos(valor.getUTCDate())}/${doisDigitos(valor.getUTCMonth() + 1)}/${valor.getUTCFullYear()}`
+            return comHora ? `${data} - ${doisDigitos(valor.getUTCHours())}:${doisDigitos(valor.getUTCMinutes())}` : data
+        }
+
+        if (!valor || typeof valor !== 'string') return ''
         const formatos = comHora
             ? [FORMATO_DATA_HORA, 'YYYY-MM-DD HH:mm:ss', 'YYYY-MM-DD HH:mm', FORMATO_DATA, 'YYYY-MM-DD']
             : [FORMATO_DATA, 'YYYY-MM-DD', 'YYYY-MM-DD HH:mm:ss', FORMATO_DATA_HORA]

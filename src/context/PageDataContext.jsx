@@ -15,6 +15,31 @@
 
     const PageDataContext = createContext()
 
+    //FALHA DE REDE (SEM RESPOSTA DO SERVIDOR) É COMUM NA ABA QUE FICOU PARADA: O NAVEGADOR SUSPENDE A ABA E, AO VOLTAR, A
+    //PRIMEIRA REQUISIÇÃO SAI ANTES DE A CONEXÃO VOLTAR. TENTA DE NOVO (ESPERANDO O online SE ESTIVER OFFLINE) ANTES DE
+    //DESISTIR. RESPOSTA DE ERRO DO SERVIDOR (4xx/5xx) NÃO É REPETIDA
+    const ESPERAS_ENTRE_TENTATIVAS = [800, 2500]
+
+    const esperar = (ms, signal) => new Promise((resolve) => {
+        const fim = () => { clearTimeout(timer); window.removeEventListener('online', fim); resolve() }
+        const timer = setTimeout(fim, navigator.onLine === false ? 15000 : ms)
+        if (navigator.onLine === false) window.addEventListener('online', fim)
+        signal?.addEventListener('abort', fim)
+    })
+
+    const getComNovaTentativa = async (urlApi, signal) => {
+        for (let tentativa = 0; ; tentativa++) {
+            try {
+                return await api.get(urlApi, { responseType: 'blob', signal })
+            } catch (err) {
+                const semResposta = !err?.response && !axios.isCancel(err) && !signal?.aborted
+                if (!semResposta || tentativa >= ESPERAS_ENTRE_TENTATIVAS.length) throw err
+                await esperar(ESPERAS_ENTRE_TENTATIVAS[tentativa], signal)
+                if (signal?.aborted) throw err
+            }
+        }
+    }
+
     export const PageDataProvider = ({ children }) => {
 
         const [pageData, setPageData] = useState(null);
@@ -67,9 +92,9 @@
             const tokenUsado = getAuthToken();
 
             try {
-                
+
                 //Blob: O CARTÃO PODE DEVOLVER UM ARQUIVO (EXPORTAÇÃO, PDF, XML) EM VEZ DO JSON DA PONTE
-                const response = await api.get(urlApi, { responseType: 'blob', signal: chamada.signal });
+                const response = await getComNovaTentativa(urlApi, chamada.signal);
                 if (!atual()) return;
 
                 if (/[?&]slug=ativar-modulo-edicao(&|$)/.test(urlApi) || (menusRef.current.editor && /[?&]slug=projetos-paginas/.test(urlApi))) {
@@ -112,6 +137,12 @@
 
                 if (!data) {
 
+                    //SEM ISSO A TELA FICAVA COM O CONTEÚDO ANTERIOR (OU A LISTA VAZIA, "Nenhum conteúdo encontrado!")
+                    if (!background) {
+                        setPageData(null);
+                        setError(new Error('Resposta inesperada do servidor para este módulo.'));
+                    }
+
                     toast(`❌ Erro: `, {
                         description: <span style={{ 'color': 'white' }}>Resposta inesperada do servidor para este módulo.</span>,
                         style: {
@@ -127,6 +158,7 @@
                 }
 
                 setPageData(data);
+                setError(null);
 
             } catch (err) {
 
@@ -151,6 +183,10 @@
                 })
                 
                 setError(err)
+
+                //A TELA DESTA URL NÃO CARREGOU: SEM pageData O PanelContent MOSTRA O ERRO COM "Tentar novamente". ANTES
+                //FICAVA O CONTEÚDO ANTERIOR OU A LISTA VAZIA ("Nenhum conteúdo encontrado!") ATÉ O F5
+                if (!background) setPageData(null)
 
                 if (err.status == 401 && getAuthToken() === tokenUsado) {
                     rotasRef.current.logout()

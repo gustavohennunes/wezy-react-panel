@@ -125,10 +125,14 @@
 
                 if (!editor) return
 
-                if (editor.getSession().getValue().length < 10) {
-                    const hidden = document.querySelector(seletor)
-                    if (hidden) editor.getSession().setValue(atob(hidden.value))
+                //COMO NO LEGADO, SÓ PREENCHE O EDITOR VAZIO — MAS AVISA EM VEZ DE NÃO FAZER NADA (PARECIA QUE O LINK NÃO FUNCIONAVA)
+                if (editor.getSession().getValue().trim().length >= 10) {
+                    toast.warning('O editor já tem código. Apague o conteúdo para usar o código inicial.')
+                    return
                 }
+
+                const hidden = document.querySelector(seletor)
+                if (hidden) editor.getSession().setValue(atob(hidden.value))
 
             }
 

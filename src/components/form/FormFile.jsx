@@ -50,10 +50,13 @@
 
             setSelectedFiles(files)
             setError(null)
-            //ARQUIVO NOVO ESCOLHIDO: O UPLOAD SUBSTITUI O ANTIGO, NÃO PRECISA MAIS DO del
+            //ARQUIVO NOVO ESCOLHIDO: O UPLOAD SUBSTITUI O ANTIGO, NÃO PRECISA MAIS DO del. O AVISO "SERÁ REMOVIDO" CONTINUA
+            //(O ANTIGO SAI MESMO AO SALVAR); ANTES O setRemovido(false) VOLTAVA A MOSTRAR A FOTO ANTIGA. SELEÇÃO LIMPA DEPOIS
+            //DE REMOVER: O del VOLTA
             if (files.length > 0) {
-                setRemovido(false)
                 arquivosRemovidos.delete(fieldName)
+            } else if (removido) {
+                arquivosRemovidos.add(fieldName)
             }
             if (onFilesChange) {
                 onFilesChange(files)
@@ -120,7 +123,11 @@
 
                 {value && removido && (
                     <div className="mb-2 flex items-center gap-2 text-2sm text-gray-600">
-                        <span>Arquivo será removido ao salvar.</span>
+                        <span>
+                            {selectedFiles.length > 0
+                                ? 'Arquivo antigo será removido, e será substituído pelo anexado.'
+                                : 'Arquivo será removido ao salvar.'}
+                        </span>
                         <button type="button" onClick={() => { setRemovido(false); arquivosRemovidos.delete(fieldName) }} className="btn btn-link btn-sm">
                             Desfazer
                         </button>
